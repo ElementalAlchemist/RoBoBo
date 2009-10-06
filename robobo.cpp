@@ -24,7 +24,6 @@ int main(int argc, char** argv) {
 		inputParams.clear();
 		inputParams = bot_socket.parseLine(input);
 		command = inputParams[1];
-		std::cout << "Command/Numeric: " << command << std::endl;
 		if (command == "001")
 			registered = true;
 		if (command == "005")
