@@ -1,0 +1,11 @@
+This bot is in VERY EARLY construction and is not recommended for any use other
+than development.  A simple compile.sh script has been provided for easy
+compiling until the bot advances enough to justify the creation of a makefile
+etc.  The compile script requires g++.
+If you wish to compile the bot with debug symbols for debugging, simply run the
+compile script with "debug" as an argument, i.e.
+
+./compile.sh debug
+
+The use of any other or no arguments will cause the bot to be compiled
+normally.
