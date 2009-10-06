@@ -1,10 +1,11 @@
 #include "robobo.h"
 #include "configuration.cpp"
+#include "lineParser.cpp"
 #include "servercapab.cpp"
 #include "socket.cpp"
 
 std::string input, command, currentNick;
-std::vector<std::string> inputParams, lastParam;
+std::vector<std::string> inputParams;
 bool registered;
 
 int main(int argc, char** argv) {
@@ -22,7 +23,7 @@ int main(int argc, char** argv) {
 		input = bot_socket.receive();
 		std::cout << input << std::endl;
 		inputParams.clear();
-		inputParams = bot_socket.parseLine(input);
+		inputParams = parseLine(input);
 		command = inputParams[1];
 		if (command == "001")
 			registered = true;
