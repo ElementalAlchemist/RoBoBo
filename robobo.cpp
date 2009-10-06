@@ -1,8 +1,8 @@
 #include "robobo.h"
+#include "configuration.cpp"
 #include "socket.cpp"
 
-std::string input, command, server, currentNick;
-unsigned short port;
+std::string input, command, currentNick;
 std::vector<std::string> inputParams;
 bool registered;
 
@@ -11,11 +11,10 @@ void handleCapab(std::vector<std::string> parsedLine) {
 }
 
 int main(int argc, char** argv) {
-	server = "128.237.157.136";
-	port = 6667;
-	Socket bot_socket (server, port);
+	ConfigReader config;
+	Socket bot_socket (config.getServer(), config.getPort());
 	bot_socket.sendMsg("NICK :RoBoBo");
-	bot_socket.sendMsg("USER RoBoBo here " + server + " :RoBoBo-IRC-BoBo IRC Bot");
+	bot_socket.sendMsg("USER RoBoBo here " + config.getServer() + " :RoBoBo-IRC-BoBo IRC Bot");
 	currentNick = "RoBoBo";
 	while (true) {
 		if (!bot_socket.isConnected()) {
