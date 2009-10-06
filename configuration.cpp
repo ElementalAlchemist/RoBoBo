@@ -1,4 +1,4 @@
-#include "robobo.h"
+#include "configuration.h"
 
 class ConfigReader {
 	public:

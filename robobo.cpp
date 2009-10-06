@@ -1,14 +1,11 @@
 #include "robobo.h"
 #include "configuration.cpp"
+#include "servercapab.cpp"
 #include "socket.cpp"
 
 std::string input, command, currentNick;
 std::vector<std::string> inputParams;
 bool registered;
-
-void handleCapab(std::vector<std::string> parsedLine) {
-	// handle 005 when I get that far
-}
 
 int main(int argc, char** argv) {
 	ConfigReader config;
