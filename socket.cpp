@@ -8,6 +8,7 @@ class Socket {
 		void sendMsg(std::string message);
 		std::string receive();
 		std::vector<std::string> parseLine(std::string message);
+		std::vector<std::string> parseLastParam(std::string lastParam);
 		void closeConnection();
 		bool isConnected();
 	private:

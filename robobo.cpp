@@ -4,7 +4,7 @@
 #include "socket.cpp"
 
 std::string input, command, currentNick;
-std::vector<std::string> inputParams;
+std::vector<std::string> inputParams, lastParam;
 bool registered;
 
 int main(int argc, char** argv) {
