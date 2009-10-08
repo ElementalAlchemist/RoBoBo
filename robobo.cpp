@@ -1,7 +1,8 @@
 #include "robobo.h"
+#include "channel.cpp"
 #include "configuration.cpp"
 #include "lineParser.cpp"
-#include "servercapab.cpp"
+#include "server.cpp"
 #include "socket.cpp"
 
 std::string input, command, currentNick;
@@ -11,6 +12,7 @@ bool registered;
 int main(int argc, char** argv) {
 	ConfigReader config;
 	Socket bot_socket (config.getServer(), config.getPort());
+	Server serverSettings;
 	bot_socket.sendMsg("NICK :RoBoBo");
 	bot_socket.sendMsg("USER RoBoBo here " + config.getServer() + " :RoBoBo-IRC-BoBo IRC Bot");
 	currentNick = "RoBoBo";
@@ -28,7 +30,7 @@ int main(int argc, char** argv) {
 		if (command == "001")
 			registered = true;
 		if (command == "005")
-			handleCapab(inputParams);
+			serverSettings.handleCapab(inputParams);
 		if (command == "433" && !registered) {
 			currentNick += "_";
 			bot_socket.sendMsg("NICK :" + currentNick);
