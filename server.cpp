@@ -1,5 +1,7 @@
 #include "server.h"
 
+#ifndef SERVER_ROBOBO
+#define SERVER_ROBOBO
 class Server {
 	public:
 		Server();
@@ -23,3 +25,4 @@ std::vector<char> Server::prefixModes(bool symbols) {
 		return statusModes[1];
 	return statusModes[0];
 }
+#endif

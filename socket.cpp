@@ -1,6 +1,8 @@
 #include "socket.h"
 #include "robobo.h"
 
+#ifndef SOCKET_ROBOBO
+#define SOCKET_ROBOBO
 class Socket {
 	public:
 		Socket(std::string server, unsigned short port);
@@ -83,3 +85,4 @@ std::string Socket::receive() {
 			seenCR = true;
 	}
 }
+#endif

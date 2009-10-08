@@ -2,6 +2,8 @@
 #include "server.cpp"
 #include "user.cpp"
 
+#ifndef CHANNEL_ROBOBO
+#define CHANNEL_ROBOBO
 class Channel {
 	public:
 		Channel(Server theServer);
@@ -76,3 +78,4 @@ int Channel::prefixSymbolNum(char prefix) {
 			return (int) i;
 	return -1;
 }
+#endif
