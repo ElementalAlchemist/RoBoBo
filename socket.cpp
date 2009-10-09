@@ -32,8 +32,7 @@ Socket::Socket(std::string server, unsigned short port) {
 		status = connect(socketfd, (sockaddr *) &socketAddr, sizeof(socketAddr));
 	while (errno == EINPROGRESS || errno == EALREADY);
 	if (status != 0 && errno != EISCONN) {
-		std::cout << "An error occurred connecting to the server." << std::endl;
-		perror("Could not connect to server.");
+		perror("Could not connect to server");
 		connected = false;
 	} else {
 		std::cout << "Successfully connected to the server." << std::endl;
@@ -71,7 +70,7 @@ std::string Socket::receive() {
 	while (true) {
 		status = recv(socketfd, &inputBuffer, 1, 0);
 		if (status < 0 && errno != EWOULDBLOCK) {
-			std::cout << status << std::endl;
+			perror("A message receive failed");
 			closeConnection();
 		}
 		if (inputBuffer[0] == '\0')
