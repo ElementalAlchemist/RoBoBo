@@ -6,6 +6,7 @@ class User {
 	public:
 		User(std::string newNick);
 		User(std::string newNick, std::vector<bool> levels);
+		std::string getNick();
 		void addStatus(int statusIndex);
 		void removeStatus(int statusIndex);
 	private:
@@ -26,6 +27,10 @@ User::User(std::string newNick, std::vector<bool> levels) {
 	nick = newNick;
 	level = levels;
 	constructCommon();
+}
+
+std::string User::getNick() {
+	return nick;
 }
 
 void User::constructCommon() {
