@@ -15,6 +15,7 @@ class Channel {
 	private:
 		std::string topic;
 		std::list<User> channelUsers;
+		std::list<User>::iterator userIterator;
 		Server serverSettings;
 		int prefixSymbolNum(char prefix);
 };
@@ -40,18 +41,18 @@ void Channel::names(std::vector<std::string> namesLine) {
 			levels[prefixSymbolNum(currNick[0])] = true;
 			currNick = currNick.substr(1);
 		}
-		User* newUser = new User (currNick, levels);
+		User newUser (currNick, levels);
 		channelUsers.push_back(newUser);
 	}
 }
 
 void Channel::joinUser(std::string nick) {
-	User* newUser = new User (nick);
+	User newUser (nick);
 	channelUsers.push_back(newUser);
 }
 
 void Channel::statusChange(bool addStatus, std::string nick, char mode) {
-	int statusIndex, userIndex;
+	int statusIndex;
 	std::vector<char> prefixes = serverSettings.prefixModes(false);
 	for (unsigned int i = 0; i < prefixes.size(); i++) {
 		if (prefixes[i] == mode) {
@@ -59,16 +60,15 @@ void Channel::statusChange(bool addStatus, std::string nick, char mode) {
 			break;
 		}
 	}
-	for (unsigned int i = 0; i < channelUsers.size(); i++) {
-		if (channelUsers[i].getNick() == nick) {
-			userIndex = (int)i;
+	for (userIterator = channelUsers.begin(); userIterator != channelUsers.end(); userIterator++) {
+		if (userIterator.getNick() == nick) {
+			if (addStatus)
+				userIterator.addStatus(statusIndex);
+			else
+				userIterator.removeStatus(statusIndex);
 			break;
 		}
 	}
-	if (addStatus)
-		channelUsers[userIndex].addStatus(statusIndex);
-	else
-		channelUsers[userIndex].removeStatus(statusIndex);
 }
 
 int Channel::prefixSymbolNum(char prefix) {
