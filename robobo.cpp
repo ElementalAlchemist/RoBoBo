@@ -5,7 +5,7 @@
 #include "server.cpp"
 #include "socket.cpp"
 
-std::string input, command, currentNick;
+std::string input, command, currentNick, ident;
 std::vector<std::string> inputParams;
 bool registered;
 
@@ -13,9 +13,10 @@ int main(int argc, char** argv) {
 	ConfigReader config;
 	Socket bot_socket (config.getServer(), config.getPort());
 	Server serverSettings;
-	bot_socket.sendMsg("NICK :RoBoBo");
-	bot_socket.sendMsg("USER RoBoBo here " + config.getServer() + " :RoBoBo-IRC-BoBo IRC Bot");
-	currentNick = "RoBoBo";
+	currentNick = config.getNick();
+	ident = config.getIdent();
+	bot_socket.sendMsg("NICK :" + currentNick);
+	bot_socket.sendMsg("USER " + ident + " here " + config.getServer() + " :RoBoBo-IRC-BoBo IRC Bot");
 	while (true) {
 		if (!bot_socket.isConnected()) {
 			bot_socket.closeConnection();
