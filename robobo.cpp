@@ -7,6 +7,7 @@
 
 std::string input, command, currentNick, ident;
 std::vector<std::string> inputParams;
+std::tr1::unordered_map<std::string, Channel> channels;
 bool registered;
 
 int main(int argc, char** argv) {
@@ -35,6 +36,13 @@ int main(int argc, char** argv) {
 		if (command == "433" && !registered) {
 			currentNick += "_";
 			bot_socket.sendMsg("NICK :" + currentNick);
+		}
+		if (command == "JOIN") {
+			std::pair<std::string, Channel> joinedChannel (inputParams[2], Channel (serverSettings));
+			channels.insert(joinedChannel);
+		}
+		if (command == "PRIVMSG" && inputParams[3] == "join") {
+			bot_socket.sendMsg("JOIN #zbwerewolf");
 		}
 	}
 }
