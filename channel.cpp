@@ -14,7 +14,8 @@ class Channel {
 		void chanMode(bool addMode, std::string mode);
 	private:
 		std::string topic;
-		std::deque<User> channelUsers;
+		std::list<User> channelUsers;
+		std::list<User>::iterator userIterator;
 		Server serverSettings;
 		int prefixSymbolNum(char prefix);
 };
@@ -59,12 +60,12 @@ void Channel::statusChange(bool addStatus, std::string nick, char mode) {
 			break;
 		}
 	}
-	for (unsigned int i = 0; i < channelUsers.size(); i++) {
-		if (channelUsers[i].getNick() == nick) {
+	for (userIterator = channelUsers.begin(); userIterator != channelUsers.end(); userIterator++) {
+		if (userIterator->getNick() == nick) {
 			if (addStatus)
-				channelUsers[i].addStatus(statusIndex);
+				userIterator->addStatus(statusIndex);
 			else
-				channelUsers[i].removeStatus(statusIndex);
+				userIterator->removeStatus(statusIndex);
 			break;
 		}
 	}
