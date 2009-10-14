@@ -2,9 +2,9 @@
 #include "channel.cpp"
 #include "configuration.cpp"
 #include "lineParser.cpp"
-#include "moduleBase.cpp"
 #include "server.cpp"
 #include "socket.cpp"
+#include "moduleBase.cpp"
 
 std::string input, command, currentNick, ident;
 std::vector<std::string> inputParams;
