@@ -1,0 +1,185 @@
+RoBoBo-IRC-BoBo
+Creating Modules Help File
+=======================
+Table of Contents
+
+1. Constructors
+2. Provided Variables and Functions
+3. Hooks and Parameters
+4. Module Functions
+
+=======================
+1. CONSTRUCTORS
+
+You should at least initialize variables you create, as with any good C++ code.
+Your constructor should inherit the module base class constructor:
+
+SampleModule::SampleModule(std::tr1::unordered_map<Channel>& channels) : Module(channels)
+
+The unordered_map channels is saved to a provided variable, and the botSocket
+is used in functions provided by the base class allowing you to send messages,
+etc.
+
+=======================
+2. PROVIDED VARIABLES AND FUNCTIONS
+
+A pointer is inherited by modules which points to the list of channels and
+their information.  channelList points to an unordered_map of channels.  The
+channel data is held in the data, and the map keys hold the channel names.
+
+A function is also inherited by modules.  This function will split a string
+into words by spaces and return std::vector<std::string> containing all the
+words in the order they were in the string.  This function is called like this:
+splitLine = splitBySpace(line);
+Where splitLine and line can be replaced with any variable names, as long as
+splitLine is of the type std::vector<std::string> and line is an std::string.
+
+An empty function is declared in the base class for reading config variables:
+config(std::tr1::unordered_map<std::string, std::string> configVars)
+You can then read your variables in with this function.  The parameter, an
+unordered map, holds the name of the variable specified in the configuration
+as the key, and variable's data in the configuration as the value.
+
+=======================
+3. HOOKS AND PARAMETERS
+
+Below is a list of IRC hooks provided by the base class and called in the bot's
+code.  Each is followed by the list of parameters with the type of each
+parameter, and it is laid out in a multi-line format: the first line contains
+the function call, and the rest, contained in a multi-line comment block,
+contain a description of the function's purpose.
+
+onChannelMsg(std::string channel, char target, std::string nick, std::string message)
+/* Allows you to do something when the bot receives a channel message.  This
+function is not called when a CTCP is sent to the channel.  See onChannelCTCP.
+The channel parameter holds the channel's name.  The target parameter holds the
+status character that the user must have to receive the message
+(e.g. /msg @#channel blah).  If the message is sent to the entire channel the
+target parameter will hold the character '0' (the number zero).  The nick
+parameter holds the nick of the user who sent the message.  The message
+parameter holds the contents of the message sent to the channel. */
+
+onUserMsg(std::string nick, std::string message)
+/* Allows you to do something when a private message is sent to the bot.  This
+function is not called when a CTCP is sent to the bot.  See onUserCTCP.
+The nick parameter holds the nick of the user who send you the message.
+The message parameter holds the contents of the message sent. */
+
+onChannelNotice(std::string channel, char target, std::string nick, std::string message)
+/* Allows you to do something when the bot receives a channel notice.  This
+function is not called when a CTCP reply is sent to the channel.
+See onChannelCTCPReply.
+The channel parameter holds the channel's name.  The target parameter holds the
+status character that the user must have to receive the message
+(e.g. /notice @#channel blah).  If the message is sent to the entire channel
+the target parameter will hold the character '0' (the number zero).  The nick
+parameter holds the nick of the user who sent the message.  The message
+parameter holds the contents of the message sent. */
+
+onUserNotice(std::string nick, std::string message)
+/* Allows you to do something when a notice is sent to the bot.  This function
+is not called when a CTCP reply is sent to the bot.  See onUserCTCPReply.
+The nick parameter holds the nick of the user who sent the notice.
+The message parameter holds the contents of the message sent. */
+
+onChannelCTCP(std::string channel, std::string nick, std::string type, std::string params)
+/* Allows you to do something when the bot receives a CTCP request sent to a
+channel.  The channel parameter holds the name of the channel the CTCP was sent
+to.  The nick parameter holds the nick of the user who sent the CTCP.  The type
+parameter holds the CTCP command (the first word, i.e. PING, VERSION, etc.).
+The params parameter holds any data sent after the CTCP command before the end
+character. */
+
+onUserCTCP(std::string nick, std::string type, std::string params)
+/* Allows you to do something when the bot receives a CTCP request sent to it.
+The nick parameter holds the nick of the user who sent the CTCP.  The type
+parameter holds the CTCP command (the first word, i.e. PING, VERSION, etc.).
+The params parameter holds any data sent after the CTCP command before the end
+character. */
+
+onChannelCTCPReply(std::string channel, std::string nick, std::string type, std::string data)
+/* Allows you to do something when the bot receives a CTCP reply sent to a
+channel.  The channel parameter holds the name of the channel it was sent to.
+The nick parameter holds the nick of the user who sent the CTCP reply.
+The type parameter holds the CTCP command being replied to (the first word,
+i.e. PING, VERSION, etc.).  The data parameter holds the data sent with the
+CTCP reply before the ending CTCP character. */
+
+onUserCTCPReply(std::string nick, std::string type, std::string data)
+/* Allows you to do something when the bot receives a CTCP reply sent to it.
+The nick parameter holds the nick of the user who sent the CTCP reply.
+The type parameter holds the CTCP command being replied to (the first word,
+i.e. PING, VERSION, etc.).  The data parameter holds the data sent with the
+CTCP reply before the ending CTCP character. */
+
+onChannelJoin(std::string channel, std::string hostmask)
+/* Allows you to do something when a user joins a channel that the bot is in.
+The channel parameter holds the name of the channel.  The hostmask parameter
+holds the hostmask (in nick!user@host format) of the user who joined the
+channel. */
+
+onChannelPart(std::string channel, std::string hostmask, std::string reason)
+/* Allows you to do something when a user parts a channel that the bot is in.
+The channel parameter holds the name of the channel that the user parted from.
+The hostmask parameter holds the hostmask of the user who parted.  The reason
+parameter holds the part reason given. */
+
+onUserQuit(std::string hostmask, std::string reason)
+/* Allows you to do something when a user quits.  The hostmask parameter holds
+the hostmask of the user who quit.  The reason parameter holds the quit reason
+given. */
+
+onChannelKick(std::string channel, std::string kicker, std::string kickee, std::string reason)
+/* Allows you to do something when someone is kicked.  The channel parameter
+holds the name of the channel in which the kick occurred.  The kicker parameter
+holds the hostmask of the user who kicked someone.  The kickee parameter holds
+the nick of the user who was kicked.  The reason parameter holds the kick
+reason given. */
+
+onOutMessage(std::string target, std::string& message)
+/* Allows you to do something just before the bot sends out a message.
+The target parameter holds the target (either nick or channel) of the message.
+The message parameter holds the contents of the message to be sent.  The
+message is passed by reference so that it can be modified before it is sent. */
+
+onOutNotice(std::string target, std::string& message)
+/* Allows you to do something just before the bot sends out a notice.
+The target parameter holds the target (either nick or channel) of the notice.
+The message parameter holds the contents of the message to be sent.  The
+message is passed by reference so that it can be modified before it is sent. */
+
+=======================
+4. MODULE FUNCTIONS
+
+This is a list of functions you can use to perform actions on IRC.  The list is
+formatted the same way as the hooks list, above.  These functions are
+predefined for you to use.
+
+sendPrivMsg(std::string target, std::string message)
+// Sends a PRIVMSG to target (nick or channel) with the message provided.
+
+sendNotice(std::string target, std::string message)
+// Sends a NOTICE to target (nick or channel) with the message provided.
+
+sendCTCP(std::string target, std::string type, std::string params)
+/* Sends a CTCP request to target (nick or channel).  It has a type (PING,
+VERSION, etc.) and potentially parameters given as params.  The params
+parameter is optional. */
+
+sendCTCPReply(std::string target, std::string type, std::string data)
+/* Sends a CTCP reply to target (nick or channel).  It has a type (PING,
+VERSION, etc.) and potentially parameters given as data.  The data parameter
+is optional in case of certain CTCPs, but most CTCP requests expect some data
+with the reply. */
+
+joinChannel(std::string channel, std::string key)
+/* Joins the channel specified.  The key parameter is optional.  If the channel
+requires a key it should be given. */
+
+partChannel(std::string channel, std::string reason)
+/* Parts the channel specified.  The reason parameter is optional.  If given,
+the bot will send reason as the part reason to the server. */
+
+kickChannelUser(std::string channel, std::string nick, std::string reason)
+/* Kicks the user nick from the channel specified.  If the reason is given,
+it is sent to the server as the kick reason. */

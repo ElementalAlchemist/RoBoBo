@@ -3,7 +3,8 @@ RoBoBo-IRC-BoBo IRC Bot
 TABLE OF CONTENTS
 
 1. Installing
-2. Licensing
+2. License
+3. Creating Modules
 
 =======================
 1. INSTALLING
@@ -11,7 +12,14 @@ TABLE OF CONTENTS
 See the INSTALL file for information.
 
 =======================
-2. LICENSING
+2. LICENSE
 
 RoBoBo is licensed under the MIT License.
 For this license and related information see the LICENSE file.
+
+=======================
+3. CREATING MODULES
+
+Creating modules requires a knowledge of C++.  If you don't know it, Google can
+help you find a good tutorial.
+For the specifics on creating modules, see the MODULES file.
