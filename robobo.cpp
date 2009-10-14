@@ -2,6 +2,7 @@
 #include "channel.cpp"
 #include "configuration.cpp"
 #include "lineParser.cpp"
+#include "moduleBase.cpp"
 #include "server.cpp"
 #include "socket.cpp"
 
