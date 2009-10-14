@@ -7,10 +7,14 @@ class ConfigReader {
 		std::string getIdent();
 		std::string getServer();
 		unsigned short getPort();
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModVars();
 	private:
 		std::string nick, ident;
 		std::string server;
 		unsigned short port;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig;
+		std::pair<std::string, std::pair<std::string, std::string> > groupModVars;
+		std::pair<std::string, std::string> oneModVar;
 };
 
 ConfigReader::ConfigReader() {
@@ -35,4 +39,8 @@ std::string ConfigReader::getServer() {
 
 unsigned short ConfigReader::getPort() {
 	return port;
+}
+
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModVars() {
+	return modConfig;
 }
