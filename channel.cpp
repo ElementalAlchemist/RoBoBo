@@ -10,6 +10,7 @@ class Channel {
 		void setTopic(std::string newTopic);
 		void names(std::vector<std::string> namesLine);
 		void joinUser(std::string nick);
+		void leaveUser(std::string nick);
 		void statusChange(bool addStatus, std::string nick, char mode);
 		void chanMode(bool addMode, std::string mode);
 	private:
@@ -49,6 +50,13 @@ void Channel::names(std::vector<std::string> namesLine) {
 void Channel::joinUser(std::string nick) {
 	User newUser (nick);
 	channelUsers.push_back(newUser);
+}
+
+void Channel::leaveUser(std::string nick) {
+	for (userIterator = channelUsers.begin(); userIterator != channelUsers.end(); userIterator++) {
+		if (nick == userIterator->getNick())
+			channelUsers.erase(userIterator);
+	}
 }
 
 void Channel::statusChange(bool addStatus, std::string nick, char mode) {
