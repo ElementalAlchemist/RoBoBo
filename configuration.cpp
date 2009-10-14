@@ -41,6 +41,6 @@ unsigned short ConfigReader::getPort() {
 	return port;
 }
 
-std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModVars() {
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getModVars() {
 	return modConfig;
 }
