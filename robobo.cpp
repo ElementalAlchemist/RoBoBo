@@ -1,9 +1,5 @@
 #include "robobo.h"
-#include "channel.cpp"
-#include "configuration.cpp"
 #include "lineParser.cpp"
-#include "server.cpp"
-#include "socket.cpp"
 #include "moduleBase.cpp"
 
 std::string input, command, currentNick, ident;
