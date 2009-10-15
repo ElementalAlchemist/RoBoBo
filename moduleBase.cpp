@@ -35,7 +35,7 @@ Module::Module(std::tr1::unordered_map<std::string, Channel>& channels, Socket& 
 	bot_socket = &botSocket;
 }
 
-void Module::sendPrivMsg(std::string target, std::string message) {
+/*void Module::sendPrivMsg(std::string target, std::string message) {
 	bot_socket->sendMsg("PRIVMSG " + target + " :" + message);
 }
 
@@ -67,7 +67,7 @@ void Module::partChannel(std::string channel, std::string reason) {
 
 void Module::kickChannelUser(std::string channel, std::string nick, std::string reason) {
 	bot_socket->sendMsg("KICK " + channel + " " + nick + " :" + reason);
-}
+} */
 
 std::vector<std::string> splitBySpace(std::string line) {
 	std::vector<std::string> split;
