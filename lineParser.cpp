@@ -1,5 +1,5 @@
 #include "lineParser.h"
-
+ 
 std::vector<std::string> parseLine(std::string message) {
 	std::string messageString;
 	std::vector<std::string> messageParams;
