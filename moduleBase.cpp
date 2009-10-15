@@ -34,3 +34,50 @@ Module::Module(std::tr1::unordered_map<std::string, Channel>& channels, Socket& 
 	channelList = &channels;
 	bot_socket = &botSocket;
 }
+
+void Module::sendPrivMsg(std::string target, std::string message) {
+	bot_socket->sendMsg("PRIVMSG " + target + " :" + message);
+}
+
+void Module::sendNotice(std::string target, std::string message) {
+	bot_socket->sendMsg("NOTICE " + target + " :" + message);
+}
+
+void Module::sendCTCP(std::string target, std::string type, std::string params) {
+	if (params != "")
+		bot_socket->sendMsg("PRIVMSG " + target + " :" + (char)1 + type + " " + params + (char)1);
+	else
+		bot_socket->sendMsg("PRIVMSG " + target + " :" + (char)1 + type + (char)1);
+}
+
+void Module::sendCTCPReply(std::string target, std::string type, std::string data) {
+	if (data != "")
+		bot_socket->sendMsg("NOTICE " + target + " :" + (char)1 + type + " " + data + (char)1);
+	else
+		bot_socket->sendMsg("NOTICE " + target + " :" + (char)1 + type + (char)1);
+}
+
+void Module::joinChannel(std::string channel, std::string key) {
+	bot_socket->sendMsg("JOIN " + channel + " " + key);
+}
+
+void Module::partChannel(std::string channel, std::string reason) {
+	bot_socket->sendMsg("PART " + channel + " :" + reason);
+}
+
+void Module::kickChannelUser(std::string channel, std::string nick, std::string reason) {
+	bot_socket->sendMsg("KICK " + channel + " " + nick + " :" + reason);
+}
+
+std::vector<std::string> splitBySpace(std::string line) {
+	std::vector<std::string> split;
+	std::string temp = "";
+	for (unsigned int i = 0; i < line.size(); i++) {
+		if (line[i] == ' ') {
+			split.push_back(temp);
+			temp = "";
+		} else
+			temp += line[i];
+	}
+	return split;
+}
