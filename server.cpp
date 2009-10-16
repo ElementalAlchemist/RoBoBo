@@ -37,7 +37,10 @@ void Server::sendMsg(std::string message) {
 }
 
 std::string Server::receiveLine() {
-	return connection.receive();
+	if (connection.isConnected)
+		return connection.receive();
+	else
+		return "";
 }
 
 bool Server::isConnected() {
