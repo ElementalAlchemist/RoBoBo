@@ -1,5 +1,7 @@
 #include "server.h"
 
+#ifndef SERVER_ROBOBO
+#define SERVER_ROBOBO
 class Server {
 	public:
 		Server(std::tr1::unordered_map<std::string, std::string> serverConfig);
@@ -50,3 +52,4 @@ std::string Server::receiveLine() {
 bool Server::isConnected() {
 	return connection.isConnected();
 }
+#endif

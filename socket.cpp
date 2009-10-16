@@ -1,5 +1,7 @@
 #include "socket.h"
 
+#ifndef SOCKET_ROBOBO
+#define SOCKET_ROBOBO
 class Socket {
 	public:
 		Socket();
@@ -82,3 +84,4 @@ std::string Socket::receive() {
 			seenCR = true;
 	}
 }
+#endif
