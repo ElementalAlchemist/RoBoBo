@@ -22,7 +22,7 @@ Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig) {
 		perror("A port was specified incorrectly in the configuration file.");
 		exit(0);
 	}
-	connection.connect(serverConfig["address"], port);
+	connection.connectServer(serverConfig["address"], port);
 	// handle the whole connection to the server soon
 }
 
@@ -31,18 +31,22 @@ void Server::parseCapab(std::vector<std::string> line005) {
 }
 
 void Server::sendMsg(std::string message) {
-	std::cout << networkName << ">" << message << std::endl;
 	message += "\r\n";
-	connection.send(message);
+	if (connection.send(message))
+		std::cout << networkName << ">" << message;
+	else {
+		std::cout << "Error: " << networkName << ">" << message;
+		connection.closeConnection();
+	}
 }
 
 std::string Server::receiveLine() {
-	if (connection.isConnected)
+	if (connection.isConnected())
 		return connection.receive();
 	else
 		return "";
 }
 
 bool Server::isConnected() {
-	return connection.connected;
+	return connection.isConnected();
 }
