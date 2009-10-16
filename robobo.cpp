@@ -1,6 +1,4 @@
 #include "robobo.h"
-#include "lineParser.cpp"
-#include "moduleBase.cpp"
 
 std::string input, command, currentNick, ident;
 std::vector<std::string> inputParams;
