@@ -3,12 +3,20 @@
 std::string input, command, currentNick, ident;
 std::vector<std::string> inputParams;
 std::tr1::unordered_map<std::string, Channel> channels;
+std::list<Server> connectedServers;
 bool registered;
+
+void makeServerList(ConfigReader& config) {
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.serverConfig();
+	std::list<Server>::iterator serverIterator;
+	for (serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++)
+		connectedServers.insert(Server (serverIterator->second));
+}
 
 int main(int argc, char** argv) {
 	ConfigReader config;
-	Socket bot_socket (config.getServer(), config.getPort());
-	Server serverSettings;
+	//Socket bot_socket (config.getServer(), config.getPort());
+	makeServerList(config);
 	currentNick = config.getNick();
 	ident = config.getIdent();
 	bot_socket.sendMsg("NICK :" + currentNick);

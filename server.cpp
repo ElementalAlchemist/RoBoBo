@@ -15,7 +15,14 @@ class Server {
 };
 
 Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig) {
-	connection.connect(serverConfig["address"], serverConfig["port"]);
+	unsigned short port;
+	std::istringstream portChange(serverConfig["port"]);
+	portChange >> port;
+	if (!portChange) {
+		perror("A port was specified incorrectly in the configuration file.");
+		exit(0);
+	}
+	connection.connect(serverConfig["address"], port);
 	// handle the whole connection to the server soon
 }
 
