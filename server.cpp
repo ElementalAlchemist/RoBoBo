@@ -9,11 +9,13 @@ class Server {
 		void sendMsg(std::string message);
 		bool isConnected();
 	private:
+		void joinChannel(std::string channelName);
 		std::string receiveLine();
 		std::string networkName;
 		std::vector<char> statusModes, chanTypes, chanModes;
 		short numModes;
 		Socket connection ();
+		std::tr1::unordered_map<std::string, Channel> channels;
 };
 
 Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig) {
@@ -52,4 +54,10 @@ std::string Server::receiveLine() {
 bool Server::isConnected() {
 	return connection.isConnected();
 }
+
+void Server::joinChannel(std::string channelName) {
+	std::pair<std::string, Channel> oneChannel(channelName, Channel());
+	channels.insert(oneChannel);
+}
+	
 #endif
