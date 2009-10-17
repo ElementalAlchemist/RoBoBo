@@ -2,7 +2,7 @@
 
 class Module {
 	public:
-		Module(std::tr1::unordered_map<std::string, Server>& servers, Socket& botSocket);
+		Module::Module(std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData);
 		virtual void onChannelMsg(std::string channel, char target, std::string nick, std::string message) = 0;
 		virtual void onUserMsg(std::string nick, std::string message) = 0;
 		virtual void onChannelNotice(std::string channel, char target, std::string nick, std::string message) = 0;
@@ -18,7 +18,8 @@ class Module {
 		virtual void onOutMessage(std::string target, std::string message) = 0;
 		virtual void onOutNotice(std::string target, std::string message) = 0;
 	protected:
-		std::tr1::unordered_map<std::string, Channel> *channelList;
+		std::list<std::string> serverList;
+		std::unordered_map<std::string, Server> servers;
 		void sendPrivMsg(std::string target, std::string message);
 		void sendNotice(std::string target, std::string message);
 		void sendCTCP(std::string target, std::string type, std::string params = "");
@@ -29,8 +30,9 @@ class Module {
 		std::vector<std::string> splitBySpace(std::string line);
 };
 
-Module::Module(std::tr1::unordered_map<std::string, Channel>& channels, Socket& botSocket) {
-	// redo this function
+Module::Module(std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData) {
+	&serverList = &listOfServers;
+	&servers = &serverData;
 }
 
 /*void Module::sendPrivMsg(std::string target, std::string message) {
