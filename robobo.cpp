@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 	makeServerList(config);
 	currentNick = config.getNick();
 	ident = config.getIdent();
-	bot_socket.sendMsg("NICK :" + currentNick);
+/*	bot_socket.sendMsg("NICK :" + currentNick);
 	bot_socket.sendMsg("USER " + ident + " here " + config.getServer() + " :RoBoBo-IRC-BoBo IRC Bot");
 	while (true) {
 		if (!bot_socket.isConnected()) {
@@ -48,5 +48,5 @@ int main(int argc, char** argv) {
 		if (command == "PRIVMSG" && inputParams[3] == "join") {
 			bot_socket.sendMsg("JOIN #zbwerewolf");
 		}
-	}
+	}*/
 }
