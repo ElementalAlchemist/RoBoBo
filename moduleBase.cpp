@@ -19,7 +19,7 @@ class Module {
 		virtual void onOutNotice(std::string target, std::string message) = 0;
 	protected:
 		std::list<std::string> moduleList, serverList;
-		std::unordered_map<std::string, Server> servers;
+		std::tr1::unordered_map<std::string, Server> servers;
 		void sendPrivMsg(std::string target, std::string message);
 		void sendNotice(std::string target, std::string message);
 		void sendCTCP(std::string target, std::string type, std::string params = "");
