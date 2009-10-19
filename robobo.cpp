@@ -17,7 +17,6 @@ void makeServerList(ConfigReader& config) {
 
 int main(int argc, char** argv) {
 	ConfigReader config;
-	//Socket bot_socket (config.getServer(), config.getPort());
 	makeServerList(config);
 	currentNick = config.getNick();
 	ident = config.getIdent();
