@@ -4,7 +4,7 @@
 #define SERVER_ROBOBO
 class Server {
 	public:
-		Server(std::tr1::unordered_map<std::string, std::string> serverConfig);
+		Server(std::tr1::unordered_map<std::string, std::string> serverConfig, std::tr1::unordered_map<std::string, Module> moduleList);
 		void parseCapab(std::vector<std::string> line005);
 		void sendMsg(std::string message);
 		bool isConnected();
@@ -17,9 +17,11 @@ class Server {
 		short numModes;
 		Socket connection ();
 		std::tr1::unordered_map<std::string, Channel> channels;
+		std::tr1::unordered_map<std::string, Module> modules;
 };
 
-Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig) {
+Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig, std::tr1::unordered_map<std::string, Module>& moduleList) {
+	&modules = &moduleList;
 	unsigned short port;
 	std::istringstream portChange(serverConfig["port"]);
 	portChange >> port;
