@@ -2,7 +2,7 @@
 
 class Module {
 	public:
-		Module::Module(std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData);
+		Module::Module(std::list <std::string>& listOfModules, std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData);
 		virtual void onChannelMsg(std::string channel, char target, std::string nick, std::string message) = 0;
 		virtual void onUserMsg(std::string nick, std::string message) = 0;
 		virtual void onChannelNotice(std::string channel, char target, std::string nick, std::string message) = 0;
@@ -18,7 +18,7 @@ class Module {
 		virtual void onOutMessage(std::string target, std::string message) = 0;
 		virtual void onOutNotice(std::string target, std::string message) = 0;
 	protected:
-		std::list<std::string> serverList;
+		std::list<std::string> moduleList, serverList;
 		std::unordered_map<std::string, Server> servers;
 		void sendPrivMsg(std::string target, std::string message);
 		void sendNotice(std::string target, std::string message);
@@ -31,6 +31,7 @@ class Module {
 };
 
 Module::Module(std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData) {
+	&moduleList = &listOfModules;
 	&serverList = &listOfServers;
 	&servers = &serverData;
 }

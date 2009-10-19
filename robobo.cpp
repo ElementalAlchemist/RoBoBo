@@ -3,6 +3,7 @@
 std::string input, command, currentNick, ident;
 std::vector<std::string> inputParams;
 std::tr1::unordered_map<std::string, Server> connectedServers;
+std::list<std::string> serverList, moduleList;
 bool registered;
 
 void makeServerList(ConfigReader& config) {
@@ -10,6 +11,7 @@ void makeServerList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator;
 	for (serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
 		connectedServer[serverIterator->first] = Server(serverIterator->second);
+		serverList.insert(serverIterator->first);
 	}
 }
 
