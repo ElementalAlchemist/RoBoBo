@@ -1,8 +1,10 @@
 #include "moduleBase.h"
 
+#ifndef MODBASE_ROBOBO
+#define MODBASE_ROBOBO
 class Module {
 	public:
-		Module::Module(std::tr1::unordered_map<std::string, Module>& moduleList, std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData);
+		Module(std::tr1::unordered_map<std::string, Module>& moduleList, std::list<std::string>& listOfServers, std::tr1::unordered_map<std::string, Server>& serverData);
 		virtual void onChannelMsg(std::string channel, char target, std::string nick, std::string message) = 0;
 		virtual void onUserMsg(std::string nick, std::string message) = 0;
 		virtual void onChannelNotice(std::string channel, char target, std::string nick, std::string message) = 0;
@@ -31,7 +33,7 @@ class Module {
 		std::vector<std::string> splitBySpace(std::string line);
 };
 
-Module::Module(std::tr1::unordered_map<std::string, Module> moduleList, std::list<std::string>& listOfServers, std::unordered_map<std::string, Server>& serverData) {
+Module::Module(std::tr1::unordered_map<std::string, Module> moduleList, std::list<std::string>& listOfServers, std::tr1::unordered_map<std::string, Server>& serverData) {
 	&modules = &moduleList;
 	&serverList = &listOfServers;
 	&servers = &serverData;
@@ -83,3 +85,4 @@ std::vector<std::string> splitBySpace(std::string line) {
 	}
 	return split;
 }
+#endif

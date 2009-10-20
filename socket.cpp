@@ -7,7 +7,7 @@ class Socket {
 		Socket();
 		~Socket();
 		void connectServer(std::string address, unsigned short port);
-		bool send(std::string message);
+		bool sendData(std::string message);
 		std::string receive();
 		void closeConnection();
 		bool isConnected();
@@ -30,10 +30,11 @@ Socket::~Socket() {
 
 void Socket::connectServer(std::string address, unsigned short port) {
 	socketAddr.sin_port = htons(port);
-	inet_pton(AF_INET, server.c_str(), &socketAddr.sin_addr);
+	inet_pton(AF_INET, address.c_str(), &socketAddr.sin_addr);
+	int status;
 	
 	do
-		int status = connect(socketfd, (sockaddr*) &socketAddr, sizeof(socketAddr));
+		status = connect(socketfd, (sockaddr*) &socketAddr, sizeof(socketAddr));
 	while (errno == EINPROGRESS || errno == EALREADY);
 	if (status != 0 && errno != EISCONN) {
 		perror("Could not connect to server");
@@ -55,7 +56,7 @@ bool Socket::isConnected() {
 	return false;
 }
 
-bool Socket::send(std::string message) {
+bool Socket::sendData(std::string message) {
 	int status = send(socketfd, message.c_str(), message.size(), 0);
 	if ((unsigned) status == message.size())
 		return true;
@@ -67,6 +68,7 @@ std::string Socket::receive() {
 	std::string messageString = "";
 	char inputBuffer[2];
 	bool seenCR = false;
+	int status;
 	while (true) {
 		status = recv(socketfd, &inputBuffer, 1, 0);
 		if (status < 0 && errno != EWOULDBLOCK) {

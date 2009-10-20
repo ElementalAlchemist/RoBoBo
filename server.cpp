@@ -9,11 +9,13 @@ class Server {
 		void sendMsg(std::string message);
 		bool isConnected();
 		std::vector<std::string> parseLine(std::string message);
+		std::vector<std::string> splitBySpace(std::string unsplitLine);
+		std::map<char, char> statusModes;
 	private:
 		void joinChannel(std::string channelName);
 		std::string receiveLine();
 		std::string networkName;
-		std::vector<char> statusModes, chanTypes, chanModes;
+		std::vector<char> chanTypes, chanModes;
 		short numModes;
 		Socket connection ();
 		std::tr1::unordered_map<std::string, Channel> channels;
@@ -39,7 +41,7 @@ void Server::parseCapab(std::vector<std::string> line005) {
 
 void Server::sendMsg(std::string message) {
 	message += "\r\n";
-	if (connection.send(message))
+	if (connection.sendData(message))
 		std::cout << networkName << ">" << message;
 	else {
 		std::cout << "Error: " << networkName << ">" << message;
@@ -81,5 +83,19 @@ std::vector<std::string> Server::parseLine(std::string message) {
 	}
 	return messageParams;
 }
-	
+
+std::vector<std::string> Server::splitBySpace(std::string unsplitLine) {
+	std::vector<std::string> parsedLine;
+	std::string word = "";
+	for (unsigned int i = 0; i < unsplitLine.size(); i++) {
+		if (unsplitLine[i] == ' ') {
+			parsedLine.push_back(word);
+			word = "";
+		} else
+			word += unsplitLine[i];
+	}
+	parsedLine.push_back(word);
+	return parsedLine;
+}
+
 #endif
