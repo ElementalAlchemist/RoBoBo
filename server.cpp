@@ -36,7 +36,7 @@ Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig, s
 }
 
 void Server::parseCapab(std::vector<std::string> line005) {
-	for (unsigned int i = 0; i < line005.size(); i++) {
+	for (unsigned int i = 3; i < line005.size(); i++) {
 		if (line005[i] == "NAMESX")
 			sendMsg("PROTOCTL NAMESX");
 		if (line005[i].substr(0,5) == "MODES") {
