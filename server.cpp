@@ -15,8 +15,8 @@ class Server {
 		void joinChannel(std::string channelName);
 		std::string receiveLine();
 		std::string networkName;
-		std::vector<char> chanTypes, chanModes;
-		short numModes;
+		std::vector<char> chanTypes;
+		short maxModes;
 		Socket connection ();
 		std::tr1::unordered_map<std::string, Channel> channels;
 		std::tr1::unordered_map<std::string, Module> modules;
@@ -36,7 +36,31 @@ Server::Server(std::tr1::unordered_map<std::string, std::string> serverConfig, s
 }
 
 void Server::parseCapab(std::vector<std::string> line005) {
-	// I'll handle this when I get there.
+	for (unsigned int i = 0; i < line005.size(); i++) {
+		if (line005[i] == "NAMESX")
+			sendMsg("PROTOCTL NAMESX");
+		if (line005[i].substr(0,5) == "MODES") {
+			std::istringstream numModes(line005[i].substr(6));
+			numModes >> maxModes;
+		}
+		if (line005[i].substr(0,7) == "NETWORK")
+			networkName = line005[i].substr(8);
+		if (line005[i].substr(0,6) == "PREFIX") { // qaohv)~&@%+
+			std::string modeInfo = line005[i].substr(8);
+			string::size_type parenPos = modeInfo.find(")");
+			std::string statusChars = modeInfo.substr(0,parenPos);
+			std::string statusSymbols = modeInfo.substr(parenPos+1);
+			for (unsigned int i = 0; i < statusChars.size(); i++) {
+				std::pair<char, char> aStatus (statusChars[i], statusSymbols[i]);
+				statusModes.insert(aStatus);
+			}
+		}
+		if (line005[i].substr(0,9) == "CHANTYPES") {
+			std::string typesOfChans = line005[i].substr(10);
+			for (unsigned int i = 0; i < typesOfChans.size(); i++)
+				chanTypes.push_back(typesOfChans[i]);
+		}
+	}
 }
 
 void Server::sendMsg(std::string message) {

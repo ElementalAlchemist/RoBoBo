@@ -40,7 +40,7 @@ void Channel::parseNames(std::vector<std::string> names) {
 					startsWithStatus = true;
 			}
 		}
-		users.insert(users.end(), User (names[i]));
+		users.insert(users.end(), User (this, names[i]));
 		std::list<User>::iterator usersEnd = users.end() - 1;
 		usersEnd->addStatuses(possessedStatuses);
 	}
@@ -48,7 +48,7 @@ void Channel::parseNames(std::vector<std::string> names) {
 
 void Channel::channelJoin(std::string hostmask) {
 	std::vector<std::string> nuh = parseHostmask(hostmask);
-	users.insert(users.end(), User(nuh[0]));
+	users.insert(users.end(), User(this, nuh[0]));
 	std::list<User>::iterator userIterator = users.end() - 1;
 	userIterator->setIdent(nuh[1]);
 	userIterator->setHost(nuh[2]);
