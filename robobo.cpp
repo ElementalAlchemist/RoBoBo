@@ -17,11 +17,11 @@ std::list<std::string> makeServerList(ConfigReader& config) {
 }
 
 int main(int argc, char** argv) {
-	ConfigReader config;
+	ConfigReader config ();
 	serverList = makeServerList(config);
-	currentNick = config.getNick();
+/*	currentNick = config.getNick();
 	ident = config.getIdent();
-/*	bot_socket.sendMsg("NICK :" + currentNick);
+	bot_socket.sendMsg("NICK :" + currentNick);
 	bot_socket.sendMsg("USER " + ident + " here " + config.getServer() + " :RoBoBo-IRC-BoBo IRC Bot");
 	while (true) {
 		if (!bot_socket.isConnected()) {
