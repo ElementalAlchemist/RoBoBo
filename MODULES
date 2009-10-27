@@ -18,11 +18,6 @@ class m_samplemodule : public Module
 
 m_samplemodule::m_samplemodule(/*Something will go in here when I code that far*/) : Module (/*This will, also*/)
 
-The unordered_map channels is saved to a provided variable, and the botSocket
-is used in functions provided by the base class allowing you to send messages,
-etc.
-The botSocket is used internally.
-
 =======================
 2. PROVIDED VARIABLES AND FUNCTIONS
 
