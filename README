@@ -22,4 +22,6 @@ For this license and related information see the LICENSE file.
 
 Creating modules requires a knowledge of C++.  If you don't know it, Google can
 help you find a good tutorial.
-For the specifics on creating modules, see the MODULES file.
+For the specifics on creating modules, see the MODULES file.  The MODULES file
+assumes you already know at least some C++ and jumps right into what you need
+to know just for this bot.

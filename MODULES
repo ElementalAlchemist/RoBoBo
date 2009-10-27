@@ -12,14 +12,11 @@ Table of Contents
 1. CONSTRUCTORS
 
 You should at least initialize variables you create, as with any good C++ code.
-Your constructor should inherit the module base class constructor:
+Your constructor should inherit the Module class and its constructor:
 
-SampleModule::SampleModule(std::tr1::unordered_map<Channel>& channels, Socket& botSocket) : Module(channels, botSocket)
+class m_samplemodule : public Module
 
-The unordered_map channels is saved to a provided variable, and the botSocket
-is used in functions provided by the base class allowing you to send messages,
-etc.
-The botSocket is used internally.
+m_samplemodule::m_samplemodule(/*Something will go in here when I code that far*/) : Module (/*This will, also*/)
 
 =======================
 2. PROVIDED VARIABLES AND FUNCTIONS
