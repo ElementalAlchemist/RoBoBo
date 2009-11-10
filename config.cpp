@@ -6,7 +6,7 @@ class ConfigReader {
 	public:
 		ConfigReader();
 		ConfigReader(std::string filename);
-		void readConfig();
+		void readConfig(std::string filename);
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getServerConfig();
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig();
 	private:
