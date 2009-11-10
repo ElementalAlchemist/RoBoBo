@@ -3,6 +3,9 @@
 # etc.
 
 server irc.freenode.net {
+	# port: the port that the IRC server uses for client connections
+	# This is usually 6667
+	port = "6667";
 	# nick: the nick for the bot to be used on that server
 	nick = "RoBoBo";
 	# ident: the ident for the bot to be used on that server.  Ident servers can override this, as can a vIdent.
