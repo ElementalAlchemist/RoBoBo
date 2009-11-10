@@ -24,7 +24,7 @@ ConfigReader::ConfigReader(std::string filename) {
 }
 
 void ConfigReader::readConfig(std::string filename) {
-	configFile.open(filename);
+	configFile.open(filename.c_str());
 	std::string configuration;
 	configFile >> configuration;
 	configFile.close();
@@ -33,7 +33,7 @@ void ConfigReader::readConfig(std::string filename) {
 	bool inBlock = false, typingSection = false, namingSection = false, escaped = false, escapedNow = false, commentable = true, writing = false, acceptVar = false, concatable = false, concatening = false;
 	std::vector<std::string> includes;
 	std::tr1::unordered_map<std::string, std::string> oneBlock;
-	for (int i = 0; i < configuration.size(); i++) {
+	for (unsigned int i = 0; i < configuration.size(); i++) {
 		if (configuration[i] == '\n')
 			lineNumber++;
 		
@@ -45,7 +45,7 @@ void ConfigReader::readConfig(std::string filename) {
 			typingSection = false;
 			namingSection = true;
 		} else if (namingSection) {
-			for ( ; configuration[i] != ' ', configuration[i] != '{'; i++)
+			for ( ; configuration[i] != ' ' && configuration[i] != '{'; i++)
 				sectionName += configuration[i];
 			namingSection = false;
 		} else if (configuration[i] == '{') {
