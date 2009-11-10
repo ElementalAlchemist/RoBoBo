@@ -9,6 +9,10 @@ server irc.freenode.net {
 	ident = "RoBoBo";
 	# gecos: the GECOS or realname for the bot to use on the server.
 	gecos = "RoBoBo-IRC-BoBo IRC Bot";
+	# channels: the channels the bot will join on connect.
+	# These channels should be in an IRC-friendly format; that is, they will
+	# be sent as they appear here immediately after the JOIN command in IRC.
+	channels = "#zbwerewolf";
 
 	# This will eventually support more stuff.
 }
