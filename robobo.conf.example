@@ -1,0 +1,15 @@
+# RoBoBo Configuration File
+# This is a file that can be used as a configuration for the RoBoBo IRC bot.
+# etc.
+
+server irc.freenode.net {
+	# nick: the nick for the bot to be used on that server
+	nick = "RoBoBo";
+	# ident: the ident for the bot to be used on that server.  Ident servers can override this, as can a vIdent.
+	ident = "RoBoBo";
+	# gecos: the GECOS or realname for the bot to use on the server.
+	gecos = "RoBoBo-IRC-BoBo IRC Bot";
+
+	# This will eventually support more stuff.
+}
+# I will expand on this file and the comments later.
