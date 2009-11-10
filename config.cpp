@@ -6,7 +6,6 @@ class ConfigReader {
 	public:
 		ConfigReader();
 		ConfigReader(std::string filename);
-		~ConfigReader();
 		void readConfig();
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getServerConfig();
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig();
@@ -17,24 +16,22 @@ class ConfigReader {
 };
 
 ConfigReader::ConfigReader() {
-	ConfigReader("robobo.conf");
+	readConfig("robobo.conf");
 }
 
 ConfigReader::ConfigReader(std::string filename) {
-	configFile.open(filename.c_str());
-	readConfig();
+	readConfig(filename);
 }
 
-ConfigReader::~ConfigReader() {
-	configFile.close();
-}
-
-void ConfigReader::readConfig() {
+void ConfigReader::readConfig(std::string filename) {
+	configFile.open(filename);
 	std::string configuration;
 	configFile >> configuration;
+	configFile.close();
 	int lineNumber = 1;
 	std::string sectionType = "", sectionName = "", varName = "", currentValue = "", concatingVar = "";
 	bool inBlock = false, typingSection = false, namingSection = false, escaped = false, escapedNow = false, commentable = true, writing = false, acceptVar = false, concatable = false, concatening = false;
+	std::vector<std::string> includes;
 	std::tr1::unordered_map<std::string, std::string> oneBlock;
 	for (int i = 0; i < configuration.size(); i++) {
 		if (configuration[i] == '\n')
@@ -56,8 +53,12 @@ void ConfigReader::readConfig() {
 			acceptVar = true;
 		} else if (configuration[i] == '}') {
 			if (!inBlock) {
-				std::perror("An end brace occurred outside a block before a corresponding opening brace existed in the configuration file on line " + lineNumber);
-				std::exit(0);
+				if (sectionType == "include")
+					readConfig(sectionName);
+				else {
+					std::perror("An end brace occurred outside a block before a corresponding opening brace existed in the configuration file on line " + lineNumber);
+					std::exit(0);
+				}
 			}
 			inBlock = false;
 			if (sectionType == "server") {
@@ -91,7 +92,7 @@ void ConfigReader::readConfig() {
 			acceptVar = false;
 		else if (configuration[i] == ' ' || configuration[i] == '\t' || configuration[i] == '\r' || configuration[i] == '\n') {
 			// ignore whitespace that's not part of a string
-		} else if (!escaped && !writing && configuration[i] == ';') {
+		} else if (!escaped && !writing && configuration[i] == ';') { // parse the end of a statement
 			oneBlock.insert(std::pair<std::string, std::string> (varName, currentValue));
 			varName = "";
 			currentValue = "";
