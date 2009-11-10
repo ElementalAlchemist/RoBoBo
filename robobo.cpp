@@ -7,17 +7,17 @@ std::list<std::string> serverList, moduleList;
 bool registered;
 
 std::list<std::string> makeServerList(ConfigReader& config) {
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.serverConfig();
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator;
 	for (serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
-		connectedServer[serverIterator->first] = Server(serverIterator->second);
+		connectedServers[serverIterator->first] = Server(serverIterator->second);
 		serverList.insert(serverList.end(), serverIterator->first);
 	}
 	return serverList;
 }
 
 int main(int argc, char** argv) {
-	ConfigReader config ();
+	ConfigReader config;
 	serverList = makeServerList(config);
 /*	currentNick = config.getNick();
 	ident = config.getIdent();
