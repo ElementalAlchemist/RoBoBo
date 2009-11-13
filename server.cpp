@@ -41,6 +41,7 @@ void Server::handleData() {
 	while (true) {
 		receivedLine = serverConnection.receive();
 		// eventually this will interpret the data received.
+		// note: when you get that far, Channel takes this as a parameter
 	}
 }
 
