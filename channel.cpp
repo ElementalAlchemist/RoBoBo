@@ -1,25 +1,7 @@
-#include "channel.h"
+#include "connection.h"
 
 #ifndef CHANNEL_ROBOBO
 #define CHANNEL_ROBOBO
-class Server;
-
-class Channel {
-	public:
-		Channel(Server* thisServer);
-		void parseNames(std::string numeric353);
-		void setTopic(std::string newTopic);
-		void setMode(bool add, char mode, std::string param = "");
-		void joinChannel(std::string nick, std::string ident, std::string host, std::string gecos);
-		void leaveChannel(std::string nick);
-	private:
-		Server* parentServer;
-		std::tr1::unordered_map<std::string, User> users;
-		std::string topic;
-		std::tr1::unordered_map<char, std::string> modes; // does not include lists or statuses
-		std::vector<std::string> banList, exceptList, invexList;
-};
-
 Channel::Channel(Server* thisServer) {
 	parentServer = thisServer;
 	topic = "";
@@ -58,7 +40,7 @@ void Channel::setMode(bool add, char mode, std::string param) {
 }
 
 void Channel::joinChannel(std::string nick, std::string ident, std::string host, std::string gecos) {
-	users.insert(std::pair<std::string, User> (nick, User (this, ident, host, gecos)));
+	users.insert(std::pair<std::string, User> (nick, User (ident, host, gecos)));
 }
 
 void Channel::leaveChannel(std::string nick) {
