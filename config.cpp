@@ -25,6 +25,10 @@ ConfigReader::ConfigReader(std::string filename) {
 
 void ConfigReader::readConfig(std::string filename) {
 	configFile.open(filename.c_str());
+	if (configFile.fail()) {
+		std::perror("Config file does not exist or could not be opened");
+		std::exit(0);
+	}
 	std::string configuration;
 	while (configFile.good())
 		configFile >> configuration;
@@ -116,11 +120,6 @@ void ConfigReader::readConfig(std::string filename) {
 			escaped = false;
 		}
  		escapedNow = false;
-	}
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator outerIter = serverConfig.begin(); outerIter != serverConfig.end(); outerIter++) {
-		std::cout << "Server: " << outerIter->first << std::endl;
-		for (std::tr1::unordered_map<std::string, std::string>::iterator innerIter = serverConfig[outerIter->first].begin(); innerIter != serverConfig[outerIter->first].end(); innerIter++)
-			std::cout << innerIter->first << " = " << innerIter->second << std::endl;
 	}
 }
 
