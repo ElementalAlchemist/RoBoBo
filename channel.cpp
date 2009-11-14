@@ -40,7 +40,7 @@ void Channel::setMode(bool add, char mode, std::string param) {
 }
 
 void Channel::joinChannel(std::string nick, std::string ident, std::string host, std::string gecos) {
-	users.insert(std::pair<std::string, User> (nick, User (ident, host, gecos)));
+	users.insert(std::pair<std::string, User> (nick, User (this, ident, host, gecos)));
 }
 
 void Channel::leaveChannel(std::string nick) {
