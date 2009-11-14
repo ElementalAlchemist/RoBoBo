@@ -33,7 +33,7 @@ class Module {
 		std::vector<std::string> splitBySpace(std::string line);
 };
 
-Module::Module(std::tr1::unordered_map<std::string, Module> moduleList, std::list<std::string>& listOfServers, std::tr1::unordered_map<std::string, Server>& serverData) {
+Module::Module(std::tr1::unordered_map<std::string, Module>& moduleList, std::list<std::string>& listOfServers, std::tr1::unordered_map<std::string, Server>& serverData) {
 	modules = &moduleList;
 	serverList = &listOfServers;
 	servers = &serverData;
