@@ -51,7 +51,10 @@ void ConfigReader::readConfig(std::string filename) {
 				configuration = configFile.get();
 			}
 			if (!configFile.good()) {
-				std::perror("An error occurred reading a section type name in the configuration file.  This error occurred on line " + lineNumber);
+				std::ostringstream lineSS;
+				lineSS << lineNumber;
+				std::string message = "An error occurred reading a section type name in the configuration file.  This error occurred on line " + lineSS.str();
+				std::perror(message.c_str());
 				std::exit(0);
 			}
 			typingSection = false;
@@ -62,7 +65,10 @@ void ConfigReader::readConfig(std::string filename) {
 				configuration = configFile.get();
 			}
 			if (!configFile.good()) {
-				std::perror("An error occurred reading a section name from the configuration file.  This error occurred on line " + lineNumber);
+				std::ostringstream lineSS;
+				lineSS << lineNumber;
+				std::string message = "An error occurred reading a section name from the configuration file.  This error occurred on line " + lineSS.str();
+				std::perror(message.c_str());
 				std::exit(0);
 			}
 			namingSection = false;
@@ -75,7 +81,10 @@ void ConfigReader::readConfig(std::string filename) {
 			acceptVar = true;
 		} else if (configuration == '}') {
 			if (!inBlock) {
-				std::perror("An end brace occurred outside a block before a corresponding opening brace existed in the configuration file.  The offending brace can be found on line " + lineNumber);
+				std::ostringstream lineSS;
+				lineSS << lineNumber;
+				std::string message = "An end brace occurred outside a block before a corresponding opening brace existed in the configuration file.  The offending brace can be found on line " + lineSS.str();
+				std::perror(message.c_str());
 				std::exit(0);
 			}
 			inBlock = false;
@@ -86,7 +95,10 @@ void ConfigReader::readConfig(std::string filename) {
 				modConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
 				oneBlock.clear();
 			} else {
-				std::perror("An invalid block type was declared in the configuration file.  This block ends on line " + lineNumber);
+				std::ostringstream lineSS;
+				lineSS << lineNumber;
+				std::string message = "An invalid block type was declared in the configuration file.  This block is of type " + sectionType + " and ends on line " + lineSS.str();
+				std::perror(message.c_str());
 				std::exit(0);
 			}
 		} else if (configuration == '\\' && !escaped)
