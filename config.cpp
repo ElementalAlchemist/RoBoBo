@@ -16,6 +16,7 @@ class ConfigReader {
 };
 
 ConfigReader::ConfigReader() {
+	std::cout << "The ConfigReader constructor was called." << std::endl; //debug
 	readConfig("robobo.conf");
 }
 
@@ -24,46 +25,53 @@ ConfigReader::ConfigReader(std::string filename) {
 }
 
 void ConfigReader::readConfig(std::string filename) {
+	std::cout << "The readConfig function was called at some point for the following file: " << filename << std::endl;
 	configFile.open(filename.c_str());
 	if (configFile.fail()) {
 		std::perror("Config file does not exist or could not be opened");
 		std::exit(0);
 	}
-	std::string configuration;
-	while (configFile.good())
-		configFile >> configuration;
-	configFile.close();
+	char configuration;
 	int lineNumber = 1;
 	std::string sectionType = "", sectionName = "", varName = "", currentValue = "", concatingVar = "";
 	bool inBlock = false, typingSection = false, namingSection = false, escaped = false, escapedNow = false, commentable = true, writing = false, acceptVar = false, concatable = false, concatening = false;
 	std::vector<std::string> includes;
 	std::tr1::unordered_map<std::string, std::string> oneBlock;
-	for (unsigned int i = 0; i < configuration.size(); i++) {
-		if (configuration[i] == '\n')
+	while (configFile.good()) {
+		configuration = configFile.get();
+		if (configuration == '\n')
 			lineNumber++;
 		
 		if (!inBlock && sectionType == "")
 			typingSection = true;
 		else if (typingSection) {
-			for ( ; configuration[i] != ' '; i++)
-				sectionType += configuration[i];
+			while (configuration != ' ' && configFile.good()) {
+				sectionType += configuration;
+				configuration = configFile.get();
+			}
+			if (!configFile.good()) {
+				std::perror("An error occurred reading a section type name in the configuration file.  This error occurred on line " + lineNumber);
+				std::exit(0);
+			}
 			typingSection = false;
 			namingSection = true;
 		} else if (namingSection) {
-			for ( ; configuration[i] != ' ' && configuration[i] != '{'; i++)
-				sectionName += configuration[i];
+			while (configuration != ' ' && configuration != '{' && configFile.good()) {
+				sectionName += configuration;
+				configuration = configFile.get();
+			}
+			if (!configFile.good()) {
+				std::perror("An error occurred reading a section name from the configuration file.  This error occurred on line " + lineNumber);
+				std::exit(0);
+			}
 			namingSection = false;
-		} else if (configuration[i] == '{') {
+		} else if (configuration == '{') {
 			inBlock = true;
 			acceptVar = true;
-		} else if (configuration[i] == '}') {
+		} else if (configuration == '}') {
 			if (!inBlock) {
-				if (sectionType == "include")
-					readConfig(sectionName);
-				else {
-					std::perror("An end brace occurred outside a block before a corresponding opening brace existed in the configuration file on line " + lineNumber);
-					std::exit(0);
-				}
+				std::perror("An end brace occurred outside a block before a corresponding opening brace existed in the configuration file.  The offending brace can be found on line " + lineNumber);
+				std::exit(0);
 			}
 			inBlock = false;
 			if (sectionType == "server") {
@@ -76,51 +84,62 @@ void ConfigReader::readConfig(std::string filename) {
 				std::perror("An invalid block type was declared in the configuration file.  This block ends on line " + lineNumber);
 				std::exit(0);
 			}
-		} else if (configuration[i] == '\\' && !escaped)
+		} else if (configuration == '\\' && !escaped)
 			escaped = escapedNow = true;
-		else if (escaped && configuration[i] == '"')
+		else if (escaped && configuration == '"')
 			currentValue += "\"";
-		else if (!escaped && configuration[i] == '"') {
+		else if (!escaped && configuration == '"') {
 			if (writing) {
 				writing = false;
 				commentable = true;
 				concatable = true;
 			} else {
-				currentValue += configuration[i];
+				currentValue += configuration;
 				writing = true;
 				commentable = false;
 				concatable = false;
 			}
 		} else if (writing) {
-			currentValue += configuration[i];
-		} else if (configuration[i] == '=')
+			currentValue += configuration;
+		} else if (configuration == '=')
 			acceptVar = false;
-		else if (configuration[i] == ' ' || configuration[i] == '\t' || configuration[i] == '\r' || configuration[i] == '\n') {
+		else if (configuration == ' ' || configuration == '\t' || configuration == '\r' || configuration == '\n') {
 			// ignore whitespace that's not part of a string
-		} else if (!escaped && !writing && configuration[i] == ';') { // parse the end of a statement
+		} else if (!escaped && !writing && configuration == ';') { // parse the end of a statement
+			if (!inBlock)
+				if (sectionType == "include")
+					includes.push_back(sectionName);
 			oneBlock.insert(std::pair<std::string, std::string> (varName, currentValue));
 			varName = "";
 			currentValue = "";
 			acceptVar = true;
 			concatable = false;
-		} else if (commentable && configuration[i] == '#') {
-			for ( ; configuration[i] != '\n'; i++) {} // ignore the rest of the line
+		} else if (commentable && configuration == '#') {
+			while (configuration != '\n' && configFile.good()) {
+				configuration = configFile.get(); // do nothing with it--ignore the line
+			}
+			lineNumber++; // count it as a line, since the \n won't reach the top of the loop where the line number increments
 		} else if (acceptVar)
-			varName += configuration[i];
-		else if (concatable && configuration[i] == '+') {
+			varName += configuration;
+		else if (concatable && configuration == '+') {
 			concatable = false;
 			concatening = true;
-		} else if (concatening && configuration[i] == '+') {
+		} else if (concatening && configuration == '+') {
 			concatening = false;
 			concatable = true;
+			// handle concatingVar sometime
 		} else if (concatening)
-			concatingVar += configuration[i];
+			concatingVar += configuration;
 		
 		if (!escapedNow && escaped) {
 			escaped = false;
 		}
  		escapedNow = false;
+		std::cout << configuration; //debug
 	}
+	configFile.close();
+	for (unsigned int i = 0; i < includes.size(); i++)
+		readConfig(includes[i]);
 }
 
 std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig() {
