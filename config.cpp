@@ -44,7 +44,8 @@ void ConfigReader::readConfig(std::string filename) {
 		
 		if (!inBlock && sectionType == "")
 			typingSection = true;
-		else if (typingSection) {
+		
+		if (typingSection) {
 			while (configuration != ' ' && configFile.good()) {
 				sectionType += configuration;
 				configuration = configFile.get();
@@ -65,6 +66,10 @@ void ConfigReader::readConfig(std::string filename) {
 				std::exit(0);
 			}
 			namingSection = false;
+			if (configuration == '{') { // handle this now since next iteration will handle the next character
+				inBlock = true;
+				acceptVar = true;
+			}
 		} else if (configuration == '{') {
 			inBlock = true;
 			acceptVar = true;
@@ -135,7 +140,6 @@ void ConfigReader::readConfig(std::string filename) {
 			escaped = false;
 		}
  		escapedNow = false;
-		std::cout << configuration; //debug
 	}
 	configFile.close();
 	for (unsigned int i = 0; i < includes.size(); i++)
