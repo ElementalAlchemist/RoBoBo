@@ -45,7 +45,14 @@ void ConfigReader::readConfig(std::string filename) {
 		if (!inBlock && sectionType == "")
 			typingSection = true;
 		
-		if (typingSection) {
+		if (commentable && configuration == '#') {
+			while (configuration != '\n' && configFile.good()) {
+				configuration = configFile.get(); // do nothing with it--ignore the line
+			}
+			lineNumber++; // count it as a line, since the \n won't reach the top of the loop where the line number increments
+		} else if (configuration == ' ' || configuration == '\t' || configuration == '\r' || configuration == '\n') {
+			// ignore whitespace that's not part of a string
+		} else if (typingSection) {
 			while (configuration != ' ' && configFile.good()) {
 				sectionType += configuration;
 				configuration = configFile.get();
@@ -120,9 +127,7 @@ void ConfigReader::readConfig(std::string filename) {
 			currentValue += configuration;
 		} else if (configuration == '=')
 			acceptVar = false;
-		else if (configuration == ' ' || configuration == '\t' || configuration == '\r' || configuration == '\n') {
-			// ignore whitespace that's not part of a string
-		} else if (!escaped && !writing && configuration == ';') { // parse the end of a statement
+		else if (!escaped && !writing && configuration == ';') { // parse the end of a statement
 			if (!inBlock)
 				if (sectionType == "include")
 					includes.push_back(sectionName);
@@ -131,11 +136,6 @@ void ConfigReader::readConfig(std::string filename) {
 			currentValue = "";
 			acceptVar = true;
 			concatable = false;
-		} else if (commentable && configuration == '#') {
-			while (configuration != '\n' && configFile.good()) {
-				configuration = configFile.get(); // do nothing with it--ignore the line
-			}
-			lineNumber++; // count it as a line, since the \n won't reach the top of the loop where the line number increments
 		} else if (acceptVar)
 			varName += configuration;
 		else if (concatable && configuration == '+') {
