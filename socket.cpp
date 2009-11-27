@@ -33,6 +33,8 @@ void Socket::connectServer(std::string address, unsigned short port) {
 	inet_pton(AF_INET, address.c_str(), &socketAddr.sin_addr);
 	int status;
 	
+	// TODO: resolve DNS
+	
 	do
 		status = connect(socketfd, (sockaddr*) &socketAddr, sizeof(socketAddr));
 	while (errno == EINPROGRESS || errno == EALREADY);
