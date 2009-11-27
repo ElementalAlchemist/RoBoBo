@@ -19,7 +19,7 @@ void makeModuleList(ConfigReader& config) {
 	}
 }
 
-void loadModules(ConfigReader& config) {
+/* void loadModules(ConfigReader& config) {
 	for (std::list<std::string>::iterator modListIter = moduleList.begin(); modListIter != moduleList.end(); modListIter++) {
 		std::string modName = *modListIter;
 		std::string fileLoc = "modules/" + modName;
@@ -48,11 +48,19 @@ void loadModules(ConfigReader& config) {
 		Module* newModule = spawnModule();
 		moduleList.insert(std::pair<std::string, Module> (modName, *newModule));
 	}
-}
+} */
 
 int main(int argc, char** argv) {
 	ConfigReader config;
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator iter = serverConf.begin(); iter != serverConf.end(); iter++) {
+		std::cout << "server " << iter->first << " {" << std::endl;
+		for (std::tr1::unordered_map<std::string, std::string>::iterator subIter = iter->second.begin(); subIter != iter->second.end(); subIter++) {
+			std::cout << subIter->first << "=\"" << subIter->second << "\";" << std::endl;
+		}
+		std::cout << "}" << std::endl;
+	}
 	makeServerList(config);
 	makeModuleList(config);
-	loadModules(config);
+	//loadModules(config);
 }

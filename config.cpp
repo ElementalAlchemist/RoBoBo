@@ -16,7 +16,6 @@ class ConfigReader {
 };
 
 ConfigReader::ConfigReader() {
-	std::cout << "The ConfigReader constructor was called." << std::endl; //debug
 	readConfig("robobo.conf");
 }
 
