@@ -4,6 +4,7 @@
 #define SERVER_ROBOBO
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars) {
 	serverConf = confVars;
+	registered = false;
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned int port;
 	portNumber >> port;
@@ -19,10 +20,19 @@ void Server::joinChannel(std::string channelName) {
 
 void Server::handleData() {
 	std::string receivedLine = "";
+	std::vector<std::string> parsedLine;
 	while (true) {
 		receivedLine = serverConnection.receive();
+		std::cout << receivedLine << std::endl;
 		// eventually this will interpret the data received.
 		// note: when you get that far, Channel takes this as a parameter
+		parsedLine = parseLine(receivedLine);
+		if (!registered) {
+			serverConnection.sendData("NICK " + serverConf["nick"]);
+			serverConnection.sendData("USER " + serverConf["ident"] + " here there :" + serverConf["gecos"]);
+			std::cout << "-> NICK " << serverConf["nick"] << std::endl << "-> USER " << serverConf["ident"] << " here there :" << serverConf["gecos"] << std::endl;
+			registered = true;
+		}
 	}
 }
 

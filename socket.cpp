@@ -20,7 +20,6 @@ class Socket {
 Socket::Socket() {
 	socketfd = socket(AF_INET, SOCK_STREAM, 0);
 	socketAddr.sin_family = AF_INET;
-	fcntl(socketfd, F_SETFL, O_NONBLOCK);
 	connected = false;
 }
 
@@ -35,10 +34,9 @@ void Socket::connectServer(std::string address, unsigned short port) {
 	
 	// TODO: resolve DNS
 	
-	do
-		status = connect(socketfd, (sockaddr*) &socketAddr, sizeof(socketAddr));
-	while (errno == EINPROGRESS || errno == EALREADY);
-	if (status != 0 && errno != EISCONN) {
+	status = connect(socketfd, (sockaddr*) &socketAddr, sizeof(socketAddr));
+	
+	if (status != 0) {
 		perror("Could not connect to server");
 		connected = false;
 	} else {
@@ -53,9 +51,7 @@ void Socket::closeConnection() {
 }
 
 bool Socket::isConnected() {
-	if (connected)
-		return true;
-	return false;
+	return connected;
 }
 
 bool Socket::sendData(std::string message) {
@@ -73,7 +69,7 @@ std::string Socket::receive() {
 	int status;
 	while (true) {
 		status = recv(socketfd, &inputBuffer, 1, 0);
-		if (status < 0 && errno != EWOULDBLOCK) {
+		if (status < 0) {
 			perror("An error occurred receiving a message");
 			closeConnection();
 		}

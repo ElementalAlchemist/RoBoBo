@@ -50,6 +50,7 @@ class Server {
 		std::tr1::unordered_map<char, char> prefix;
 		std::vector<char> chanTypes, statusMsg;
 		std::vector<std::vector<char> > chanModes;
+		bool registered;
 		void handleData();
 		void parse005(std::vector<std::string> parsedLine);
 		std::vector<std::string> parseLine(std::string unformattedLine);
