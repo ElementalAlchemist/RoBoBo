@@ -24,7 +24,6 @@ ConfigReader::ConfigReader(std::string filename) {
 }
 
 void ConfigReader::readConfig(std::string filename) {
-	std::cout << "The readConfig function was called at some point for the following file: " << filename << std::endl;
 	configFile.open(filename.c_str());
 	if (configFile.fail()) {
 		std::perror("Config file does not exist or could not be opened");
