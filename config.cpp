@@ -47,7 +47,7 @@ void ConfigReader::readConfig(std::string filename) {
 			while (configuration != '\n' && configFile.good()) {
 				configuration = configFile.get(); // do nothing with it--ignore the line
 			}
-			lineNumber++; // count it as a line, since the \n won't reach the top of the loop where the line number increments
+			lineNumber++; // count it as a line, since the \n won't reach the part of the loop where the line number increments
 		} else if ((configuration == ' ' || configuration == '\t' || configuration == '\r' || configuration == '\n') && !writing) {
 			// ignore whitespace that's not part of a string
 		} else if (typingSection) {
@@ -116,7 +116,6 @@ void ConfigReader::readConfig(std::string filename) {
 				commentable = true;
 				concatable = true;
 			} else {
-				currentValue += configuration;
 				writing = true;
 				commentable = false;
 				concatable = false;
