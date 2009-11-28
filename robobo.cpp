@@ -52,14 +52,6 @@ void makeModuleList(ConfigReader& config) {
 
 int main(int argc, char** argv) {
 	ConfigReader config;
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator iter = serverConf.begin(); iter != serverConf.end(); iter++) {
-		std::cout << "server " << iter->first << " {" << std::endl;
-		for (std::tr1::unordered_map<std::string, std::string>::iterator subIter = iter->second.begin(); subIter != iter->second.end(); subIter++) {
-			std::cout << subIter->first << "=\"" << subIter->second << "\";" << std::endl;
-		}
-		std::cout << "}" << std::endl;
-	}
 	makeServerList(config);
 	makeModuleList(config);
 	//loadModules(config);
