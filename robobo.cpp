@@ -7,7 +7,6 @@ std::list<std::string> serverList, moduleList;
 void makeServerList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
-		connectedServers.insert(std::pair<std::string, Server> (serverIterator->first, Server (serverIterator->first, serverIterator->second)));
 		serverList.insert(serverList.end(), serverIterator->first);
 	}
 }
@@ -16,6 +15,13 @@ void makeModuleList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig = config.getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIterator = modConfig.begin(); modIterator != modConfig.end(); modIterator++) {
 		moduleList.insert(moduleList.end(), modIterator->first);
+	}
+}
+
+void connectServers(ConfigReader& config) {
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
+	for (std::list<std::string>::iterator serverIterator = serverList.begin(); serverIterator != serverList.end(); serverIterator++) {
+		connectedServers.insert(std::pair<std::string, Server> (*serverIterator, Server (*serverIterator, serverConfig[*serverIterator], moduleList)));
 	}
 }
 
@@ -52,7 +58,8 @@ void makeModuleList(ConfigReader& config) {
 
 int main(int argc, char** argv) {
 	ConfigReader config;
-	makeServerList(config);
 	makeModuleList(config);
+	makeServerList(config);
+	connectServers(config);
 	//loadModules(config);
 }

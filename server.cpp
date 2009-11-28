@@ -1,9 +1,11 @@
 #include "connection.h"
+#include "channel.cpp"
 
 #ifndef SERVER_ROBOBO
 #define SERVER_ROBOBO
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, std::list<std::string> modList) {
 	serverConf = confVars;
+	moduleList = modList;
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned int port;
 	portNumber >> port;
@@ -19,6 +21,14 @@ void Server::joinChannel(std::string channelName) {
 
 // other interface functions
 
+std::tr1::unordered_map<char, char> Server::getPrefixes() {
+	return prefix;
+}
+
+std::vector<std::vector<char> > Server::getChanModes() {
+	return chanModes;
+}
+
 void Server::handleData() {
 	std::string receivedLine = "";
 	std::vector<std::string> parsedLine;
@@ -33,8 +43,7 @@ void Server::handleData() {
 		else if (parsedLine[1] == "005")
 			parse005(parsedLine);
 		else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
-			Channel joiningChannel (this);
-			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], joiningChannel));
+			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
 		}
 	}
 }

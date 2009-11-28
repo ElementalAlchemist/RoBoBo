@@ -7,7 +7,8 @@ User::User(Channel* thisChannel, std::string theIdent, std::string theHost, std:
 	ident = theIdent;
 	host = theHost;
 	gecos = theGECOS;
-	for (std::tr1::unordered_map<char, char>::iterator it = parentChannel->parentServer->prefix.begin(); it != parentChannel->parentServer->prefix.end(); it++)
+	std::tr1::unordered_map<char, char> prefixes = parentChannel->parentServer->getPrefixes();
+	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); it++)
 		hasStatus.insert(std::pair<char, bool> (it->first, false));
 }
 
