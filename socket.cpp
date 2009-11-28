@@ -55,6 +55,7 @@ bool Socket::isConnected() {
 }
 
 bool Socket::sendData(std::string message) {
+	message += "\r\n";
 	int status = send(socketfd, message.c_str(), message.size(), 0);
 	if ((unsigned) status == message.size())
 		return true;
