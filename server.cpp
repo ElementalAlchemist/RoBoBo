@@ -28,6 +28,14 @@ void Server::handleData() {
 		// eventually this will interpret the data received.
 		// note: when you get that far, Channel takes this as a parameter
 		parsedLine = parseLine(receivedLine);
+		if (parsedLine[1] == "001")
+			joinChannel(serverConf["channels"]);
+		else if (parsedLine[1] == "005")
+			parse005(parsedLine);
+		else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
+			Channel joiningChannel (this);
+			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], joiningChannel));
+		}
 	}
 }
 
@@ -77,5 +85,9 @@ std::vector<std::string> Server::separateBySpace(std::string joinedLine) {
 	if (wordPart != "")
 		words.push_back(wordPart);
 	return words;
+}
+
+std::string Server::separateNickFromFullHostmask(std::string hostmask) {
+	return hostmask.substr(0, hostmask.find_first_of('!'));
 }
 #endif

@@ -54,5 +54,6 @@ class Server {
 		void parse005(std::vector<std::string> parsedLine);
 		std::vector<std::string> parseLine(std::string unformattedLine);
 		std::vector<std::string> separateBySpace(std::string joinedLine);
+		std::string separateNickFromFullHostmask(std::string hostmask);
 };
 #endif
