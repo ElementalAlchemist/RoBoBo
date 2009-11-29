@@ -29,6 +29,11 @@ std::vector<std::vector<char> > Server::getChanModes() {
 	return chanModes;
 }
 
+void Server::resyncChannels() {
+	for (std::tr1::unordered_map<std::string, Channel>::iterator iter = inChannels.begin(); iter != inChannels.end(); iter++)
+		serverConnection.sendData("NAMES " + iter->first);
+}
+
 void Server::handleData() {
 	std::string receivedLine = "";
 	std::vector<std::string> parsedLine;
@@ -38,13 +43,29 @@ void Server::handleData() {
 		// eventually this will interpret the data received.
 		// note: when you get that far, Channel takes this as a parameter
 		parsedLine = parseLine(receivedLine);
-		if (parsedLine[1] == "001")
+		if (parsedLine[1] == "001") // welcome to the network
 			joinChannel(serverConf["channels"]);
-		else if (parsedLine[1] == "005")
+		else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
-		else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
+		else if (parsedLine[1] == "332") { // channel topic
+			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
+				if (it->first == parsedLine[3])
+					it->second.setTopic(parsedLine[4]);
+			}
+		} else if (parsedLine[1] == "353") { // NAMES reply
+			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
+				if (it->first == parsedLine[4])
+					it->second.parseNames(separateBySpace(parsedLine[5]));
+			}
+		} else if (parsedLine[1] == "366") { // end of NAMES reply
+			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
+				if (it->first == parsedLine[3])
+					it->second.numeric366();
+			}
+		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
-		}
+		else if (parsedLine[0] == "PING") // server ping
+			serverConnection.sendData("PONG " + parsedLine[1]);
 	}
 }
 

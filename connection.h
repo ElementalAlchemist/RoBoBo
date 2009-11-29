@@ -24,8 +24,8 @@ class User {
 class Channel {
 	public:
 		Channel(Server* thisServer);
-		void parseNames(std::string numeric353);
-		void clearUserlist();
+		void parseNames(std::vector<std::string> names);
+		void numeric366();
 		void setTopic(std::string newTopic);
 		void setMode(bool add, char mode, std::string param = "");
 		void joinChannel(std::string nick, std::string ident, std::string host, std::string gecos);
@@ -36,6 +36,7 @@ class Channel {
 		std::string topic;
 		std::tr1::unordered_map<char, std::string> modes; // does not include lists or statuses
 		std::vector<std::string> banList, exceptList, invexList;
+		bool namesSync;
 };
 
 class Server {
@@ -45,6 +46,7 @@ class Server {
 		// more interface functions soon
 		std::tr1::unordered_map<char, char> getPrefixes(); // necessary in channels
 		std::vector<std::vector<char> > getChanModes();
+		void resyncChannels();
 	private:
 		Socket serverConnection;
 		std::list<std::string> moduleList;
