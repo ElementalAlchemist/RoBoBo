@@ -25,7 +25,11 @@ void Channel::setMode(bool add, char mode, std::string param) {
 	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
 	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); it++) {
 		if (it->first == mode) {
-			users[param].status(add, mode);
+			//users[param].status(add, mode);
+			for (std::tr1::unordered_map<std::string, User>::iterator iter = users.begin(); iter != users.end(); iter++) {
+				if (iter->first == param)
+					iter->second.status(add, mode);
+			}
 			handled = true;
 		}
 	}
