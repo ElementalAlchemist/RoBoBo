@@ -41,15 +41,14 @@ class Channel {
 
 class Server {
 	public:
-		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, std::list<std::string> modList);
-		void joinChannel(std::string channelName);
-		// more interface functions soon
+		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, std::list<std::string>* modList);
+		void sendLine(std::string line);
 		std::tr1::unordered_map<char, char> getPrefixes(); // necessary in channels
 		std::vector<std::vector<char> > getChanModes();
 		void resyncChannels();
 	private:
 		Socket serverConnection;
-		std::list<std::string> moduleList;
+		std::list<std::string>* moduleList;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		std::tr1::unordered_map<std::string, Channel> inChannels;
 		std::string network;

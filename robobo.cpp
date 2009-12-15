@@ -6,9 +6,8 @@ std::list<std::string> serverList, moduleList;
 
 void makeServerList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++)
 		serverList.insert(serverList.end(), serverIterator->first);
-	}
 }
 
 void makeModuleList(ConfigReader& config) {
@@ -20,8 +19,15 @@ void makeModuleList(ConfigReader& config) {
 
 void connectServers(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
-	for (std::list<std::string>::iterator serverIterator = serverList.begin(); serverIterator != serverList.end(); serverIterator++) {
-		connectedServers.insert(std::pair<std::string, Server> (*serverIterator, Server (*serverIterator, serverConfig[*serverIterator], moduleList)));
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
+		std::tr1::unordered_map<std::string, std::string> thisServerConf;
+		for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator confIter = serverConfig.begin(); confIter != serverConfig.end(); confIter++) {
+			if (confIter->first == serverIterator->first) {
+				thisServerConf = confIter->second;
+				break;
+			}
+		}
+		connectedServers.insert(std::pair<std::string, Server> (serverIterator->first, Server (serverIterator->first, thisServerConf, &moduleList)));
 	}
 }
 
@@ -58,8 +64,8 @@ void connectServers(ConfigReader& config) {
 
 int main(int argc, char** argv) {
 	ConfigReader config;
-	makeModuleList(config);
 	makeServerList(config);
+	makeModuleList(config);
 	connectServers(config);
 	//loadModules(config);
 }

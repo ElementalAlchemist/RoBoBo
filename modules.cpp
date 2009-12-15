@@ -4,7 +4,7 @@
 #define MODBASE_ROBOBO
 class Module {
 	public:
-		Module(std::tr1::unordered_map<std::string, Module>& moduleList, std::tr1::unordered_map<std::string, Server>& serverData);
+		Module(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList);
 		virtual ~Module();
 		virtual void onChannelMsg(std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string nick, std::string message);
@@ -22,7 +22,7 @@ class Module {
 		virtual void onOutNotice(std::string target, std::string message);
 	protected:
 		std::tr1::unordered_map<std::string, Module>* modules;
-		std::tr1::unordered_map<std::string, Server>* servers;
+		std::list<std::string>* servers;
 		void sendPrivMsg(std::string target, std::string message);
 		void sendNotice(std::string target, std::string message);
 		void sendCTCP(std::string target, std::string type, std::string params = "");
@@ -33,9 +33,9 @@ class Module {
 		std::vector<std::string> splitBySpace(std::string line);
 };
 
-Module::Module(std::tr1::unordered_map<std::string, Module>& moduleList, std::tr1::unordered_map<std::string, Server>& serverData) {
-	modules = &moduleList;
-	servers = &serverData;
+Module::Module(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList) {
+	modules = moduleList;
+	servers = serverList;
 }
 
 Module::~Module() {}

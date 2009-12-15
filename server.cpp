@@ -3,7 +3,7 @@
 
 #ifndef SERVER_ROBOBO
 #define SERVER_ROBOBO
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, std::list<std::string> modList) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, std::list<std::string>* modList) {
 	serverConf = confVars;
 	moduleList = modList;
 	std::istringstream portNumber (serverConf["port"]);
@@ -15,11 +15,9 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	handleData();
 }
 
-void Server::joinChannel(std::string channelName) {
-	serverConnection.sendData("JOIN " + channelName);
+void Server::sendLine(std::string line) {
+	serverConnection.sendData(line);
 }
-
-// other interface functions
 
 std::tr1::unordered_map<char, char> Server::getPrefixes() {
 	return prefix;
@@ -43,9 +41,10 @@ void Server::handleData() {
 		// eventually this will interpret the data received.
 		// note: when you get that far, Channel takes this as a parameter
 		parsedLine = parseLine(receivedLine);
-		if (parsedLine[1] == "001") // welcome to the network
-			joinChannel(serverConf["channels"]);
-		else if (parsedLine[1] == "005") // server features
+		if (parsedLine[1] == "001") { // welcome to the network
+			if (serverConf["channels"] != "")
+				serverConnection.sendData("JOIN " + serverConf["channels"]);
+		} else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
 		else if (parsedLine[1] == "332") { // channel topic
 			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
