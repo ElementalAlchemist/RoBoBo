@@ -1,10 +1,10 @@
 #include "connection.h"
-#include "modinterface.cpp"
 #include "channel.cpp"
 
 #ifndef SERVER_ROBOBO
 #define SERVER_ROBOBO
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
+	serverName = serverAddress;
 	serverConf = confVars;
 	moduleData = modFace;
 	std::istringstream portNumber (serverConf["port"]);
@@ -26,6 +26,10 @@ std::tr1::unordered_map<char, char> Server::getPrefixes() {
 
 std::vector<std::vector<char> > Server::getChanModes() {
 	return chanModes;
+}
+
+std::vector<char> getChanTypes() {
+	return chanTypes;
 }
 
 void Server::resyncChannels() {
