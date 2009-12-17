@@ -8,6 +8,7 @@ class ModuleInterface {
 		void sendToServer(std::string server, std::string rawLine);
 		void callHook(std::string server, std::vector<std::string> parsedLine);
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
+		void callHookSelf(std::string server, std::vector<std::string> parsedLine);
 	private:
 		std::tr1::unordered_map<std::string, Server>* servers;
 		std::tr1::unordered_map<std::string, Module>* modules;
@@ -32,10 +33,10 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 	if (parsedLine[1] == "PRIVMSG") {
 		if (parsedLine[3][0] == (char)1) {
 			if (parsedLine[3][parsedLine.size()-1] == (char)1)
-				parsedLine[3] = parsedLine.substr(1, parsedLine.size()-2);
+				parsedLine[3] = parsedLine[3].substr(1, parsedLine[3].size()-2);
 			else
-				parsedLine[3] = parsedLine.substr(1);
-			if (isChanType(parsedLine[2][0]) {
+				parsedLine[3] = parsedLine[3].substr(1);
+			if (isChanType(parsedLine[2][0])) {
 				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 					modIter->second.onChannelCTCP(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			} else if (isChanType(parsedLine[2][1]) {
@@ -57,11 +58,43 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 					modIter->second.onUserMsg(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			}
 		}
+	} else if (parsedLine[1] == "NOTICE") {
+		if (parsedLine[3][0] == (char)1) {
+			if (parsedLine[3][parsedLine.size()-1] == (char)1)
+				parsedLine[3] = parsedLine[3].substr(1, parsedLine[3].size()-2);
+			else
+				parsedLine[3] = parsedLine[3].substr(1);
+			if (isChanType(parsedLine[2][0])) {
+				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+					modIter->second.onChannelCTCPReply(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
+			} else if (isChanType(parsedLine[2][1])) {
+				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+					modIter->second.onChannelCTCPReply(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
+			} else {
+				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+					modIter->second.onUserCTCPReply(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
+			}
+		} else {
+			if (isChanType(parsedLine[2][0])) {
+				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+					modIter->second.onChannelNotice(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
+			} else if (isChanType(parsedLine[2][1])) {
+				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+					modIter->second.onChannelNotice(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
+			} else {
+				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+					modIter->second.onUserNotice(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
+			}
+		}
 	}
 }
 
 void ModuleInterface::callHookOut(std::string server, std::vector<std::string> parsedLine) {
 	
+}
+
+void ModuleInterface::callHookSelf(std::string server, std::vector<std::string> parsedLine) {
+	// copypasta callHook, changing the hook names for Self
 }
 
 std::string ModuleInterface::parseNickFromHost(std::string host) {

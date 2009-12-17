@@ -7,21 +7,22 @@ class Module {
 		void init(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace);
 		Module();
 		virtual ~Module();
-		virtual void onChannelMsg(std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserMsg(std::string nick, std::string message);
-		virtual void onChannelNotice(std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserNotice(std::string nick, std::string message);
-		virtual void onChannelCTCP(std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserCTCP(std::string nick, std::string message);
-		virtual void onChannelCTCPReply(std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserCTCPReply(std::string nick, std::string message);
-		virtual void onChannelJoin(std::string channel, std::string hostmask);
-		virtual void onChannelPart(std::string channel, std::string hostmask, std::string reason);
-		virtual void onUserQuit(std::string hostmask, std::string reason);
-		virtual void onChannelKick(std::string channel, std::string kicker, std::string kickee, std::string reason);
-		virtual void onNumeric(std::string numeric, std::string message);
-		virtual void onOutMessage(std::string target, std::string message);
-		virtual void onOutNotice(std::string target, std::string message);
+		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual void onUserMsg(std::string server, std::string nick, std::string message);
+		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual void onUserNotice(std::string server, std::string nick, std::string message);
+		virtual void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual void onUserCTCP(std::string server, std::string nick, std::string message);
+		virtual void onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual void onUserCTCPReply(std::string server, std::string nick, std::string message);
+		virtual void onChannelJoin(std::string server, std::string channel, std::string hostmask);
+		virtual void onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason);
+		virtual void onUserQuit(std::string server, std::string hostmask, std::string reason);
+		virtual void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		virtual void onNumeric(std::string server, std::string numeric, std::string message);
+		virtual void onOutMessage(std::string server, std::string target, std::string message);
+		virtual void onOutNotice(std::string server, std::string target, std::string message);
+		virtual void onOtherData(std::string rawLine);
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, Module>* modules;
@@ -47,35 +48,37 @@ Module::Module() {}
 
 Module::~Module() {}
 
-void Module::onChannelMsg(std::string channel, char target, std::string nick, std::string message) {}
+void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
-void Module::onUserMsg(std::string nick, std::string message) {}
+void Module::onUserMsg(std::string server, std::string nick, std::string message) {}
 
-void Module::onChannelNotice(std::string channel, char target, std::string nick, std::string message) {}
+void Module::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
-void Module::onUserNotice(std::string nick, std::string message) {}
+void Module::onUserNotice(std::string server, std::string nick, std::string message) {}
 
-void Module::onChannelCTCP(std::string channel, char target, std::string nick, std::string message) {}
+void Module::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
-void Module::onUserCTCP(std::string nick, std::string message) {}
+void Module::onUserCTCP(std::string server, std::string nick, std::string message) {}
 
-void Module::onChannelCTCPReply(std::string channel, char target, std::string nick, std::string message) {}
+void Module::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
-void Module::onUserCTCPReply(std::string nick, std::string message) {}
+void Module::onUserCTCPReply(std::string server, std::string nick, std::string message) {}
 
-void Module::onChannelJoin(std::string channel, std::string hostmask) {}
+void Module::onChannelJoin(std::string server, std::string channel, std::string hostmask) {}
 
-void Module::onChannelPart(std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onUserQuit(std::string hostmask, std::string reason) {}
+void Module::onUserQuit(std::string server, std::string hostmask, std::string reason) {}
 
-void Module::onChannelKick(std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
-void Module::onNumeric(std::string numeric, std::string message) {}
+void Module::onNumeric(std::string server, std::string numeric, std::string message) {}
 
-void Module::onOutMessage(std::string target, std::string message) {}
+void Module::onOutMessage(std::string server, std::string target, std::string message) {}
 
-void Module::onOutNotice(std::string target, std::string message) {}
+void Module::onOutNotice(std::string server, std::string target, std::string message) {}
+
+void Module::onOtherData(std::string rawLine) {}
 
 /*void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
 	bot_socket->sendMsg("PRIVMSG " + target + " :" + message);
