@@ -31,36 +31,37 @@ void connectServers(ConfigReader& config, ModuleInterface& modInterface) {
 	}
 }
 
-/* void loadModules(ConfigReader& config, ModuleInterface& modInterface) {
+inline void loadModules(ConfigReader& config, ModuleInterface& modInterface) {
 	for (std::list<std::string>::iterator modListIter = moduleList.begin(); modListIter != moduleList.end(); modListIter++) {
 		std::string modName = *modListIter;
 		std::string fileLoc = "modules/" + modName;
 		void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 		if (openModule == NULL) {
-			std::string error = "Could not load module: " + modName + ": " + dlerror();
+			std::string error = "Could not load module " + modName + ": " + dlerror();
 			std::perror(error.c_str());
 			continue;
 		}
 		char* dlsymError;
-		void* spawnModule = dlsym(openModule, "spawn");
+		Module* spawnModule = (Module*) dlsym(openModule, "spawn");
 		dlsymError = dlerror();
 		if (dlsymError) {
-			std::string error = "Could not load module: " + modName + ": " + dlsymError;
+			std::string error = "Could not load module " + modName + ": " + dlsymError;
 			std::perror(error.c_str());
 			continue;
 		}
-		void* unspawnModule = dlsym(openModule, "unspawn");
-		dlsymError = dlerror();
+		dlsym(openModule, "unspawn"); // check that unspawn exists; if it doesn't, load should fail
+		dlsymError = dlerror(); // even though we don't use unspawn yet
 		if (dlsymError) {
-			std::string error = "Could not load module: " + modName + ": " + dlsymError;
+			std::string error = "Could not load module " + modName + ": " + dlsymError;
 			std::perror(error.c_str());
 			continue;
-		} // this should exist but we don't use it yet
+		}
 		
-		Module* newModule = spawnModule();
-		moduleList.insert(std::pair<std::string, Module> (modName, *newModule, &modInterface));
+		Module* newModule = spawnModule;
+		newModule->init(&loadedModules, &serverList, &modInterface);
+		loadedModules.insert(std::pair<std::string, Module> (modName, *newModule));
 	}
-} */
+}
 
 int main(int argc, char** argv) {
 	ConfigReader config;
@@ -68,5 +69,5 @@ int main(int argc, char** argv) {
 	makeServerList(config);
 	makeModuleList(config);
 	connectServers(config, modInterface);
-	//loadModules(config, modInterface);
+	loadModules(config, modInterface);
 }

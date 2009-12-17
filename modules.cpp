@@ -4,7 +4,8 @@
 #define MODBASE_ROBOBO
 class Module {
 	public:
-		Module(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace);
+		void init(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace);
+		Module();
 		virtual ~Module();
 		virtual void onChannelMsg(std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string nick, std::string message);
@@ -35,11 +36,13 @@ class Module {
 		std::vector<std::string> splitBySpace(std::string line);
 };
 
-Module::Module(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace) {
+void Module::init(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace) {
 	modules = moduleList;
 	servers = serverList;
 	serverData = modFace;
 }
+
+Module::Module() {}
 
 Module::~Module() {}
 
