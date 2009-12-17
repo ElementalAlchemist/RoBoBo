@@ -4,20 +4,20 @@ std::tr1::unordered_map<std::string, Server> connectedServers;
 std::tr1::unordered_map<std::string, Module> loadedModules;
 std::list<std::string> serverList, moduleList;
 
-void makeServerList(ConfigReader& config) {
+inline void makeServerList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++)
 		serverList.insert(serverList.end(), serverIterator->first);
 }
 
-void makeModuleList(ConfigReader& config) {
+inline void makeModuleList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig = config.getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIterator = modConfig.begin(); modIterator != modConfig.end(); modIterator++) {
 		moduleList.insert(moduleList.end(), modIterator->first);
 	}
 }
 
-void connectServers(ConfigReader& config) {
+void connectServers(ConfigReader& config, ModuleInterface& modInterface) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
 		std::tr1::unordered_map<std::string, std::string> thisServerConf;
@@ -27,11 +27,11 @@ void connectServers(ConfigReader& config) {
 				break;
 			}
 		}
-		connectedServers.insert(std::pair<std::string, Server> (serverIterator->first, Server (serverIterator->first, thisServerConf, &moduleList)));
+		connectedServers.insert(std::pair<std::string, Server> (serverIterator->first, Server (serverIterator->first, thisServerConf, &modInterface)));
 	}
 }
 
-/* void loadModules(ConfigReader& config) {
+/* void loadModules(ConfigReader& config, ModuleInterface& modInterface) {
 	for (std::list<std::string>::iterator modListIter = moduleList.begin(); modListIter != moduleList.end(); modListIter++) {
 		std::string modName = *modListIter;
 		std::string fileLoc = "modules/" + modName;
@@ -58,14 +58,15 @@ void connectServers(ConfigReader& config) {
 		} // this should exist but we don't use it yet
 		
 		Module* newModule = spawnModule();
-		moduleList.insert(std::pair<std::string, Module> (modName, *newModule));
+		moduleList.insert(std::pair<std::string, Module> (modName, *newModule, &modInterface));
 	}
 } */
 
 int main(int argc, char** argv) {
 	ConfigReader config;
+	ModuleInterface modInterface (&connectedServers, &loadedModules);
 	makeServerList(config);
 	makeModuleList(config);
-	connectServers(config);
-	//loadModules(config);
+	connectServers(config, modInterface);
+	//loadModules(config, modInterface);
 }

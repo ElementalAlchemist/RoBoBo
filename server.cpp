@@ -1,11 +1,12 @@
 #include "connection.h"
+#include "modinterface.cpp"
 #include "channel.cpp"
 
 #ifndef SERVER_ROBOBO
 #define SERVER_ROBOBO
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, std::list<std::string>* modList) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
 	serverConf = confVars;
-	moduleList = modList;
+	moduleData = modFace;
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned int port;
 	portNumber >> port;
