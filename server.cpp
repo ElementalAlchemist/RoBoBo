@@ -98,6 +98,7 @@ std::vector<std::string> Server::parseLine(std::string unformattedLine) {
 				for (i++; i < unformattedLine.size(); i++)
 					linePart += unformattedLine[i];
 				parsedLine.push_back(linePart);
+				linePart = "";
 				break;
 			}
 		}
