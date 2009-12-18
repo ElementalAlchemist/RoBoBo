@@ -21,6 +21,7 @@ class Module {
 		virtual void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		virtual void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		virtual void onOtherData(std::string server, std::vector<std::string> parsedLine);
+		
 		virtual void onOutChannelMessage(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserMessage(std::string server, std::string target, std::string message);
 		virtual void onOutChannelNotice(std::string server, std::string target, char status, std::string message);
@@ -30,18 +31,19 @@ class Module {
 		virtual void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
 		virtual void onOutOtherData(std::string server, std::vector<std::string> parsedLine);
-		virtual void onSelfChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onSelfUserMsg(std::string server, std::string nick, std::string message);
-		virtual void onSelfChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onSelfUserNotice(std::string server, std::string nick, std::string message);
-		virtual void onSelfChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onSelfUserCTCP(std::string server, std::string nick, std::string message);
-		virtual void onSelfChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onSelfUserCTCPReply(std::string server, std::string nick, std::string message);
-		virtual void onSelfChannelJoin(std::string server, std::string channel, std::string hostmask);
-		virtual void onSelfChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason);
-		virtual void onSelfUserQuit(std::string server, std::string hostmask, std::string reason);
-		virtual void onSelfChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		
+		virtual void onSelfChannelMsg(std::string server, std::string channel, char target, std::string message);
+		virtual void onSelfUserMsg(std::string server, std::string message);
+		virtual void onSelfChannelNotice(std::string server, std::string channel, char target, std::string message);
+		virtual void onSelfUserNotice(std::string server, std::string message);
+		virtual void onSelfChannelCTCP(std::string server, std::string channel, char target, std::string message);
+		virtual void onSelfUserCTCP(std::string server, std::string message);
+		virtual void onSelfChannelCTCPReply(std::string server, std::string channel, char target, std::string message);
+		virtual void onSelfUserCTCPReply(std::string server, std::string message);
+		virtual void onSelfChannelJoin(std::string server, std::string channel);
+		virtual void onSelfChannelPart(std::string server, std::string channel, std::string reason);
+		virtual void onSelfUserQuit(std::string server, std::string reason);
+		virtual void onSelfChannelKick(std::string server, std::string channel, std::string kickee, std::string reason);
 		virtual void onSelfOtherData(std::string server, std::vector<std::string> parsedLine);
 	protected:
 		std::string moduleName;
@@ -115,29 +117,29 @@ void Module::onOutUserCTCPReply(std::string server, std::string target, std::str
 
 void Module::onOutOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
-void Module::onSelfChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+void Module::onSelfChannelMsg(std::string server, std::string channel, char target, std::string message) {}
 
-void Module::onSelfUserMsg(std::string server, std::string nick, std::string message) {}
+void Module::onSelfUserMsg(std::string server, std::string message) {}
 
-void Module::onSelfChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+void Module::onSelfChannelNotice(std::string server, std::string channel, char target, std::string message) {}
 
-void Module::onSelfUserNotice(std::string server, std::string nick, std::string message) {}
+void Module::onSelfUserNotice(std::string server, std::string message) {}
 
-void Module::onSelfChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+void Module::onSelfChannelCTCP(std::string server, std::string channel, char target, std::string message) {}
 
-void Module::onSelfUserCTCP(std::string server, std::string nick, std::string message) {}
+void Module::onSelfUserCTCP(std::string server, std::string message) {}
 
-void Module::onSelfChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+void Module::onSelfChannelCTCPReply(std::string server, std::string channel, char target, std::string message) {}
 
-void Module::onSelfUserCTCPReply(std::string server, std::string nick, std::string message) {}
+void Module::onSelfUserCTCPReply(std::string server, std::string message) {}
 
-void Module::onSelfChannelJoin(std::string server, std::string channel, std::string hostmask) {}
+void Module::onSelfChannelJoin(std::string server, std::string channel) {}
 
-void Module::onSelfChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onSelfChannelPart(std::string server, std::string channel, std::string reason) {}
 
-void Module::onSelfUserQuit(std::string server, std::string hostmask, std::string reason) {}
+void Module::onSelfUserQuit(std::string server, std::string reason) {}
 
-void Module::onSelfChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onSelfChannelKick(std::string server, std::string channel, std::string kickee, std::string reason) {}
 
 void Module::onSelfOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
