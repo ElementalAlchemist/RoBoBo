@@ -86,6 +86,21 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 					modIter->second.onUserNotice(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			}
 		}
+	} else if (parsedLine[1] == "JOIN") {
+		if (parsedLine[0][0] == ':')
+			parsedLine[0] = parsedLine[0].substr(1);
+		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+			modIter->second.onChannelJoin(server, parsedLine[2], parsedLine[0]);
+	} else if (parsedLine[1] == "PART") {
+		if (parsedLine[0][0] == ':')
+			parsedLine[0] = parsedLine[0].substr(1);
+		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+			modIter->second.onChannelPart(server, parsedLine[2], parsedLine[0], parsedLine[3]);
+	} else if (parsedLine[1] == "QUIT") {
+		if (parsedLine[0][0] == ':')
+			parsedLine[0] = parsedLine[0].substr(1);
+		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+			modIter->second.onUserQuit(server, parsedLine[0], parsedLine[2]);
 	}
 }
 

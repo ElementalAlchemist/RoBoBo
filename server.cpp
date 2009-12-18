@@ -43,8 +43,6 @@ void Server::handleData() {
 	while (true) {
 		receivedLine = serverConnection.receive();
 		std::cout << receivedLine << std::endl;
-		// eventually this will interpret the data received.
-		// note: when you get that far, Channel takes this as a parameter
 		parsedLine = parseLine(receivedLine);
 		if (parsedLine[1] == "001") { // welcome to the network
 			if (serverConf["channels"] != "")
