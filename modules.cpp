@@ -95,11 +95,51 @@ void Module::onChannelKick(std::string server, std::string channel, std::string 
 
 void Module::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {}
 
-void Module::onOutMessage(std::string server, std::string target, std::string message) {}
-
-void Module::onOutNotice(std::string server, std::string target, std::string message) {}
-
 void Module::onOtherData(std::string server, std::vector<std::string> parsedLine) {}
+
+void Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) {}
+
+void Module::onOutUserMessage(std::string server, std::string target, std::string message) {}
+
+void Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) {}
+
+void Module::onOutUserNotice(std::string server, std::string target, std::string message) {}
+
+void Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) {}
+
+void Module::onOutUserCTCP(std::string server, std::string target, std::string message) {}
+
+void Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
+
+void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
+
+void Module::onOutOtherData(std::string server, std::vector<std::string> parsedLine) {}
+
+void Module::onSelfChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+
+void Module::onSelfUserMsg(std::string server, std::string nick, std::string message) {}
+
+void Module::onSelfChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+
+void Module::onSelfUserNotice(std::string server, std::string nick, std::string message) {}
+
+void Module::onSelfChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+
+void Module::onSelfUserCTCP(std::string server, std::string nick, std::string message) {}
+
+void Module::onSelfChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+
+void Module::onSelfUserCTCPReply(std::string server, std::string nick, std::string message) {}
+
+void Module::onSelfChannelJoin(std::string server, std::string channel, std::string hostmask) {}
+
+void Module::onSelfChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason) {}
+
+void Module::onSelfUserQuit(std::string server, std::string hostmask, std::string reason) {}
+
+void Module::onSelfChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+
+void Module::onSelfOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
 /*void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
 	bot_socket->sendMsg("PRIVMSG " + target + " :" + message);
