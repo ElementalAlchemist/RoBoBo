@@ -8,7 +8,7 @@
 if [ "$1" = "debug" ]
 then
 	echo Compiling with debug symbols.
-	g++ -ansi -pedantic-errors -Wall -g -O0 -fno-inline robobo.cpp -o robobo
+	g++ -ansi -pedantic-errors -Wall -ldl -g -O0 -fno-inline robobo.cpp -o robobo
 else
 	echo Compiling normally.
 	g++ -ansi -pedantic-errors -Wall -ldl robobo.cpp -o robobo
