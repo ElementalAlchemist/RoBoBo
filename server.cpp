@@ -49,6 +49,7 @@ void Server::handleData() {
 		receivedLine = serverConnection.receive();
 		std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
+		moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			if (serverConf["channels"] != "")
 				serverConnection.sendData("JOIN " + serverConf["channels"]);
