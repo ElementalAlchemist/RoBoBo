@@ -30,7 +30,10 @@ void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
 }
 
 std::tr1::unordered_map<std::string, std::string> ModuleInterface::getServerData(std::string server) {
-	
+	for (std::tr1::unordered_map<std::string, Server>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
+		if (serverIter->first == server)
+			return serverIter->second.getInfo();
+	}
 }
 
 void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {

@@ -43,6 +43,7 @@ class Server {
 	public:
 		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace);
 		void sendLine(std::string line);
+		std::tr1::unordered_map<std::string, std::string> getInfo();
 		std::tr1::unordered_map<char, char> getPrefixes(); // necessary in channels
 		std::vector<std::vector<char> > getChanModes();
 		std::vector<char> getChanTypes();

@@ -20,6 +20,10 @@ void Server::sendLine(std::string line) {
 	serverConnection.sendData(line);
 }
 
+std::tr1::unordered_map<std::string, std::string> Server::getInfo() {
+	return serverConf;
+}
+
 std::tr1::unordered_map<char, char> Server::getPrefixes() {
 	return prefix;
 }
