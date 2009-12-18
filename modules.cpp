@@ -35,6 +35,7 @@ class Module {
 		void joinChannel(std::string server, std::string channel, std::string key = "");
 		void partChannel(std::string server, std::string channel, std::string reason);
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
+		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
 };
 
@@ -114,7 +115,17 @@ void Module::kickChannelUser(std::string server, std::string channel, std::strin
 	bot_socket->sendMsg("KICK " + channel + " " + nick + " :" + reason);
 } */
 
-std::vector<std::string> splitBySpace(std::string line) {
+std::vector<std::string> Module::splitHostmask(std::string hostmask) {
+	std::vector<std::string> splitmask;
+	int exclamationPoint = hostmask.find_first_of('!');
+	int atSign = hostmask.find_first_of('@');
+	splitmask.push_back(hostmask.substr(0, exclamationPoint));
+	splitmask.push_back(hostmask.substr(exclamationPoint, atSign - exclamationPoint));
+	splitmask.push_back(hostmask.substr(atSign));
+	return splitmask;
+}
+
+std::vector<std::string> Module::splitBySpace(std::string line) {
 	std::vector<std::string> split;
 	std::string temp = "";
 	for (unsigned int i = 0; i < line.size(); i++) {
