@@ -104,6 +104,12 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 	} else if (parsedLine[1] == "KICK") {
 		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 			modIter->second.onChannelKick(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
+	} else if (parsedLine[1].size() == 3 && charIsNumeric(parsedLine[1][0]) && charIsNumeric(parsedLine[1][1]) && charIsNumeric(parsedLine[1][2])) {
+		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+			modIter->second.onNumeric(server, parsedLine[1], parsedLine);
+	} else {
+		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+			modIter->second.onOtherData(server, parsedLine);
 	}
 }
 
