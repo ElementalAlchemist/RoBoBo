@@ -33,7 +33,7 @@ std::vector<std::vector<char> > Server::getChanModes() {
 	return chanModes;
 }
 
-std::vector<char> getChanTypes() {
+std::vector<char> Server::getChanTypes() {
 	return chanTypes;
 }
 

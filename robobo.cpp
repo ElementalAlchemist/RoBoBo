@@ -25,8 +25,9 @@ void connectServers(ConfigReader& config, ModuleInterface& modInterface) {
 }
 
 inline void loadModules(ConfigReader& config, ModuleInterface& modInterface) {
-	for (std::list<std::string>::iterator modListIter = moduleList.begin(); modListIter != moduleList.end(); modListIter++) {
-		std::string modName = *modListIter;
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConfig = config.getModConfig();
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConfig.begin(); modIter != moduleConfig.end(); modIter++) {
+		std::string modName = modIter->first;
 		std::string fileLoc = "modules/" + modName;
 		void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 		if (openModule == NULL) {

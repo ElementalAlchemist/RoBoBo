@@ -34,6 +34,8 @@ std::tr1::unordered_map<std::string, std::string> ModuleInterface::getServerData
 		if (serverIter->first == server)
 			return serverIter->second.getInfo();
 	}
+	std::tr1::unordered_map<std::string, std::string> data; // if we're this far the module coder probably shouldn't be coding modules
+	return data; // but here's a blank map, just for you. :)
 }
 
 void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {
@@ -47,7 +49,7 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 			if (isChanType(parsedLine[2][0])) {
 				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 					modIter->second.onChannelCTCP(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1]) {
+			} else if (isChanType(parsedLine[2][1])) {
 				for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 					modIter->second.onChannelCTCP(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			} else {
