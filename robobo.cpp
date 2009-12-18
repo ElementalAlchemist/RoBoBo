@@ -2,19 +2,12 @@
 
 std::tr1::unordered_map<std::string, Server> connectedServers;
 std::tr1::unordered_map<std::string, Module> loadedModules;
-std::list<std::string> serverList, moduleList;
+std::list<std::string> serverList;
 
 inline void makeServerList(ConfigReader& config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++)
 		serverList.insert(serverList.end(), serverIterator->first);
-}
-
-inline void makeModuleList(ConfigReader& config) {
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig = config.getModConfig();
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIterator = modConfig.begin(); modIterator != modConfig.end(); modIterator++) {
-		moduleList.insert(moduleList.end(), modIterator->first);
-	}
 }
 
 void connectServers(ConfigReader& config, ModuleInterface& modInterface) {
@@ -67,7 +60,6 @@ int main(int argc, char** argv) {
 	ConfigReader config;
 	ModuleInterface modInterface (&connectedServers, &loadedModules);
 	makeServerList(config);
-	makeModuleList(config);
 	connectServers(config, modInterface);
 	loadModules(config, modInterface);
 }
