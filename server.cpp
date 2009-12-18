@@ -11,13 +11,14 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	unsigned int port;
 	portNumber >> port;
 	serverConnection.connectServer(serverAddress, port);
-	serverConnection.sendData("NICK " + serverConf["nick"]);
-	serverConnection.sendData("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
+	sendLine("NICK " + serverConf["nick"]);
+	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
 	handleData();
 }
 
 void Server::sendLine(std::string line) {
 	serverConnection.sendData(line);
+	moduleData->callHookOut(serverName, parseLine(line));
 }
 
 std::tr1::unordered_map<std::string, std::string> Server::getInfo() {
