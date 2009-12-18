@@ -117,10 +117,6 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 	
 }
 
-void ModuleInterface::callHookSelf(std::string server, std::vector<std::string> parsedLine) {
-	// copypasta callHook, changing the hook names for Self
-}
-
 std::string ModuleInterface::parseNickFromHost(std::string host) {
 	if (host[0] == ':')
 		host = host.substr(1);
