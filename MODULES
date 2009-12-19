@@ -3,181 +3,260 @@ Creating Modules Help File
 =======================
 Table of Contents
 
-1. Constructors
-2. Provided Variables and Functions
-3. Hooks and Parameters
-4. Module Functions
+1. Specifics of Implementation
+2. Communicating with a Server
+- 2.1. Receiving Data from a Server
+- 2.2. Receiving Data Being Sent to a Server
+- 2.3. Sending Data to a Server
+3. Helpful Variables and Functions
 
 =======================
-1. CONSTRUCTORS
+1. SPECIFICS OF IMPLEMENTATION
 
-You should at least initialize variables you create, as with any good C++ code.
-Your constructor should inherit the Module class and its constructor:
+In order to interface with the bot, you will need to define a few things.
 
-class m_samplemodule : public Module
+First, you will need modules allowing the bot to load and unload your modules.
+This is internally known as "spawning," mostly because "spawn" is such a cool
+word.  In order for the bot to load your module, you must define a way to load
+and unload your module.  This is done most simply as such:
 
-m_samplemodule::m_samplemodule(/*Something will go in here when I code that far*/) : Module (/*This will, also*/)
+extern "C" Module* spawn() {
+	return new mod_name;
+}
 
-=======================
-2. PROVIDED VARIABLES AND FUNCTIONS
+extern "C" unspawn(Module* mod) {
+	delete mod;
+}
 
-A pointer is inherited by modules which points to the list of channels and
-their information.  channelList points to an unordered_map of channels.  The
-channel data is held in the data, and the map keys hold the channel names.
+In this portion, the only thing that should change is the returned class in the
+spawn() function, which should be changed from mod_name to the name of your
+module class.  If you really want you can change the name of the mod variable
+in unspawn(Module*).
 
-A function is also inherited by modules.  This function will split a string
-into words by spaces and return std::vector<std::string> containing all the
-words in the order they were in the string.  This function is called like this:
-splitLine = splitBySpace(line);
-Where splitLine and line can be replaced with any variable names, as long as
-splitLine is of the type std::vector<std::string> and line is an std::string.
+Now that you've defined those, you are ready to make your class!  Your class
+must extend the Module class.
 
-An empty function is declared in the base class for reading config variables:
-config(std::tr1::unordered_map<std::string, std::string> configVars)
-You can then read your variables in with this function.  The parameter, an
-unordered map, holds the name of the variable specified in the configuration
-as the key, and variable's data in the configuration as the value.
+class mod_name : public Module {
+// Look!  A module!
+};
 
-=======================
-3. HOOKS AND PARAMETERS
+Finally, you should NOT overwrite the init() function.  This function is used
+to pass important variables into the Module.
 
-Below is a list of IRC hooks provided by the base class and called in the bot's
-code.  Each is followed by the list of parameters with the type of each
-parameter, and it is laid out in a multi-line format: the first line contains
-the function call, and the rest, contained in a multi-line comment block,
-contain a description of the function's purpose.
-
-onChannelMsg(std::string channel, char target, std::string nick, std::string message)
-/* Allows you to do something when the bot receives a channel message.  This
-function is not called when a CTCP is sent to the channel.  See onChannelCTCP.
-The channel parameter holds the channel's name.  The target parameter holds the
-status character that the user must have to receive the message
-(e.g. /msg @#channel blah).  If the message is sent to the entire channel the
-target parameter will hold the character '0' (the number zero).  The nick
-parameter holds the nick of the user who sent the message.  The message
-parameter holds the contents of the message sent to the channel. */
-
-onUserMsg(std::string nick, std::string message)
-/* Allows you to do something when a private message is sent to the bot.  This
-function is not called when a CTCP is sent to the bot.  See onUserCTCP.
-The nick parameter holds the nick of the user who send you the message.
-The message parameter holds the contents of the message sent. */
-
-onChannelNotice(std::string channel, char target, std::string nick, std::string message)
-/* Allows you to do something when the bot receives a channel notice.  This
-function is not called when a CTCP reply is sent to the channel.
-See onChannelCTCPReply.
-The channel parameter holds the channel's name.  The target parameter holds the
-status character that the user must have to receive the message
-(e.g. /notice @#channel blah).  If the message is sent to the entire channel
-the target parameter will hold the character '0' (the number zero).  The nick
-parameter holds the nick of the user who sent the message.  The message
-parameter holds the contents of the message sent. */
-
-onUserNotice(std::string nick, std::string message)
-/* Allows you to do something when a notice is sent to the bot.  This function
-is not called when a CTCP reply is sent to the bot.  See onUserCTCPReply.
-The nick parameter holds the nick of the user who sent the notice.
-The message parameter holds the contents of the message sent. */
-
-onChannelCTCP(std::string channel, std::string nick, std::string type, std::string params)
-/* Allows you to do something when the bot receives a CTCP request sent to a
-channel.  The channel parameter holds the name of the channel the CTCP was sent
-to.  The nick parameter holds the nick of the user who sent the CTCP.  The type
-parameter holds the CTCP command (the first word, i.e. PING, VERSION, etc.).
-The params parameter holds any data sent after the CTCP command before the end
-character. */
-
-onUserCTCP(std::string nick, std::string type, std::string params)
-/* Allows you to do something when the bot receives a CTCP request sent to it.
-The nick parameter holds the nick of the user who sent the CTCP.  The type
-parameter holds the CTCP command (the first word, i.e. PING, VERSION, etc.).
-The params parameter holds any data sent after the CTCP command before the end
-character. */
-
-onChannelCTCPReply(std::string channel, std::string nick, std::string type, std::string data)
-/* Allows you to do something when the bot receives a CTCP reply sent to a
-channel.  The channel parameter holds the name of the channel it was sent to.
-The nick parameter holds the nick of the user who sent the CTCP reply.
-The type parameter holds the CTCP command being replied to (the first word,
-i.e. PING, VERSION, etc.).  The data parameter holds the data sent with the
-CTCP reply before the ending CTCP character. */
-
-onUserCTCPReply(std::string nick, std::string type, std::string data)
-/* Allows you to do something when the bot receives a CTCP reply sent to it.
-The nick parameter holds the nick of the user who sent the CTCP reply.
-The type parameter holds the CTCP command being replied to (the first word,
-i.e. PING, VERSION, etc.).  The data parameter holds the data sent with the
-CTCP reply before the ending CTCP character. */
-
-onChannelJoin(std::string channel, std::string hostmask)
-/* Allows you to do something when a user joins a channel that the bot is in.
-The channel parameter holds the name of the channel.  The hostmask parameter
-holds the hostmask (in nick!user@host format) of the user who joined the
-channel. */
-
-onChannelPart(std::string channel, std::string hostmask, std::string reason)
-/* Allows you to do something when a user parts a channel that the bot is in.
-The channel parameter holds the name of the channel that the user parted from.
-The hostmask parameter holds the hostmask of the user who parted.  The reason
-parameter holds the part reason given. */
-
-onUserQuit(std::string hostmask, std::string reason)
-/* Allows you to do something when a user quits.  The hostmask parameter holds
-the hostmask of the user who quit.  The reason parameter holds the quit reason
-given. */
-
-onChannelKick(std::string channel, std::string kicker, std::string kickee, std::string reason)
-/* Allows you to do something when someone is kicked.  The channel parameter
-holds the name of the channel in which the kick occurred.  The kicker parameter
-holds the hostmask of the user who kicked someone.  The kickee parameter holds
-the nick of the user who was kicked.  The reason parameter holds the kick
-reason given. */
-
-onOutMessage(std::string target, std::string& message)
-/* Allows you to do something just before the bot sends out a message.
-The target parameter holds the target (either nick or channel) of the message.
-The message parameter holds the contents of the message to be sent.  The
-message is passed by reference so that it can be modified before it is sent. */
-
-onOutNotice(std::string target, std::string& message)
-/* Allows you to do something just before the bot sends out a notice.
-The target parameter holds the target (either nick or channel) of the notice.
-The message parameter holds the contents of the message to be sent.  The
-message is passed by reference so that it can be modified before it is sent. */
+From here you have the skeleton of your module.  The rest of this document
+outlines information you may want to know such as how to receive and be able to
+parse data from IRC servers, and how to send data from IRC servers.
 
 =======================
-4. MODULE FUNCTIONS
+2. COMMUNICATING WITH A SERVER
 
-This is a list of functions you can use to perform actions on IRC.  The list is
-formatted the same way as the hooks list, above.  These functions are
-predefined for you to use.
+As a module for an IRC bot, you can expect to be able to communicate with the
+servers the bot is connected to.
 
-sendPrivMsg(std::string target, std::string message)
-// Sends a PRIVMSG to target (nick or channel) with the message provided.
+=======================
+2.1. RECEIVING DATA FROM A SERVER
 
-sendNotice(std::string target, std::string message)
-// Sends a NOTICE to target (nick or channel) with the message provided.
+One direction of communication is receiving data.  This is provided through
+what the bot calls "hooks."  In order to use hooks you must simply define the
+functions corresponding to the hooks you need, which are declared in the base
+Module class.
 
-sendCTCP(std::string target, std::string type, std::string params)
-/* Sends a CTCP request to target (nick or channel).  It has a type (PING,
-VERSION, etc.) and potentially parameters given as params.  The params
-parameter is optional. */
+void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
+	This function is called when a PRIVMSG is received through a channel.  It is not triggered on CTCP.
+		server: The server from which the message was received
+		channel: The channel through which the message was received
+		target: The status character of the nicks who received the message.  If none, target == '0'
+		nick: The nick the message is from
+		message: The contents of the message
+void onUserMsg(std::string server, std::string nick, std::string message);
+	This function is called when a PRIVMSG is received directly from a user.  It is not triggered on CTCP.
+		server: The server from which the message was received
+		nick: The nick the message is from
+		message: The contents of the message
+void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
+	This function is called when a NOTICE is received through a channel.  It is not triggered on CTCP reply.
+		server: The server from which the notice was received
+		channel: The channel through which the message was recevied
+		target: The status character of the nicks who received the message.  If none, target == '0'
+		nick: The nick the notice is from
+		message: The contents of the message
+void onUserNotice(std::string server, std::string nick, std::string message);
+	This function is called when a NOTICE is received directly from a user.  It is not triggered on CTCP reply.
+		server: The server from which the notice was received
+		nick: The nick the notice is from
+		message: The contents of the message
+void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
+	This function is called when a CTCP request is received through a channel.
+		server: The server from which the request was received
+		channel: The channel through which the request was received
+		target: The status character of the nicks who received the request.  If none, target == '0'
+		nick: The nick the request is from
+		message: The contents of the request, including the type and any other data
+void onUserCTCP(std::string server, std::string nick, std::string message);
+	This function is called when a CTCP request is received directly from a user.
+		server: The server from which the request was received
+		nick: The nick the request is from
+		message: The contents of the request, including the type and any other data
+void onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
+	This function is called when a CTCP reply is received through a channel.
+		server: The server from which the reply was received
+		channel: The channel through which the reply was received
+		target: The status character of the nicks who received the reply.  If none, target == '0'
+		nick: The nick the reply is from
+		message: The contents of the reply, including the type and any other data
+void onUserCTCPReply(std::string server, std::string nick, std::string message);
+	This function is called when a CTCP reply is received directly from a user.
+		server: The server from which the reply was received
+		nick: The nick the reply is from
+		message: The contents of the reply, including the type and any other data
+void onChannelJoin(std::string server, std::string channel, std::string hostmask);
+	This function is called when someone joins a channel.  This can be the bot or anyone else.
+		server: The server from which the JOIN was received
+		channel: The channel that was joined
+		hostmask: The hostmask of the user who joined
+void onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason);
+	This function is called when someone parts a channel.  This can be the bot or anyone else.
+		server: The server from which the PART was received.
+		channel: The channel that was parted
+		hostmask: The hostmask of the user who parted
+		reason: The part reason
+void onUserQuit(std::string server, std::string hostmask, std::string reason);
+	This function is called when someone quits the IRC server.  This can be the bot or anyone else.
+		server: The server from which the QUIT was received.
+		hostmask: The hostmask of the user who quit
+		reason: The quit message
+void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+	This function is called when someone is kicked from an IRC channel.
+		server: The server from which the KICK was received
+		channel: The channel a user was kicked from
+		kicker: The nick of the user who kicked
+		kickee: The nick of the user who was kicked
+		reason: The kick reason
+void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
+	This function is called when the bot receives a numeric from the server.
+		server: The server that sent the numeric
+		numeric: The numeric
+		parsedLine: The entire line parsed as IRC parameters
+void onOtherData(std::string server, std::vector<std::string> parsedLine);
+	This function serves as a catch-all function.  All lines that don't call other hooks call this one.
+		server: The server the line was received from
+		parsedLine: The entire line parsed as IRC parameters
 
-sendCTCPReply(std::string target, std::string type, std::string data)
-/* Sends a CTCP reply to target (nick or channel).  It has a type (PING,
-VERSION, etc.) and potentially parameters given as data.  The data parameter
-is optional in case of certain CTCPs, but most CTCP requests expect some data
-with the reply. */
+=======================
+2.2 RECEIVING DATA BEING SENT TO A SERVER
 
-joinChannel(std::string channel, std::string key)
-/* Joins the channel specified.  The key parameter is optional.  If the channel
-requires a key it should be given. */
+Some hooks are defined to catch outgoing data, as well.  These hooks will be
+called when a matching line is sent, even if the hook being called belongs to
+the module that sent the line.
 
-partChannel(std::string channel, std::string reason)
-/* Parts the channel specified.  The reason parameter is optional.  If given,
-the bot will send reason as the part reason to the server. */
+void onOutChannelMessage(std::string server, std::string target, char status, std::string message);
+	This function is called whenever the bot sends a PRIVMSG to a channel.
+		server: The server the line was sent to
+		target: The channel the line was sent to
+		status: The status level the line was sent to.  If there is none, target == '0'
+		message: The actual message
+void onOutUserMessage(std::string server, std::string target, std::string message);
+	This function is called whenever the bot sends a PRIVMSG to a user.
+		server: The server the line was sent to
+		target: The nick the line was sent to
+		message: The actual message
+void onOutChannelNotice(std::string server, std::string target, char status, std::string message);
+	This function is called when the bot sends a notice to the channel.
+		server: The server the line was sent to
+		target: The channel the line was sent to
+		status: The status level the line was sent to.  If there is none, target == '0'
+		message: The actual message
+void onOutUserNotice(std::string server, std::string target, std::string message);
+	This function is called when the bot sends a notice to a user.
+		server: The server the line was sent to
+		target: The nick the line was sent to
+		message: The actual message
+void onOutChannelCTCP(std::string server, std::string target, char status, std::string message);
+	This function is called when the bot sends a CTCP request to a channel.
+		server: The server the CTCP request was sent to
+		target: The channel the CTCP request was sent to
+		status: The status level the line was sent to.  If there is none, target == '0'
+		message: The actual CTCP request, including the type and other sent data
+void onOutUserCTCP(std::string server, std::string target, std::string message);
+	This function is called when the bot sends a CTCP request to a user.
+		server: The server the CTCP request was sent to
+		target: The nick the CTCP request was sent to
+		message: The actual request, including the type and other sent data
+void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
+	This function is called when the bot sends a CTCP reply to a channel.
+		server: The server the CTCP reply was sent to
+		target: The channel the CTCP reply was sent to
+		status: The status level the line was sent to.  If there is none, target == '0'
+		message: The actual CTCP reply, including the type and other given information
+void onOutUserCTCPReply(std::string server, std::string target, std::string message);
+	This function is called when the bot sends a CTCP reply to a user.
+		server: The server the CTCP reply was sent to
+		target: The user the CTCP reply was sent to
+		message: The actual reply, including the type and any given information
 
-kickChannelUser(std::string channel, std::string nick, std::string reason)
-/* Kicks the user nick from the channel specified.  If the reason is given,
-it is sent to the server as the kick reason. */
+=======================
+2.3. SENDING DATA TO A SERVER
+
+Some functions are provided to you free of charge in the Module class allowing
+you to easily perform certain actions.
+
+void sendPrivMsg(std::string server, std::string target, std::string message);
+	This function will send a message.
+		server: The server the message is to be sent to
+		target: The recipient of the message.  Either a nick or a channel.
+		message: The message you wish to send.
+void sendNotice(std::string server, std::string target, std::string message);
+	This function will send a notice.
+		server: The server the message is to be sent to
+		target: The recipient of the notice.  Either a nick or a channel.
+		message: The message you wish to send.
+void sendCTCP(std::string server, std::string target, std::string type, std::string params = "");
+	This function will send a CTCP request.
+		server: The server the CTCP is to be sent to.
+		target: The recipient of the CTCP request.
+		type: The type of CTCP you are sending (PING, VERSION, etc.)
+		params: Optional. Any data that should be sent with the CTCP request.
+void sendCTCPReply(std::string server, std::string target, std::string type, std::string data = "");
+	This function will send a CTCP reply.
+		server: The server the reply is to be sent to.
+		target: The recipient of the CTCP reply.
+		type: The type of reply you are sending (PING, VERSION, etc.)
+		params: Optional. Any data that should be sent with the CTCP reply.
+void joinChannel(std::string server, std::string channel, std::string key = "");
+	This function will make the bot join a channel.
+		server: The server of the channel the bot should be joining
+		channel: The channel to join
+		key: Optional. The key of the channel the bot is to join
+void partChannel(std::string server, std::string channel, std::string reason);
+	This function will make the bot part a channel.
+		server: The server of the channel the bot should part
+		channel: The channel the bot should part
+		reason: The part message
+void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
+	This function will make the bot kick someone in a channel.
+		server: The server on which the user you wish to kick is
+		channel: The channel to kick a user from
+		nick: The nick to kick from the channel
+		reason: The kick reason
+
+=======================
+3. HELPFUL VARIABLES AND FUNCTIONS
+
+The Module class contains some functions that make it possible to code many
+modules and other functions that are just helpful.
+
+std::list<std::string>* servers;
+This variable holds a list of valid server names.  It has the names of all
+connected servers.
+
+std::vector<std::string> splitHostmask(std::string hostmask)
+This function takes a hostmask.  The hostmask can be either in the form of a
+normal nick!user@host hostmask or taken directly from a parsedLine[0] (or any
+other variable that may contain a line split up in that fashion).
+It returns a vector with the nick in position 0, the ident in position 1, and
+the hostname in position 2.
+
+std::vector<std::string> splitBySpace(std::string line)
+This function takes any line, and it splits it into pieces using a space as a
+delimiter.  Each word gets one position in the vector in the order in which the
+word was found.
