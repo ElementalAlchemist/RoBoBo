@@ -183,9 +183,6 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 					modIter->second.onOutUserNotice(server, parsedLine[2], parsedLine[3]);
 			}
 		}
-	} else {
-		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
-			modIter->second.onOutOtherData(server, parsedLine);
 	}
 }
 

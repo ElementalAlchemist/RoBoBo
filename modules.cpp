@@ -30,7 +30,6 @@ class Module {
 		virtual void onOutUserCTCP(std::string server, std::string target, std::string message);
 		virtual void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
-		virtual void onOutOtherData(std::string server, std::vector<std::string> parsedLine);
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, Module>* modules;
@@ -100,8 +99,6 @@ void Module::onOutUserCTCP(std::string server, std::string target, std::string m
 void Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
 
 void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
-
-void Module::onOutOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
 /*void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
 	bot_socket->sendMsg("PRIVMSG " + target + " :" + message);
