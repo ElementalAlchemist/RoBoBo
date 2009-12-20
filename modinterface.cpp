@@ -166,17 +166,9 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 				}
 				if (!found)
 					category = 4;
-				if (category == 0 || category == 1) {
+				if (category == 0 || category == 1 || (category == 2 && addMode)) {
 					for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 						modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam++]);
-				} else if (category == 2) {
-					if (addMode) {
-						for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
-							modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam++]);
-					} else {
-						for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
-							modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
-					}
 				} else {
 					for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 						modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
