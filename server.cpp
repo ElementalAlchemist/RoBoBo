@@ -159,6 +159,9 @@ void Server::handleData() {
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
 			serverConnection.closeConnection();
 			break;
+		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
+			serverConnection.closeConnection();
+			break;
 		} else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
 		else if (parsedLine[0] == "ERROR") {
