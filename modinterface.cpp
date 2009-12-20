@@ -115,6 +115,70 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 	} else if (parsedLine[1] == "KICK") {
 		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 			modIter->second.onChannelKick(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
+	} else if (parsedLine[1] == "MODE") {
+		bool addMode = true;
+		int currParam = 4;
+		for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
+			if (parsedLine[3][i] == '+')
+				addMode = true;
+			else if (parsedLine[3][i] == '-')
+				addMode = false;
+			else {
+				std::vector<std::vector<char> > serverModes = servers->getChanModes();
+				bool found = false;
+				short category;
+				for (unsigned int j = 0; j < serverModes[0].size(); j++) {
+					if (parsedLine[3][i] == serverModes[0][j]) {
+						found = true;
+						category = 0;
+						break;
+					}
+				}
+				if (!found) {
+					for (unsigned int j = 0; j < serverModes[1].size(); j++) {
+						if (parsedLine[3][i] == serverModes[1][j]) {
+							found = true;
+							category = 1;
+							break;
+						}
+					}
+				}
+				if (!found) {
+					for (unsigned int j = 0; j < serverModes[2].size(); j++) {
+						if (parsedLine[3][i] == serverModes[1][j]) {
+							found = true;
+							category = 2;
+							break;
+						}
+					}
+				}
+				if (!found) {
+					for (unsigned int j = 0; j < serverModes[3].size(); j++) {
+						if (parsedLine[3][i] == serverModes[1][j]) {
+							found = true;
+							category = 3;
+						}
+					}
+				}
+				if (!found)
+					category = 4;
+				if (category == 0 || category == 1) {
+					for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+						modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam++]);
+				} else if (category == 2) {
+					if (addMode) {
+						for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+							modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam++]);
+					} else {
+						for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+							modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
+					}
+				} else {
+					for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
+						modIter->second.onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
+				}
+			}
+		}
 	} else if (parsedLine[1].size() == 3 && charIsNumeric(parsedLine[1][0]) && charIsNumeric(parsedLine[1][1]) && charIsNumeric(parsedLine[1][2])) {
 		for (std::tr1::unordered_map<std::string, Module>::iterator modIter = modules->begin(); modIter != modules->end(); modIter++)
 			modIter->second.onNumeric(server, parsedLine[1], parsedLine);

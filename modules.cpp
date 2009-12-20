@@ -19,6 +19,7 @@ class Module {
 		virtual void onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason);
 		virtual void onUserQuit(std::string server, std::string hostmask, std::string reason);
 		virtual void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		virtual void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		virtual void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		virtual void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		
@@ -42,6 +43,7 @@ class Module {
 		void joinChannel(std::string server, std::string channel, std::string key = "");
 		void partChannel(std::string server, std::string channel, std::string reason);
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
+		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
 };
@@ -79,6 +81,8 @@ void Module::onChannelPart(std::string server, std::string channel, std::string 
 void Module::onUserQuit(std::string server, std::string hostmask, std::string reason) {}
 
 void Module::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+
+void Module::onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
 
 void Module::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {}
 

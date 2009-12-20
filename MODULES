@@ -132,6 +132,14 @@ void onChannelKick(std::string server, std::string channel, std::string kicker, 
 		kicker: The nick of the user who kicked
 		kickee: The nick of the user who was kicked
 		reason: The kick reason
+void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
+	This function is called when someone sets a mode on an IRC channel.
+		server: The server from which the MODE was received
+		channel: The channel in which the mode was set
+		setter: The user who set the mode
+		mode: The mode character
+		add: TRUE if the mode was added and FALSE if the mode was removed
+		param: Any parameters with the mode; empty string if there were no parameters
 void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 	This function is called when the bot receives a numeric from the server.
 		server: The server that sent the numeric
@@ -238,6 +246,13 @@ void kickChannelUser(std::string server, std::string channel, std::string nick, 
 		channel: The channel to kick a user from
 		nick: The nick to kick from the channel
 		reason: The kick reason
+void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
+	This function will make the bot set a mode on a channel.
+		server: The server the channel is on
+		channel: The channel the mode is to be set on
+		mode: The mode character you wish to setMode
+		add: TRUE if you wish to set the mode, FALSE if you wish to remove it
+		param: Optional. The parameter for the mode
 
 =======================
 3. HELPFUL VARIABLES AND FUNCTIONS
