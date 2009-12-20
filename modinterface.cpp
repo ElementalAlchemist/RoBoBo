@@ -124,7 +124,11 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 			else if (parsedLine[3][i] == '-')
 				addMode = false;
 			else {
-				std::vector<std::vector<char> > serverModes = servers->getChanModes();
+				std::vector<std::vector<char> > serverModes;
+				for (std::tr1::unordered_map<std::string, Server>::iterator servIter = servers->begin(); servIter != servers->end(); servIter++) {
+					if (servIter->first == server)
+						serverModes = servIter->second.getChanModes();
+				}
 				bool found = false;
 				short category;
 				for (unsigned int j = 0; j < serverModes[0].size(); j++) {

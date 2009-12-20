@@ -18,6 +18,7 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 
 void Server::sendLine(std::string line) {
 	serverConnection.sendData(line);
+	std::cout << " -> " << line << std::endl;
 	moduleData->callHookOut(serverName, parseLine(line));
 }
 
