@@ -50,7 +50,8 @@ void Server::handleData() {
 		receivedLine = serverConnection.receive();
 		std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
-		moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
+		if (parsedLine.size() >= 1)
+			moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			if (serverConf["channels"] != "")
 				sendLine("JOIN " + serverConf["channels"]);
@@ -155,10 +156,19 @@ void Server::handleData() {
 			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
-		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
+		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
+			serverConnection.closeConnection();
 			break;
-		else if (parsedLine[0] == "PING") // server ping
+		} else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
+		else if (parsedLine[0] == "ERROR") {
+			if (parsedLine[1].size() > 12) {
+				if (parsedLine[1].substr(0,12) == "Closing Link") {
+					serverConnection.closeConnection();
+					break;
+				}
+			}
+		}
 	}
 }
 
