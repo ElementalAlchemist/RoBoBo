@@ -51,9 +51,9 @@ inline void loadModules(ConfigReader& config, ModuleInterface& modInterface) {
 			continue;
 		}
 		
-		Module* newModule = spawnModule;
-		newModule->init(&loadedModules, &serverList, &modInterface);
-		loadedModules.insert(std::pair<std::string, Module> (modName, *newModule));
+		Module newModule = *spawnModule;
+		newModule.init(&loadedModules, &serverList, &modInterface);
+		loadedModules.insert(std::pair<std::string, Module> (modName, newModule));
 	}
 }
 
