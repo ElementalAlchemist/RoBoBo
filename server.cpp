@@ -149,7 +149,9 @@ void Server::handleData() {
 					}
 				}
 			}
-		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
+		} else if (parsedLine[1] == "NICK" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot's nick changed
+			serverConf["nick"] = parsedLine[2];
+		else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
