@@ -40,7 +40,7 @@ std::vector<char> Server::getChanTypes() {
 
 void Server::resyncChannels() {
 	for (std::tr1::unordered_map<std::string, Channel>::iterator iter = inChannels.begin(); iter != inChannels.end(); iter++)
-		serverConnection.sendData("NAMES " + iter->first);
+		sendLine("NAMES " + iter->first);
 }
 
 void Server::handleData() {
@@ -53,7 +53,7 @@ void Server::handleData() {
 		moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			if (serverConf["channels"] != "")
-				serverConnection.sendData("JOIN " + serverConf["channels"]);
+				sendLine("JOIN " + serverConf["channels"]);
 		} else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
 		else if (parsedLine[1] == "332") { // channel topic
@@ -74,14 +74,14 @@ void Server::handleData() {
 		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
 		else if (parsedLine[0] == "PING") // server ping
-			serverConnection.sendData("PONG " + parsedLine[1]);
+			sendLine("PONG " + parsedLine[1]);
 	}
 }
 
 void Server::parse005(std::vector<std::string> parsedLine) {
 	for (unsigned int i = 3; i < parsedLine.size(); i++) {
 		if (parsedLine[i] == "NAMESX")
-			serverConnection.sendData("PROTOCTL NAMESX");
+			sendLine("PROTOCTL NAMESX");
 		// other parts will come soon
 	}
 }
