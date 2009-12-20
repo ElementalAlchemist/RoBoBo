@@ -35,7 +35,6 @@ class Module {
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, Module>* modules;
 		std::list<std::string>* servers;
-		ModuleInterface* serverData;
 		void sendPrivMsg(std::string server, std::string target, std::string message);
 		void sendNotice(std::string server, std::string target, std::string message);
 		void sendCTCP(std::string server, std::string target, std::string type, std::string params = "");
@@ -46,6 +45,8 @@ class Module {
 		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
+	private:
+		ModuleInterface* serverData;
 };
 
 void Module::init(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace) {
