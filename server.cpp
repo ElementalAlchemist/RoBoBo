@@ -71,6 +71,84 @@ void Server::handleData() {
 				if (it->first == parsedLine[3])
 					it->second.numeric366();
 			}
+		} else if (parsedLine[1] == "MODE") {
+			bool addMode = true;
+			if (parsedLine[2] == serverConf["nick"]) { // if it's a user mode
+				for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
+					if (parsedLine[3][i] == '+')
+						addMode = true;
+					else if (parsedLine[3][i] == '-')
+						addMode = false;
+					else {
+						if (addMode)
+							userModes.push_back(parsedLine[3][i];
+						else {
+							for (unsigned int j = 0; j < userModes.size(); j++) {
+								if (parsedLine[3][i] == userModes[j]) {
+									userModes.remove(j);
+									break;
+								}
+							}
+						}
+					}
+				}
+			} else { // it's a channel mode
+				int currParam = 4;
+				for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
+					if (parsedLine[3][i] == '+')
+						addMode = true;
+					else if (parsedLine[3][i] == '-')
+						addMode = false;
+					else {
+						bool found = false;
+						int category;
+						for (unsigned int j = 0; j < chanModes[0].size(); j++) {
+							if (parsedLine[3][i] == chanModes[0][j]) {
+								found = true;
+								category = 0;
+							}
+						}
+						if (!found) {
+							for (unsigned int j = 0; j < chanModes[1].size(); j++) {
+								if (parsedLine[3][i] == chanModes[1][j]) {
+									found = true;
+									category = 1;
+								}
+							}
+						}
+						if (!found) {
+							for (unsigned int j = 0; j < chanModes[2].size(); j++) {
+								if (parsedLine[3][i] == chanModes[2][j]) {
+									found = true;
+									category = 2;
+								}
+							}
+						}
+						if (!found) {
+							for (unsigned int j = 0; j < chanModes[3].size(); j++) {
+								if (parsedLine[3][i] == chanModes[3][j]) {
+									found = true;
+									category = 3;
+								}
+							}
+						}
+						if (!found)
+							category = 4;
+						
+						if (category == 0 || category == 1 || (category == 2 && addMode)) {
+							for (std::tr1::unordered_map<std::string, Channel>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
+								if (chanIter->first == parsedLine[2])
+									chanIter->second.setMode(addMode, parsedLine[3][i], parsedLine[currParam++]);
+							}
+						} else {
+							for (std::tr1::unordered_map<std::string, Channel>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
+								if (chanIter->first == parsedLine[2])
+									chanIter->second.setMode(addMode, parsedLine[3][i], "");
+							}
+						}
+					}
+				}
+			}
 		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
