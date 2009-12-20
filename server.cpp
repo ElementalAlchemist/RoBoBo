@@ -81,11 +81,11 @@ void Server::handleData() {
 						addMode = false;
 					else {
 						if (addMode)
-							userModes.push_back(parsedLine[3][i];
+							userModes.push_back(parsedLine[3][i]);
 						else {
-							for (unsigned int j = 0; j < userModes.size(); j++) {
-								if (parsedLine[3][i] == userModes[j]) {
-									userModes.remove(j);
+							for (std::vector<char>::iterator uModeIter = userModes.begin(); uModeIter != userModes.end(); uModeIter++) {
+								if (parsedLine[3][i] == *uModeIter) {
+									userModes.erase(uModeIter);
 									break;
 								}
 							}
@@ -153,10 +153,9 @@ void Server::handleData() {
 			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
-		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
-			connected = false;
+		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			break;
-		} else if (parsedLine[0] == "PING") // server ping
+		else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
 	}
 }
