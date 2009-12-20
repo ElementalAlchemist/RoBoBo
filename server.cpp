@@ -174,9 +174,59 @@ void Server::handleData() {
 
 void Server::parse005(std::vector<std::string> parsedLine) {
 	for (unsigned int i = 3; i < parsedLine.size(); i++) {
-		if (parsedLine[i] == "NAMESX")
-			sendLine("PROTOCTL NAMESX");
-		// other parts will come soon
+		if (parsedLine[i] == "NAMESX") // RoBoBo supports NAMESX
+			sendLine("PROTOCTL NAMESX"); // NAMESX
+		if (parsedLine[i].size() > 8) { // Network name
+			if (parsedLine[i].substr(0,8) == "NETWORK=") // NETWORK=NameOfNetwork
+				network = parsedLine[i].substr(8);
+		}
+		if (parsedLine[i].size() > 7) { // Channel statuses
+			if (parsedLine[i].substr(0,7) == "PREFIX=") { // PREFIX=(qaohv)~&@%+
+				std::string data = parsedLine[i].substr(8);
+				std::string modes = data.substr(0, data.find_first_of(')'));
+				std::string chars = data.substr(data.find_first_of(')') + 1);
+				for (unsigned int i = 0; i < modes.size(); i++)
+					prefix.insert(std::pair<char, char> (modes[i], chars[i]));
+			}
+		}
+		if (parsedLine[i].size() > 10) { // Channel types
+			if (parsedLine[i].substr(0,10) == "CHANTYPES=") { // CHANTYPES=#&
+				std::string types = parsedLine[i].substr(10);
+				for (unsigned int i = 0; i < types.size(); i++)
+					chanTypes.push_back(types[i]);
+			}
+		}
+		if (parsedLine[i].size() > 10) { // Channel modes
+			if (parsedLine[i].substr(0,10) == "CHANMODES=") { // CHANMODES=Ibeg,k,FJLfjl,ABCGKMNOPQRSTcimnprst
+				std::string modeList = parsedLine[i].substr(10);
+				std::vector<char> currSet;
+				unsigned int i;
+				for (i = 0; i < modeList.size(); i++) { // list modes
+					if (modeList[i] == ',')
+						break;
+					currSet.push_back(modeList[i]);
+				}
+				chanModes.push_back(currSet);
+				currSet.clear();
+				for (i++; i < modeList.size(); i++) { // param for set and unset; increment i off comma before continuing
+					if (modeList[i] == ',')
+						break;
+					currSet.push_back(modeList[i]);
+				}
+				chanModes.push_back(currSet);
+				currSet.clear();
+				for (i++; i < modeList.size(); i++) { // param for set; increment i off comma
+					if (modeList[i] == ',')
+						break;
+					currSet.push_back(modeList[i]);
+				}
+				chanModes.push_back(currSet);
+				currSet.clear();
+				for (i++; i < modeList.size(); i++) // no param; increment i off comma
+					currSet.push_back(modeList[i]); // no more commas
+				chanModes.push_back(currSet);
+			}
+		}
 	}
 }
 
