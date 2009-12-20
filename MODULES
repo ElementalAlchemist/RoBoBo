@@ -15,10 +15,10 @@ Table of Contents
 
 In order to interface with the bot, you will need to define a few things.
 
-First, you will need modules allowing the bot to load and unload your modules.
-This is internally known as "spawning," mostly because "spawn" is such a cool
-word.  In order for the bot to load your module, you must define a way to load
-and unload your module.  This is done most simply as such:
+First, you will need functions allowing the bot to load and unload your
+modules.  This is internally known as "spawning," mostly because "spawn" is
+such a cool word.  In order for the bot to load your module, you must define a
+way to load and unload your module.  This is done most simply as such:
 
 extern "C" Module* spawn() {
 	return new mod_name;
@@ -39,6 +39,11 @@ must extend the Module class.
 class mod_name : public Module {
 // Look!  A module!
 };
+
+Your constructor can be unique to your module.  The Module class has an empty
+constructor with no important code in it (the important code is in a separate
+function).  However, you should at least initialize the std::string variable
+moduleName with the name of your module.
 
 Finally, you should NOT overwrite the init() function.  This function is used
 to pass important variables into the Module.
