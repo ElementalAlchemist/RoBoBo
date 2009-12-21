@@ -1,0 +1,11 @@
+RoBoBo-IRC-BoBo
+Current TODO List
+
+[ ] - not done
+[>] - in progress
+[x] - complete
+
+Before considering releasing alpha 1
+======================================
+[ ] - Thread Server::handleData()
+[ ] - compile modules
