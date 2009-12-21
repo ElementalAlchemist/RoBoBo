@@ -10,14 +10,10 @@ class Channel;
 
 class User {
 	public:
-		User(Channel* thisChannel, std::string theIdent, std::string theHost, std::string theGECOS);
-		std::string getIdent();
-		std::string getHost();
-		std::string getName();
+		User(Channel* thisChannel);
 		void status(bool add, char status);
 		Channel* parentChannel;
 	private:
-		std::string ident, host, gecos;
 		std::tr1::unordered_map<char, bool> hasStatus;
 };
 
@@ -28,7 +24,7 @@ class Channel {
 		void numeric366();
 		void setTopic(std::string newTopic);
 		void setMode(bool add, char mode, std::string param = "");
-		void joinChannel(std::string nick, std::string ident, std::string host, std::string gecos);
+		void joinChannel(std::string nick);
 		void leaveChannel(std::string nick);
 		Server* parentServer;
 	private:

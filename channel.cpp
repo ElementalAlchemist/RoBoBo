@@ -14,7 +14,24 @@ void Channel::parseNames(std::vector<std::string> names) {
 		users.clear();
 		namesSync = false;
 	}
-	// will handle this soon
+	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
+	std::vector<char> modes;
+	for (unsigned int i = 0; i < names.size(); i++) {
+		for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); prefixIter++) {
+			if (prefixIter->second == names[i][0]) {
+				modes.push_back(prefixIter->first);
+				names[i] = names[i].substr(1);
+			}
+		}
+		users.insert(std::pair<std::string, User> (names[i], User(this)));
+		for (unsigned int j = 0; j < modes.size(); j++) {
+			for (std::tr1::unordered_map<std::string, User>::iterator userIter = users.begin(); userIter != users.end(); userIter++) {
+				if (names[i] == userIter->first)
+					userIter->second.status(true, modes[j]);
+			}
+		}
+		modes.clear();
+	}
 }
 
 void Channel::numeric366() {
@@ -29,7 +46,6 @@ void Channel::setMode(bool add, char mode, std::string param) {
 	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
 	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); it++) {
 		if (it->first == mode) {
-			//users[param].status(add, mode);
 			bool exists = false;
 			for (std::tr1::unordered_map<std::string, User>::iterator iter = users.begin(); iter != users.end(); iter++) {
 				if (iter->first == param){
@@ -43,8 +59,8 @@ void Channel::setMode(bool add, char mode, std::string param) {
 	}
 }
 
-void Channel::joinChannel(std::string nick, std::string ident, std::string host, std::string gecos) {
-	users.insert(std::pair<std::string, User> (nick, User (this, ident, host, gecos)));
+void Channel::joinChannel(std::string nick) {
+	users.insert(std::pair<std::string, User> (nick, User (this)));
 }
 
 void Channel::leaveChannel(std::string nick) {
