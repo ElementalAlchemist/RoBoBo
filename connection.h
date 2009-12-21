@@ -34,8 +34,6 @@ class Channel {
 	private:
 		std::tr1::unordered_map<std::string, User> users;
 		std::string topic;
-		std::tr1::unordered_map<char, std::string> modes; // does not include lists or statuses
-		std::vector<std::string> banList, exceptList, invexList;
 		bool namesSync;
 };
 

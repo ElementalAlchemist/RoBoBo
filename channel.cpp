@@ -26,7 +26,6 @@ void Channel::setTopic(std::string newTopic) {
 }
 
 void Channel::setMode(bool add, char mode, std::string param) {
-	bool handled = false;
 	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
 	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); it++) {
 		if (it->first == mode) {
@@ -40,23 +39,7 @@ void Channel::setMode(bool add, char mode, std::string param) {
 			}
 			if (!exists)
 				parentServer->resyncChannels();
-			handled = true;
 		}
-	}
-	if (!handled) {
-		std::vector<std::vector<char> > chanModes = parentServer->getChanModes();
-		for (std::vector<char>::iterator it = chanModes[0].begin(); it != chanModes[0].end(); it++) {
-			if (mode == *it) { // check if it's a list mode
-				// add to ban list, except list, or invex list
-				handled = true;
-			}
-		}
-	}
-	if (!handled) {
-		if (add)
-			modes.insert(std::pair<char, std::string> (mode, param));
-		else
-			modes.erase(mode);
 	}
 }
 
