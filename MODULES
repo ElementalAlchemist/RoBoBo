@@ -258,6 +258,10 @@ void setMode(std::string server, std::string channel, char mode, bool add, std::
 		mode: The mode character you wish to setMode
 		add: TRUE if you wish to set the mode, FALSE if you wish to remove it
 		param: Optional. The parameter for the mode
+void quitServer(std::string server, std::string reason);
+	This function makes the bot quit a server.
+		server: The server to quit
+		reason: The quit reason to give
 
 =======================
 3. HELPFUL VARIABLES AND FUNCTIONS

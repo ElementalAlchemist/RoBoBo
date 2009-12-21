@@ -43,6 +43,7 @@ class Module {
 		void partChannel(std::string server, std::string channel, std::string reason);
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
 		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
+		void quitServer(std::string server, std::string reason);
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
 	private:
@@ -105,39 +106,57 @@ void Module::onOutChannelCTCPReply(std::string server, std::string target, char 
 
 void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
 
-/*void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
-	bot_socket->sendMsg("PRIVMSG " + target + " :" + message);
+void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
+	serverData.sendToServer(server, "PRIVMSG " + target + " :" + message);
 }
 
 void Module::sendNotice(std::string server, std::string target, std::string message) {
-	bot_socket->sendMsg("NOTICE " + target + " :" + message);
+	serverData.sendToServer(server, "NOTICE " + target + " :" + message);
 }
 
-void Module::sendCTCP(std::string server, std::string target, std::string type, std::string params) {
-	if (params != "")
-		bot_socket->sendMsg("PRIVMSG " + target + " :" + (char)1 + type + " " + params + (char)1);
+void Module::sendCTCP(std::string server, std::string target, std::string type, std::string params = "") {
+	if (params == "")
+		serverData.sendToServer(server, "PRIVMSG " + target + " :" + (char)1 + type + (char)1);
 	else
-		bot_socket->sendMsg("PRIVMSG " + target + " :" + (char)1 + type + (char)1);
+		serverData.sendToServer(server, "PRIVMSG " + target + " :" + (char)1 + type + " " + params + (char)1);
 }
 
-void Module::sendCTCPReply(std::string server, std::string target, std::string type, std::string data) {
-	if (data != "")
-		bot_socket->sendMsg("NOTICE " + target + " :" + (char)1 + type + " " + data + (char)1);
+void Module::sendCTCPReply(std::string server, std::string target, std::string type, std::string data = "") {
+	if (data == "")
+		serverData.sendToServer(server, "NOTICE " + target + " :" + (char)1 + type + (char)1);
 	else
-		bot_socket->sendMsg("NOTICE " + target + " :" + (char)1 + type + (char)1);
+		serverData.sendToServer(server, "NOTICE " + target + " :" + (char)1 + type + " " + data + (char)1);
 }
 
-void Module::joinChannel(std::string server, std::string channel, std::string key) {
-	bot_socket->sendMsg("JOIN " + channel + " " + key);
+void Module::joinChannel(std::string server, std::string channel, std::string key = "") {
+	serverData.sendToServer(server, "JOIN " + channel + " " + key);
 }
 
 void Module::partChannel(std::string server, std::string channel, std::string reason) {
-	bot_socket->sendMsg("PART " + channel + " :" + reason);
+	serverData.sendToServer(server, "PART " + channel + " :" + reason);
 }
 
 void Module::kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason) {
-	bot_socket->sendMsg("KICK " + channel + " " + nick + " :" + reason);
-} */
+	serverData.sendToServer(server, "KICK " + channel + " " + nick + " :" + reason);
+}
+
+void Module::setMode(std::string server, std::string channel, char mode, bool add, std::string param = "") {
+	if (param == "") {
+		if (add)
+			serverData.sendToServer(server, "MODE " + channel + " +" + mode);
+		else
+			serverData.sendToServer(server, "MODE " + channel + " -" + mode);
+	} else {
+		if (add)
+			serverData.sendToServer(server, "MODE " + channel + " +" + mode + " " + param);
+		else
+			serverData.sendToServer(server, "MODE " + channel + " -" + mode + " " + param);
+	}
+}
+
+void Module::quitServer(std::string server, std::string reason) {
+	serverData.sendToServer(server, "QUIT :" + reason);
+}
 
 std::vector<std::string> Module::splitHostmask(std::string hostmask) {
 	std::vector<std::string> splitmask;
