@@ -13,7 +13,8 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	serverConnection.connectServer(serverAddress, port);
 	sendLine("NICK " + serverConf["nick"]);
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
-	handleData();
+	//handleData();
+	pthread_create(&dataReceiveThread, NULL, handleData_thread, this);
 }
 
 void Server::sendLine(std::string line) {
@@ -43,11 +44,19 @@ void Server::resyncChannels() {
 		sendLine("NAMES " + iter->first);
 }
 
+void* Server::handleData_thread(void* selfPtr) {
+	Server* servPtr = (Server*) selfPtr;
+	servPtr->handleData();
+	return NULL;
+}
+
 void Server::handleData() {
 	std::string receivedLine = "";
 	std::vector<std::string> parsedLine;
 	while (true) {
 		receivedLine = serverConnection.receive();
+		if (receivedLine == "")
+			break; // this case indicates a receive error
 		std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
 		if (parsedLine.size() >= 1)

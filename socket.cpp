@@ -73,6 +73,7 @@ std::string Socket::receive() {
 		if (status < 0) {
 			perror("An error occurred receiving a message");
 			closeConnection();
+			break;
 		}
 		if (inputBuffer[0] == '\0')
 			return messageString;
@@ -84,5 +85,6 @@ std::string Socket::receive() {
 		if (inputBuffer[0] == '\r')
 			seenCR = true;
 	}
+	return "";
 }
 #endif
