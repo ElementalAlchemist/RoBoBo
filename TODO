@@ -11,3 +11,4 @@ Before considering releasing alpha 1
 [ ] - compile modules
 [>] - fix parsing of the conf files
 	[ ] - fix including in conf files
+	[>] - test concatenation of other variables
