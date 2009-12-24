@@ -55,13 +55,6 @@ void ConfigReader::readConfig(std::string filename) {
 				sectionType += configuration;
 				configuration = configFile.get();
 			}
-			if (!configFile.good()) {
-				std::ostringstream lineSS;
-				lineSS << lineNumber;
-				std::string message = "An error occurred reading a section type name in the configuration file.  This error occurred on line " + lineSS.str();
-				std::perror(message.c_str());
-				std::exit(0);
-			}
 			typingSection = false;
 			namingSection = true;
 		} else if (namingSection) {
@@ -84,7 +77,7 @@ void ConfigReader::readConfig(std::string filename) {
 		} else if (configuration == '{') {
 			inBlock = true;
 			acceptVar = true;
-		} else if (configuration == '}') {
+		} else if (configuration == '}' && !writing) {
 			if (!inBlock) {
 				std::ostringstream lineSS;
 				lineSS << lineNumber;
@@ -93,19 +86,21 @@ void ConfigReader::readConfig(std::string filename) {
 				std::exit(0);
 			}
 			inBlock = false;
-			if (sectionType == "server") {
+			typingSection = true;
+			if (sectionType == "server")
 				serverConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
-				oneBlock.clear();
-			} else if (sectionType == "module") {
+			else if (sectionType == "module")
 				modConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
-				oneBlock.clear();
-			} else {
+			else {
 				std::ostringstream lineSS;
 				lineSS << lineNumber;
 				std::string message = "An invalid block type was declared in the configuration file.  This block is of type " + sectionType + " and ends on line " + lineSS.str();
 				std::perror(message.c_str());
 				std::exit(0);
 			}
+			sectionType = "";
+			sectionName = "";
+			oneBlock.clear();
 		} else if (configuration == '\\' && !escaped)
 			escaped = escapedNow = true;
 		else if (escaped && configuration == '"')
@@ -141,7 +136,21 @@ void ConfigReader::readConfig(std::string filename) {
 		} else if (concatening && configuration == '+') {
 			concatening = false;
 			concatable = true;
-			// handle concatingVar sometime
+			bool found = false;
+			for (std::tr1::unordered_map<std::string, std::string>::iterator blockIter = oneBlock.begin(); blockIter != oneBlock.end(); blockIter++) {
+				if (blockIter->first == concatingVar) {
+					currentValue += concatingVar;
+					found = true;
+				}
+			}
+			concatingVar = "";
+			if (!found) {
+				std::ostringstream lineSS;
+				lineSS << lineNumber;
+				std::string message = "An invalid variable was concatenated to a value.  This occurred on line " + lineSS.str();
+				std::perror(message.c_str());
+				std::exit(0);
+			}
 		} else if (concatening)
 			concatingVar += configuration;
 		
