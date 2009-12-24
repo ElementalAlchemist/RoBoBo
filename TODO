@@ -9,6 +9,6 @@ Before considering releasing alpha 1
 ======================================
 [x] - Thread Server::handleData()
 [ ] - compile modules
-[>] - fix parsing of the conf files
-	[ ] - fix including in conf files
+[x] - fix parsing of the conf files
+	[x] - fix including in conf files
 	[x] - test concatenation of other variables

@@ -58,7 +58,7 @@ void ConfigReader::readConfig(std::string filename) {
 			typingSection = false;
 			namingSection = true;
 		} else if (namingSection) {
-			while (configuration != ' ' && configuration != '{' && configFile.good()) {
+			while (configuration != ' ' && configuration != '{' && configuration != ';' && configFile.good()) {
 				sectionName += configuration;
 				configuration = configFile.get();
 			}
@@ -74,6 +74,8 @@ void ConfigReader::readConfig(std::string filename) {
 				inBlock = true;
 				acceptVar = true;
 			}
+			if (configuration == ';' && sectionType == "include")
+				includes.push_back(sectionName);
 		} else if (configuration == '{') {
 			inBlock = true;
 			acceptVar = true;
@@ -132,10 +134,11 @@ void ConfigReader::readConfig(std::string filename) {
 					std::perror(message.c_str());
 					std::exit(0);
 				}
+			} else {
+				if (concatening)
+					currentValue += oneBlock[concatingVar];
+				oneBlock.insert(std::pair<std::string, std::string> (varName, currentValue));
 			}
-			if (concatening)
-				currentValue += oneBlock[concatingVar];
-			oneBlock.insert(std::pair<std::string, std::string> (varName, currentValue));
 			varName = "";
 			currentValue = "";
 			acceptVar = true;
@@ -159,8 +162,10 @@ void ConfigReader::readConfig(std::string filename) {
  		escapedNow = false;
 	}
 	configFile.close();
-	for (unsigned int i = 0; i < includes.size(); i++)
+	for (unsigned int i = 0; i < includes.size(); i++) {
+		std::cout << "Look!  A file was included! " << includes[i] << std::endl;
 		readConfig(includes[i]);
+	}
 }
 
 std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig() {
