@@ -114,15 +114,27 @@ void ConfigReader::readConfig(std::string filename) {
 				writing = true;
 				commentable = false;
 				concatable = false;
+				concatening = false;
 			}
 		} else if (writing) {
 			currentValue += configuration;
-		} else if (configuration == '=')
+		} else if (configuration == '=') {
 			acceptVar = false;
-		else if (!escaped && !writing && configuration == ';') { // parse the end of a statement
-			if (!inBlock)
+			concatening = true;
+		} else if (!escaped && !writing && configuration == ';') { // parse the end of a statement
+			if (!inBlock) {
 				if (sectionType == "include")
 					includes.push_back(sectionName);
+				else {
+					std::ostringstream lineSS;
+					lineSS << lineNumber;
+					std::string message = "An invalid semicolon was found in the configuration file on line " + lineSS.str();
+					std::perror(message.c_str());
+					std::exit(0);
+				}
+			}
+			if (concatening)
+				currentValue += oneBlock[concatingVar];
 			oneBlock.insert(std::pair<std::string, std::string> (varName, currentValue));
 			varName = "";
 			currentValue = "";
@@ -136,21 +148,8 @@ void ConfigReader::readConfig(std::string filename) {
 		} else if (concatening && configuration == '+') {
 			concatening = false;
 			concatable = true;
-			bool found = false;
-			for (std::tr1::unordered_map<std::string, std::string>::iterator blockIter = oneBlock.begin(); blockIter != oneBlock.end(); blockIter++) {
-				if (blockIter->first == concatingVar) {
-					currentValue += concatingVar;
-					found = true;
-				}
-			}
+			currentValue += oneBlock[concatingVar]; std::cout << concatingVar << std::endl;
 			concatingVar = "";
-			if (!found) {
-				std::ostringstream lineSS;
-				lineSS << lineNumber;
-				std::string message = "An invalid variable was concatenated to a value.  This occurred on line " + lineSS.str();
-				std::perror(message.c_str());
-				std::exit(0);
-			}
 		} else if (concatening)
 			concatingVar += configuration;
 		
