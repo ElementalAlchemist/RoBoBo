@@ -46,6 +46,7 @@ class Server {
 		std::string serverName;
 		Socket serverConnection;
 		ModuleInterface* moduleData;
+		pthread_t dataReceiveThread;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		std::tr1::unordered_map<std::string, Channel> inChannels;
 		std::string network;
@@ -53,6 +54,7 @@ class Server {
 		std::tr1::unordered_map<char, char> prefix;
 		std::vector<char> chanTypes;
 		std::vector<std::vector<char> > chanModes;
+		static void* handleData_thread(void* ptr);
 		void handleData();
 		void parse005(std::vector<std::string> parsedLine);
 		std::vector<std::string> parseLine(std::string unformattedLine);

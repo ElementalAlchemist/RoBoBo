@@ -2,22 +2,22 @@
 
 #ifndef MODIFACE_ROBOBO
 #define MODIFACE_ROBOBO
-ModuleInterface::ModuleInterface(std::tr1::unordered_map<std::string, Server>* serverMap, std::tr1::unordered_map<std::string, Module>* moduleMap) {
+ModuleInterface::ModuleInterface(std::tr1::unordered_map<std::string, Server*>* serverMap, std::tr1::unordered_map<std::string, Module>* moduleMap) {
 	servers = serverMap;
 	modules = moduleMap;
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
-	for (std::tr1::unordered_map<std::string, Server>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
 		if (serverIter->first == server)
-			serverIter->second.sendLine(rawLine);
+			serverIter->second->sendLine(rawLine);
 	}
 }
 
 std::tr1::unordered_map<std::string, std::string> ModuleInterface::getServerData(std::string server) {
-	for (std::tr1::unordered_map<std::string, Server>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
 		if (serverIter->first == server)
-			return serverIter->second.getInfo();
+			return serverIter->second->getInfo();
 	}
 	std::tr1::unordered_map<std::string, std::string> data; // if we're this far the module coder probably shouldn't be coding modules
 	return data; // but here's a blank map, just for you. :)
@@ -110,9 +110,9 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 				addMode = false;
 			else {
 				std::vector<std::vector<char> > serverModes;
-				for (std::tr1::unordered_map<std::string, Server>::iterator servIter = servers->begin(); servIter != servers->end(); servIter++) {
+				for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers->begin(); servIter != servers->end(); servIter++) {
 					if (servIter->first == server)
-						serverModes = servIter->second.getChanModes();
+						serverModes = servIter->second->getChanModes();
 				}
 				bool found = false;
 				short category;
@@ -245,8 +245,8 @@ bool ModuleInterface::charIsNumeric(char number) {
 
 bool ModuleInterface::isChanType(char chanPrefix) {
 	std::vector<char> prefixes;
-	for (std::tr1::unordered_map<std::string, Server>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
-		prefixes = serverIter->second.getChanTypes();
+	for (std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers->begin(); serverIter != servers->end(); serverIter++) {
+		prefixes = serverIter->second->getChanTypes();
 		for (unsigned int i = 0; i < prefixes.size(); i++) {
 			if (chanPrefix == prefixes[i])
 				return true;

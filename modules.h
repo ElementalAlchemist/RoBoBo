@@ -54,13 +54,13 @@ class Module {
 
 class ModuleInterface {
 	public:
-		ModuleInterface(std::tr1::unordered_map<std::string, Server>* serverMap, std::tr1::unordered_map<std::string, Module>* moduleMap);
+		ModuleInterface(std::tr1::unordered_map<std::string, Server*>* serverMap, std::tr1::unordered_map<std::string, Module>* moduleMap);
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		void callHook(std::string server, std::vector<std::string> parsedLine);
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
 	private:
-		std::tr1::unordered_map<std::string, Server>* servers;
+		std::tr1::unordered_map<std::string, Server*>* servers;
 		std::tr1::unordered_map<std::string, Module>* modules;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);

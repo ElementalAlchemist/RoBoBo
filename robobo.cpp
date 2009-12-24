@@ -1,6 +1,6 @@
 #include "robobo.h"
 
-std::tr1::unordered_map<std::string, Server> connectedServers;
+std::tr1::unordered_map<std::string, Server*> connectedServers;
 std::tr1::unordered_map<std::string, Module> loadedModules;
 std::list<std::string> serverList;
 
@@ -20,7 +20,8 @@ void connectServers(ConfigReader& config, ModuleInterface& modInterface) {
 				break;
 			}
 		}
-		connectedServers.insert(std::pair<std::string, Server> (serverIterator->first, Server (serverIterator->first, thisServerConf, &modInterface)));
+		Server* newConnection = new Server (serverIterator->first, thisServerConf, &modInterface);
+		connectedServers.insert(std::pair<std::string, Server*> (serverIterator->first, newConnection));
 	}
 }
 
@@ -63,4 +64,5 @@ int main(int argc, char** argv) {
 	makeServerList(config);
 	connectServers(config, modInterface);
 	loadModules(config, modInterface);
+	pthread_exit(NULL);
 }
