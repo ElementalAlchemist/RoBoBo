@@ -8,7 +8,8 @@ Current TODO List
 Before considering releasing alpha 1
 ======================================
 [x] - Thread Server::handleData()
-[ ] - compile modules
+[x] - compile modules
 [x] - fix parsing of the conf files
 	[x] - fix including in conf files
 	[x] - test concatenation of other variables
+[>] - load modules without segfaulting
