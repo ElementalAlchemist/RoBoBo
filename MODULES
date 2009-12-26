@@ -15,23 +15,29 @@ Table of Contents
 
 In order to interface with the bot, you will need to define a few things.
 
-First, you will need functions allowing the bot to load and unload your
-modules.  This is internally known as "spawning," mostly because "spawn" is
-such a cool word.  In order for the bot to load your module, you must define a
-way to load and unload your module.  This is done most simply as such:
+First, you will need to make a C++ file which includes some module data from
+the bot.  This file should be placed in the modules/ directory.  The file
+should be included as such:
+
+#include "../modinclude.h"
+
+This allows your class to extend the Module class and access other necessary
+classes.
+
+Second, you will need functions allowing the bot to load your module.  This is
+internally known as "spawning," mostly because "spawn" is such a cool word.  In
+order for the bot to load your module, you must define a way to load your
+module.  This is done most simply as such:
 
 extern "C" Module* spawn() {
 	return new mod_name;
-}
-
-extern "C" unspawn(Module* mod) {
-	delete mod;
 }
 
 In this portion, the only thing that should change is the returned class in the
 spawn() function, which should be changed from mod_name to the name of your
 module class.  If you really want you can change the name of the mod variable
 in unspawn(Module*).
+This must be placed after your class definition.
 
 Now that you've defined those, you are ready to make your class!  Your class
 must extend the Module class.
