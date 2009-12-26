@@ -141,6 +141,7 @@ void ConfigReader::readConfig(std::string filename) {
 			}
 			varName = "";
 			currentValue = "";
+			concatingVar = "";
 			acceptVar = true;
 			concatable = false;
 			concatening = false;
