@@ -143,6 +143,7 @@ void ConfigReader::readConfig(std::string filename) {
 			currentValue = "";
 			acceptVar = true;
 			concatable = false;
+			concatening = false;
 		} else if (acceptVar)
 			varName += configuration;
 		else if (concatable && configuration == '+') {
