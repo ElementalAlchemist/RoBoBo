@@ -2,15 +2,15 @@
 
 #ifndef MODBASE_ROBOBO
 #define MODBASE_ROBOBO
-void Module::init(std::tr1::unordered_map<std::string, Module>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace) {
+Module::Module() {}
+
+Module::~Module() {}
+
+void Module::init(std::tr1::unordered_map<std::string, Module*>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace) {
 	modules = moduleList;
 	servers = serverList;
 	serverData = modFace;
 }
-
-Module::Module() {}
-
-Module::~Module() {}
 
 void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 

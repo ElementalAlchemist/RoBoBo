@@ -1,7 +1,7 @@
 #include "robobo.h"
 
 std::tr1::unordered_map<std::string, Server*> connectedServers;
-std::tr1::unordered_map<std::string, Module> loadedModules;
+std::tr1::unordered_map<std::string, Module*> loadedModules;
 std::list<std::string> serverList;
 
 inline void makeServerList(ConfigReader& config) {
@@ -44,17 +44,10 @@ inline void loadModules(ConfigReader& config, ModuleInterface& modInterface) {
 			std::perror(error.c_str());
 			continue;
 		}
-		dlsym(openModule, "unspawn"); // check that unspawn exists; if it doesn't, load should fail
-		dlsymError = dlerror(); // even though we don't use unspawn yet
-		if (dlsymError) {
-			std::string error = "Could not load module " + modName + ": " + dlsymError;
-			std::perror(error.c_str());
-			continue;
-		}
 		
-		Module newModule = *spawnModule;
-		newModule.init(&loadedModules, &serverList, &modInterface);
-		loadedModules.insert(std::pair<std::string, Module> (modName, newModule));
+		Module* newModule = spawnModule;
+		newModule->init(&loadedModules, &serverList, &modInterface);
+		loadedModules.insert(std::pair<std::string, Module*> (modName, newModule));
 	}
 }
 
