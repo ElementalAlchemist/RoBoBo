@@ -55,7 +55,7 @@ inline void loadModules() {
 
 int main(int argc, char** argv) {
 	makeServerList();
-	connectServers();
 	loadModules();
+	connectServers();
 	pthread_exit(NULL);
 }
