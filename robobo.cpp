@@ -12,18 +12,10 @@ inline void makeServerList() {
 		serverList.insert(serverList.end(), serverIterator->first);
 }
 
-void connectServers() {
+inline void connectServers() {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig = config.getServerConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConfig.begin(); serverIterator != serverConfig.end(); serverIterator++) {
-		std::tr1::unordered_map<std::string, std::string> thisServerConf;
-		for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator confIter = serverConfig.begin(); confIter != serverConfig.end(); confIter++) {
-			if (confIter->first == serverIterator->first) {
-				thisServerConf = confIter->second;
-				break;
-			}
-		}
-		Server* newConnection = new Server (serverIterator->first, thisServerConf, &modInterface);
-		connectedServers.insert(std::pair<std::string, Server*> (serverIterator->first, newConnection));
+		connectedServers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverIterator->first, serverIterator->second, &modInterface)));
 	}
 }
 
@@ -55,7 +47,7 @@ inline void loadModules() {
 
 int main(int argc, char** argv) {
 	makeServerList();
-	loadModules();
 	connectServers();
+	loadModules();
 	pthread_exit(NULL);
 }
