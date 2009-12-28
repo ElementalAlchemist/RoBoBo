@@ -6,9 +6,7 @@ Module::Module() {}
 
 Module::~Module() {}
 
-void Module::init(std::tr1::unordered_map<std::string, Module*>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace) {
-	modules = moduleList;
-	servers = serverList;
+void Module::init(ModuleInterface* modFace) {
 	serverData = modFace;
 }
 

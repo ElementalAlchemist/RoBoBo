@@ -1,14 +1,13 @@
 #include "main.h"
+#include <dlfcn.h>
 
 #ifndef MODULES_DEF_ROBOBO
 #define MODULES_DEF_ROBOBO
-class ModuleInterface;
-
 class Module {
 	public:
 		Module();
 		virtual ~Module();
-		void init(std::tr1::unordered_map<std::string, Module*>* moduleList, std::list<std::string>* serverList, ModuleInterface* modFace);
+		void init(ModuleInterface* modFace);
 		
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
@@ -36,8 +35,6 @@ class Module {
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
 	protected:
 		std::string moduleName;
-		std::tr1::unordered_map<std::string, Module*>* modules;
-		std::list<std::string>* servers;
 		void sendPrivMsg(std::string server, std::string target, std::string message);
 		void sendNotice(std::string server, std::string target, std::string message);
 		void sendCTCP(std::string server, std::string target, std::string type, std::string params = "");
@@ -55,16 +52,20 @@ class Module {
 
 class ModuleInterface {
 	public:
-		ModuleInterface(std::tr1::unordered_map<std::string, Server*>* serverMap, std::tr1::unordered_map<std::string, Module*>* moduleMap);
+		ModuleInterface(ConfigReader* config);
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		void callHook(std::string server, std::vector<std::string> parsedLine);
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
+		std::tr1::unordered_map<std::string, Module*> getModules();
+		std::list<std::string> getServers();
 	private:
-		std::tr1::unordered_map<std::string, Server*>* servers;
-		std::tr1::unordered_map<std::string, Module*>* modules;
+		std::tr1::unordered_map<std::string, Server*> servers;
+		std::tr1::unordered_map<std::string, Module*> modules;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);
+		void connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf);
+		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
 };
 #endif

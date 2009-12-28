@@ -10,7 +10,6 @@ class ConfigReader {
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getServerConfig();
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig();
 	private:
- 		std::ifstream configFile;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig;
 };
@@ -24,6 +23,7 @@ ConfigReader::ConfigReader(std::string filename) {
 }
 
 void ConfigReader::readConfig(std::string filename) {
+	std::ifstream configFile;
 	configFile.open(filename.c_str());
 	if (configFile.fail()) {
 		std::perror("Config file does not exist or could not be opened");
