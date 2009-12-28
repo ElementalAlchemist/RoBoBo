@@ -44,6 +44,8 @@ class Module {
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
 		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
 		void quitServer(std::string server, std::string reason);
+		std::list<std::string> getServers();
+		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
 	private:

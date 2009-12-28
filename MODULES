@@ -15,11 +15,11 @@ Table of Contents
 
 In order to interface with the bot, you will need to define a few things.
 
-First, you will need to make a C++ file which includes some module data from
-the bot.  This file should be placed in the modules/ directory.  The file
-should be included as such:
+First, you will need to make a C++ file which includes some data from the bot.
+This file should be placed in the modules/ directory.  The file should be
+included as such:
 
-#include "../modinclude.h"
+#include "../robobo.h"
 
 This allows your class to extend the Module class and access other necessary
 classes.
@@ -35,9 +35,9 @@ extern "C" Module* spawn() {
 
 In this portion, the only thing that should change is the returned class in the
 spawn() function, which should be changed from mod_name to the name of your
-module class.  If you really want you can change the name of the mod variable
-in unspawn(Module*).
-This must be placed after your class definition.
+module class.  This must be placed after your class definition.  If you think
+you will forget about it, write it first, and then just define the class above
+it.
 
 Now that you've defined those, you are ready to make your class!  Your class
 must extend the Module class.
@@ -62,7 +62,9 @@ parse data from IRC servers, and how to send data from IRC servers.
 2. COMMUNICATING WITH A SERVER
 
 As a module for an IRC bot, you can expect to be able to communicate with the
-servers the bot is connected to.
+servers the bot is connected to.  The subsections that follow describe how to
+catch received and sent messages so that you can react to them as well as how
+to send messages from your module.
 
 =======================
 2.1. RECEIVING DATA FROM A SERVER
@@ -270,14 +272,18 @@ void quitServer(std::string server, std::string reason);
 		reason: The quit reason to give
 
 =======================
-3. HELPFUL VARIABLES AND FUNCTIONS
+3. HELPFUL FUNCTIONS
 
 The Module class contains some functions that make it possible to code many
 modules and other functions that are just helpful.
 
-std::list<std::string>* servers;
-This variable holds a list of valid server names.  It has the names of all
+std::list<std::string> getServers()
+This function returns a list of valid server names.  It gives the names of all
 connected servers.
+
+std::tr1::unordered_map<std::string, Module*> getModules()
+This function returns currently loaded modules.  This is useful if you want
+your module to interact with another module.
 
 std::vector<std::string> splitHostmask(std::string hostmask)
 This function takes a hostmask.  The hostmask can be either in the form of a

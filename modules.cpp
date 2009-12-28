@@ -130,4 +130,12 @@ std::vector<std::string> Module::splitBySpace(std::string line) {
 	}
 	return split;
 }
+
+std::list<std::string> Module::getServers() {
+	return serverData->getServers();
+}
+
+std::tr1::unordered_map<std::string, Module*> Module::getModules() {
+	return serverData->getModules();
+}
 #endif
