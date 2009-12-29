@@ -54,7 +54,7 @@ class Module {
 
 class ModuleInterface {
 	public:
-		ModuleInterface(ConfigReader* config, ModuleInterface* interface);
+		ModuleInterface(ConfigReader* config);
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		void callHook(std::string server, std::vector<std::string> parsedLine);
@@ -67,7 +67,7 @@ class ModuleInterface {
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);
-		void connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf, ModuleInterface* interface);
-		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* interface);
+		void connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf);
+		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
 };
 #endif

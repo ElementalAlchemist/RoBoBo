@@ -2,12 +2,12 @@
 
 #ifndef MODIFACE_ROBOBO
 #define MODIFACE_ROBOBO
-ModuleInterface::ModuleInterface(ConfigReader* config, ModuleInterface* interface) {
+ModuleInterface::ModuleInterface(ConfigReader* config) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config->getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config->getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
-		loadModule(modConfIter->first, modConfIter->second, interface);
-	connectServers(serverConf, interface);
+		loadModule(modConfIter->first, modConfIter->second);
+	connectServers(serverConf);
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
@@ -258,12 +258,12 @@ bool ModuleInterface::isChanType(char chanPrefix) {
 	return false;
 }
 
-void ModuleInterface::connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf, ModuleInterface* interface) {
+void ModuleInterface::connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf) {
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConf.begin(); serverIterator != serverConf.end(); serverIterator++)
-		servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverIterator->first, serverIterator->second, interface)));
+		servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverIterator->first, serverIterator->second, this)));
 }
 
-void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* interface) {
+void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
 	std::string fileLoc = "modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
@@ -281,7 +281,7 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	}
 	
 	Module* newModule = spawnModule;
-	newModule->init(interface);
+	newModule->init(this);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 }
 

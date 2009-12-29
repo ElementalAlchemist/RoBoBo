@@ -2,6 +2,6 @@
 
 int main(int argc, char** argv) {
 	ConfigReader config;
-	ModuleInterface* modInterface = new ModuleInterface (&config, modInterface);
+	new ModuleInterface (&config);
 	pthread_exit(NULL);
 }
