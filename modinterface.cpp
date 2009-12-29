@@ -2,12 +2,12 @@
 
 #ifndef MODIFACE_ROBOBO
 #define MODIFACE_ROBOBO
-ModuleInterface::ModuleInterface(ConfigReader* config) {
+ModuleInterface::ModuleInterface(ConfigReader* config, ModuleInterface* interface) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config->getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config->getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
-		loadModule(modConfIter->first, modConfIter->second);
-	connectServers(serverConf);
+		loadModule(modConfIter->first, modConfIter->second, interface);
+	connectServers(serverConf, interface);
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
@@ -102,7 +102,7 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 			modIter->second->onUserQuit(server, parsedLine[0], parsedLine[2]);
 	} else if (parsedLine[1] == "KICK") {
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
-			modIter->second->onChannelKick(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
+			modIter->second->onChannelKick(server, parsedLihttp://github.com/ElementalAlchemist/RoBoBo-IRC-BoBone[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
 	} else if (parsedLine[1] == "MODE") {
 		bool addMode = true;
 		int currParam = 4;
@@ -124,7 +124,7 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 						found = true;
 						category = 0;
 						break;
-					}
+					}http://github.com/ElementalAlchemist/RoBoBo-IRC-BoBo
 				}
 				if (!found) {
 					for (unsigned int j = 0; j < serverModes[1].size(); j++) {
@@ -222,7 +222,7 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 		} else {
 			if (isChanType(parsedLine[2][0])) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
-					modIter->second->onOutChannelNotice(server, parsedLine[2], '0', parsedLine[3]);
+					modIter->second->onOutChannelNotice(shttp://github.com/ElementalAlchemist/RoBoBo-IRC-BoBoerver, parsedLine[2], '0', parsedLine[3]);
 			} else if (isChanType(parsedLine[2][1])) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
 					modIter->second->onOutChannelNotice(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3]);
@@ -258,12 +258,12 @@ bool ModuleInterface::isChanType(char chanPrefix) {
 	return false;
 }
 
-void ModuleInterface::connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf) {
+void ModuleInterface::connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf, ModuleInterface* interface) {
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConf.begin(); serverIterator != serverConf.end(); serverIterator++)
-		servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverIterator->first, serverIterator->second, this)));
+		servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverIterator->first, serverIterator->second, interface)));
 }
 
-void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
+void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* interface) {
 	std::string fileLoc = "modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
@@ -281,7 +281,7 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	}
 	
 	Module* newModule = spawnModule;
-	newModule->init(this);
+	newModule->init(interface);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 }
 
