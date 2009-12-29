@@ -102,7 +102,7 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 			modIter->second->onUserQuit(server, parsedLine[0], parsedLine[2]);
 	} else if (parsedLine[1] == "KICK") {
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
-			modIter->second->onChannelKick(server, parsedLihttp://github.com/ElementalAlchemist/RoBoBo-IRC-BoBone[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
+			modIter->second->onChannelKick(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
 	} else if (parsedLine[1] == "MODE") {
 		bool addMode = true;
 		int currParam = 4;
@@ -124,7 +124,7 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 						found = true;
 						category = 0;
 						break;
-					}http://github.com/ElementalAlchemist/RoBoBo-IRC-BoBo
+					}
 				}
 				if (!found) {
 					for (unsigned int j = 0; j < serverModes[1].size(); j++) {
@@ -222,7 +222,7 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 		} else {
 			if (isChanType(parsedLine[2][0])) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
-					modIter->second->onOutChannelNotice(shttp://github.com/ElementalAlchemist/RoBoBo-IRC-BoBoerver, parsedLine[2], '0', parsedLine[3]);
+					modIter->second->onOutChannelNotice(server, parsedLine[2], '0', parsedLine[3]);
 			} else if (isChanType(parsedLine[2][1])) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
 					modIter->second->onOutChannelNotice(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3]);
