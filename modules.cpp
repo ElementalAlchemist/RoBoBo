@@ -128,6 +128,8 @@ std::vector<std::string> Module::splitBySpace(std::string line) {
 		} else
 			temp += line[i];
 	}
+	if (temp != "")
+		split.push_back(temp);
 	return split;
 }
 
