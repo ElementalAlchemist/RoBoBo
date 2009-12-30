@@ -10,5 +10,5 @@ all:
 	g++ -ansi -pedantic-errors -Wall -ldl -pthread robobo.cpp -o robobo
 	g++ -ansi -pedantic-errors -Wall -c -export-dynamic -pipe -shared -fPIC modules/m_helloworld.cpp -o modules/m_helloworld.so
 clean:
-	rm -f *.so *.o
+	rm modules/*.so
 	rm robobo
