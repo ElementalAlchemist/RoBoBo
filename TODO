@@ -21,3 +21,4 @@ Sometime before the beta stage
 [ ] - Make an administration module
 [ ] - Enhance module abilities
 [ ] - Add interface to access channel/user data
+[ ] - Add data queue/sending thread
