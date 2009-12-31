@@ -11,7 +11,6 @@ int main(int argc, char** argv) {
 			return 0;
 		}
 	}
-	ConfigReader config;
-	new ModuleInterface (&config);
+	new ModuleInterface (new ConfigReader ());
 	pthread_exit(NULL);
 }
