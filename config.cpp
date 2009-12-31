@@ -164,10 +164,8 @@ void ConfigReader::readConfig(std::string filename) {
  		escapedNow = false;
 	}
 	configFile.close();
-	for (unsigned int i = 0; i < includes.size(); i++) {
-		std::cout << "Look!  A file was included! " << includes[i] << std::endl;
+	for (unsigned int i = 0; i < includes.size(); i++)
 		readConfig(includes[i]);
-	}
 }
 
 std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig() {
