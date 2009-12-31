@@ -6,7 +6,8 @@ Module::Module() {}
 
 Module::~Module() {}
 
-void Module::init(ModuleInterface* modFace) {
+void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace) {
+	config = modConf;
 	serverData = modFace;
 }
 
