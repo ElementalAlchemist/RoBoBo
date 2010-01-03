@@ -2,6 +2,8 @@
 #include <string.h> // C strings to handle args
 
 int main(int argc, char** argv) {
+	std::string confDir = ".";
+	std::string confName = "robobo.conf";
 	if (argc > 1) { // analyze arguments
 		bool exitAfter = false;
 		for (int i = 1; i < argc; i++) { // iterate through all arguments
@@ -19,12 +21,26 @@ int main(int argc, char** argv) {
 			} else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;
 				exitAfter = true;
+			} else if (strcmp(argv[i], "--confdir") == 0) {
+				if (++i >= argc) {
+					std::perror("An argument was not specified for the --confdir argument.");
+					return 0;
+				}
+				confDir = argv[i];
+				std::cout << "Looking for the configuration file in " << confDir << std::endl;
+			} else if (strcmp(argv[i], "--confname") == 0) {
+				if (++i >= argc) {
+					std::perror("An argument was not specified for the --confname argument.");
+					return 0;
+				}
+				confName = argv[i];
+				std::cout << "Looking for a configuration file named " << confName << std::endl;
 			}
 			std::cout << std::endl; // add a newline after a parameter's output
 		}
 		if (exitAfter)
 			return 0;
 	}
-	new ModuleInterface (new ConfigReader ());
+	new ModuleInterface (new ConfigReader (confName, confDir));
 	pthread_exit(NULL);
 }

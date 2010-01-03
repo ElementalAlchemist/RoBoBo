@@ -4,9 +4,8 @@
 #define CONFIG_ROBOBO
 class ConfigReader {
 	public:
-		ConfigReader();
-		ConfigReader(std::string filename);
-		void readConfig(std::string filename);
+		ConfigReader(std::string filename, std::string filedir);
+		void readConfig(std::string filename, std::string filedir);
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getServerConfig();
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig();
 	private:
@@ -14,17 +13,14 @@ class ConfigReader {
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig;
 };
 
-ConfigReader::ConfigReader() {
-	readConfig("robobo.conf");
+ConfigReader::ConfigReader(std::string filename, std::string filedir) {
+	readConfig(filename, filedir);
 }
 
-ConfigReader::ConfigReader(std::string filename) {
-	readConfig(filename);
-}
-
-void ConfigReader::readConfig(std::string filename) {
+void ConfigReader::readConfig(std::string filename, std::string filedir) {
 	std::ifstream configFile;
-	configFile.open(filename.c_str());
+	std::string absConfFile = filedir + "/" + filename;
+	configFile.open(absConfFile.c_str());
 	if (configFile.fail()) {
 		std::perror("Config file does not exist or could not be opened");
 		std::exit(0);
@@ -165,7 +161,7 @@ void ConfigReader::readConfig(std::string filename) {
 	}
 	configFile.close();
 	for (unsigned int i = 0; i < includes.size(); i++)
-		readConfig(includes[i]);
+		readConfig(includes[i], filedir);
 }
 
 std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig() {
