@@ -3,6 +3,7 @@
 
 int main(int argc, char** argv) {
 	if (argc > 1) { // analyze arguments
+		bool exitAfter = false;
 		for (int i = 1; i < argc; i++) { // iterate through all arguments
 			if (strcmp(argv[i], "--help") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo IRC Bot Help" << std::endl;
@@ -14,12 +15,15 @@ int main(int argc, char** argv) {
 				std::cout << "Command Line Arguments:" << std::endl;
 				std::cout << "\t--help: display this help and exit" << std::endl;
 				std::cout << "\t--version: display RoBoBo's version and exit" << std::endl;
+				exitAfter = true;
 			} else if (strcmp(argv[i], "--version") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;
+				exitAfter = true;
 			}
 			std::cout << std::endl; // add a newline after a parameter's output
 		}
-		return 0;
+		if (exitAfter)
+			return 0;
 	}
 	new ModuleInterface (new ConfigReader ());
 	pthread_exit(NULL);
