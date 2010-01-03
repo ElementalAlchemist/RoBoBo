@@ -14,8 +14,7 @@ int main(int argc, char** argv) {
 				std::cout << "Command Line Arguments:" << std::endl;
 				std::cout << "\t--help: display this help and exit" << std::endl;
 				std::cout << "\t--version: display RoBoBo's version and exit" << std::endl;
-			}
-			if (strcmp(argv[i], "--version") == 0) {
+			} else if (strcmp(argv[i], "--version") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;
 			}
 			std::cout << std::endl; // add a newline after a parameter's output
