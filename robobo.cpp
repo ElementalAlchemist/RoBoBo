@@ -23,14 +23,14 @@ int main(int argc, char** argv) {
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--confdir") == 0) {
 				if (++i >= argc) {
-					std::perror("An argument was not specified for the --confdir argument.");
+					std::cout << "An argument was not specified for the --confdir argument." << std::endl;
 					return 0;
 				}
 				confDir = argv[i];
 				std::cout << "Looking for the configuration file in " << confDir << std::endl;
 			} else if (strcmp(argv[i], "--confname") == 0) {
 				if (++i >= argc) {
-					std::perror("An argument was not specified for the --confname argument.");
+					std::cout << "An argument was not specified for the --confname argument." << std::endl;
 					return 0;
 				}
 				confName = argv[i];
