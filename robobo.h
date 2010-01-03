@@ -7,5 +7,3 @@ class ModuleInterface; // forward-declare so it can be used in modules and serve
 #include "config.cpp"
 #include "modinterface.cpp" // and now include it
 #include "server.cpp"
-
-#include <string.h> // C strings to handle args
