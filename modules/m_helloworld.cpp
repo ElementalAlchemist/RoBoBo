@@ -1,4 +1,4 @@
-#include "../robobo.h"
+#include "modinclude.h"
 
 class m_helloworld : public Module {
 	public:
