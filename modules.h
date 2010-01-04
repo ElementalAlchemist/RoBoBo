@@ -55,7 +55,7 @@ class Module {
 
 class ModuleInterface {
 	public:
-		ModuleInterface(ConfigReader* config);
+		ModuleInterface(ConfigReader config);
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		void callHook(std::string server, std::vector<std::string> parsedLine);

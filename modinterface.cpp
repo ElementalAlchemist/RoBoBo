@@ -2,9 +2,9 @@
 
 #ifndef MODIFACE_ROBOBO
 #define MODIFACE_ROBOBO
-ModuleInterface::ModuleInterface(ConfigReader* config) {
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config->getServerConfig();
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config->getModConfig();
+ModuleInterface::ModuleInterface(ConfigReader config) {
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
 		loadModule(modConfIter->first, modConfIter->second);
 	connectServers(serverConf);
