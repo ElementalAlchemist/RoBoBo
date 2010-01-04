@@ -1,5 +1,4 @@
 #include "robobo.h"
-#include <string.h> // C strings to handle args
 
 int main(int argc, char** argv) {
 	std::string confDir = ".";
