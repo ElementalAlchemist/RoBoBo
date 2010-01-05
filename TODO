@@ -5,7 +5,7 @@ Current TODO List
 [>] - in progress
 [x] - complete
 
-Before considering releasing alpha 1
+Before releasing alpha 1
 ======================================
 [x] - Thread Server::handleData()
 [x] - compile modules
@@ -13,6 +13,7 @@ Before considering releasing alpha 1
 	[x] - fix including in conf files
 	[x] - test concatenation of other variables
 [>] - load modules without segfaulting
+[ ] - fix channel resyncing on status change
 
 Sometime before the beta stage
 ======================================
@@ -25,3 +26,4 @@ Sometime before the beta stage
 [ ] - Add interface to access channel/user data
 [ ] - Add data queue/sending thread
 [ ] - Fork to background
+[ ] - DCC protocol
