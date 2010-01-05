@@ -15,7 +15,10 @@ int main(int argc, char** argv) {
 				std::cout << "Some command line arguments are provided to perform certain actions.  With no" << std::endl << "parameters, the bot will run as a bot.  With some command line arguments, the" << std::endl << "functionality of the bot can be changed." << std::endl;
 				std::cout << "Command Line Arguments:" << std::endl;
 				std::cout << "\t--help: display this help and exit" << std::endl;
+				std::cout << "\t\t-h: same as --help" << std::endl;
+				std::cout << "\t\t-?: same as --help" << std::endl;
 				std::cout << "\t--version: display RoBoBo's version and exit" << std::endl;
+				std::cout << "\t\t-v: same as --version" << std::endl;
 				std::cout << "\t--confdir <directory>: make RoBoBo look in the specified directory for the configuration" << std::endl;
 				std::cout << "\t--confname <filename>: make RoBoBo look for the specified file in the conf directory for configuration information" << std::endl;
 				exitAfter = true;
