@@ -1,8 +1,8 @@
 #include "robobo.h"
 
 int main(int argc, char** argv) {
-	std::string confDir = ".";
-	std::string confName = "robobo.conf";
+	std::string confDir = "."; // look in current directory by default
+	std::string confName = "robobo.conf"; // look for robobo.conf by default
 	if (argc > 1) { // analyze arguments
 		bool exitAfter = false;
 		for (int i = 1; i < argc; i++) { // iterate through all arguments
@@ -19,8 +19,8 @@ int main(int argc, char** argv) {
 				std::cout << "\t\t-?: same as --help" << std::endl;
 				std::cout << "\t--version: display RoBoBo's version and exit" << std::endl;
 				std::cout << "\t\t-v: same as --version" << std::endl;
-				std::cout << "\t--confdir <directory>: make RoBoBo look in the specified directory for the configuration" << std::endl;
-				std::cout << "\t--confname <filename>: make RoBoBo look for the specified file in the conf directory for configuration information" << std::endl;
+				std::cout << "\t--confdir <directory>: make RoBoBo look in the specified directory for the configuration instead of current directory" << std::endl;
+				std::cout << "\t--confname <filename>: make RoBoBo look for the specified file in the conf directory for configuration information instead of robobo.conf" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;

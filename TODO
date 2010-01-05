@@ -18,7 +18,10 @@ Sometime before the beta stage
 ======================================
 [ ] - 433 :Nick currently in use support
 [ ] - DNS resolving on IRC hostnames
-[ ] - Make an administration module
+[ ] - Modules
+	[ ] - Administration module
+	[ ] - CTCP Reply module
 [ ] - Enhance module abilities
 [ ] - Add interface to access channel/user data
 [ ] - Add data queue/sending thread
+[ ] - Fork to background
