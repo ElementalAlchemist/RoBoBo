@@ -61,6 +61,7 @@ void Server::handleData() {
 		if (parsedLine.size() >= 1)
 			moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
+			sendLine("MODE " + serverConf["nick"] + " +B"); // set bot mode
 			if (serverConf["channels"] != "")
 				sendLine("JOIN " + serverConf["channels"]);
 		} else if (parsedLine[1] == "005") // server features
