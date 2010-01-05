@@ -16,6 +16,8 @@ int main(int argc, char** argv) {
 				std::cout << "Command Line Arguments:" << std::endl;
 				std::cout << "\t--help: display this help and exit" << std::endl;
 				std::cout << "\t--version: display RoBoBo's version and exit" << std::endl;
+				std::cout << "\t--confdir <directory>: make RoBoBo look in the specified directory for the configuration" << std::endl;
+				std::cout << "\t--confname <filename>: make RoBoBo look for the specified file in the conf directory for configuration information" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;
