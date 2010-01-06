@@ -103,7 +103,7 @@ void Server::handleData() {
 					}
 				}
 			} else { // it's a channel mode
-				int currParam = 4;
+				int currParam = 4; // MODE parameters start at the fourth IRC parameter
 				for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
 					if (parsedLine[3][i] == '+')
 						addMode = true;

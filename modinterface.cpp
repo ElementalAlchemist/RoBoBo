@@ -2,12 +2,14 @@
 
 #ifndef MODIFACE_ROBOBO
 #define MODIFACE_ROBOBO
-ModuleInterface::ModuleInterface(ConfigReader config) {
+ModuleInterface::ModuleInterface(std::string confdir, std::string confname) {
+	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
 		loadModule(modConfIter->first, modConfIter->second);
-	connectServers(serverConf);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); servConfIter++)
+		connectServer(servConfIter->first, servConfIter->second);
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
@@ -258,9 +260,8 @@ bool ModuleInterface::isChanType(char chanPrefix) {
 	return false;
 }
 
-void ModuleInterface::connectServers(std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf) {
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator serverIterator = serverConf.begin(); serverIterator != serverConf.end(); serverIterator++)
-		servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverIterator->first, serverIterator->second, this)));
+void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf) {
+	servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverName, serverConf, this)));
 }
 
 void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {

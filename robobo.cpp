@@ -45,6 +45,6 @@ int main(int argc, char** argv) {
 		if (exitAfter)
 			return 0;
 	}
-	new ModuleInterface (ConfigReader (confName, confDir)); //run actual bot
+	new ModuleInterface (confDir, confName); //run actual bot
 	pthread_exit(NULL);
 }
