@@ -5,6 +5,7 @@ TABLE OF CONTENTS
 1. Installing
 2. License
 3. Creating Modules
+4. Acknowledgements
 
 =======================
 1. INSTALLING
@@ -25,3 +26,9 @@ help you find a good tutorial.
 For the specifics on creating modules, see the MODULES file.  The MODULES file
 assumes you already know at least some C++ and jumps right into what you need
 to know just for this bot.
+
+=======================
+4. ACKNOWLEDGEMENTS
+
+I would like to thank MasseR from GitHub for somehow finding this project at
+the very beginning and giving me a needed push in the right direction. :)
