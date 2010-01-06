@@ -112,10 +112,18 @@ void Server::handleData() {
 					else {
 						bool found = false;
 						int category;
-						for (unsigned int j = 0; j < chanModes[0].size(); j++) {
-							if (parsedLine[3][i] == chanModes[0][j]) {
+						for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefix.begin(); prefixIter != prefix.end(); prefixIter++) {
+							if (parsedLine[3][i] == prefixIter->first) {
 								found = true;
-								category = 0;
+								category = 0; // count it as a list mode since it's a list of users who hold a status
+							}
+						}
+						if (!found) {
+							for (unsigned int j = 0; j < chanModes[0].size(); j++) {
+								if (parsedLine[3][i] == chanModes[0][j]) {
+									found = true;
+									category = 0;
+								}
 							}
 						}
 						if (!found) {

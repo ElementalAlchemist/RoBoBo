@@ -48,7 +48,7 @@ void Channel::setMode(bool add, char mode, std::string param) {
 		if (it->first == mode) {
 			bool exists = false;
 			for (std::tr1::unordered_map<std::string, User*>::iterator iter = users.begin(); iter != users.end(); iter++) {
-				if (iter->first == param){
+				if (iter->first == param) {
 					iter->second->status(add, mode);
 					exists = true;
 				}
