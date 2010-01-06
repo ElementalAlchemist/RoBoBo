@@ -23,11 +23,11 @@ void Channel::parseNames(std::vector<std::string> names) {
 				names[i] = names[i].substr(1);
 			}
 		}
-		users.insert(std::pair<std::string, User> (names[i], User(this)));
+		users.insert(std::pair<std::string, User*> (names[i], new User (this)));
 		for (unsigned int j = 0; j < modes.size(); j++) {
-			for (std::tr1::unordered_map<std::string, User>::iterator userIter = users.begin(); userIter != users.end(); userIter++) {
+			for (std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin(); userIter != users.end(); userIter++) {
 				if (names[i] == userIter->first)
-					userIter->second.status(true, modes[j]);
+					userIter->second->status(true, modes[j]);
 			}
 		}
 		modes.clear();
@@ -47,9 +47,9 @@ void Channel::setMode(bool add, char mode, std::string param) {
 	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); it++) {
 		if (it->first == mode) {
 			bool exists = false;
-			for (std::tr1::unordered_map<std::string, User>::iterator iter = users.begin(); iter != users.end(); iter++) {
+			for (std::tr1::unordered_map<std::string, User*>::iterator iter = users.begin(); iter != users.end(); iter++) {
 				if (iter->first == param){
-					iter->second.status(add, mode);
+					iter->second->status(add, mode);
 					exists = true;
 				}
 			}
@@ -60,7 +60,7 @@ void Channel::setMode(bool add, char mode, std::string param) {
 }
 
 void Channel::joinChannel(std::string nick) {
-	users.insert(std::pair<std::string, User> (nick, User (this)));
+	users.insert(std::pair<std::string, User*> (nick, new User (this)));
 }
 
 void Channel::leaveChannel(std::string nick) {

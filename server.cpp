@@ -39,7 +39,7 @@ std::vector<char> Server::getChanTypes() {
 }
 
 void Server::resyncChannels() {
-	for (std::tr1::unordered_map<std::string, Channel>::iterator iter = inChannels.begin(); iter != inChannels.end(); iter++)
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); iter++)
 		sendLine("NAMES " + iter->first);
 }
 
@@ -67,19 +67,19 @@ void Server::handleData() {
 		} else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
 		else if (parsedLine[1] == "332") { // channel topic
-			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
+			for (std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
 				if (it->first == parsedLine[3])
-					it->second.setTopic(parsedLine[4]);
+					it->second->setTopic(parsedLine[4]);
 			}
 		} else if (parsedLine[1] == "353") { // NAMES reply
-			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
+			for (std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
 				if (it->first == parsedLine[4])
-					it->second.parseNames(separateBySpace(parsedLine[5]));
+					it->second->parseNames(separateBySpace(parsedLine[5]));
 			}
 		} else if (parsedLine[1] == "366") { // end of NAMES reply
-			for (std::tr1::unordered_map<std::string, Channel>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
+			for (std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
 				if (it->first == parsedLine[3])
-					it->second.numeric366();
+					it->second->numeric366();
 			}
 		} else if (parsedLine[1] == "MODE") {
 			bool addMode = true;
@@ -146,14 +146,14 @@ void Server::handleData() {
 							category = 4;
 						
 						if (category == 0 || category == 1 || (category == 2 && addMode)) {
-							for (std::tr1::unordered_map<std::string, Channel>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
+							for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
 								if (chanIter->first == parsedLine[2])
-									chanIter->second.setMode(addMode, parsedLine[3][i], parsedLine[currParam++]);
+									chanIter->second->setMode(addMode, parsedLine[3][i], parsedLine[currParam++]);
 							}
 						} else {
-							for (std::tr1::unordered_map<std::string, Channel>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
+							for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
 								if (chanIter->first == parsedLine[2])
-									chanIter->second.setMode(addMode, parsedLine[3][i], "");
+									chanIter->second->setMode(addMode, parsedLine[3][i], "");
 							}
 						}
 					}
@@ -162,7 +162,7 @@ void Server::handleData() {
 		} else if (parsedLine[1] == "NICK" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot's nick changed
 			serverConf["nick"] = parsedLine[2];
 		else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
-			inChannels.insert(std::pair<std::string, Channel> (parsedLine[2], Channel (this)));
+			inChannels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (this)));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {

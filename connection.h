@@ -28,7 +28,7 @@ class Channel {
 		void leaveChannel(std::string nick);
 		Server* parentServer;
 	private:
-		std::tr1::unordered_map<std::string, User> users;
+		std::tr1::unordered_map<std::string, User*> users;
 		std::string topic;
 		bool namesSync;
 };
@@ -48,7 +48,7 @@ class Server {
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
-		std::tr1::unordered_map<std::string, Channel> inChannels;
+		std::tr1::unordered_map<std::string, Channel*> inChannels;
 		std::string network;
 		std::vector<char> userModes;
 		std::tr1::unordered_map<char, char> prefix;
