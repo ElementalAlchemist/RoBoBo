@@ -261,7 +261,7 @@ bool ModuleInterface::isChanType(char chanPrefix) {
 }
 
 void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf) {
-	servers.insert(std::pair<std::string, Server*> (serverIterator->first, new Server (serverName, serverConf, this)));
+	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, serverConf, this)));
 }
 
 void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
