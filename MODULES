@@ -78,6 +78,8 @@ what the bot calls "hooks."  In order to use hooks you must simply define the
 functions corresponding to the hooks you need, which are declared in the base
 Module class.
 
+void onPostInit();
+	This function is called after the function is initialized with the configuration and interface with the rest of the bot.
 void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 	This function is called when a PRIVMSG is received through a channel.  It is not triggered on CTCP.
 		server: The server from which the message was received
@@ -276,10 +278,14 @@ void quitServer(std::string server, std::string reason);
 		reason: The quit reason to give
 
 =======================
-3. HELPFUL FUNCTIONS
+3. HELPFUL VARIABLES AND FUNCTIONS
 
 The Module class contains some functions that make it possible to code many
 modules and other functions that are just helpful.
+
+std::tr1::unordered_map<std::string, std::string> config;
+This variable contains all of the variables that correspond to the module and
+the values that the variables have as defined in the configuration file.
 
 std::list<std::string> getServers()
 This function returns a list of valid server names.  It gives the names of all
