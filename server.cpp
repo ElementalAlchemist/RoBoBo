@@ -1,8 +1,8 @@
 #include "connection.h"
 #include "channel.cpp"
 
-#ifndef SERVER_ROBOBO
-#define SERVER_ROBOBO
+#ifndef SERVER_CPP
+#define SERVER_CPP
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
 	serverName = serverAddress;
 	serverConf = confVars;

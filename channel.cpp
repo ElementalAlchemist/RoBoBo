@@ -1,8 +1,8 @@
 #include "connection.h"
 #include "user.cpp"
 
-#ifndef CHANNEL_ROBOBO
-#define CHANNEL_ROBOBO
+#ifndef CHANNEL_CPP
+#define CHANNEL_CPP
 Channel::Channel(Server* thisServer) {
 	parentServer = thisServer;
 	topic = "";

@@ -1,7 +1,7 @@
 #include "socket.h"
 
-#ifndef SOCKET_ROBOBO
-#define SOCKET_ROBOBO
+#ifndef SOCKET_CPP
+#define SOCKET_CPP
 class Socket {
 	public:
 		Socket();

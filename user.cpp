@@ -1,7 +1,7 @@
 #include "connection.h"
 
-#ifndef USER_ROBOBO
-#define USER_ROBOBO
+#ifndef USER_CPP
+#define USER_CPP
 User::User(Channel* thisChannel) {
 	parentChannel = thisChannel;
 	std::tr1::unordered_map<char, char> prefixes = parentChannel->parentServer->getPrefixes();

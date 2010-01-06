@@ -3,8 +3,8 @@
 
 #include <sstream>
 
-#ifndef CONNECTION_DEF_ROBOBO
-#define CONNECTION_DEF_ROBOBO
+#ifndef CONNECTION_H
+#define CONNECTION_H
 class Server;
 class Channel;
 

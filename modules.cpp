@@ -1,7 +1,7 @@
 #include "modules.h"
 
-#ifndef MODBASE_ROBOBO
-#define MODBASE_ROBOBO
+#ifndef MODBASE_CPP
+#define MODBASE_CPP
 Module::Module() {}
 
 Module::~Module() {}

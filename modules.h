@@ -2,8 +2,8 @@
 #include "config.cpp"
 #include <dlfcn.h>
 
-#ifndef MODULES_DEF_ROBOBO
-#define MODULES_DEF_ROBOBO
+#ifndef MODULES_H
+#define MODULES_H
 class Module {
 	public:
 		Module();

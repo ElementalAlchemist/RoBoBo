@@ -1,7 +1,7 @@
 #include "config.h"
 
-#ifndef CONFIG_ROBOBO
-#define CONFIG_ROBOBO
+#ifndef CONFIG_CPP
+#define CONFIG_CPP
 class ConfigReader {
 	public:
 		ConfigReader(std::string filename, std::string filedir);
