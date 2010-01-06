@@ -19,4 +19,5 @@ server irc.freenode.net {
 
 	# This will eventually support more stuff.
 }
-# I will expand on this file and the comments later.
+
+#module m_helloworld.so {}
