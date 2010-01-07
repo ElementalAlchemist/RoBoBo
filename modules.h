@@ -34,7 +34,7 @@ class Module {
 		virtual void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
 		
-		
+		virtual std::string getHelp();
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, std::string> config;

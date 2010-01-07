@@ -13,7 +13,7 @@ void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, Mod
 
 void Module::onPostInit() {}
 
-void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+void Module::onChannelMsg(std::tr1::unordered_map<std::string, std::string> config, ModuleInterface* modInterface, std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
 void Module::onUserMsg(std::string server, std::string nick, std::string message) {}
 
@@ -59,7 +59,9 @@ void Module::onOutChannelCTCPReply(std::string server, std::string target, char 
 
 void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
 
-void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
+std::string Module::getHelp() {}
+
+void Module::sendPrivMsg(ModuleInterface* serverData, std::string server, std::string target, std::string message) {
 	serverData->sendToServer(server, "PRIVMSG " + target + " :" + message);
 }
 
