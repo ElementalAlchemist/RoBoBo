@@ -78,8 +78,6 @@ what the bot calls "hooks."  In order to use hooks you must simply define the
 functions corresponding to the hooks you need, which are declared in the base
 Module class.
 
-void onPostInit();
-	This function is called after the function is initialized with the configuration and interface with the rest of the bot.
 void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 	This function is called when a PRIVMSG is received through a channel.  It is not triggered on CTCP.
 		server: The server from which the message was received

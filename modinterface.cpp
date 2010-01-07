@@ -284,7 +284,6 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	Module* newModule = spawnModule;
 	newModule->init(modConf, this);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
-	newModule->onPostInit();
 }
 
 std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {

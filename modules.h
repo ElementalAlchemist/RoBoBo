@@ -9,8 +9,7 @@ class Module {
 		Module();
 		virtual ~Module();
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace);
-		virtual void onPostInit();
-		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual void onChannelMsg(std::tr1::unordered_map<std::string, std::string> config, ModuleInterface* modInterface, std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
 		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserNotice(std::string server, std::string nick, std::string message);
@@ -34,10 +33,12 @@ class Module {
 		virtual void onOutUserCTCP(std::string server, std::string target, std::string message);
 		virtual void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
+		
+		
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, std::string> config;
-		void sendPrivMsg(std::string server, std::string target, std::string message);
+		void sendPrivMsg(ModuleInterface* serverData, std::string server, std::string target, std::string message);
 		void sendNotice(std::string server, std::string target, std::string message);
 		void sendCTCP(std::string server, std::string target, std::string type, std::string params = "");
 		void sendCTCPReply(std::string server, std::string target, std::string type, std::string data = "");
@@ -66,6 +67,7 @@ class ModuleInterface {
 	private:
 		std::tr1::unordered_map<std::string, Server*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf;
 		unsigned short debugLevel;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
