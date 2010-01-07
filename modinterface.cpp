@@ -2,7 +2,7 @@
 
 #ifndef MODINTERFACE_CPP
 #define MODINTERFACE_CPP
-ModuleInterface::ModuleInterface(std::string confdir, std::string confname) {
+ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug) {
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig();

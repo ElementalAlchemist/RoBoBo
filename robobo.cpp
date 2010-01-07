@@ -3,6 +3,7 @@
 int main(int argc, char** argv) {
 	std::string confDir = "."; // look in current directory by default
 	std::string confName = "robobo.conf"; // look for robobo.conf by default
+	unsigned short debug = 0;
 	if (argc > 1) { // analyze arguments
 		bool exitAfter = false;
 		for (int i = 1; i < argc; i++) { // iterate through all arguments
@@ -21,6 +22,8 @@ int main(int argc, char** argv) {
 				std::cout << "\t\t-v: same as --version" << std::endl;
 				std::cout << "\t--confdir <directory>: make RoBoBo look in the specified directory for the configuration instead of current directory" << std::endl;
 				std::cout << "\t--confname <filename>: make RoBoBo look for the specified file in the conf directory for configuration information" << std::endl;
+				std::cout << "\t--debug: make RoBoBo enter debug mode" << std::endl;
+				std::cout << "\t\t-d: same as --debug" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
 				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;
@@ -39,12 +42,20 @@ int main(int argc, char** argv) {
 				}
 				confName = argv[i];
 				std::cout << "Looking for a configuration file named " << confName << std::endl;
+			} else if (strcmp(argv[i], "--debug") == 0 || strcmp(argv[i], "-d") == 0) {
+				if (i+1 >= argc || !(strcmp(argv[i+1], "0") == 0 || strcmp(argv[i+1], "1") == 0 || strcmp(argv[i+1], "2") == 0 || strcmp(argv[i+1], "3") == 0 || strcmp(argv[i+1], "4") == 0 || strcmp(argv[i+1], "5") == 0))
+					debug = 1;
+				else {
+					std::istringstream debugNum (argv[++i]);
+					debugNum >> debug;
+				}
+				std::cout << "Setting debug mode with level " << debug << std::endl;
 			}
 			std::cout << std::endl; // add a newline after a parameter's output
 		}
 		if (exitAfter)
 			return 0;
 	}
-	new ModuleInterface (confDir, confName); //run actual bot
+	new ModuleInterface (confDir, confName, debug); //run actual bot
 	pthread_exit(NULL);
 }

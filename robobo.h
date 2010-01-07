@@ -8,3 +8,4 @@ class ModuleInterface; // forward-declare so it can be used in modules and serve
 #include "server.cpp"
 
 #include <string.h> // C strings to handle args
+#include <sstream>
