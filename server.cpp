@@ -234,6 +234,10 @@ void Server::sendData() {
 		outData.pop();
 		command = sendingMessage.substr(0,sendingMessage.find_first_of(' '));
 		
+		if (command == "MODE") { // consolidate modes into one line
+			// to be handled soon.
+		}
+		
 		if (command == "ELINE" || command == "GLINE" || command == "KLINE" || command == "ZLINE" || command == "KILL" || command == "PING" || command == "PONG" || command == "USER" || command == "SAMODE" || command == "SAJOIN" || command == "SAPART" || command == "SAQUIT" || command == "SANICK" || command == "SATOPIC") // add the correct number of seconds by the command being sent
 			secondsToAdd = 0;
 		else if (command == "JOIN" || command == "MAP" || command == "OPER" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
@@ -330,6 +334,12 @@ void Server::parse005(std::vector<std::string> parsedLine) {
 				for (i++; i < modeList.size(); i++) // no param; increment i off comma
 					currSet.push_back(modeList[i]); // no more commas
 				chanModes.push_back(currSet);
+			}
+		}
+		if (parsedLine[i].size() > 6) { // max modes per line
+			if (parsedLine[i].substr(0,6) == "MODES=") { // MODES=19
+				std::istringstream maxModesInLine (parsedLine[i].substr(6));
+				maxModesInLine >> maxModes;
 			}
 		}
 	}

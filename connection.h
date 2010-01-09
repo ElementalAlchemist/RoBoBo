@@ -58,6 +58,7 @@ class Server {
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		std::tr1::unordered_map<std::string, Channel*> inChannels;
 		std::string network;
+		unsigned short maxModes;
 		std::vector<char> userModes;
 		std::tr1::unordered_map<char, char> prefix;
 		std::vector<char> chanTypes;
