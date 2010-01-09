@@ -7,7 +7,8 @@ Table of Contents
 2. Communicating with a Server
 - 2.1. Receiving Data from a Server
 - 2.2. Receiving Data Being Sent to a Server
-- 2.3. Sending Data to a Server
+- 2.3. Other Hooks
+- 2.4. Sending Data to a Server
 3. Helpful Variables and Functions
 
 =======================
@@ -220,7 +221,15 @@ void onOutUserCTCPReply(std::string server, std::string target, std::string mess
 		message: The actual reply, including the type and any given information
 
 =======================
-2.3. SENDING DATA TO A SERVER
+2.3. OTHER HOOKS
+
+There are some other hooks, too.  When they are called depends on the hook.
+
+void onPostInit();
+	This function is called immediately after the module is loaded with its configuration and access to the ModuleInterface.
+
+=======================
+2.4. SENDING DATA TO A SERVER
 
 Some functions are provided to you free of charge in the Module class allowing
 you to easily perform certain actions.

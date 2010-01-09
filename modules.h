@@ -9,6 +9,7 @@ class Module {
 		Module();
 		virtual ~Module();
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace);
+		virtual void onPostInit();
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
 		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
