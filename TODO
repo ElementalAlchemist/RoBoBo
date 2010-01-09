@@ -12,13 +12,13 @@ Before releasing alpha 1
 [x] - fix parsing of the conf files
 	[x] - fix including in conf files
 	[x] - test concatenation of other variables
-[>] - load modules without segfaulting
+[x] - load modules without segfaulting
 [x] - fix channel resyncing on status change
 
 Sometime before the beta stage
 ======================================
 [ ] - 433 :Nick currently in use support
-[ ] - DNS resolving on IRC hostnames
+[ ] - DNS resolving on IRC server names
 [ ] - Modules
 	[ ] - Administration module
 	[ ] - CTCP Reply module
