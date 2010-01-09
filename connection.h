@@ -2,6 +2,7 @@
 #include "socket.cpp"
 
 #include <sstream>
+#include <queue>
 
 #ifndef CONNECTION_H
 #define CONNECTION_H
@@ -48,6 +49,7 @@ class Server {
 		Socket serverConnection;
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;
+		pthread_t dataSendThread;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		std::tr1::unordered_map<std::string, Channel*> inChannels;
 		std::string network;
@@ -55,8 +57,11 @@ class Server {
 		std::tr1::unordered_map<char, char> prefix;
 		std::vector<char> chanTypes;
 		std::vector<std::vector<char> > chanModes;
+		std::queue<std::string> outData;
 		static void* handleData_thread(void* ptr);
 		void handleData();
+		static void* sendData_thread(void* ptr);
+		void sendData();
 		void parse005(std::vector<std::string> parsedLine);
 		std::vector<std::string> parseLine(std::string unformattedLine);
 		std::vector<std::string> separateBySpace(std::string joinedLine);

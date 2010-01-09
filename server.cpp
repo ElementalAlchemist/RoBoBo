@@ -14,12 +14,17 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	sendLine("NICK " + serverConf["nick"]);
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
 	pthread_create(&dataReceiveThread, NULL, handleData_thread, this);
+	pthread_create(&dataSendThread, NULL, sendData_thread, this);
 }
 
-void Server::sendLine(std::string line) {
+/*void Server::sendLine(std::string line) {
 	serverConnection.sendData(line);
 	std::cout << " -> " << line << std::endl;
 	moduleData->callHookOut(serverName, parseLine(line));
+}*/
+
+void Server::sendLine(std::string line) {
+	outData.push(line);
 }
 
 std::tr1::unordered_map<std::string, std::string> Server::getInfo() {
@@ -194,6 +199,16 @@ void Server::handleData() {
 			}
 		}
 	}
+}
+
+void* Server::sendData_thread(void* ptr) {
+	Server* servptr = (Server*) ptr;
+	servptr->sendData();
+	return NULL;
+}
+
+void Server::sendData() {
+	
 }
 
 void Server::parse005(std::vector<std::string> parsedLine) {
