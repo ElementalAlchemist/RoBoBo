@@ -44,6 +44,7 @@ class Server {
 		void resyncChannels();
 	private:
 		std::string serverName;
+		bool registered;
 		Socket serverConnection;
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;
