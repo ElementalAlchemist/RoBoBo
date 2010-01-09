@@ -4,6 +4,7 @@
 #ifndef SERVER_CPP
 #define SERVER_CPP
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
+	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	serverName = serverAddress;
 	serverConf = confVars;
 	moduleData = modFace;
@@ -15,6 +16,12 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
 	pthread_create(&dataReceiveThread, NULL, handleData_thread, this);
 	pthread_create(&dataSendThread, NULL, sendData_thread, this);
+}
+
+Server::~Server() {
+	pthread_exit(&dataReceiveThread);
+	pthread_exit(&dataSendThread);
+	pthread_exit(&secondDecrementThread);
 }
 
 /*void Server::sendLine(std::string line) {
@@ -208,7 +215,66 @@ void* Server::sendData_thread(void* ptr) {
 }
 
 void Server::sendData() {
-	
+	seconds = 0;
+	unsigned short secondsToAdd = 0;
+	std::string sendingMessage = "";
+	std::string command = "";
+	pthread_create(&secondDecrementThread, NULL, secondDecrement_thread, this);
+	timespec halfSecond;
+	halfSecond.tv_sec = 0;
+	halfSecond.tv_nsec = 500000000; // 500 million nanoseconds = 0.5 seconds.
+	while (true) {
+		if (outData.empty()) {
+			std::cout << "No data is being sent." << std::endl;
+			nanosleep(&halfSecond, NULL); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
+			continue; // start loop over
+		}
+		std::cout << "Sending a message.  outData.size() == " << outData.size() << "; seconds == " << seconds << ";" << std::endl;
+		sendingMessage = outData.front();
+		outData.pop();
+		command = sendingMessage.substr(0,sendingMessage.find_first_of(' '));
+		
+		if (command == "ELINE" || command == "GLINE" || command == "KLINE" || command == "ZLINE" || command == "KILL" || command == "PING" || command == "PONG" || command == "USER" || command == "SAMODE" || command == "SAJOIN" || command == "SAPART" || command == "SAQUIT" || command == "SANICK" || command == "SATOPIC") // add the correct number of seconds by the command being sent
+			secondsToAdd = 0;
+		else if (command == "JOIN" || command == "MAP" || command == "OPER" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
+			secondsToAdd = 2;
+		else if (command == "REHASH")
+			secondsToAdd = 3;
+		else if (command == "INVITE")
+			secondsToAdd = 4;
+		else if (command == "LIST" || command == "CYCLE")
+			secondsToAdd = 5;
+		else
+			secondsToAdd = 1;
+		
+		while (seconds + secondsToAdd > 10) {
+			sleep(1);
+		}
+		serverConnection.sendData(sendingMessage);
+		std::cout << " -> " << sendingMessage << std::endl;
+		moduleData->callHookOut(serverName, parseLine(sendingMessage));
+		pthread_mutex_lock(&secondsmutex);
+		seconds += secondsToAdd;
+		pthread_mutex_unlock(&secondsmutex);
+	}
+}
+
+void* Server::secondDecrement_thread(void* ptr) {
+	Server* servptr = (Server*) ptr;
+	servptr->secondDecrement();
+	return NULL;
+}
+
+void Server::secondDecrement() {
+	while (true) {
+		sleep(1);
+		if (seconds > 0) {
+			pthread_mutex_lock(&secondsmutex);
+			seconds--;
+			std::cout << "Seconds decremented: " << seconds << std::endl;
+			pthread_mutex_unlock(&secondsmutex);
+		}
+	}
 }
 
 void Server::parse005(std::vector<std::string> parsedLine) {

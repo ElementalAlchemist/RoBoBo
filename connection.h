@@ -3,6 +3,7 @@
 
 #include <sstream>
 #include <queue>
+#include <time.h>
 
 #ifndef CONNECTION_H
 #define CONNECTION_H
@@ -37,6 +38,7 @@ class Channel {
 class Server {
 	public:
 		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace);
+		~Server();
 		void sendLine(std::string line);
 		std::tr1::unordered_map<std::string, std::string> getInfo();
 		std::tr1::unordered_map<char, char> getPrefixes(); // necessary in channels
@@ -50,6 +52,9 @@ class Server {
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;
 		pthread_t dataSendThread;
+		pthread_t secondDecrementThread;
+		pthread_mutex_t secondsmutex;
+		volatile unsigned short seconds; // seconds in the penalty system
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		std::tr1::unordered_map<std::string, Channel*> inChannels;
 		std::string network;
@@ -62,6 +67,8 @@ class Server {
 		void handleData();
 		static void* sendData_thread(void* ptr);
 		void sendData();
+		static void* secondDecrement_thread(void* ptr);
+		void secondDecrement();
 		void parse005(std::vector<std::string> parsedLine);
 		std::vector<std::string> parseLine(std::string unformattedLine);
 		std::vector<std::string> separateBySpace(std::string joinedLine);
