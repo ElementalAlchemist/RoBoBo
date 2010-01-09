@@ -57,7 +57,9 @@ void Module::onOutChannelCTCPReply(std::string server, std::string target, char 
 
 void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
 
-std::string Module::getHelp() { return ""; }
+std::string Module::getDesc() { return "This module has no description."; }
+
+std::string Module::getHelp() { return "There is no help available for this module."; }
 
 void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
 	serverData->sendToServer(server, "PRIVMSG " + target + " :" + message);

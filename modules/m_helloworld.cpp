@@ -3,7 +3,7 @@
 class m_helloworld : public Module {
 	public:
 		void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-		std::string getHelp();
+		std::string getDesc();
 };
 
 void m_helloworld::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
@@ -12,7 +12,7 @@ void m_helloworld::onChannelMsg(std::string server, std::string channel, char ta
 		sendPrivMsg(server, channel, "Hello world!");
 }
 
-std::string m_helloworld::getHelp() {
+std::string m_helloworld::getDesc() {
 	std::string helpText = "Responds to text starting with \"Hello \" with \"Hello world!\"  Intended as a simple test module.";
 	return helpText;
 }
