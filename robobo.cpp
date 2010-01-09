@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 				std::cout << "\t\t-d: same as --debug" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
-				std::cout << "RoBoBo-IRC-BoBo Pre-alpha Development Version" << std::endl;
+				std::cout << "RoBoBo-IRC-BoBo Version 1.0.0 Alpha 1" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--confdir") == 0) {
 				if (++i >= argc) {
