@@ -225,8 +225,8 @@ void onOutUserCTCPReply(std::string server, std::string target, std::string mess
 
 There are some other hooks, too.  When they are called depends on the hook.
 
-void onPostInit();
-	This function is called immediately after the module is loaded with its configuration and access to the ModuleInterface.
+void onLoadComplete();
+	This function is called once all modules are loaded.  Modules will have the config and bot access loaded by this call.
 
 =======================
 2.4. SENDING DATA TO A SERVER
