@@ -273,7 +273,8 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 		return;
 	}
 	char* dlsymError;
-	Module* spawnModule = (Module*) dlsym(openModule, "spawn");
+	typedef void* (*module_spawn_t)();
+	module_spawn_t spawnModule = (module_spawn_t) dlsym(openModule, "spawn");
 	dlsymError = dlerror();
 	if (dlsymError) {
 		std::string error = "Could not load module " + modName + ": " + dlsymError;
@@ -281,7 +282,7 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 		return;
 	}
 	
-	Module* newModule = spawnModule;
+	Module* newModule = (Module*)spawnModule();
 	newModule->init(modConf, this);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 }
