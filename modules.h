@@ -9,7 +9,7 @@ class Module {
 		Module();
 		virtual ~Module();
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace);
-		virtual void onPostInit();
+		virtual void onLoadComplete();
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
 		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -35,8 +35,8 @@ class Module {
 		virtual void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
 		
-		virtual std::string getHelp();
 		virtual std::string getDesc();
+		virtual std::string getHelp();
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, std::string> config;

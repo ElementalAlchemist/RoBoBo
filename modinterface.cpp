@@ -8,6 +8,8 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig();
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
 		loadModule(modConfIter->first, modConfIter->second);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
+		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); servConfIter++)
 		connectServer(servConfIter->first, servConfIter->second);
 }
@@ -285,7 +287,6 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	Module* newModule = (Module*)spawnModule();
 	newModule->init(modConf, this);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
-	newModule->onPostInit();
 }
 
 std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {

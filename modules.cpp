@@ -11,7 +11,7 @@ void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, Mod
 	serverData = modFace;
 }
 
-void Module::onPostInit() {}
+void Module::onLoadComplete() {}
 
 void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
