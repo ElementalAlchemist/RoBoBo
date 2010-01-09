@@ -5,16 +5,6 @@ Current TODO List
 [>] - in progress
 [x] - complete
 
-Before releasing alpha 1
-======================================
-[x] - Thread Server::handleData()
-[x] - compile modules
-[x] - fix parsing of the conf files
-	[x] - fix including in conf files
-	[x] - test concatenation of other variables
-[x] - load modules without segfaulting
-[x] - fix channel resyncing on status change
-
 Sometime before the beta stage
 ======================================
 [ ] - 433 :Nick currently in use support
