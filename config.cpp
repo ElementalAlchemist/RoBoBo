@@ -149,7 +149,7 @@ void ConfigReader::readConfig(std::string filename, std::string filedir) {
 		} else if (concatening && configuration == '+') {
 			concatening = false;
 			concatable = true;
-			currentValue += oneBlock[concatingVar]; std::cout << concatingVar << std::endl;
+			currentValue += oneBlock[concatingVar];
 			concatingVar = "";
 		} else if (concatening)
 			concatingVar += configuration;
