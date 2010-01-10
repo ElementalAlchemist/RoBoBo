@@ -14,6 +14,9 @@ server irc.freenode.net {
 	ident = "RoBoBo";
 	# gecos: the GECOS or realname for the bot to use on the server.
 	gecos = "RoBoBo-IRC-BoBo IRC Bot";
+	# password: if the server requires a password to connect, add it here
+	# if it doesn't, leave it blank or commented
+	# password = "";
 	# channels: the channels the bot will join on connect.
 	# These channels should be in an IRC-friendly format; that is, they will
 	# be sent as they appear here immediately after the JOIN command in IRC.

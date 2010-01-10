@@ -14,6 +14,8 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	serverConnection.connectServer(serverAddress, port);
 	sendLine("NICK " + serverConf["nick"]);
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
+	if (serverConf["password"] != "")
+		sendLine("PASS " + serverConf["password"]);
 	pthread_create(&dataReceiveThread, NULL, handleData_thread, this);
 	pthread_create(&dataSendThread, NULL, sendData_thread, this);
 }
