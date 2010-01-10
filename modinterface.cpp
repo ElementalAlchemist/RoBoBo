@@ -152,38 +152,16 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 					}
 				}
 				if (!found) {
-					for (unsigned int j = 0; j < serverModes[0].size(); j++) {
-						if (parsedLine[3][i] == serverModes[0][j]) {
-							found = true;
-							category = 0;
+					for (unsigned int j = 0; j < serverModes.size(); j++) {
+						for (unsigned int k = 0; k < serverModes[j].size(); k++) {
+							if (parsedLine[3][i] == serverModes[j][k]) {
+								found = true;
+								category = j;
+								break;
+							}
+						}
+						if (found)
 							break;
-						}
-					}
-				}
-				if (!found) {
-					for (unsigned int j = 0; j < serverModes[1].size(); j++) {
-						if (parsedLine[3][i] == serverModes[1][j]) {
-							found = true;
-							category = 1;
-							break;
-						}
-					}
-				}
-				if (!found) {
-					for (unsigned int j = 0; j < serverModes[2].size(); j++) {
-						if (parsedLine[3][i] == serverModes[1][j]) {
-							found = true;
-							category = 2;
-							break;
-						}
-					}
-				}
-				if (!found) {
-					for (unsigned int j = 0; j < serverModes[3].size(); j++) {
-						if (parsedLine[3][i] == serverModes[1][j]) {
-							found = true;
-							category = 3;
-						}
 					}
 				}
 				if (!found)

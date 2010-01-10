@@ -131,35 +131,16 @@ void Server::handleData() {
 							}
 						}
 						if (!found) {
-							for (unsigned int j = 0; j < chanModes[0].size(); j++) {
-								if (parsedLine[3][i] == chanModes[0][j]) {
-									found = true;
-									category = 0;
+							for (unsigned int j = 0; j < chanModes.size(); j++) {
+								for (unsigned int k = 0; k < chanModes[j].size(); k++) {
+									if (parsedLine[3][i] == chanModes[j][k]) {
+										found = true;
+										category = j;
+										break;
+									}
 								}
-							}
-						}
-						if (!found) {
-							for (unsigned int j = 0; j < chanModes[1].size(); j++) {
-								if (parsedLine[3][i] == chanModes[1][j]) {
-									found = true;
-									category = 1;
-								}
-							}
-						}
-						if (!found) {
-							for (unsigned int j = 0; j < chanModes[2].size(); j++) {
-								if (parsedLine[3][i] == chanModes[2][j]) {
-									found = true;
-									category = 2;
-								}
-							}
-						}
-						if (!found) {
-							for (unsigned int j = 0; j < chanModes[3].size(); j++) {
-								if (parsedLine[3][i] == chanModes[3][j]) {
-									found = true;
-									category = 3;
-								}
+								if (found)
+									break;
 							}
 						}
 						if (!found)
