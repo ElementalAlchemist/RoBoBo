@@ -135,17 +135,29 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 				addMode = false;
 			else {
 				std::vector<std::vector<char> > serverModes;
+				std::tr1::unordered_map<char, char> prefixes;
 				for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); servIter++) {
-					if (servIter->first == server)
+					if (servIter->first == server) {
 						serverModes = servIter->second->getChanModes();
+						prefixes = servIter->second->getPrefixes();
+					}
 				}
 				bool found = false;
 				short category;
-				for (unsigned int j = 0; j < serverModes[0].size(); j++) {
-					if (parsedLine[3][i] == serverModes[0][j]) {
+				for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter) {
+					if (parsedLine[3][i] == prefixIter->first) {
 						found = true;
 						category = 0;
 						break;
+					}
+				}
+				if (!found) {
+					for (unsigned int j = 0; j < serverModes[0].size(); j++) {
+						if (parsedLine[3][i] == serverModes[0][j]) {
+							found = true;
+							category = 0;
+							break;
+						}
 					}
 				}
 				if (!found) {
@@ -176,9 +188,11 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 				}
 				if (!found)
 					category = 4;
+				
 				if (category == 0 || category == 1 || (category == 2 && addMode)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
-						modIter->second->onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam++]);
+						modIter->second->onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam]);
+					currParam++;
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
 						modIter->second->onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
