@@ -3,6 +3,7 @@
 class m_modetest : public Module {
 	public:
 		void onChannelMsg(std::string server, std::string channel, char status, std::string nick, std::string message);
+		std::string getDesc();
 };
 
 void m_modetest::onChannelMsg(std::string server, std::string channel, char status, std::string nick, std::string message) {
@@ -51,6 +52,8 @@ void m_modetest::onChannelMsg(std::string server, std::string channel, char stat
 		}
 	}
 }
+
+std::string m_modetest::getDesc() { return "This module sets channel modes based on the parameters given with the !mode fantasy command."; }
 
 extern "C" Module* spawn() {
 	return new m_modetest;
