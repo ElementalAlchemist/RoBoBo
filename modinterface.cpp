@@ -30,6 +30,24 @@ std::tr1::unordered_map<std::string, std::string> ModuleInterface::getServerData
 	return data; // but here's a blank map, just for you. :)
 }
 
+std::vector<std::vector<char> > ModuleInterface::getServerChanModes(std::string server) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.begin(); serverIter != servers.end(); serverIter++) {
+		if (serverIter->first == server)
+			return serverIter->second->getChanModes();
+	}
+	std::vector<std::vector<char> > data; // If you're going to send random channel mode requests, at least look through the server list
+	return data; // I mean, seriously.  What's wrong with you?
+}
+
+std::tr1::unordered_map<char, char> ModuleInterface::getServerPrefixes(std::string server) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.begin(); serverIter != servers.end(); serverIter++) {
+		if (serverIter->first == server)
+			return serverIter->second->getPrefixes();
+	}
+	std::tr1::unordered_map<char, char> data; // I'm tired of saying it.  You're probably handling this from a hook.  USE THE SERVER PARAMETER.
+	return data; // It doesn't get any easier.
+}
+
 void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "PRIVMSG") {
 		if (parsedLine[3][0] == (char)1) { // CTCP

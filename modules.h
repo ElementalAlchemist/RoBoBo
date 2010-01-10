@@ -53,6 +53,8 @@ class Module {
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
+		std::vector<std::vector<char> > getServerChanModes(std::string server);
+		std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
 	private:
 		ModuleInterface* serverData;
 };
@@ -62,6 +64,8 @@ class ModuleInterface {
 		ModuleInterface(std::string confdir, std::string confname, unsigned short debug);
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
+		std::vector<std::vector<char> > getServerChanModes(std::string server);
+		std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
 		void callHook(std::string server, std::vector<std::string> parsedLine);
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
 		std::tr1::unordered_map<std::string, Module*> getModules();

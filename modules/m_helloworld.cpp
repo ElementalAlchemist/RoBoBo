@@ -8,8 +8,11 @@ class m_helloworld : public Module {
 
 void m_helloworld::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	std::vector<std::string> splitMsg = splitBySpace(message);
-	if (splitMsg[0] == "Hello")
+	if (splitMsg[0] == "Hello") {
 		sendPrivMsg(server, channel, "Hello world!");
+		sendPrivMsg(server, channel, "How are you today?");
+		sendPrivMsg(server, channel, "Ah, so am I.");
+	}
 }
 
 std::string m_helloworld::getDesc() {

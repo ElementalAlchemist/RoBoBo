@@ -24,12 +24,6 @@ Server::~Server() {
 	pthread_exit(&secondDecrementThread);
 }
 
-/*void Server::sendLine(std::string line) {
-	serverConnection.sendData(line);
-	std::cout << " -> " << line << std::endl;
-	moduleData->callHookOut(serverName, parseLine(line));
-}*/
-
 void Server::sendLine(std::string line) {
 	outData.push(line);
 }
@@ -225,21 +219,48 @@ void Server::sendData() {
 	halfSecond.tv_nsec = 500000000; // 500 million nanoseconds = 0.5 seconds.
 	while (true) {
 		if (outData.empty()) {
-			std::cout << "No data is being sent." << std::endl;
 			nanosleep(&halfSecond, NULL); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
-			continue; // start loop over
+			continue; // check again for empty queue
 		}
-		std::cout << "Sending a message.  outData.size() == " << outData.size() << "; seconds == " << seconds << ";" << std::endl;
 		sendingMessage = outData.front();
 		outData.pop();
 		command = sendingMessage.substr(0,sendingMessage.find_first_of(' '));
 		
 		if (command == "MODE") { // consolidate modes into one line
-			// to be handled soon.
+			std::vector<std::string> parsedLine = parseLine(sendingMessage);
+			std::string channel = parsedLine[1], modes = parsedLine[2], params = "";
+			bool addingMode = (modes[0] == '+') ? true : false;
+			if (parsedLine.size() > 3) // if there is a parameter, add it
+				params += " " + parsedLine[3];
+			
+			if (!outData.empty()) {
+				sendingMessage = outData.front();
+				parsedLine = parseLine(sendingMessage);
+				unsigned short limit = 1;
+				while (parsedLine[0] == "MODE" && parsedLine[1] == channel && limit <= maxModes) {
+					outData.pop(); // remove the message we are parsing
+					if ((parsedLine[2][0] == '+') == addingMode) // if we're doing the same thing as the operation already occurring on the mode string
+						modes += parsedLine[2][1];
+					else
+						modes += parsedLine[2];
+					if (parsedLine[2][0] == '+')
+						addingMode = true;
+					else
+						addingMode = false;
+					if (parsedLine.size() > 3)
+						params += " " + parsedLine[3];
+					limit++;
+					if (!outData.empty()) {
+						sendingMessage = outData.front();
+						parsedLine = parseLine(sendingMessage);
+					}
+				}
+			}
+			sendingMessage = "MODE " + channel + " " + modes + params; // set the sendingMessage to the final compilation forming the message we are sending
 		}
 		
-		if (command == "ELINE" || command == "GLINE" || command == "KLINE" || command == "ZLINE" || command == "KILL" || command == "PING" || command == "PONG" || command == "USER" || command == "SAMODE" || command == "SAJOIN" || command == "SAPART" || command == "SAQUIT" || command == "SANICK" || command == "SATOPIC") // add the correct number of seconds by the command being sent
-			secondsToAdd = 0;
+		if (command == "ELINE" || command == "GLINE" || command == "KLINE" || command == "ZLINE" || command == "KILL" || command == "PING" || command == "PONG" || command == "USER" || command == "SAMODE" || command == "SAJOIN" || command == "SAPART" || command == "SAQUIT" || command == "SANICK" || command == "SATOPIC")
+			secondsToAdd = 0;  // add the correct number of seconds for the command being sent
 		else if (command == "JOIN" || command == "MAP" || command == "OPER" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
 			secondsToAdd = 2;
 		else if (command == "REHASH")
@@ -248,7 +269,7 @@ void Server::sendData() {
 			secondsToAdd = 4;
 		else if (command == "LIST" || command == "CYCLE")
 			secondsToAdd = 5;
-		else
+		else // all commands not on the list are worth 1 second.
 			secondsToAdd = 1;
 		
 		while (seconds + secondsToAdd > 10) {
@@ -275,7 +296,6 @@ void Server::secondDecrement() {
 		if (seconds > 0) {
 			pthread_mutex_lock(&secondsmutex);
 			seconds--;
-			std::cout << "Seconds decremented: " << seconds << std::endl;
 			pthread_mutex_unlock(&secondsmutex);
 		}
 	}

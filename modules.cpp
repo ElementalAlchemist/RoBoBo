@@ -147,4 +147,12 @@ std::list<std::string> Module::getServers() {
 std::tr1::unordered_map<std::string, Module*> Module::getModules() {
 	return serverData->getModules();
 }
+
+std::vector<std::vector<char> > Module::getServerChanModes(std::string server) {
+	return serverData->getServerChanModes(server);
+}
+
+std::tr1::unordered_map<char, char> Module::getServerPrefixes(std::string server) {
+	return serverData->getServerPrefixes(server);
+}
 #endif
