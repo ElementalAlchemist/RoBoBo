@@ -10,8 +10,6 @@ void m_helloworld::onChannelMsg(std::string server, std::string channel, char ta
 	std::vector<std::string> splitMsg = splitBySpace(message);
 	if (splitMsg[0] == "Hello") {
 		sendPrivMsg(server, channel, "Hello world!");
-		sendPrivMsg(server, channel, "How are you today?");
-		sendPrivMsg(server, channel, "Ah, so am I.");
 	}
 }
 
