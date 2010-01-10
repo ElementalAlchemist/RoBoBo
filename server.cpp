@@ -259,15 +259,15 @@ void Server::sendData() {
 			sendingMessage = "MODE " + channel + " " + modes + params; // set the sendingMessage to the final compilation forming the message we are sending
 		}
 		
-		if (command == "ELINE" || command == "GLINE" || command == "KLINE" || command == "ZLINE" || command == "KILL" || command == "PING" || command == "PONG" || command == "USER" || command == "SAMODE" || command == "SAJOIN" || command == "SAPART" || command == "SAQUIT" || command == "SANICK" || command == "SATOPIC")
+		if (command == "GLINE" || command == "KLINE" || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
 			secondsToAdd = 0;  // add the correct number of seconds for the command being sent
-		else if (command == "JOIN" || command == "MAP" || command == "OPER" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
+		else if (command == "JOIN" || command == "MAP" || command == "REHASH" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
 			secondsToAdd = 2;
-		else if (command == "REHASH")
+		else if (command == "NICK" || command == "CYCLE")
 			secondsToAdd = 3;
 		else if (command == "INVITE")
 			secondsToAdd = 4;
-		else if (command == "LIST" || command == "CYCLE")
+		else if (command == "LIST" || command == "PART" || command == "MKPASSWD")
 			secondsToAdd = 5;
 		else // all commands not on the list are worth 1 second.
 			secondsToAdd = 1;
