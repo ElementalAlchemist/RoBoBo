@@ -51,6 +51,39 @@ void Server::resyncChannels() {
 		sendLine("NAMES " + iter->first);
 }
 
+std::list<std::string> getChannels() {
+	std::list<std::string> channelList;
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
+		channelList.insert(channelList.end(), chanIter->first);
+	return channelList;
+}
+
+std::string Server::getChannelTopic(std::string channel) {
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
+		if (chanIter->first == channel)
+			return chanIter->second->getTopic(channel);
+	}
+	return "";
+}
+
+std::list<std::string> Server::getChannelUsers(std::string channel) {
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
+		if (chanIter->first == channel)
+			return chanIter->second->getUsers();
+	}
+	return std::list<std::string> (); // Return a blank list for a nonexistant channel.
+}
+
+std::pair<char, char> Server::getUserStatus(std::string channel, std::string user) {
+	char status = '0';
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
+		if (channel == inChannel->first)
+			status = inChannel->second->getStatus(user);
+	}
+	if (status == '0')
+		return std::pair<char, char> ('0', ' ');
+	return std::pair<char, char> (status, prefix[status]);
+
 void* Server::handleData_thread(void* ptr) {
 	Server* servptr = (Server*) ptr;
 	servptr->handleData();

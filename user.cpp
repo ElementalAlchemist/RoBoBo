@@ -12,4 +12,12 @@ User::User(Channel* thisChannel) {
 void User::status(bool add, char status) {
 	hasStatus[status] = add;
 }
+
+char User::getStatus() {
+	for (std::map<char, bool>::iterator statusIter = hasStatus.begin(); statusIter != hasStatus.end(); ++statusIter) {
+		if (statusIter->second)
+			return statusIter->first;
+	}
+	return '0';
+}
 #endif

@@ -1,6 +1,7 @@
 #include "main.h"
 #include "socket.cpp"
 
+#include <map>
 #include <sstream>
 #include <queue>
 #include <time.h>
@@ -14,9 +15,10 @@ class User {
 	public:
 		User(Channel* thisChannel);
 		void status(bool add, char status);
+		char getStatus();
 		Channel* parentChannel;
 	private:
-		std::tr1::unordered_map<char, bool> hasStatus;
+		std::map<char, bool> hasStatus;
 };
 
 class Channel {
@@ -28,6 +30,9 @@ class Channel {
 		void setMode(bool add, char mode, std::string param = "");
 		void joinChannel(std::string nick);
 		void leaveChannel(std::string nick);
+		std::list<std::string> getUsers();
+		char getStatus(std::string user);
+		std::string getTopic();
 		Server* parentServer;
 	private:
 		std::tr1::unordered_map<std::string, User*> users;
@@ -45,6 +50,10 @@ class Server {
 		std::vector<std::vector<char> > getChanModes();
 		std::vector<char> getChanTypes();
 		void resyncChannels();
+		std::list<std::string> getChannels();
+		std::string getChannelTopic(std::string channel);
+		std::list<std::string> getChannelUsers(std::string channel);
+		std::pair<char, char> getUserStatus(std::string channel, std::string user);
 	private:
 		std::string serverName;
 		bool registered;

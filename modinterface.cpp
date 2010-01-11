@@ -309,4 +309,36 @@ std::list<std::string> ModuleInterface::getServers() {
 		serverList.insert(serverList.end(), servIter->first);
 	return serverList;
 }
+
+std::list<std::string> ModuleInterface::getChannels(std::string server) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+		if (servIter->first == server)
+			return servIter->second->getChannels();
+	}
+	return std::list<std::string> ();
+}
+
+std::string ModuleInterface::getChannelTopic(std::string server, std::string channel) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+		if (servIter->first == server)
+			return servIter->second->getChannelTopic(channel);
+	}
+	return "";
+}
+
+std::list<std::string> ModuleInterface::getChannelUsers(std::string server, std::string channel) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+		if (servIter->first == server)
+			return servIter->second->getChannelUsers();
+	}
+	return std::list<std::string> (); // return an empty list to those who can't provide a correct server name.
+}
+
+std::pair<char, char> ModuleInterface::getUserStatus(std::string server, std::string channel, std::string user) {
+	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+		if (servIter->first == server)
+			return servIter->second->getUserStatus(channel, user);
+	}
+	return std::pair<char, char> ('0', ' '); // if we're here return the pair for a statusless user
+}
 #endif
