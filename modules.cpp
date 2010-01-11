@@ -63,6 +63,8 @@ std::string Module::getDesc() { return "This module has no description."; }
 
 std::string Module::getHelp() { return "There is no help available for this module."; }
 
+std::vector<std::string> Module::getRequiredVars() { return std::vector<std::string> (); }
+
 void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
 	serverData->sendToServer(server, "PRIVMSG " + target + " :" + message);
 }

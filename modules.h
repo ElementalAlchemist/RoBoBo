@@ -37,6 +37,7 @@ class Module {
 		
 		virtual std::string getDesc();
 		virtual std::string getHelp();
+		virtual std::vector<std::string> getRequiredVars();
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, std::string> config;
