@@ -12,6 +12,9 @@ Sometime before the beta stage
 [ ] - Modules
 	[ ] - Administration module
 	[ ] - CTCP Reply module
+		[>] - Version
+		[ ] - Ping
+		[ ] - Time
 [x] - Enhance module abilities
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread
