@@ -73,6 +73,7 @@ class ModuleInterface {
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfigs();
 		std::list<std::string> getChannels(std::string server);
 		std::string getChannelTopic(std::string server, std::string channel);
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);

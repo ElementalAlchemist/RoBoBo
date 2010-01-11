@@ -314,6 +314,10 @@ std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {
 	return modules;
 }
 
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ModuleInterface::getModConfigs() {
+	return moduleConfigs;
+}
+
 std::list<std::string> ModuleInterface::getServers() {
 	std::list<std::string> serverList;
 	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); servIter++)
