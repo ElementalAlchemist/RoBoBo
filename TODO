@@ -12,7 +12,7 @@ Sometime before the beta stage
 [ ] - Modules
 	[ ] - Administration module
 	[ ] - CTCP Reply module
-[>] - Enhance module abilities
+[x] - Enhance module abilities
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread
 [ ] - Fork to background
