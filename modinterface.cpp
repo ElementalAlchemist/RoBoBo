@@ -51,7 +51,7 @@ std::tr1::unordered_map<char, char> ModuleInterface::getServerPrefixes(std::stri
 void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "PRIVMSG") {
 		if (parsedLine[3][0] == (char)1) { // CTCP
-			if (parsedLine[3][parsedLine.size()-1] == (char)1) // trim CTCP characters
+			if (parsedLine[3][parsedLine[3].size()-1] == (char)1) // trim CTCP characters
 				parsedLine[3] = parsedLine[3].substr(1, parsedLine[3].size()-2);
 			else
 				parsedLine[3] = parsedLine[3].substr(1);
@@ -80,7 +80,7 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 		}
 	} else if (parsedLine[1] == "NOTICE") {
 		if (parsedLine[3][0] == (char)1) {
-			if (parsedLine[3][parsedLine.size()-1] == (char)1)
+			if (parsedLine[3][parsedLine[3].size()-1] == (char)1)
 				parsedLine[3] = parsedLine[3].substr(1, parsedLine[3].size()-2);
 			else
 				parsedLine[3] = parsedLine[3].substr(1);
