@@ -123,7 +123,7 @@ void Module::quitServer(std::string server, std::string reason) {
 	serverData->sendToServer(server, "QUIT :" + reason);
 }
 
-unsigned int getBotVersion() {
+unsigned int Module::getBotVersion() {
 	return 900; // alpha 1
 }
 
