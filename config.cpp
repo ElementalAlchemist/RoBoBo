@@ -7,10 +7,11 @@ class ConfigReader {
 		ConfigReader(std::string filename, std::string filedir);
 		void readConfig(std::string filename, std::string filedir);
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getServerConfig();
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig();
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig(bool loading);
 	private:
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig;
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modConfig;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modLoadConfig;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modKeepConfig;
 };
 
 ConfigReader::ConfigReader(std::string filename, std::string filedir) {
@@ -88,7 +89,9 @@ void ConfigReader::readConfig(std::string filename, std::string filedir) {
 			if (sectionType == "server")
 				serverConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
 			else if (sectionType == "module")
-				modConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
+				modLoadConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
+			else if (sectionType == "moduleconf")
+				modKeepConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
 			else {
 				std::ostringstream lineSS;
 				lineSS << lineNumber;
@@ -168,7 +171,9 @@ std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::s
 	return serverConfig;
 }
 
-std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getModConfig() {
-	return modConfig;
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getModConfig(bool loading) {
+	if (loading)
+		return modLoadConfig;
+	return modKeepConfig;
 }
 #endif
