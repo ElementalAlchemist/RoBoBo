@@ -299,6 +299,12 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 }
 
+void ModuleInterface::removeServer(std::string server) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	delete servIter->second;
+	servers.erase(servIter);
+}
+
 std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {
 	return modules;
 }
@@ -329,7 +335,7 @@ std::string ModuleInterface::getChannelTopic(std::string server, std::string cha
 std::list<std::string> ModuleInterface::getChannelUsers(std::string server, std::string channel) {
 	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
 		if (servIter->first == server)
-			return servIter->second->getChannelUsers();
+			return servIter->second->getChannelUsers(channel);
 	}
 	return std::list<std::string> (); // return an empty list to those who can't provide a correct server name.
 }

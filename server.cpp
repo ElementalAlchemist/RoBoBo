@@ -20,12 +20,6 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	pthread_create(&dataSendThread, NULL, sendData_thread, this);
 }
 
-Server::~Server() {
-	pthread_exit(&dataReceiveThread);
-	pthread_exit(&dataSendThread);
-	pthread_exit(&secondDecrementThread);
-}
-
 void Server::sendLine(std::string line) {
 	outData.push(line);
 }
@@ -51,7 +45,7 @@ void Server::resyncChannels() {
 		sendLine("NAMES " + iter->first);
 }
 
-std::list<std::string> getChannels() {
+std::list<std::string> Server::getChannels() {
 	std::list<std::string> channelList;
 	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 		channelList.insert(channelList.end(), chanIter->first);
@@ -61,7 +55,7 @@ std::list<std::string> getChannels() {
 std::string Server::getChannelTopic(std::string channel) {
 	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
 		if (chanIter->first == channel)
-			return chanIter->second->getTopic(channel);
+			return chanIter->second->getTopic();
 	}
 	return "";
 }
@@ -77,12 +71,13 @@ std::list<std::string> Server::getChannelUsers(std::string channel) {
 std::pair<char, char> Server::getUserStatus(std::string channel, std::string user) {
 	char status = '0';
 	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
-		if (channel == inChannel->first)
-			status = inChannel->second->getStatus(user);
+		if (channel == chanIter->first)
+			status = chanIter->second->getStatus(user);
 	}
 	if (status == '0')
 		return std::pair<char, char> ('0', ' ');
 	return std::pair<char, char> (status, prefix[status]);
+}
 
 void* Server::handleData_thread(void* ptr) {
 	Server* servptr = (Server*) ptr;
@@ -201,9 +196,11 @@ void Server::handleData() {
 			inChannels.erase(parsedLine[2]);
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
 			serverConnection.closeConnection();
+			moduleData->removeServer(serverName); // The server is disconnected. Remove its instance.
 			break;
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			serverConnection.closeConnection();
+			moduleData->removeServer(serverName);
 			break;
 		} else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
@@ -211,6 +208,7 @@ void Server::handleData() {
 			if (parsedLine[1].size() > 12) {
 				if (parsedLine[1].substr(0,12) == "Closing Link") {
 					serverConnection.closeConnection();
+					moduleData->removeServer(serverName);
 					break;
 				}
 			}
@@ -234,6 +232,8 @@ void Server::sendData() {
 	halfSecond.tv_sec = 0;
 	halfSecond.tv_nsec = 500000000; // 500 million nanoseconds = 0.5 seconds.
 	while (true) {
+		if (!serverConnection.isConnected())
+			break; // Thread must die when server isn't connected.
 		if (outData.empty()) {
 			nanosleep(&halfSecond, NULL); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
 			continue; // check again for empty queue
@@ -308,6 +308,8 @@ void* Server::secondDecrement_thread(void* ptr) {
 
 void Server::secondDecrement() {
 	while (true) {
+		if (!serverConnection.isConnected())
+			break; // thread must die when server isn't connected anymore
 		sleep(1);
 		if (seconds > 0) {
 			pthread_mutex_lock(&secondsmutex);

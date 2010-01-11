@@ -74,6 +74,9 @@ class ModuleInterface {
 		std::string getChannelTopic(std::string server, std::string channel);
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
+		void connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf);
+		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
+		void removeServer(std::string server);
 	private:
 		std::tr1::unordered_map<std::string, Server*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
@@ -81,7 +84,5 @@ class ModuleInterface {
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);
-		void connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf);
-		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
 };
 #endif
