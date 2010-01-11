@@ -12,6 +12,11 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); servConfIter++)
 		connectServer(servConfIter->first, servConfIter->second);
+	
+	moduleConfigs = moduleConf;
+	moduleConf = config.getModConfig(false);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter)
+		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
