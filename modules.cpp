@@ -63,8 +63,6 @@ std::string Module::getDesc() { return "This module has no description."; }
 
 std::string Module::getHelp() { return "There is no help available for this module."; }
 
-std::vector<std::string> Module::getRequiredVars() { return std::vector<std::string> (); }
-
 void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
 	serverData->sendToServer(server, "PRIVMSG " + target + " :" + message);
 }
@@ -115,6 +113,10 @@ void Module::setMode(std::string server, std::string channel, char mode, bool ad
 
 void Module::quitServer(std::string server, std::string reason) {
 	serverData->sendToServer(server, "QUIT :" + reason);
+}
+
+unsigned int getBotVersion() {
+	return 900; // alpha 1
 }
 
 std::vector<std::string> Module::splitHostmask(std::string hostmask) {

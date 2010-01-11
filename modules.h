@@ -37,7 +37,6 @@ class Module {
 		
 		virtual std::string getDesc();
 		virtual std::string getHelp();
-		virtual std::vector<std::string> getRequiredVars();
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, std::string> config;
@@ -49,7 +48,9 @@ class Module {
 		void partChannel(std::string server, std::string channel, std::string reason);
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
 		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
+		void connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf);
 		void quitServer(std::string server, std::string reason);
+		unsigned int getBotVersion();
 		std::list<std::string> getServers();
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::vector<std::string> splitHostmask(std::string hostmask);
