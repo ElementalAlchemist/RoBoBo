@@ -48,6 +48,7 @@ class Module {
 		void partChannel(std::string server, std::string channel, std::string reason);
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
 		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
+		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
 		void connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf);
 		void quitServer(std::string server, std::string reason);
 		unsigned int getBotVersion();

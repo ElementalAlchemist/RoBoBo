@@ -111,6 +111,14 @@ void Module::setMode(std::string server, std::string channel, char mode, bool ad
 	}
 }
 
+void Module::sendOtherCommand(std::string server, std::string command, std::string data) {
+	serverData->sendToServer(server, command + " " + data);
+}
+
+void Module::connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf) {
+	serverData->connectServer(server, serverConf);
+}
+
 void Module::quitServer(std::string server, std::string reason) {
 	serverData->sendToServer(server, "QUIT :" + reason);
 }
