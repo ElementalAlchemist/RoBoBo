@@ -12,7 +12,7 @@ Sometime before the beta stage
 [ ] - Modules
 	[ ] - Administration module
 	[ ] - CTCP Reply module
-		[>] - Version
+		[x] - Version
 		[ ] - Ping
 		[ ] - Time
 [x] - Enhance module abilities
