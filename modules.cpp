@@ -123,6 +123,14 @@ void Module::quitServer(std::string server, std::string reason) {
 	serverData->sendToServer(server, "QUIT :" + reason);
 }
 
+void Module::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
+	serverData->loadModule(modName, modConf);
+}
+
+void Module::unloadModule(std::string modName) {
+	serverData->unloadModule(modName);
+}
+
 unsigned int Module::getBotVersion() {
 	return 900; // alpha 1
 }

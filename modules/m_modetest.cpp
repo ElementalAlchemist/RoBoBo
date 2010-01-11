@@ -58,7 +58,3 @@ std::string m_modetest::getDesc() { return "This module sets channel modes based
 extern "C" Module* spawn() {
 	return new m_modetest;
 }
-
-extern "C" void unspawn(Module* mod) {
-	delete mod;
-}

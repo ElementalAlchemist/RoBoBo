@@ -44,7 +44,3 @@ std::string VersionReply::getDesc() {
 extern "C" Module* spawn() {
 	return new VersionReply;
 }
-
-extern "C" void unspawn(Module* mod) {
-	delete mod;
-}

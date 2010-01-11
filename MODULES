@@ -27,19 +27,15 @@ classes.
 
 Second, you will need functions allowing the bot to load your module.  This is
 internally known as "spawning," mostly because "spawn" is such a cool word.  In
-order for the bot to load your module, you must define a way to load and unload
-your module.  This is done most simply as such:
+order for the bot to load your module, you must define a way to load your
+module.  This is done most simply as such:
 
 extern "C" Module* spawn() {
 	return new mod_name;
 }
 
-extern "C" void unspawn(Module* mod) {
-	delete mod;
-}
-
 In this portion, the only thing that should change is the returned class in the
-spawn() function, which should be changed from mod_name to the name of your
+spawn() function, which must be changed from mod_name to the name of your
 module class.  This must be placed after your class definition.  If you think
 you will forget about it, write it first, and then just define the class above
 it.

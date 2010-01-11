@@ -304,8 +304,18 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 }
 
+void ModuleInterface::unloadModule(std::string modName) {
+	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(modName);
+	if (modIter == modules.end())
+		return;
+	delete modIter->second;
+	modules.erase(modIter);
+}
+
 void ModuleInterface::removeServer(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
 	delete servIter->second;
 	servers.erase(servIter);
 }
