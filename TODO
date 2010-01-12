@@ -11,10 +11,10 @@ Sometime before the beta stage
 [x] - DNS resolving on IRC server names
 [ ] - Modules
 	[ ] - Administration module
-	[ ] - CTCP Reply module
+	[x] - CTCP Reply modules
 		[x] - Version
 		[x] - Ping
-		[ ] - Time
+		[x] - Time
 [x] - Enhance module abilities
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread

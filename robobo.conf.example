@@ -31,3 +31,5 @@ module m_ctcpversionreply.so { # This module replies to CTCP VERSION requests se
 }
 
 module m_ctcppingreply.so {} # This module replies to CTCP PING requests sent to the bot.  There are no configurable options.
+
+module m_ctcptimereply.so {} # This module replies to CTCP TIME requests sent to the bot.  There are no configurable options.
