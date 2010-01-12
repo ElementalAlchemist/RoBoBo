@@ -28,8 +28,10 @@ Socket::~Socket() {
 }
 
 void Socket::connectServer(std::string address, unsigned short port) {
+	hostent* serverHost = gethostbyname(address.c_str());
+	in_addr* serverAddress = (in_addr*) serverHost->h_addr_list[0];
 	socketAddr.sin_port = htons(port);
-	inet_pton(AF_INET, address.c_str(), &socketAddr.sin_addr);
+	inet_pton(AF_INET, inet_ntoa(*serverAddress), &socketAddr.sin_addr);
 	int status;
 	
 	status = connect(socketfd, (sockaddr*) &socketAddr, sizeof(socketAddr));

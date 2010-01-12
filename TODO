@@ -8,7 +8,7 @@ Current TODO List
 Sometime before the beta stage
 ======================================
 [x] - 433 :Nick currently in use support
-[ ] - DNS resolving on IRC server names
+[x] - DNS resolving on IRC server names
 [ ] - Modules
 	[ ] - Administration module
 	[ ] - CTCP Reply module
