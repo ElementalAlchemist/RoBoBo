@@ -9,7 +9,7 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	serverConf = confVars;
 	moduleData = modFace;
 	std::istringstream portNumber (serverConf["port"]);
-	unsigned int port;
+	unsigned short port;
 	portNumber >> port;
 	serverConnection.connectServer(serverAddress, port);
 	sendLine("NICK " + serverConf["nick"]);
