@@ -13,7 +13,7 @@ Sometime before the beta stage
 	[ ] - Administration module
 	[ ] - CTCP Reply module
 		[x] - Version
-		[ ] - Ping
+		[x] - Ping
 		[ ] - Time
 [x] - Enhance module abilities
 [x] - Add interface to access channel/user data
