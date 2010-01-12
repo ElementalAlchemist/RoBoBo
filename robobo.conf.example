@@ -25,4 +25,9 @@ server irc.freenode.net {
 	# This will eventually support more stuff.
 }
 
-module m_helloworld.so {}
+module m_ctcpversionreply.so { # This module replies to CTCP VERSION requests sent to the bot.
+	# replystring: Text added to the end of the VERSION reply sent from the bot. Optional.
+	#replystring = "";
+}
+
+module m_ctcppingreply.so {} # This module replies to CTCP PING requests sent to the bot.  There are no configurable options.
