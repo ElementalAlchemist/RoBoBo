@@ -18,7 +18,7 @@ Sometime before the beta stage
 [x] - Enhance module abilities
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread
-[ ] - Fork to background
+[x] - Fork to background
 [ ] - DCC protocol
 
 Sometime before release (either alpha or beta)
