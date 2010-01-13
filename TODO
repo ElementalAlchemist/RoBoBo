@@ -24,3 +24,5 @@ Sometime before the beta stage
 Sometime before release (either alpha or beta)
 ======================================
 [ ] - Clean up loop iterating, use .find(first) instead
+[ ] - Write something that adds all modules to the makefile so module authors
+		don't have to do it themselves.
