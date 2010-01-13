@@ -20,8 +20,8 @@ void TimeReply::onUserCTCP(std::string server, std::string nick, std::string mes
 }
 
 void TimeReply::sendTime(std::string server, std::string target) {
-	time_t uTimestamp = time(NULL);
-	tm* currTime = localtime(&uTimestamp);
+	time_t unixTimestamp = time(NULL);
+	tm* currTime = localtime(&unixTimestamp);
 	std::string month;
 	switch (currTime->tm_mon) {
 		case 0:
@@ -69,7 +69,8 @@ void TimeReply::sendTime(std::string server, std::string target) {
 	timeOutput << currTime->tm_min << ":";
 	if (currTime->tm_sec < 10)
 		timeOutput << "0";
-	timeOutput << currTime->tm_sec;
+	timeOutput << currTime->tm_sec << " ";
+	timeOutput << "(" << unixTimestamp << ")";
 	sendCTCPReply(server, target, "TIME", timeOutput.str());
 }
 
