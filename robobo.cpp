@@ -56,6 +56,7 @@ int main(int argc, char** argv) {
 		if (exitAfter)
 			return 0;
 	}
+	daemon(1,0);
 	new ModuleInterface (confDir, confName, debug); //run actual bot
 	pthread_exit(NULL);
 }
