@@ -89,6 +89,7 @@ class ModuleInterface {
 		std::tr1::unordered_map<std::string, Module*> modules;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConfigs;
 		unsigned short debugLevel;
+		std::string directory;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);

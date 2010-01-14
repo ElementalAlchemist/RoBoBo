@@ -2,7 +2,7 @@
 
 #ifndef MODINTERFACE_CPP
 #define MODINTERFACE_CPP
-ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug) {
+ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir) {
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
@@ -282,7 +282,7 @@ void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_
 }
 
 void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
-	std::string fileLoc = "modules/" + modName;
+	std::string fileLoc = directory + "/modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
 		std::string error = "Could not load module " + modName + ": " + dlerror();

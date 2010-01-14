@@ -1,7 +1,8 @@
 #include "robobo.h"
 
 int main(int argc, char** argv) {
-	std::string confDir = "."; // look in current directory by default
+	std::string confDir = argv[0]; // look in directory with robobo executable by default
+	confDir = confDir.substr(0, confDir.find_last_of('/'));
 	std::string confName = "robobo.conf"; // look for robobo.conf by default
 	unsigned short debug = 0;
 	if (argc > 1) { // analyze arguments
