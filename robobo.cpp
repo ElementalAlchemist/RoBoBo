@@ -57,8 +57,10 @@ int main(int argc, char** argv) {
 		if (exitAfter)
 			return 0;
 	}
-	if (debug == 0)
+	if (debug == 0) {
+		std::cout << "RoBoBo-IRC-BoBo started.  Forking..." << std::endl;
 		daemon(1,0);
+	}
 	new ModuleInterface (confDir, confName, debug); //run actual bot
 	pthread_exit(NULL);
 }
