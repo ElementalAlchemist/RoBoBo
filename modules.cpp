@@ -21,6 +21,10 @@ void Module::onChannelNotice(std::string server, std::string channel, char targe
 
 void Module::onUserNotice(std::string server, std::string nick, std::string message) {}
 
+void Module::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+
+void Module::onUserAction(std::string server, std::string nick, std::string message) {}
+
 void Module::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
 void Module::onUserCTCP(std::string server, std::string nick, std::string message) {}
@@ -50,6 +54,10 @@ void Module::onOutUserMessage(std::string server, std::string target, std::strin
 void Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) {}
 
 void Module::onOutUserNotice(std::string server, std::string target, std::string message) {}
+
+void Module::onOutChannelAction(std::string server, std::string target, char status, std::string message) {}
+
+void Module::onOutUserAction(std::string server, std::string target, std::string message) {}
 
 void Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) {}
 

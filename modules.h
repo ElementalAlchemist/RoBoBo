@@ -14,6 +14,8 @@ class Module {
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
 		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserNotice(std::string server, std::string nick, std::string message);
+		virtual void onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual void onUserAction(std::string server, std::string nick, std::string message);
 		virtual void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserCTCP(std::string server, std::string nick, std::string message);
 		virtual void onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -30,6 +32,8 @@ class Module {
 		virtual void onOutUserMessage(std::string server, std::string target, std::string message);
 		virtual void onOutChannelNotice(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserNotice(std::string server, std::string target, std::string message);
+		virtual void onOutChannelAction(std::string server, std::string target, char status, std::string message);
+		virtual void onOutUserAction(std::string server, std::string target, std::string message);
 		virtual void onOutChannelCTCP(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserCTCP(std::string server, std::string target, std::string message);
 		virtual void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
