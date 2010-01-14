@@ -1,7 +1,7 @@
 #include "modinclude.h"
 #include <ctime>
 
-class m_ctcptimereply : public Module {
+class TimeReply : public Module {
 	public:
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
@@ -9,17 +9,17 @@ class m_ctcptimereply : public Module {
 		void sendTime(std::string server, std::string target);
 };
 
-void m_ctcptimereply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+void TimeReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "TIME")
 		sendTime(server, nick);
 }
 
-void m_ctcptimereply::onUserCTCP(std::string server, std::string nick, std::string message) {
+void TimeReply::onUserCTCP(std::string server, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "TIME")
 		sendTime(server, nick);
 }
 
-void m_ctcptimereply::sendTime(std::string server, std::string target) {
+void TimeReply::sendTime(std::string server, std::string target) {
 	time_t unixTimestamp = time(NULL);
 	tm* currTime = localtime(&unixTimestamp);
 	std::string month;
@@ -75,5 +75,5 @@ void m_ctcptimereply::sendTime(std::string server, std::string target) {
 }
 
 extern "C" Module* spawn() {
-	return new m_ctcptimereply;
+	return new TimeReply;
 }

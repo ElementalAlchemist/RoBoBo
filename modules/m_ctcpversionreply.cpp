@@ -1,6 +1,6 @@
 #include "modinclude.h"
 
-class m_ctcpversionreply : public Module {
+class VersionReply : public Module {
 	public:
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
@@ -9,17 +9,17 @@ class m_ctcpversionreply : public Module {
 		void sendVersionReply(std::string server, std::string target);
 };
 
-void m_ctcpversionreply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+void VersionReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "VERSION")
 		sendVersionReply(server, nick);
 }
 
-void m_ctcpversionreply::onUserCTCP(std::string server, std::string nick, std::string message) {
+void VersionReply::onUserCTCP(std::string server, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "VERSION")
 		sendVersionReply(server, nick);
 }
 
-void m_ctcpversionreply::sendVersionReply(std::string server, std::string target) {
+void VersionReply::sendVersionReply(std::string server, std::string target) {
 	std::string versionReply = "RoBoBo-IRC-BoBo IRC Bot ";
 	switch (getBotVersion()) { // get bot version, so this mod isn't restricted to one version of the bot and doesn't have to be updated with each version
 		case 900:
@@ -37,10 +37,10 @@ void m_ctcpversionreply::sendVersionReply(std::string server, std::string target
 	sendCTCPReply(server, target, "VERSION", versionReply);
 }
 
-std::string m_ctcpversionreply::getDesc() {
+std::string VersionReply::getDesc() {
 	return "This module sends a reply to CTCP version.";
 }
 
 extern "C" Module* spawn() {
-	return new m_ctcpversionreply;
+	return new VersionReply;
 }
