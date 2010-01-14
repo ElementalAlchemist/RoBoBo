@@ -9,7 +9,7 @@ class Module {
 	public:
 		Module();
 		virtual ~Module();
-		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace);
+		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName);
 		virtual void onLoadComplete();
 		virtual std::vector<std::string> getAbilities();
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -57,7 +57,7 @@ class Module {
 		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
 		void connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf);
 		void quitServer(std::string server, std::string reason);
-		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
+		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, bool startup);
 		void unloadModule(std::string modName);
 		unsigned int getBotVersion();
 		std::list<std::string> getServers();

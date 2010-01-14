@@ -7,7 +7,7 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
-		loadModule(modConfIter->first, modConfIter->second);
+		loadModule(modConfIter->first, modConfIter->second, true);
 	std::vector<std::string> abilities;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++) {
 		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
@@ -312,7 +312,7 @@ void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_
 	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, serverConf, this)));
 }
 
-void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
+void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, bool startup) {
 	std::string fileLoc = directory + "/modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
@@ -331,8 +331,10 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	}
 	
 	Module* newModule = (Module*)spawnModule();
-	newModule->init(modConf, this);
+	newModule->init(modConf, this, modName);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
+	if (!startup)
+		newModule->onLoadComplete();
 }
 
 void ModuleInterface::unloadModule(std::string modName) {
