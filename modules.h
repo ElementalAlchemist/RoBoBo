@@ -1,6 +1,7 @@
 #include "main.h"
 #include "config.cpp"
 #include <dlfcn.h>
+#include <map>
 
 #ifndef MODULES_H
 #define MODULES_H
@@ -10,6 +11,7 @@ class Module {
 		virtual ~Module();
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace);
 		virtual void onLoadComplete();
+		virtual std::vector<std::string> getAbilities();
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
 		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -60,6 +62,7 @@ class Module {
 		unsigned int getBotVersion();
 		std::list<std::string> getServers();
 		std::tr1::unordered_map<std::string, Module*> getModules();
+		std::multimap<std::string, std::string> getModAbilities();
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
 		std::vector<std::vector<char> > getServerChanModes(std::string server);
@@ -79,6 +82,7 @@ class ModuleInterface {
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();
+		std::multimap<std::string, std::string> getModuleAbilities();
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfigs();
 		std::list<std::string> getChannels(std::string server);
 		std::string getChannelTopic(std::string server, std::string channel);
@@ -92,6 +96,7 @@ class ModuleInterface {
 		std::tr1::unordered_map<std::string, Server*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConfigs;
+		std::multimap<std::string, std::string> modAbilities;
 		unsigned short debugLevel;
 		std::string directory;
 		std::string parseNickFromHost(std::string host);

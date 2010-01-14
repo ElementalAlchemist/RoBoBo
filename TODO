@@ -20,7 +20,7 @@ Sometime before the beta stage
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread
 [x] - Fork to background
-[ ] - Add "services provided" feature allowing modules to let other modules know what services it can provide
+[x] - Add "services provided" feature allowing modules to let other modules know what services it can provide
 
 Sometime before release (either alpha or beta)
 ======================================

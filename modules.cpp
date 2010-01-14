@@ -13,6 +13,8 @@ void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, Mod
 
 void Module::onLoadComplete() {}
 
+std::vector<std::string> Module::getAbilities() { return std::vector<std::string> (); }
+
 void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
 void Module::onUserMsg(std::string server, std::string nick, std::string message) {}
@@ -174,6 +176,10 @@ std::list<std::string> Module::getServers() {
 
 std::tr1::unordered_map<std::string, Module*> Module::getModules() {
 	return serverData->getModules();
+}
+
+std::multimap<std::string, std::string> Module::getModAbilities() {
+	return serverData->getModuleAbilities();
 }
 
 std::vector<std::vector<char> > Module::getServerChanModes(std::string server) {
