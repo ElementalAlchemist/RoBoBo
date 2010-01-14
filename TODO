@@ -15,11 +15,12 @@ Sometime before the beta stage
 		[x] - Version
 		[x] - Ping
 		[x] - Time
+	[ ] - DCC protocol
 [x] - Enhance module abilities
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread
 [x] - Fork to background
-[ ] - DCC protocol
+[ ] - Add "services provided" feature allowing modules to let other modules know what services it can provide
 
 Sometime before release (either alpha or beta)
 ======================================
