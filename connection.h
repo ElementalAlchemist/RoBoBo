@@ -55,7 +55,7 @@ class Server {
 		std::pair<char, char> getUserStatus(std::string channel, std::string user);
 	private:
 		std::string serverName;
-		bool registered;
+		bool registered, altChanged;
 		Socket serverConnection;
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;

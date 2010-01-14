@@ -119,8 +119,12 @@ void Server::handleData() {
 					it->second->numeric366();
 			}
 		} else if (parsedLine[1] == "433" && !registered) { // nickname already in use
-			sendLine("NICK " + serverConf["altnick"]);
-			serverConf["nick"] = serverConf["altnick"];
+			if (!altChanged) {
+				sendLine("NICK " + serverConf["altnick"]);
+				serverConf["nick"] = serverConf["altnick"];
+				altChanged = true;
+			} else
+				sendLine("QUIT");
 		} else if (parsedLine[1] == "MODE") {
 			bool addMode = true;
 			if (parsedLine[2] == serverConf["nick"]) { // if it's a user mode
