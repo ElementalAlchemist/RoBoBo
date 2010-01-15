@@ -15,7 +15,7 @@ Sometime before the beta stage
 		[x] - Version
 		[x] - Ping
 		[x] - Time
-	[ ] - DCC protocol
+	[>] - DCC protocol
 [x] - Enhance module abilities
 [x] - Add interface to access channel/user data
 [x] - Add data queue/sending thread
