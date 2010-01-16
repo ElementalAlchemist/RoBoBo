@@ -25,6 +25,7 @@ class Module {
 		virtual void onChannelJoin(std::string server, std::string channel, std::string hostmask);
 		virtual void onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason);
 		virtual void onUserQuit(std::string server, std::string hostmask, std::string reason);
+		virtual void onNickChange(std::string server, std::string oldNick, std::string newNick);
 		virtual void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		virtual void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		virtual void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
