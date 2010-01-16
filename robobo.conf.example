@@ -2,7 +2,7 @@
 # This is a file that can be used as a configuration for the RoBoBo IRC bot.
 # etc.
 
-server irc.freenode.net {
+server irc.example.com {
 	# port: the port that the IRC server uses for client connections
 	# This is usually 6667
 	port = "6667";
@@ -20,7 +20,7 @@ server irc.freenode.net {
 	# channels: the channels the bot will join on connect.
 	# These channels should be in an IRC-friendly format; that is, they will
 	# be sent as they appear here immediately after the JOIN command in IRC.
-	channels = "#zbwerewolf";
+	channels = "#robobo";
 
 	# This will eventually support more stuff.
 }
@@ -33,3 +33,9 @@ module m_ctcpversionreply.so { # This module replies to CTCP VERSION requests se
 module m_ctcppingreply.so {} # This module replies to CTCP PING requests sent to the bot.  There are no configurable options.
 
 module m_ctcptimereply.so {} # This module replies to CTCP TIME requests sent to the bot.  There are no configurable options.
+
+module m_dccchat.so {} # This module allows the bot to accept DCC chat requests and open a DCC chat session.  There are no configurable options.
+
+module m_admin.so { # This module allows for administration of the bot.
+	# Options coming soon.
+}
