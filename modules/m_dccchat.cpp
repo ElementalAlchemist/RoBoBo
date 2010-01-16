@@ -106,8 +106,14 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 			if (modIter == modules.end())
 				reportingModules.erase(reportingModules.begin()+i);
 			else {
-				dccChat* dccMod = (dccChat*)modIter->second;
-				dccMod->onDCCReceive(id, receivedMsg);
+				std::vector<std::string> modSupports = modIter->second->supports();
+				for (unsigned int i = 0; i < modSupports.size(); i++) {
+					if (modSupports[i] == "DCC_CHAT") {
+						dccChat* dccMod = (dccChat*)modIter->second;
+						dccMod->onDCCReceive(id, receivedMsg);
+						break;
+					}
+				}
 			}
 		}
 	}
