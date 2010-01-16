@@ -42,6 +42,8 @@ void Module::onChannelPart(std::string server, std::string channel, std::string 
 
 void Module::onUserQuit(std::string server, std::string hostmask, std::string reason) {}
 
+void Module::onNickChange(std::string server, std::string oldNick, std::string newNick) {}
+
 void Module::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
 void Module::onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
