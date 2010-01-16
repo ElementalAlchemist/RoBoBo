@@ -9,12 +9,13 @@ debug:
 	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC -g modules/m_ctcppingreply.cpp -o modules/m_ctcppingreply.so
 	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC -g modules/m_ctcptimereply.cpp -o modules/m_ctcptimereply.so
 	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC -g modules/m_dccchat.cpp -o modules/m_dccchat.so
+	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC -g modules/m_admin.cpp -o modules/m_admin.so
 robobo:
 	g++ -ansi -pedantic-errors -Wall -ldl -pthread -rdynamic robobo.cpp -o robobo
 	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC modules/m_ctcpversionreply.cpp -o modules/m_ctcpversionreply.so
 	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC modules/m_ctcppingreply.cpp -o modules/m_ctcppingreply.so
 	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC modules/m_ctcptimereply.cpp -o modules/m_ctcptimereply.so
-	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC modules/m_dccchat.cpp -o modules/m_dccchat.so
+	g++ -ansi -pedantic-errors -Wall -pipe -shared -fPIC modules/m_admin.cpp -o modules/m_admin.so
 clean:
 	rm modules/*.so
 	rm robobo

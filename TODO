@@ -10,7 +10,7 @@ Sometime before the beta stage
 [x] - 433 :Nick currently in use support
 [x] - DNS resolving on IRC server names
 [ ] - Modules
-	[ ] - Administration module
+	[>] - Administration module
 	[x] - CTCP Reply modules
 		[x] - Version
 		[x] - Ping
