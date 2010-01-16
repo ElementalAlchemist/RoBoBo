@@ -21,7 +21,7 @@ class m_dccchat : public dccSender {
 		void dccConnect(std::string server, std::string nick, std::string ip, std::string port);
 		void dccListen(std::string id, Socket* listenSocket);
 		static void* dccListen_thread(void* args);
-		std::vector<pthread_t> threads;
+		std::vector<pthread_t*> threads;
 		std::tr1::unordered_map<std::string, Socket*> activeConnections;
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
@@ -78,9 +78,10 @@ void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip,
 	dccListenArg listenData;
 	listenData.modPtr = this;
 	listenData.sockPtr = dccSocket;
-	pthread_t newThread;
+	pthread_t fullNewThread;
+	pthread_t* newThread = &fullNewThread;
 	threads.push_back(newThread);
-	pthread_create(&threads[threads.size()-1], NULL, &dccListen_thread, (void*)&listenData);
+	pthread_create(newThread, NULL, &dccListen_thread, (void*)&listenData);
 }
 
 void* m_dccchat::dccListen_thread(void* args) {
@@ -112,4 +113,8 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 	}
 	delete listenSocket;
 	activeConnections.erase(id);
+}
+
+extern "C" Module* spawn() {
+	return new m_dccchat;
 }
