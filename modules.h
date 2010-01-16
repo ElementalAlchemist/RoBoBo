@@ -43,7 +43,7 @@ class Module {
 		
 		virtual std::string getDesc();
 		virtual std::string getHelp();
-		std::vector<std::string> supports();
+		virtual std::vector<std::string> supports();
 	protected:
 		std::string moduleName;
 		std::tr1::unordered_map<std::string, std::string> config;
