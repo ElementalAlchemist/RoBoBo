@@ -117,6 +117,12 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 			}
 		}
 	}
+	std::tr1::unordered_map<std::string, Module*> modules = getModules();
+	for (unsigned int i = 0; i < reportingModules.size(); i++) {
+		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(reportingModules[i]);
+		dccChat* dccMod = (dccChat*) modules->second;
+		dccMod->onDCCEnd(id); // call the DCC end hook for each watching module as the DCC session ends
+	}
 	delete listenSocket;
 	activeConnections.erase(id);
 }

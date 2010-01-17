@@ -1,6 +1,7 @@
 class dccChat : public Module {
 	public:
 		virtual void onDCCReceive(std::string dccid, std::string message);
+		virtual void onDCCEnd(std::string dccid);
 };
 
 class dccSender : public Module {
