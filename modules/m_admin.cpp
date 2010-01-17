@@ -24,6 +24,8 @@ class Admin : public dccChat {
 		void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
+		void onDCCReceive(std::string dccid, std::string message);
+		void onDCCEnd(std::string dccid);
 		std::string getDesc();
 		std::string getHelp();
 		std::vector<std::string> supports();
@@ -31,6 +33,7 @@ class Admin : public dccChat {
 		std::vector<std::string> identified;
 		bool isYes(std::string str);
 		std::vector<std::tr1::unordered_map<std::string, std::string> > admins;
+		std::vector<bool> verbosity;
 		bool dcc;
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
 };
@@ -53,10 +56,12 @@ void Admin::onLoadComplete() {
 	
 	std::tr1::unordered_map<std::string, std::string> adminPrivs;
 	for (int i = 0; config[i+"/nick"] != ""; i++) {
+		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[i+"/server"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
 		admins.push_back(adminPrivs);
+		verbosity.push_back(false); // verbosity should only be true with an open DCC chat session
 		adminPrivs.clear();
 	}
 }
@@ -65,6 +70,7 @@ void Admin::onRehash() {
 	admins.clear();
 	std::tr1::unordered_map<std::string, std::string> adminPrivs;
 	for (int i = 0; config[i+"/nick"] != ""; i++) {
+		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[i+"/server"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
@@ -152,6 +158,21 @@ void Admin::onNumeric(std::string server, std::string numeric, std::vector<std::
 
 void Admin::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 	// possibly do something here, depending on verbosity levels
+}
+
+void Admin::onDCCReceive(std::string dccid, std::string message) { // dccid = server/nick
+	std::string server = dccid.substr(0, dccid.find_first_of('/'));
+	std::string nick = dccid.substr(dccid.find_first_of('/')+1);
+	handleDCCMessage(server, nick, message);
+}
+
+void Admin::onDCCEnd(std::string dccid) {
+	for (unsigned int i = 0; i < admins.size(); i++) {
+		std::tr1::unordered_map<std::string, std::string>::iterator server = admins[i].find("server");
+		std::tr1::unordered_map<std::string, std::string>::iterator nick = admins[i].find("nick");
+		if (dccid == server->second + "/" + nick->second)
+			verbosity[i] = false;
+	}
 }
 
 std::string Admin::getDesc() {
