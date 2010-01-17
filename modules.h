@@ -63,6 +63,7 @@ class Module {
 		void quitServer(std::string server, std::string reason);
 		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
 		void unloadModule(std::string modName);
+		void rehashBot();
 		unsigned int getBotVersion();
 		std::list<std::string> getServers();
 		std::tr1::unordered_map<std::string, Module*> getModules();
@@ -92,6 +93,7 @@ class ModuleInterface {
 		std::string getChannelTopic(std::string server, std::string channel);
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
+		void rehash();
 		void connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf);
 		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, bool startup);
 		void unloadModule(std::string modName);
@@ -103,6 +105,7 @@ class ModuleInterface {
 		std::multimap<std::string, std::string> modAbilities;
 		unsigned short debugLevel;
 		std::string directory;
+		std::string configName;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);

@@ -152,6 +152,10 @@ void Module::unloadModule(std::string modName) {
 	serverData->unloadModule(modName);
 }
 
+void Module::rehashBot() {
+	serverData->rehash();
+}
+
 unsigned int Module::getBotVersion() {
 	return 900; // alpha 1
 }

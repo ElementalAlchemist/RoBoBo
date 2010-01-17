@@ -2,7 +2,7 @@
 
 #ifndef MODINTERFACE_CPP
 #define MODINTERFACE_CPP
-ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir) {
+ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
@@ -309,6 +309,27 @@ bool ModuleInterface::isChanType(char chanPrefix) {
 		}
 	}
 	return false;
+}
+
+void ModuleInterface::rehash() {
+	ConfigReader config (configName, directory);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servIter = serverConf.begin(); servIter != serverConf.end(); ++servIter) {
+		if (servers.find(servIter->first) == servers.end())
+			connectServer(servIter->first, servIter->second);
+	}
+	moduleConfigs.clear();
+	moduleConfigs = config.getModConfig(true);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(false);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConf.begin(); modIter != moduleConf.end(); ++modIter)
+		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modIter->first, modIter->second));
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConfigs.begin(); modIter != moduleConfigs.end(); ++modIter) {
+		std::tr1::unordered_map<std::string, Module*>::iterator module = modules.find(modIter->first);
+		if (module != modules.end()) {
+			module->second->reconf(modIter->second);
+			module->second->onRehash();
+		}
+	}
 }
 
 void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf) {
