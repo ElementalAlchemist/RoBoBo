@@ -12,7 +12,13 @@ void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, Mod
 	moduleName = modName;
 }
 
+void Module::reconf(std::tr1::unordered_map<std::string, std::string> modConf) {
+	config = modConf;
+}
+
 void Module::onLoadComplete() {}
+
+void Module::onRehash() {}
 
 std::vector<std::string> Module::getAbilities() { return std::vector<std::string> (); }
 
