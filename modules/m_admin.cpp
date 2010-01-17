@@ -61,8 +61,7 @@ void Admin::onLoadComplete() {
 	for (int i = 0; i < numAdmins; i++) {
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("fantasy", isYes(config[i+"/fantasy"]) ? "yes" : "no"));
-		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[i+"/verbose"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
 		admins.push_back(adminPrivs);
 		adminPrivs.clear();
 	}
@@ -75,16 +74,17 @@ std::vector<std::string> Admin::getAbilities() {
 }
 
 void Admin::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// check for fantasy
+	// possibly do something here, depending on verbosity levels
 }
 
 void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
 	if (!dcc)
 		handleDCCMessage(server, nick, message);
+	// possibly do something here, depending on verbosity levels
 }
 
 void Admin::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// possibly do something here, depending on admin's verbosity level
+	// possibly do something here, depending on verbosity levels
 }
 
 void Admin::onUserNotice(std::string server, std::string nick, std::string message) {
