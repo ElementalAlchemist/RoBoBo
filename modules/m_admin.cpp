@@ -4,6 +4,7 @@
 class Admin : public dccChat {
 	public:
 		void onLoadComplete();
+		void onRehash();
 		std::vector<std::string> getAbilities();
 		void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserMsg(std::string server, std::string nick, std::string message);
@@ -50,15 +51,20 @@ void Admin::onLoadComplete() {
 		}
 	}
 	
-	int numAdmins;
-	std::istringstream numAdminsStr (config["numAdmins"]);
-	numAdminsStr >> numAdmins;
-	if (!numAdminsStr || numAdmins == 0) { // if the stream has failed to retrieve a number or if there are 0 admins
-		unloadModule(moduleName); // unload this module
-		return;
-	}
 	std::tr1::unordered_map<std::string, std::string> adminPrivs;
-	for (int i = 0; i < numAdmins; i++) {
+	for (int i = 0; config[i+"/nick"] != ""; i++) {
+		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
+		admins.push_back(adminPrivs);
+		adminPrivs.clear();
+	}
+}
+
+void Admin::onRehash() {
+	admins.clear();
+	std::tr1::unordered_map<std::string, std::string> adminPrivs;
+	for (int i = 0; config[i+"/nick"] != ""; i++) {
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
