@@ -90,9 +90,19 @@ void Admin::onChannelMsg(std::string server, std::string channel, char target, s
 }
 
 void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
-	if (!dcc)
-		handleDCCMessage(server, nick, message);
-	// possibly do something here, depending on verbosity levels
+	bool dccMsg = false;
+	if (!dcc) {
+		for (unsigned int i = 0; i < verbosity.size(); i++) {
+			if ((verbosity[i] && admins[i]["server"] == server && admins[i]["nick"] == nick) || (admins[i]["server"] == server && admins[i]["nick"] == nick && splitBySpace(message)[0] == "login")) {
+				handleDCCMessage(server, nick, message);
+				dccMsg = true;
+				break;
+			}
+		}
+	}
+	if (!dccMsg) {
+		// possibly do something here, depending on verbosity levels
+	}
 }
 
 void Admin::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
