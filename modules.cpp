@@ -197,11 +197,31 @@ std::multimap<std::string, std::string> Module::getModAbilities() {
 	return serverData->getModuleAbilities();
 }
 
+std::tr1::unordered_map<std::string, std::string> Module::getServerData(std::string server) {
+	return serverData->getServerData(server);
+}
+
 std::vector<std::vector<char> > Module::getServerChanModes(std::string server) {
 	return serverData->getServerChanModes(server);
 }
 
 std::tr1::unordered_map<char, char> Module::getServerPrefixes(std::string server) {
 	return serverData->getServerPrefixes(server);
+}
+
+std::list<std::string> Module::getChannels(std::string server) {
+	return serverData->getChannels(server);
+}
+
+std::string Module::getChannelTopic(std::string server, std::string channel) {
+	return serverData->getChannelTopic(server, channel);
+}
+
+std::list<std::string> Module::getChannelUsers(std::string server, std::string channel) {
+	return serverData->getChannelUsers(server, channel);
+}
+
+std::pair<char, char> Module::getUserStatus(std::string server, std::string channel, std::string user) {
+	return serverData->getUserStatus(server, channel, user);
 }
 #endif

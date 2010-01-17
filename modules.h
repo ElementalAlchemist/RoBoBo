@@ -70,8 +70,13 @@ class Module {
 		std::multimap<std::string, std::string> getModAbilities();
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
+		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		std::vector<std::vector<char> > getServerChanModes(std::string server);
 		std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
+		std::list<std::string> getChannels(std::string server);
+		std::string getChannelTopic(std::string server, std::string channel);
+		std::list<std::string> getChannelUsers(std::string server, std::string channel);
+		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 	private:
 		ModuleInterface* serverData;
 };
@@ -88,7 +93,6 @@ class ModuleInterface {
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();
 		std::multimap<std::string, std::string> getModuleAbilities();
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfigs();
 		std::list<std::string> getChannels(std::string server);
 		std::string getChannelTopic(std::string server, std::string channel);
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);
