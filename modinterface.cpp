@@ -357,16 +357,20 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	Module* newModule = (Module*)spawnModule();
 	newModule->init(modConf, this, modName);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
+	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));
 	if (!startup)
 		newModule->onLoadComplete();
 }
 
 void ModuleInterface::unloadModule(std::string modName) {
 	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(modName);
+	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modName);
 	if (modIter == modules.end())
 		return;
 	delete modIter->second;
 	modules.erase(modIter);
+	dlclose(modFileIter);
+	moduleFiles.erase(modFileIter);
 }
 
 void ModuleInterface::removeServer(std::string server) {

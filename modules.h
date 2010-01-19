@@ -105,6 +105,7 @@ class ModuleInterface {
 	private:
 		std::tr1::unordered_map<std::string, Server*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
+		std::tr1::unordered_map<std::string, void*> moduleFiles;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConfigs;
 		std::multimap<std::string, std::string> modAbilities;
 		unsigned short debugLevel;
