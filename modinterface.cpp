@@ -369,7 +369,7 @@ void ModuleInterface::unloadModule(std::string modName) {
 		return;
 	delete modIter->second;
 	modules.erase(modIter);
-	dlclose(modFileIter);
+	dlclose(modFileIter->second);
 	moduleFiles.erase(modFileIter);
 }
 
