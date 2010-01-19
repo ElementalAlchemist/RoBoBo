@@ -34,6 +34,7 @@ class Admin : public dccChat {
 		bool isYes(std::string str);
 		std::vector<std::tr1::unordered_map<std::string, std::string> > admins;
 		std::vector<bool> verbosity;
+		std::vector<bool> nonDCClogin;
 		bool dcc;
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
 };
@@ -62,6 +63,7 @@ void Admin::onLoadComplete() {
 		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
 		admins.push_back(adminPrivs);
 		verbosity.push_back(false); // verbosity should only be true with an open DCC chat session
+		nonDCClogin.push_back(false); // nonDCClogin should only be true when someone logs in via PRIVMSGS
 		adminPrivs.clear();
 	}
 }
@@ -93,9 +95,22 @@ void Admin::onUserMsg(std::string server, std::string nick, std::string message)
 	bool dccMsg = false;
 	if (!dcc) {
 		for (unsigned int i = 0; i < verbosity.size(); i++) {
-			if ((verbosity[i] && admins[i]["server"] == server && admins[i]["nick"] == nick) || (admins[i]["server"] == server && admins[i]["nick"] == nick && splitBySpace(message)[0] == "login")) {
+			if ((nonDCClogin[i] && admins[i]["server"] == server && admins[i]["nick"] == nick)) {
 				handleDCCMessage(server, nick, message);
 				dccMsg = true;
+				break;
+			}
+			if (admins[i]["server"] == server && admins[i]["nick"] == nick && splitBySpace(message)[0] == "login") {
+				if (message.size() <= 6)
+					sendPrivMsg(server, nick, "You must use the login command with the password, i.e. login <password>");
+				else {
+					if (admins[i]["password"] == splitBySpace(message)[1]) {
+						nonDCClogin[i] = true;
+						sendPrivMsg(server, nick, "You are now identified.");
+					} else
+						sendPrivMsg(server, nick, "You suck.");
+				}
+				dccMsg = true; // the message was handled.
 				break;
 			}
 		}
