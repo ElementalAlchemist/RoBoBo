@@ -31,12 +31,13 @@ class Admin : public dccChat {
 		std::vector<std::string> supports();
 	private:
 		std::vector<std::string> identified;
-		bool isYes(std::string str);
 		std::vector<std::tr1::unordered_map<std::string, std::string> > admins;
-		std::vector<bool> verbosity;
+		std::vector<int> verbosity;
 		std::vector<bool> nonDCClogin;
 		bool dcc;
+		bool isValidVerboseLevel(std::string verboseLevel);
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
+		void sendVerbose(int verboseLevel, std::string message);
 };
 
 void Admin::onLoadComplete() {
@@ -60,9 +61,14 @@ void Admin::onLoadComplete() {
 		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[i+"/server"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
+		if (isValidVerboseLevel(config[i+"/verbose"]))
+			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[i+"/verbose"]));
+		else {
+			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl;
+			unloadModule(moduleName);
+		}
 		admins.push_back(adminPrivs);
-		verbosity.push_back(false); // verbosity should only be true with an open DCC chat session
+		verbosity.push_back(0); // verbosity should only be >0 with an open DCC chat session
 		nonDCClogin.push_back(false); // nonDCClogin should only be true when someone logs in via PRIVMSGS
 		adminPrivs.clear();
 	}
@@ -75,7 +81,7 @@ void Admin::onRehash() {
 		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[i+"/server"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", isYes(config[i+"/verbose"]) ? "yes" : "no"));
+		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[i+"/verbose"]));
 		admins.push_back(adminPrivs);
 		adminPrivs.clear();
 	}
@@ -94,7 +100,7 @@ void Admin::onChannelMsg(std::string server, std::string channel, char target, s
 void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
 	bool dccMsg = false;
 	if (!dcc) {
-		for (unsigned int i = 0; i < verbosity.size(); i++) {
+		for (unsigned int i = 0; i < nonDCClogin.size(); i++) {
 			if ((nonDCClogin[i] && admins[i]["server"] == server && admins[i]["nick"] == nick)) {
 				handleDCCMessage(server, nick, message);
 				dccMsg = true;
@@ -102,13 +108,13 @@ void Admin::onUserMsg(std::string server, std::string nick, std::string message)
 			}
 			if (admins[i]["server"] == server && admins[i]["nick"] == nick && splitBySpace(message)[0] == "login") {
 				if (message.size() <= 6)
-					sendPrivMsg(server, nick, "You must use the login command with the password, i.e. login <password>");
+					sendPrivMsg(server, nick, "Usage: login <password>");
 				else {
 					if (admins[i]["password"] == splitBySpace(message)[1]) {
 						nonDCClogin[i] = true;
 						sendPrivMsg(server, nick, "You are now identified.");
 					} else
-						sendPrivMsg(server, nick, "You suck.");
+						sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away. :(");
 				}
 				dccMsg = true; // the message was handled.
 				break;
@@ -197,7 +203,7 @@ void Admin::onDCCEnd(std::string dccid) {
 		std::tr1::unordered_map<std::string, std::string>::iterator server = admins[i].find("server");
 		std::tr1::unordered_map<std::string, std::string>::iterator nick = admins[i].find("nick");
 		if (dccid == server->second + "/" + nick->second)
-			verbosity[i] = false;
+			verbosity[i] = 0;
 	}
 }
 
@@ -215,15 +221,58 @@ std::vector<std::string> Admin::supports() {
 	return supporting;
 }
 
-bool Admin::isYes(std::string str) {
-	if (str == "yes" || str == "Yes" || str == "yEs" || str == "yeS" || str == "YEs" || str == "YeS" || str == "yES" || str == "YES" || str == "y" || str == "Y") // all cases of yes and y
+bool Admin::isValidVerboseLevel(std::string verboseLevel) {
+	std::istringstream verboseLevelString (verboseLevel);
+	int verboseLevelNum;
+	verboseLevelString >> verboseLevelNum;
+	if (!verboseLevelString)
+		return false;
+	if (verboseLevel >= 0 && verboseLevel <= 2) // all currently supported verbose levels
 		return true;
 	return false;
 }
 
 void Admin::handleDCCMessage(std::string server, std::string nick, std::string message) {
 	std::vector<std::string> splitMsg = splitBySpace(message);
-	// I'll get to more of this.
+	dccSender* dccMod = getModules().find(getModAbilities().find("DCC_CHAT")->second)->second;
+	if (splitMsg[0] == "login") {
+		if (splitMsg.size() == 1) {
+			dccMod->dccSend(server + "/" + nick, "Usage: login <password>");
+			dccMod->unhookDCCSession(moduleName, server + "/" + nick);
+			return;
+		}
+		int adminNum = -1;
+		for (unsigned int i = 0; i < admins.size(); i++) {
+			if (admins[i]["nick"] == nick) {
+				adminNum = (int) i;
+				break;
+			}
+		}
+		if (adminNum == -1) {
+			dccMod->dccSend(server + "/" + nick, "You are not an admin of this bot.  Go away.");
+			dccMod->unhookDCCSession(moduleName, server + "/" + nick);
+			sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
+			return;
+		}
+		if (admins[adminNum]["password"] != splitMsg[1]) {
+			dccMod->dccSend(server + "/" + nick, "You are not an admin of this bot.  Go away.");
+			dccMod->unhookDCCSession(moduleName, server + "/" + nick);
+			sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
+			return;
+		} // at this point we've returned out all failures, so do the necessary stuff on authentication
+		sendVerbose(1, "Admin " + nick + " has logged in.");
+		// handle logging in procedures e.g. set verbosity level etc.
+	}
+}
+
+void Admin::sendVerbose(int verboseLevel, std::string message) {
+	dccSender* dccMod = getModules().find(getModAbilities().find("DCC_CHAT")->second)->second;
+	if (verboseLevel < 1)
+		verboseLevel = 1; // verboseLevel 0 receives no messages, no matter what
+	for (unsigned int i = 0; i < verbosity.size(); i++) {
+		if (verbosity[i] >= verboseLevel)
+			dccMod->dccSend(admins[i]["server"]+"/"+admins[i]["nick"], message);
+	}
 }
 
 extern "C" Module* spawn() {
