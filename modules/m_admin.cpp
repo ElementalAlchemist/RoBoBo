@@ -162,6 +162,7 @@ void Admin::onChannelPart(std::string server, std::string channel, std::string h
 
 void Admin::onUserQuit(std::string server, std::string hostmask, std::string reason) {
 	// possibly do something here, depending on verbosity levels
+	// check nonDCClogin
 }
 
 void Admin::onNickChange(std::string server, std::string oldNick, std::string newNick) {
@@ -221,7 +222,8 @@ bool Admin::isYes(std::string str) {
 }
 
 void Admin::handleDCCMessage(std::string server, std::string nick, std::string message) {
-	// I'll get to this.
+	std::vector<std::string> splitMsg = splitBySpace(message);
+	// I'll get to more of this.
 }
 
 extern "C" Module* spawn() {
