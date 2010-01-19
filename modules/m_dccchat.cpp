@@ -16,6 +16,7 @@ class m_dccchat : public dccSender {
 		void sendDCCMessage(std::string recipient, std::string message);
 		std::vector<std::string> getAbilities();
 		bool hookDCCMessage(std::string modName, std::string hookMsg);
+		void unhookDCCSession(std::string modName, std::string dccid);
 		std::string getDesc();
 	private:
 		void dccConnect(std::string server, std::string nick, std::string ip, std::string port);
@@ -23,6 +24,7 @@ class m_dccchat : public dccSender {
 		static void* dccListen_thread(void* args);
 		std::vector<pthread_t*> threads;
 		std::tr1::unordered_map<std::string, Socket*> activeConnections;
+		std::tr1::unordered_map<std::string, std::vector<std::string> > reportingModules;
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
 
@@ -64,6 +66,16 @@ bool m_dccchat::hookDCCMessage(std::string modName, std::string hookMsg) {
 	return false;
 }
 
+void m_dccchat::unhookDCCSession(std::string modName, std::string dccid) {
+	std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator reportingModIter = reportingModules.find(dccid);
+	if (reportingModIter == reportingModules.end())
+		return;
+	for (unsigned int i = 0; i < reportingModIter->second.size(); i++) {
+		if (reportingModIter->second[i] == modName)
+			reportingModIter->second.erase(reportingModIter->second.begin()+i);
+	}
+}
+
 std::string m_dccchat::getDesc() {
 	return "This module gives the bot DCC CHAT support, allowing users to enter in DCC CHAT communication with the bot.";
 }
@@ -75,6 +87,7 @@ void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip,
 	portNumber >> dccPort;
 	dccSocket->connectServer(ip, dccPort);
 	activeConnections.insert(std::pair<std::string, Socket*> (server + "/" + nick, dccSocket));
+	reportingModules.insert(std::pair<std::string, std::vector<std::string> > (server + "/" + nick, std::vector<std::string> ()));
 	dccListenArg listenData;
 	listenData.modPtr = this;
 	listenData.sockPtr = dccSocket;
@@ -91,7 +104,7 @@ void* m_dccchat::dccListen_thread(void* args) {
 }
 
 void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
-	std::vector<std::string> reportingModules;
+	std::vector<std::string> ourReportingModules; = reportingModules.find(id)->second;
 	while (true) {
 		if (!listenSocket->isConnected())
 			break;
@@ -99,12 +112,12 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 		std::tr1::unordered_map<std::string, Module*> modules = getModules(); // get a new one each time in case it is updated
 		for (std::tr1::unordered_map<std::string, std::string>::iterator hookIter = moduleTriggers.begin(); hookIter != moduleTriggers.end(); ++hookIter) {
 			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' ')))
-				reportingModules.push_back(hookIter->second);
+				ourReportingModules.push_back(hookIter->second);
 		}
-		for (unsigned int i = 0; i < reportingModules.size(); i++) {
-			std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(reportingModules[i]);
+		for (unsigned int i = 0; i < ourReportingModules.size(); i++) {
+			std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules[i]);
 			if (modIter == modules.end())
-				reportingModules.erase(reportingModules.begin()+i);
+				ourReportingModules.erase(ourReportingModules.begin()+i);
 			else {
 				std::vector<std::string> modSupports = modIter->second->supports();
 				for (unsigned int i = 0; i < modSupports.size(); i++) {
@@ -119,7 +132,7 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 	}
 	std::tr1::unordered_map<std::string, Module*> modules = getModules();
 	for (unsigned int i = 0; i < reportingModules.size(); i++) {
-		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(reportingModules[i]);
+		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules[i]);
 		dccChat* dccMod = (dccChat*) modIter->second;
 		dccMod->onDCCEnd(id); // call the DCC end hook for each watching module as the DCC session ends
 	}
