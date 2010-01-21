@@ -30,7 +30,7 @@ class m_dccchat : public dccSender {
 
 void m_dccchat::onUserCTCP(std::string server, std::string nick, std::string message) {
 	std::vector<std::string> messageParts = splitBySpace(message);
-	if (messageParts[0] == "DCC" && messageParts[1] == "CHAT") {
+	if (messageParts[0] == "DCC" && messageParts[1] == "CHAT" && messageParts[2] == "chat") {
 		if (activeConnections.find(server + "/" + nick) == activeConnections.end())
 			dccConnect(server, nick, messageParts[3], messageParts[4]);
 		else
