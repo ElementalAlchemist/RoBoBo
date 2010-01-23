@@ -35,7 +35,7 @@ class Admin : public dccChat {
 		std::vector<std::tr1::unordered_map<std::string, std::string> > admins;
 		std::vector<int> verbosity;
 		std::vector<bool> loggedIn;
-		bool dcc;
+		dccSender* dccMod;
 		bool isValidVerboseLevel(std::string verboseLevel);
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
 		void sendVerbose(int verboseLevel, std::string message);
@@ -46,14 +46,13 @@ void Admin::onLoadComplete() {
 	std::multimap<std::string, std::string> services = getModAbilities();
 	std::multimap<std::string, std::string>::iterator serviceIter = services.find("DCC_CHAT");
 	if (serviceIter == services.end())
-		dcc = false;
+		dccMod = NULL;
 	else {
-		dcc = true;
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = getModules().find(serviceIter->second);
-		dccSender* dccMod = (dccSender*) modIter->second;
+		dccMod = (dccSender*) modIter->second;
 		if (!dccMod->hookDCCMessage(moduleName, "login")) { // hook DCC message
 			if (!dccMod->hookDCCMessage(moduleName, "admin")) { // backup
-				dcc = false; // couldn't hook messages, so no DCC
+				dccMod = NULL; // couldn't hook messages, so no DCC
 			}
 		}
 	}
@@ -136,7 +135,7 @@ void Admin::onChannelMsg(std::string server, std::string channel, char target, s
 
 void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
 	bool dccMsg = false;
-	if (!dcc) {
+	if (dccMod == NULL) {
 		for (unsigned int i = 0; i < loggedIn.size(); i++) {
 			if ((loggedIn[i] && admins[i]["server"] == server && admins[i]["nick"] == nick)) {
 				handleDCCMessage(server, nick, message);
@@ -287,39 +286,59 @@ bool Admin::isValidVerboseLevel(std::string verboseLevel) {
 
 void Admin::handleDCCMessage(std::string server, std::string nick, std::string message) {
 	std::vector<std::string> splitMsg = splitBySpace(message);
-	dccSender* dccMod = getModules().find(getModAbilities().find("DCC_CHAT")->second)->second;
-	if (splitMsg[0] == "login") {
-		if (splitMsg.size() == 1) {
-			dccMod->dccSend(server + "/" + nick, "Usage: login <password>");
-			dccMod->unhookDCCSession(moduleName, server + "/" + nick);
-			return;
-		}
-		int adminNum = -1;
-		for (unsigned int i = 0; i < admins.size(); i++) {
-			if (admins[i]["nick"] == nick) {
-				adminNum = (int) i;
-				break;
+	if (splitMsg[0] == "login" || splitMsg[0] == "admin") {
+		if (dccMod == NULL) {
+			if (splitMsg.size() == 1) {
+				sendPrivMsg(server, nick, "Usage: " + splitMsg[0] + " <password>");
+				return;
 			}
+			int adminNum = -1;
+			for (unsigned int i = 0; i < admins.size(); i++) {
+				if (admins[i]["nick"] == nick) {
+					adminNum = (int) i;
+					break;
+				}
+			}
+			if (adminNum == -1) {
+				sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away.");
+				return;
+			}
+			if (admins[adminNum]["password"] != splitMsg[1]) {
+				sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away.");
+				return;
+			}
+		} else {
+			if (splitMsg.size() == 1) {
+				dccMod->dccSend(server + "/" + nick, "Usage: " + splitMsg[0] + " <password>");
+				dccMod->unhookDCCSession(moduleName, server + "/" + nick);
+				return;
+			}
+			int adminNum = -1;
+			for (unsigned int i = 0; i < admins.size(); i++) {
+				if (admins[i]["nick"] == nick) {
+					adminNum = (int) i;
+					break;
+				}
+			}
+			if (adminNum == -1) {
+				dccMod->dccSend(server + "/" + nick, "You are not an admin of this bot.  Go away.");
+				dccMod->unhookDCCSession(moduleName, server + "/" + nick);
+				sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
+				return;
+			}
+			if (admins[adminNum]["password"] != splitMsg[1]) {
+				dccMod->dccSend(server + "/" + nick, "You are not an admin of this bot.  Go away.");
+				dccMod->unhookDCCSession(moduleName, server + "/" + nick);
+				sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
+				return;
+			} // at this point we've returned out all failures, so do the necessary stuff on authentication
+			sendVerbose(1, "Admin " + nick + " has logged in.");
+			// handle logging in procedures e.g. set verbosity level etc.
 		}
-		if (adminNum == -1) {
-			dccMod->dccSend(server + "/" + nick, "You are not an admin of this bot.  Go away.");
-			dccMod->unhookDCCSession(moduleName, server + "/" + nick);
-			sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
-			return;
-		}
-		if (admins[adminNum]["password"] != splitMsg[1]) {
-			dccMod->dccSend(server + "/" + nick, "You are not an admin of this bot.  Go away.");
-			dccMod->unhookDCCSession(moduleName, server + "/" + nick);
-			sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
-			return;
-		} // at this point we've returned out all failures, so do the necessary stuff on authentication
-		sendVerbose(1, "Admin " + nick + " has logged in.");
-		// handle logging in procedures e.g. set verbosity level etc.
 	}
 }
 
 void Admin::sendVerbose(int verboseLevel, std::string message) {
-	dccSender* dccMod = getModules().find(getModAbilities().find("DCC_CHAT")->second)->second;
 	if (verboseLevel < 1)
 		verboseLevel = 1; // verboseLevel 0 receives no messages, no matter what
 	for (unsigned int i = 0; i < verbosity.size(); i++) {
