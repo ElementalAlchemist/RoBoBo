@@ -31,8 +31,11 @@ class m_dccchat : public dccSender {
 
 void m_dccchat::onNickChange(std::string server, std::string oldNick, std::string newNick) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(server + "/" + oldNick);
-	if (dccIter != activeConnections.end())
-		dccIter->first = server + "/" + newNick; // change the ID so someone who takes the old nick can DCC chat the bot
+	if (dccIter != activeConnections.end()) {
+		Socket* thisSocket = dccIter->second;
+		activeConnections.erase(dccIter);
+		activeConnections.insert(std::pair<std::string, Socket*> (server + "/" + newNick, thisSocket));
+	}
 }
 
 void m_dccchat::onUserCTCP(std::string server, std::string nick, std::string message) {
@@ -111,7 +114,7 @@ void* m_dccchat::dccListen_thread(void* args) {
 }
 
 void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
-	std::vector<std::string> ourReportingModules; = reportingModules.find(id)->second;
+	std::vector<std::string> ourReportingModules = reportingModules.find(id)->second;
 	while (true) {
 		if (!listenSocket->isConnected())
 			break;
