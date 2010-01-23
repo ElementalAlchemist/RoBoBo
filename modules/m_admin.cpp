@@ -1,5 +1,6 @@
 #include "modinclude.h"
 #include "dcc_chat.h"
+#include "bot_admin.h"
 
 class Admin : public dccChat {
 	public:
@@ -38,6 +39,7 @@ class Admin : public dccChat {
 		bool isValidVerboseLevel(std::string verboseLevel);
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
 		void sendVerbose(int verboseLevel, std::string message);
+		std::tr1::unordered_map<std::string, std::vector<std::string> > botAdminCommands;
 };
 
 void Admin::onLoadComplete() {
@@ -72,6 +74,23 @@ void Admin::onLoadComplete() {
 		nonDCClogin.push_back(false); // nonDCClogin should only be true when someone logs in via PRIVMSGS
 		adminPrivs.clear();
 	}
+	
+	std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
+		std::vector<std::string> modSupports = modIter->second->supports();
+		for (unsigned int i = 0; i < modSupports.size(); i++) {
+			if (modSupports[i] == "BOT_ADMIN") {
+				AdminHook* adminCommandMod = (AdminHook*) modIter->second;
+				std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
+				for (unsigned int i = 0; i < adminSupport.size(); i++) {
+					std::string command = adminSupport[i][0];
+					adminSupport[i][0] = modIter->first;
+					botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[i]));
+				}
+				break;
+			}
+		}
+	}
 }
 
 void Admin::onRehash() {
@@ -84,6 +103,24 @@ void Admin::onRehash() {
 		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[i+"/verbose"]));
 		admins.push_back(adminPrivs);
 		adminPrivs.clear();
+	}
+	
+	botAdminCommands.clear();
+	std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
+		std::vector<std::string> modSupports = modIter->second->supports();
+		for (unsigned int i = 0; i < modSupports.size(); i++) {
+			if (modSupports[i] == "BOT_ADMIN") {
+				AdminHook* adminCommandMod = (AdminHook*) modIter->second;
+				std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
+				for (unsigned int i = 0; i < adminSupport.size(); i++) {
+					std::string command = adminSupport[i][0];
+					adminSupport[i][0] = modIter->first;
+					botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[i]));
+				}
+				break;
+			}
+		}
 	}
 }
 
