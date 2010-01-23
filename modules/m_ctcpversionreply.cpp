@@ -25,6 +25,9 @@ void VersionReply::sendVersionReply(std::string server, std::string target) {
 		case 900:
 			versionReply += "v1.0.0a1";
 			break;
+		case 910:
+			versionReply += "v1.0.0a2";
+			break;
 		case 950:
 			versionReply += "v1.0.0b1";
 			break;
