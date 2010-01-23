@@ -34,7 +34,7 @@ class Admin : public dccChat {
 		std::vector<std::string> identified;
 		std::vector<std::tr1::unordered_map<std::string, std::string> > admins;
 		std::vector<int> verbosity;
-		std::vector<bool> nonDCClogin;
+		std::vector<bool> loggedIn;
 		bool dcc;
 		bool isValidVerboseLevel(std::string verboseLevel);
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
@@ -71,7 +71,7 @@ void Admin::onLoadComplete() {
 		}
 		admins.push_back(adminPrivs);
 		verbosity.push_back(0); // verbosity should only be >0 with an open DCC chat session
-		nonDCClogin.push_back(false); // nonDCClogin should only be true when someone logs in via PRIVMSGS
+		loggedIn.push_back(false);
 		adminPrivs.clear();
 	}
 	
@@ -137,8 +137,8 @@ void Admin::onChannelMsg(std::string server, std::string channel, char target, s
 void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
 	bool dccMsg = false;
 	if (!dcc) {
-		for (unsigned int i = 0; i < nonDCClogin.size(); i++) {
-			if ((nonDCClogin[i] && admins[i]["server"] == server && admins[i]["nick"] == nick)) {
+		for (unsigned int i = 0; i < loggedIn.size(); i++) {
+			if ((loggedIn[i] && admins[i]["server"] == server && admins[i]["nick"] == nick)) {
 				handleDCCMessage(server, nick, message);
 				dccMsg = true;
 				break;
@@ -148,7 +148,7 @@ void Admin::onUserMsg(std::string server, std::string nick, std::string message)
 					sendPrivMsg(server, nick, "Usage: login <password>");
 				else {
 					if (admins[i]["password"] == splitBySpace(message)[1]) {
-						nonDCClogin[i] = true;
+						loggedIn[i] = true;
 						sendPrivMsg(server, nick, "You are now identified.");
 					} else
 						sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away. :(");
@@ -205,12 +205,19 @@ void Admin::onChannelPart(std::string server, std::string channel, std::string h
 
 void Admin::onUserQuit(std::string server, std::string hostmask, std::string reason) {
 	// possibly do something here, depending on verbosity levels
-	// check nonDCClogin
+	// check loggedIn
 }
 
 void Admin::onNickChange(std::string server, std::string oldNick, std::string newNick) {
+	for (unsigned int i = 0; i < admins.size(); i++) {
+		if (loggedIn[i]) {
+			std::tr1::unordered_map<std::string, std::string>::iterator adminServer = admins[i].find("server");
+			std::tr1::unordered_map<std::string, std::string>::iterator adminNick = admins[i].find("nick");
+			if (adminServer->second == server && adminNick->second == oldNick)
+				adminNick->second = newNick;
+		}
+	}
 	// possibly do something depending on verbosity levels
-	// check for nick changes to admin
 }
 
 void Admin::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
@@ -239,8 +246,10 @@ void Admin::onDCCEnd(std::string dccid) {
 	for (unsigned int i = 0; i < admins.size(); i++) {
 		std::tr1::unordered_map<std::string, std::string>::iterator server = admins[i].find("server");
 		std::tr1::unordered_map<std::string, std::string>::iterator nick = admins[i].find("nick");
-		if (dccid == server->second + "/" + nick->second)
+		if (dccid == server->second + "/" + nick->second) {
 			verbosity[i] = 0;
+			loggedIn[i] = false;
+		}
 	}
 }
 
