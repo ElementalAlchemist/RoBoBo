@@ -216,7 +216,7 @@ void Admin::onNickChange(std::string server, std::string oldNick, std::string ne
 	for (unsigned int i = 0; i < admins.size(); i++) {
 		if (loggedIn[i]) {
 			if (admins[i]["server"] == server && admins[i]["nick"] == oldNick)
-				adminNick->second = newNick;
+				admins[i]["nick"] = newNick;
 		}
 	}
 	// possibly do something depending on verbosity levels
