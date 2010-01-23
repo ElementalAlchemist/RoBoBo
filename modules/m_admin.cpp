@@ -205,9 +205,7 @@ void Admin::onChannelPart(std::string server, std::string channel, std::string h
 void Admin::onUserQuit(std::string server, std::string hostmask, std::string reason) {
 	for (unsigned int i = 0; i < admins.size(); i++) {
 		if (loggedIn[i] && verbosity[i] == 0) { // DCC chat can persist after QUIT. For our purposes a verbosity of 0 is a query (though not necessarily)
-			std::tr1::unordered_map<std::string, std::string>::iterator adminServer = admins[i].find("server");
-			std::tr1::unordered_map<std::string, std::string>::iterator adminNick = admins[i].find("nick");
-			if (adminServer->second == server && adminNick->second == hostmask.substr(0, hostmask.find_first_of('!')))
+			if (admins[i]["server"] == server && admins[i]["nick"] == hostmask.substr(0, hostmask.find_first_of('!')))
 				loggedIn[i] = false;
 		}
 	}
@@ -217,9 +215,7 @@ void Admin::onUserQuit(std::string server, std::string hostmask, std::string rea
 void Admin::onNickChange(std::string server, std::string oldNick, std::string newNick) {
 	for (unsigned int i = 0; i < admins.size(); i++) {
 		if (loggedIn[i]) {
-			std::tr1::unordered_map<std::string, std::string>::iterator adminServer = admins[i].find("server");
-			std::tr1::unordered_map<std::string, std::string>::iterator adminNick = admins[i].find("nick");
-			if (adminServer->second == server && adminNick->second == oldNick)
+			if (admins[i]["server"] == server && admins[i]["nick"] == oldNick)
 				adminNick->second = newNick;
 		}
 	}
@@ -250,9 +246,7 @@ void Admin::onDCCReceive(std::string dccid, std::string message) { // dccid = se
 
 void Admin::onDCCEnd(std::string dccid) {
 	for (unsigned int i = 0; i < admins.size(); i++) {
-		std::tr1::unordered_map<std::string, std::string>::iterator server = admins[i].find("server");
-		std::tr1::unordered_map<std::string, std::string>::iterator nick = admins[i].find("nick");
-		if (dccid == server->second + "/" + nick->second) {
+		if (dccid == admins[i]["server"] + "/" + admins[i]["nick"]) {
 			verbosity[i] = 0;
 			loggedIn[i] = false;
 		}
@@ -331,10 +325,10 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->unhookDCCSession(moduleName, server + "/" + nick);
 				sendVerbose(1, "Unauthorized user " + server + "/" + nick + " has attempted to authenticate with the bot.");
 				return;
-			} // at this point we've returned out all failures, so do the necessary stuff on authentication
+			}
 			sendVerbose(1, "Admin " + nick + " has logged in.");
-		}
-		// handle logging in procedures e.g. set verbosity level etc.
+		} // at this point we've returned out all failures, so do the necessary stuff on authentication
+		
 	}
 }
 
