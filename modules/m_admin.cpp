@@ -279,7 +279,7 @@ bool Admin::isValidVerboseLevel(std::string verboseLevel) {
 	verboseLevelString >> verboseLevelNum;
 	if (!verboseLevelString)
 		return false;
-	if (verboseLevel >= 0 && verboseLevel <= 2) // all currently supported verbose levels
+	if (verboseLevelNum >= 0 && verboseLevelNum <= 2) // all currently supported verbose levels
 		return true;
 	return false;
 }
@@ -333,8 +333,8 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				return;
 			} // at this point we've returned out all failures, so do the necessary stuff on authentication
 			sendVerbose(1, "Admin " + nick + " has logged in.");
-			// handle logging in procedures e.g. set verbosity level etc.
 		}
+		// handle logging in procedures e.g. set verbosity level etc.
 	}
 }
 
