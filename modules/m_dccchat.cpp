@@ -11,6 +11,7 @@ struct dccListenArg {
 
 class m_dccchat : public dccSender {
 	public:
+		void onNickChange(std::string server, std::string oldNick, std::string newNick);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
 		void sendDCCMessage(std::string recipient, std::string message);
@@ -27,6 +28,12 @@ class m_dccchat : public dccSender {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > reportingModules;
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
+
+void m_dccchat::onNickChange(std::string server, std::string oldNick, std::string newNick) {
+	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(server + "/" + oldNick);
+	if (dccIter != activeConnections.end())
+		dccIter->first = server + "/" + newNick; // change the ID so someone who takes the old nick can DCC chat the bot
+}
 
 void m_dccchat::onUserCTCP(std::string server, std::string nick, std::string message) {
 	std::vector<std::string> messageParts = splitBySpace(message);
