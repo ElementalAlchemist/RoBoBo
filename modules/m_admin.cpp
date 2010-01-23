@@ -204,8 +204,15 @@ void Admin::onChannelPart(std::string server, std::string channel, std::string h
 }
 
 void Admin::onUserQuit(std::string server, std::string hostmask, std::string reason) {
+	for (unsigned int i = 0; i < admins.size(); i++) {
+		if (loggedIn[i] && verbosity[i] == 0) { // DCC chat can persist after QUIT. For our purposes a verbosity of 0 is a query (though not necessarily)
+			std::tr1::unordered_map<std::string, std::string>::iterator adminServer = admins[i].find("server");
+			std::tr1::unordered_map<std::string, std::string>::iterator adminNick = admins[i].find("nick");
+			if (adminServer->second == server && adminNick->second == hostmask.substr(0, hostmask.find_first_of('!')))
+				loggedIn[i] = false;
+		}
+	}
 	// possibly do something here, depending on verbosity levels
-	// check loggedIn
 }
 
 void Admin::onNickChange(std::string server, std::string oldNick, std::string newNick) {
