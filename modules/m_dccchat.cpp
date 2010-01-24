@@ -100,6 +100,7 @@ void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip,
 	reportingModules.insert(std::pair<std::string, std::vector<std::string> > (server + "/" + nick, std::vector<std::string> ()));
 	dccListenArg listenData;
 	listenData.modPtr = this;
+	listenData.id = server + "/" + nick;
 	listenData.sockPtr = dccSocket;
 	pthread_t fullNewThread;
 	pthread_t* newThread = &fullNewThread;
@@ -114,11 +115,13 @@ void* m_dccchat::dccListen_thread(void* args) {
 }
 
 void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
-	std::vector<std::string> ourReportingModules = reportingModules.find(id)->second;
+	std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator theReportingModules = reportingModules.find(id);
+	std::vector<std::string> ourReportingModules = theReportingModules->second;
 	while (true) {
 		if (!listenSocket->isConnected())
 			break;
 		std::string receivedMsg = listenSocket->receive();
+		std::cout << "DCC " << id << ":" << receivedMsg << std::endl;
 		std::tr1::unordered_map<std::string, Module*> modules = getModules(); // get a new one each time in case it is updated
 		for (std::tr1::unordered_map<std::string, std::string>::iterator hookIter = moduleTriggers.begin(); hookIter != moduleTriggers.end(); ++hookIter) {
 			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' ')))

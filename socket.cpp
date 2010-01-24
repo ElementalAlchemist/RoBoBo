@@ -66,7 +66,6 @@ bool Socket::sendData(std::string message) {
 std::string Socket::receive() {
 	std::string messageString = "";
 	char inputBuffer[2];
-	bool seenCR = false;
 	int status;
 	while (true) {
 		status = recv(socketfd, &inputBuffer, 1, 0);
@@ -77,13 +76,10 @@ std::string Socket::receive() {
 		}
 		if (inputBuffer[0] == '\0')
 			return messageString;
-		if (inputBuffer[0] == '\n' && seenCR)
+		if (inputBuffer[0] == '\n')
 			return messageString;
 		if (inputBuffer[0] != '\n' && inputBuffer[0] != '\r')
 			messageString += inputBuffer[0];
-		seenCR = false;
-		if (inputBuffer[0] == '\r')
-			seenCR = true;
 	}
 	return "";
 }
