@@ -102,10 +102,11 @@ void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip,
 	listenData.modPtr = this;
 	listenData.id = server + "/" + nick;
 	listenData.sockPtr = dccSocket;
-	pthread_t fullNewThread;
-	pthread_t* newThread = &fullNewThread;
-	threads.push_back(newThread);
-	pthread_create(newThread, NULL, &dccListen_thread, (void*)&listenData);
+	pthread_t newThread;
+	threads.push_back(&newThread);
+	void* listenArgs = (void*) &listenData;
+	pthread_create(&newThread, NULL, &dccListen_thread, listenArgs);
+	sleep(1); // make the arguments passed to the thread not die before the thread function can read them.
 }
 
 void* m_dccchat::dccListen_thread(void* args) {
@@ -115,8 +116,7 @@ void* m_dccchat::dccListen_thread(void* args) {
 }
 
 void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
-	std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator theReportingModules = reportingModules.find(id);
-	std::vector<std::string> ourReportingModules = theReportingModules->second;
+	std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator ourReportingModules = reportingModules.find(id);
 	while (true) {
 		if (!listenSocket->isConnected())
 			break;
@@ -125,12 +125,12 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 		std::tr1::unordered_map<std::string, Module*> modules = getModules(); // get a new one each time in case it is updated
 		for (std::tr1::unordered_map<std::string, std::string>::iterator hookIter = moduleTriggers.begin(); hookIter != moduleTriggers.end(); ++hookIter) {
 			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' ')))
-				ourReportingModules.push_back(hookIter->second);
+				ourReportingModules->second.push_back(hookIter->second);
 		}
-		for (unsigned int i = 0; i < ourReportingModules.size(); i++) {
-			std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules[i]);
+		for (unsigned int i = 0; i < ourReportingModules->second.size(); i++) {
+			std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules->second[i]);
 			if (modIter == modules.end())
-				ourReportingModules.erase(ourReportingModules.begin()+i);
+				ourReportingModules->second.erase(ourReportingModules->second.begin()+i);
 			else {
 				std::vector<std::string> modSupports = modIter->second->supports();
 				for (unsigned int i = 0; i < modSupports.size(); i++) {
@@ -145,7 +145,7 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 	}
 	std::tr1::unordered_map<std::string, Module*> modules = getModules();
 	for (unsigned int i = 0; i < reportingModules.size(); i++) {
-		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules[i]);
+		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules->second[i]);
 		dccChat* dccMod = (dccChat*) modIter->second;
 		dccMod->onDCCEnd(id); // call the DCC end hook for each watching module as the DCC session ends
 	}
