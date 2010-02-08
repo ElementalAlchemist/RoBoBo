@@ -30,6 +30,7 @@ class Admin : public dccChat {
 		std::string getDesc();
 		std::string getHelp();
 		std::vector<std::string> supports();
+		void sendVerbose(int verboseLevel, std::string message);
 	private:
 		std::vector<std::string> identified;
 		std::vector<std::tr1::unordered_map<std::string, std::string> > admins;
@@ -38,7 +39,6 @@ class Admin : public dccChat {
 		dccSender* dccMod;
 		bool isValidVerboseLevel(std::string verboseLevel);
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
-		void sendVerbose(int verboseLevel, std::string message);
 		std::tr1::unordered_map<std::string, std::vector<std::string> > botAdminCommands;
 };
 

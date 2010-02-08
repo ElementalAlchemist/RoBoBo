@@ -14,7 +14,7 @@ class m_dccchat : public dccSender {
 		void onNickChange(std::string server, std::string oldNick, std::string newNick);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
-		void sendDCCMessage(std::string recipient, std::string message);
+		void dccSend(std::string recipient, std::string message);
 		std::vector<std::string> getAbilities();
 		bool hookDCCMessage(std::string modName, std::string hookMsg);
 		void unhookDCCSession(std::string modName, std::string dccid);
@@ -55,7 +55,7 @@ std::vector<std::string> m_dccchat::getConnections() {
 	return connections;
 }
 
-void m_dccchat::sendDCCMessage(std::string recipient, std::string message) {
+void m_dccchat::dccSend(std::string recipient, std::string message) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(recipient);
 	if (dccIter == activeConnections.end())
 		return;
