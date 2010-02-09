@@ -58,12 +58,17 @@ void Admin::onLoadComplete() {
 	}
 	
 	std::tr1::unordered_map<std::string, std::string> adminPrivs;
-	for (int i = 0; config[i+"/nick"] != ""; i++) {
-		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[i+"/server"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
-		if (isValidVerboseLevel(config[i+"/verbose"]))
-			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[i+"/verbose"]));
+	int i = 0;
+	while (true) {
+		std::ostringstream adminIndex;
+		adminIndex << i;
+		if (config[adminIndex.str()+"/nick"] == "")
+			break;
+		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[adminIndex.str()+"/server"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[adminIndex.str()+"/nick"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[adminIndex.str()+"/password"]));
+		if (isValidVerboseLevel(config[adminIndex.str()+"/verbose"]))
+			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
 			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl;
 			unloadModule(moduleName);
@@ -71,7 +76,7 @@ void Admin::onLoadComplete() {
 		admins.push_back(adminPrivs);
 		verbosity.push_back(0); // verbosity should only be >0 with an open DCC chat session
 		loggedIn.push_back(false);
-		adminPrivs.clear();
+		i++;
 	}
 	
 	std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
@@ -283,7 +288,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 	if (splitMsg[0] == "login" || splitMsg[0] == "admin") {
 		int adminNum = -1;
 		for (unsigned int i = 0; i < admins.size(); i++) {
-			if (admins[i]["nick"] == nick) {
+			if (admins[i]["server"] == server && admins[i]["nick"] == nick) {
 				adminNum = (int) i;
 				break;
 			}
