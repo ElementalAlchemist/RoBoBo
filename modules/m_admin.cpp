@@ -332,13 +332,17 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		adminVerbosityLevel >> verbose;
 		verbosity[adminNum] = verbose;
 	} else if (splitMsg[0] == "modules") {
-		
+		// list loaded modules and descriptions
 	} else if (splitMsg[0] == "help") {
-		
+		if (splitMsg.size() == 1) {
+			// list commands
+		} else {
+			// give help on a module or command
+		}
 	} else if (splitMsg[0] == "active") {
-		
+		// list active admins
 	} else {
-		
+		// run command check
 	}
 }
 
