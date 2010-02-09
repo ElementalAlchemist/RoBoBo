@@ -2,7 +2,7 @@
 #include "dcc_chat.h"
 #include "bot_admin.h"
 
-class Admin : public dccChat, AdminMod {
+class Admin : public dccChat, public AdminMod {
 	public:
 		void onLoadComplete();
 		void onRehash();
@@ -100,13 +100,25 @@ void Admin::onLoadComplete() {
 void Admin::onRehash() {
 	admins.clear();
 	std::tr1::unordered_map<std::string, std::string> adminPrivs;
-	for (int i = 0; config[i+"/nick"] != ""; i++) {
-		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[i+"/server"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[i+"/nick"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[i+"/password"]));
-		adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[i+"/verbose"]));
+	int i = 0;
+	while (true) {
+		std::ostringstream adminIndex;
+		adminIndex << i;
+		if (config[adminIndex.str()+"/nick"] == "")
+			break;
+		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[adminIndex.str()+"/server"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[adminIndex.str()+"/nick"]));
+		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[adminIndex.str()+"/password"]));
+		if (isValidVerboseLevel(config[adminIndex.str()+"/verbose"]))
+			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
+		else {
+			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl;
+			unloadModule(moduleName);
+		}
 		admins.push_back(adminPrivs);
-		adminPrivs.clear();
+		verbosity.push_back(0); // verbosity should only be >0 with an open DCC chat session
+		loggedIn.push_back(false);
+		i++;
 	}
 	
 	botAdminCommands.clear();
@@ -332,7 +344,21 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		adminVerbosityLevel >> verbose;
 		verbosity[adminNum] = verbose;
 	} else if (splitMsg[0] == "modules") {
-		// list loaded modules and descriptions
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "Loaded modules:");
+		else
+			dccMod->dccSend(server + "/" + nick, "Loaded modules:");
+		std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
+		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
+			if (dccMod == NULL)
+				sendPrivMsg(server, nick, modIter->first + ": " + modIter->second->getDesc());
+			else
+				dccMod->dccSend(server + "/" + nick, modIter->first + ": " + modIter->second->getDesc());
+		}
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "End of module list.");
+		else
+			dccMod->dccSend(server + "/" + nick, "End of module list.");
 	} else if (splitMsg[0] == "help") {
 		if (splitMsg.size() == 1) {
 			// list commands
