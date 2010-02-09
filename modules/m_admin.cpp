@@ -2,7 +2,7 @@
 #include "dcc_chat.h"
 #include "bot_admin.h"
 
-class Admin : public dccChat {
+class Admin : public dccChat, AdminMod {
 	public:
 		void onLoadComplete();
 		void onRehash();
@@ -336,6 +336,8 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 	} else if (splitMsg[0] == "help") {
 		
 	} else if (splitMsg[0] == "active") {
+		
+	} else {
 		
 	}
 }
