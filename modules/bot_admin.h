@@ -5,7 +5,7 @@ class AdminHook : public Module {
 		virtual void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, bool dcc, bool master);
 };
 
-class AdminMod : public Module {
+class AdminMod {
 	public:
 		virtual ~AdminMod();
 		virtual void sendVerbose(int verboseLevel, std::string message);
