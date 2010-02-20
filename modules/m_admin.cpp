@@ -305,20 +305,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				break;
 			}
 		}
-		if (dccMod == NULL) {
-			if (splitMsg.size() == 1) {
-				sendPrivMsg(server, nick, "Usage: " + splitMsg[0] + " <password>");
-				return;
-			}
-			if (adminNum == -1) {
-				sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away.");
-				return;
-			}
-			if (admins[adminNum]["password"] != splitMsg[1]) {
-				sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away.");
-				return;
-			}
-		} else {
+		if (dccMod != NULL) { // just in case.  The login code for no DCC is handled in onUserMsg
 			if (splitMsg.size() == 1) {
 				dccMod->dccSend(server + "/" + nick, "Usage: " + splitMsg[0] + " <password>");
 				dccMod->unhookDCCSession(moduleName, server + "/" + nick);
@@ -337,6 +324,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				return;
 			}
 			sendVerbose(1, "Admin " + nick + " has logged in.");
+			dccMod->dccSend(server + "/" + nick, "You are now identified.");
 		} // at this point we've returned out all failures, so do the necessary stuff on authentication
 		loggedIn[adminNum] = true;
 		std::istringstream adminVerbosityLevel (config[adminNum+"/verbose"]);
