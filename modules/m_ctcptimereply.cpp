@@ -5,6 +5,7 @@ class TimeReply : public Module {
 	public:
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
+		std::string getDesc();
 	private:
 		void sendTime(std::string server, std::string target);
 };
@@ -17,6 +18,10 @@ void TimeReply::onChannelCTCP(std::string server, std::string channel, char targ
 void TimeReply::onUserCTCP(std::string server, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "TIME")
 		sendTime(server, nick);
+}
+
+std::string TimeReply::getDesc() {
+	return "Responds to CTCP TIME requests.";
 }
 
 void TimeReply::sendTime(std::string server, std::string target) {
