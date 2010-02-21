@@ -361,8 +361,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->dccSend(server + "/" + nick, "End of command list!");
 			}
 		} else {
-			std::string helpCommand = message.substr(5); // cut "help " off the beginning
-			if (helpCommand == "modules") {
+			if (splitMsg[1] == "modules") {
 				if (dccMod == NULL) {
 					sendPrivMsg(server, nick, "modules implemented by module " + moduleName);
 					sendPrivMsg(server, nick, "Lists loaded modules.");
@@ -376,14 +375,14 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				}
 				return;
 			}
-			if (helpCommand == "help") {
+			if (splitMsg[1] == "help") {
 				if (dccMod == NULL)
 					sendPrivMsg(server, nick, "Silly you!  You're using that!");
 				else
 					dccMod->dccSend(server + "/" + nick, "Silly you!  You're using that!");
 				return;
 			}
-			if (helpCommand == "active") {
+			if (splitMsg[1] == "active") {
 				if (dccMod == NULL) {
 					sendPrivMsg(server, nick, "active implemented by module " + moduleName);
 					sendPrivMsg(server, nick, "Lists logged-in bot administrators.");
@@ -397,7 +396,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				}
 				return;
 			}
-			std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(helpCommand);
+			std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(splitMsg[1]);
 			if (comIter == botAdminCommands.end()) {
 				if (dccMod == NULL)
 					sendPrivMsg(server, nick, "That command does not exist.");
@@ -420,9 +419,33 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			}
 		}
 	} else if (splitMsg[0] == "active") {
-		// list active admins
+		if (dccMod == NULL) {
+			sendPrivMsg(server, nick, "Online Bot Administrators");
+			for (unsigned int i = 0; i < admins.size(); i++) {
+				if (loggedIn[i])
+					sendPrivMsg(server, nick, admins[i]["nick"] + ", using server " + admins[i]["server"]);
+			}
+			sendPrivMsg(server, nick, "End of online admin list.");
+		} else {
+			dccMod->dccSend(server + "/" + nick, "Online Bot Administrators");
+			for (unsigned int i = 0; i < admins.size(); i++) {
+				if (loggedIn[i])
+					dccMod->dccSend(server + "/" + nick, admins[i]["nick"] + ", using server " + admins[i]["server"]);
+			}
+			dccMod->dccSend(server + "/" + nick, "End of online admin list.");
+		}
 	} else {
-		// run command check
+		std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(splitMsg[0]);
+		if (comIter == botAdminCommands.end()) {
+			if (dccMod == NULL)
+				sendPrivMsg(server, nick, "That command does not exist.");
+			else
+				dccMod->dccSend(server + "/" + nick, "That command does not exist.");
+			return;
+		}
+		std::tr1::unordered_map<std::string, Module*>::iterator modIter = getModules().find(comIter->second[0]);
+		AdminHook* adminCommandModule = (AdminHook*) modIter->second;
+		adminCommandModule->onAdminCommand(server, nick, splitMsg[0], message.substr(splitMsg[0].size() + 1), dccMod, (server == admins[0]["server"] && nick == admins[0]["nick"]));
 	}
 }
 
