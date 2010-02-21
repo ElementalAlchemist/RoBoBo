@@ -374,6 +374,28 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 					dccMod->dccSend(server + "/" + nick, "This command lists all loaded modules and their descriptions.  This command takes no arguments.");
 					dccMod->dccSend(server + "/" + nick, "End of help for modules.");
 				}
+				return;
+			}
+			if (helpCommand == "help") {
+				if (dccMod == NULL)
+					sendPrivMsg(server, nick, "Silly you!  You're using that!");
+				else
+					dccMod->dccSend(server + "/" + nick, "Silly you!  You're using that!");
+				return;
+			}
+			if (helpCommand == "active") {
+				if (dccMod == NULL) {
+					sendPrivMsg(server, nick, "active implemented by module " + moduleName);
+					sendPrivMsg(server, nick, "Lists logged-in bot administrators.");
+					sendPrivMsg(server, nick, "This command lists the nicks and servers of all online administrators.  This command takes no arguments.");
+					sendPrivMsg(server, nick, "End of help for active");
+				} else {
+					dccMod->dccSend(server + "/" + nick, "active implemented by module " + moduleName);
+					dccMod->dccSend(server + "/" + nick, "Lists logged-in bot administrators.");
+					dccMod->dccSend(server + "/" + nick, "This command lists the nicks and servers of all online administrators.  This command takes no arguments.");
+					dccMod->dccSend(server + "/" + nick, "End of help for active");
+				}
+				return;
 			}
 			std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(helpCommand);
 			if (comIter == botAdminCommands.end()) {
