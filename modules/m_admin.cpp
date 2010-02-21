@@ -349,7 +349,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				sendPrivMsg(server, nick, "RoBoBo Admin Help");
 				sendPrivMsg(server, nick, "help -> Gives help on using commands.");
 				sendPrivMsg(server, nick, "modules -> Lists loaded modules.");
-				sendPrivMsg(server, nick, "active -> Lists logged-in bot administrators.");
+				sendPrivMsg(server, nick, "admins -> Lists logged-in bot administrators.");
 				for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.begin(); comIter != botAdminCommands.end(); ++comIter)
 					sendPrivMsg(server, nick, comIter->first + " -> " + comIter->second[1]);
 				sendPrivMsg(server, nick, "End of command list!");
@@ -357,7 +357,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->dccSend(server + "/" + nick, "RoBoBo Admin Help");
 				dccMod->dccSend(server + "/" + nick, "help -> Gives help on using commands.");
 				dccMod->dccSend(server + "/" + nick, "modules -> Lists loaded modules.");
-				dccMod->dccSend(server + "/" + nick, "active -> Lists logged-in bot administrators.");
+				dccMod->dccSend(server + "/" + nick, "admins -> Lists logged-in bot administrators.");
 				for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.begin(); comIter != botAdminCommands.end(); ++comIter)
 					dccMod->dccSend(server + "/" + nick, comIter->first + " -> " + comIter->second[1]);
 				dccMod->dccSend(server + "/" + nick, "End of command list!");
@@ -384,17 +384,17 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 					dccMod->dccSend(server + "/" + nick, "Silly you!  You're using that!");
 				return;
 			}
-			if (splitMsg[1] == "active") {
+			if (splitMsg[1] == "admins") {
 				if (dccMod == NULL) {
-					sendPrivMsg(server, nick, "active implemented by module " + moduleName);
+					sendPrivMsg(server, nick, "admins implemented by module " + moduleName);
 					sendPrivMsg(server, nick, "Lists logged-in bot administrators.");
 					sendPrivMsg(server, nick, "This command lists the nicks and servers of all online administrators.  This command takes no arguments.");
-					sendPrivMsg(server, nick, "End of help for active");
+					sendPrivMsg(server, nick, "End of help for admins");
 				} else {
-					dccMod->dccSend(server + "/" + nick, "active implemented by module " + moduleName);
+					dccMod->dccSend(server + "/" + nick, "admins implemented by module " + moduleName);
 					dccMod->dccSend(server + "/" + nick, "Lists logged-in bot administrators.");
 					dccMod->dccSend(server + "/" + nick, "This command lists the nicks and servers of all online administrators.  This command takes no arguments.");
-					dccMod->dccSend(server + "/" + nick, "End of help for active");
+					dccMod->dccSend(server + "/" + nick, "End of help for admins");
 				}
 				return;
 			}
@@ -420,7 +420,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->dccSend(server + "/" + nick, "End of help for " + comIter->first);
 			}
 		}
-	} else if (splitMsg[0] == "active") {
+	} else if (splitMsg[0] == "admins") {
 		if (dccMod == NULL) {
 			sendPrivMsg(server, nick, "Online Bot Administrators");
 			for (unsigned int i = 0; i < admins.size(); i++) {
