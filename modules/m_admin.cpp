@@ -27,7 +27,6 @@ class Admin : public AdminMod {
 		void onDCCReceive(std::string dccid, std::string message);
 		void onDCCEnd(std::string dccid);
 		std::string getDesc();
-		std::string getHelp();
 		std::vector<std::string> supports();
 		void sendVerbose(int verboseLevel, std::string message);
 	private:
@@ -273,10 +272,6 @@ std::string Admin::getDesc() {
 	return "This module provides administration features for the bot.";
 }
 
-std::string Admin::getHelp() {
-	return "Help coming soon.";
-}
-
 std::vector<std::string> Admin::supports() {
 	std::vector<std::string> supporting;
 	supporting.push_back("DCC_CHAT");
@@ -366,7 +361,41 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->dccSend(server + "/" + nick, "End of command list!");
 			}
 		} else {
-			// give help on a module or command
+			std::string helpCommand = message.substr(5); // cut "help " off the beginning
+			if (helpCommand == "modules") {
+				if (dccMod == NULL) {
+					sendPrivMsg(server, nick, "modules implemented by module " + moduleName);
+					sendPrivMsg(server, nick, "Lists loaded modules.");
+					sendPrivMsg(server, nick, "This command lists all loaded modules and their descriptions.  This command takes no arguments.");
+					sendPrivMsg(server, nick, "End of help for modules");
+				} else {
+					dccMod->dccSend(server + "/" + nick, "modules implemented by module " + moduleName);
+					dccMod->dccSend(server + "/" + nick, "Lists loaded modules.");
+					dccMod->dccSend(server + "/" + nick, "This command lists all loaded modules and their descriptions.  This command takes no arguments.");
+					dccMod->dccSend(server + "/" + nick, "End of help for modules.");
+				}
+			}
+			std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(helpCommand);
+			if (comIter == botAdminCommands.end()) {
+				if (dccMod == NULL)
+					sendPrivMsg(server, nick, "That command does not exist.");
+				else
+					dccMod->dccSend(server + "/" + nick, "That command does not exist.");
+				return;
+			}
+			if (dccMod == NULL) {
+				sendPrivMsg(server, nick, comIter->first + " implemented by module " + comIter->second[0]);
+				sendPrivMsg(server, nick, comIter->second[1]);
+				for (unsigned int i = 2; i < comIter->second.size(); i++)
+					sendPrivMsg(server, nick, comIter->second[i]);
+				sendPrivMsg(server, nick, "End of help for " + comIter->first);
+			} else {
+				dccMod->dccSend(server + "/" + nick, comIter->first + " implemented by module " + comIter->second[0]);
+				dccMod->dccSend(server + "/" + nick, comIter->second[1]);
+				for (unsigned int i = 2; i < comIter->second.size(); i++)
+					dccMod->dccSend(server + "/" + nick, comIter->second[i]);
+				dccMod->dccSend(server + "/" + nick, "End of help for " + comIter->first);
+			}
 		}
 	} else if (splitMsg[0] == "active") {
 		// list active admins
