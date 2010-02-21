@@ -1,8 +1,7 @@
 #include "modinclude.h"
-#include "dcc_chat.h"
 #include "bot_admin.h"
 
-class Admin : public dccChat, public AdminMod {
+class Admin : public AdminMod {
 	public:
 		void onLoadComplete();
 		void onRehash();
@@ -349,7 +348,9 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			dccMod->dccSend(server + "/" + nick, "End of module list.");
 	} else if (splitMsg[0] == "help") {
 		if (splitMsg.size() == 1) {
-			// list commands
+			for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.begin(); comIter != botAdminCommands.end(); ++comIter) {
+				
+			}
 		} else {
 			// give help on a module or command
 		}
