@@ -299,6 +299,8 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				break;
 			}
 		}
+		if (loggedIn[adminNum])
+			return; // stop!
 		if (dccMod != NULL) { // just in case.  The login code for no DCC is handled in onUserMsg
 			if (splitMsg.size() == 1) {
 				dccMod->dccSend(server + "/" + nick, "Usage: " + splitMsg[0] + " <password>");
