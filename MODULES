@@ -20,7 +20,7 @@ First, you will need to make a C++ file which includes some data from the bot.
 This file should be placed in the modules/ directory.  The file should be
 included as such:
 
-#include "../robobo.h"
+#include "modinclude.h"
 
 This allows your class to extend the Module class and access other necessary
 classes.
@@ -47,17 +47,14 @@ class mod_name : public Module {
 // Look!  A module!
 };
 
-Your constructor can be unique to your module.  The Module class has an empty
-constructor with no important code in it (the important code is in a separate
-function).  However, you should at least initialize the std::string variable
-moduleName with the name of your module.
-
-Finally, you should NOT overwrite the init() function.  This function is used
-to pass important variables into the Module.
+If you wish you may write a constructor for your modules, if you wish to
+initialize class variables.  No parameters are passed to the constructor, and,
+as such, there is not access to bot functions in the constructor.  Use
+onLoadComplete() instead (see below, section 2.3).
 
 From here you have the skeleton of your module.  The rest of this document
 outlines information you may want to know such as how to receive and be able to
-parse data from IRC servers, and how to send data from IRC servers.
+parse data from IRC servers, and how to send data to IRC servers.
 
 =======================
 2. COMMUNICATING WITH A SERVER
@@ -72,8 +69,8 @@ to send messages from your module.
 
 One direction of communication is receiving data.  This is provided through
 what the bot calls "hooks."  In order to use hooks you must simply define the
-functions corresponding to the hooks you need, which are declared in the base
-Module class.
+functions corresponding to the hooks you need, which are declared as virtual in
+the base Module class.
 
 void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 	This function is called when a PRIVMSG is received through a channel.  It is not triggered on CTCP.
@@ -169,7 +166,8 @@ void onOtherData(std::string server, std::vector<std::string> parsedLine);
 
 Some hooks are defined to catch outgoing data, as well.  These hooks will be
 called when a matching line is sent, even if the hook being called belongs to
-the module that sent the line.
+the module that sent the line.  Outgoing hooks are not defined for data that is
+returned when successful (i.e. MODE, etc.).
 
 void onOutChannelMessage(std::string server, std::string target, char status, std::string message);
 	This function is called whenever the bot sends a PRIVMSG to a channel.
@@ -222,7 +220,9 @@ void onOutUserCTCPReply(std::string server, std::string target, std::string mess
 There are some other hooks, too.  When they are called depends on the hook.
 
 void onLoadComplete();
-	This function is called once all modules are loaded.  Modules will have the config and bot access loaded by this call.
+	This function is called once all modules are loaded.  Modules will have the config and bot access loaded before this call.
+void onRehash();
+	This function is called when the bot is rehashed.  Modules will have an updated config loaded before this call.
 
 =======================
 2.4. SENDING DATA TO A SERVER
