@@ -21,7 +21,7 @@ Sometime before the beta stage
 [x] - Add data queue/sending thread
 [x] - Fork to background
 [x] - Add "services provided" feature allowing modules to let other modules know what services it can provide
-[ ] - Update MODULES doc
+[x] - Update MODULES doc
 
 Sometime before release (either alpha or beta)
 ======================================
