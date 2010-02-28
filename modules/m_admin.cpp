@@ -301,7 +301,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		}
 		if (loggedIn[adminNum])
 			return; // stop!
-		if (dccMod != NULL) { // just in case.  The login code for no DCC is handled in onUserMsg
+		if (dccMod != NULL) { // the login code for no DCC is already handled in onUserMsg
 			if (splitMsg.size() == 1) {
 				dccMod->dccSend(server + "/" + nick, "Usage: " + splitMsg[0] + " <password>");
 				dccMod->unhookDCCSession(moduleName, server + "/" + nick);
@@ -399,13 +399,8 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				return;
 			}
 			std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(splitMsg[1]);
-			if (comIter == botAdminCommands.end()) {
-				if (dccMod == NULL)
-					sendPrivMsg(server, nick, "That command does not exist.");
-				else
-					dccMod->dccSend(server + "/" + nick, "That command does not exist.");
+			if (comIter == botAdminCommands.end())
 				return;
-			}
 			if (dccMod == NULL) {
 				sendPrivMsg(server, nick, comIter->first + " implemented by module " + comIter->second[0]);
 				sendPrivMsg(server, nick, comIter->second[1]);
@@ -438,13 +433,8 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		}
 	} else {
 		std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(splitMsg[0]);
-		if (comIter == botAdminCommands.end()) {
-			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "That command does not exist.");
-			else
-				dccMod->dccSend(server + "/" + nick, "That command does not exist.");
+		if (comIter == botAdminCommands.end())
 			return;
-		}
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = getModules().find(comIter->second[0]);
 		AdminHook* adminCommandModule = (AdminHook*) modIter->second;
 		adminCommandModule->onAdminCommand(server, nick, splitMsg[0], message.substr(splitMsg[0].size() + 1), dccMod, (server == admins[0]["server"] && nick == admins[0]["nick"]));
