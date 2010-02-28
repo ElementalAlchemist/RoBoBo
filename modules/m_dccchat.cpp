@@ -124,8 +124,17 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 		std::cout << "DCC " << id << ":" << receivedMsg << std::endl;
 		std::tr1::unordered_map<std::string, Module*> modules = getModules(); // get a new one each time in case it is updated
 		for (std::tr1::unordered_map<std::string, std::string>::iterator hookIter = moduleTriggers.begin(); hookIter != moduleTriggers.end(); ++hookIter) {
-			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' ')))
-				ourReportingModules->second.push_back(hookIter->second);
+			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' '))) {
+				bool alreadyReporting = false;
+				for (unsigned int i = 0; i < ourReportingModules->second.size(); i++) {
+					if (ourReportingModules->second[i] == hookIter->second) {
+						alreadyReporting = true;
+						break;
+					}
+				}
+				if (!alreadyReporting)
+					ourReportingModules->second.push_back(hookIter->second);
+			}
 		}
 		for (unsigned int i = 0; i < ourReportingModules->second.size(); i++) {
 			std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules->second[i]);
