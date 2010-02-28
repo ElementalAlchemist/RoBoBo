@@ -1,0 +1,19 @@
+RoBoBo-IRC-BoBo
+Current TODO List
+
+[ ] - not done
+[>] - in progress
+[x] - complete
+
+Beta 1
+======================================
+[ ] - Admin command modules
+[ ] - Configure
+	[ ] - Update docs
+
+Sometime before release (either alpha or beta)
+======================================
+[ ] - Clean up loop iterating, use .find(first) instead
+[ ] - Write something that adds all modules to the makefile so module authors
+		don't have to do it themselves.
+[ ] - Preincrement object iterators in loops
