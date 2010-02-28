@@ -5,23 +5,9 @@ Current TODO List
 [>] - in progress
 [x] - complete
 
-Sometime before the beta stage
+Beta 1
 ======================================
-[x] - 433 :Nick currently in use support
-[x] - DNS resolving on IRC server names
-[x] - Modules
-	[x] - Administration module
-	[x] - CTCP Reply modules
-		[x] - Version
-		[x] - Ping
-		[x] - Time
-	[x] - DCC protocol
-[x] - Enhance module abilities
-[x] - Add interface to access channel/user data
-[x] - Add data queue/sending thread
-[x] - Fork to background
-[x] - Add "services provided" feature allowing modules to let other modules know what services it can provide
-[x] - Update MODULES doc
+[ ] - Admin command modules
 
 Sometime before release (either alpha or beta)
 ======================================
