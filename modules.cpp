@@ -142,8 +142,8 @@ void Module::quitServer(std::string server, std::string reason) {
 	serverData->sendToServer(server, "QUIT :" + reason);
 }
 
-void Module::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf) {
-	serverData->loadModule(modName, modConf, false);
+bool Module::loadModule(std::string modName) {
+	return serverData->loadModule(modName, false);
 }
 
 void Module::unloadModule(std::string modName) {

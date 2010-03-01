@@ -6,8 +6,13 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); modConfIter++)
-		loadModule(modConfIter->first, modConfIter->second, true);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter) {
+		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
+		if (loadModule(modConfIter->first, true))
+			std::cout << "Module " << modConfIter->first << " loaded successfully." << std::endl;
+		else
+			std::cout << "Module " << modConfIter->first << " failed to load." << std::endl;
+	}
 	std::vector<std::string> abilities;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++) {
 		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
@@ -18,7 +23,6 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); servConfIter++)
 		connectServer(servConfIter->first, servConfIter->second);
 	
-	moduleConfigs = moduleConf;
 	moduleConf = config.getModConfig(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
@@ -336,13 +340,16 @@ void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_
 	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, serverConf, this)));
 }
 
-void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, bool startup) {
+bool ModuleInterface::loadModule(std::string modName, bool startup) {
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConf = moduleConfigs.find(modName);
+	if (modConf == moduleConfigs.end())
+		return false;
 	std::string fileLoc = directory + "/modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
 		std::string error = "Could not load module " + modName + ": " + dlerror();
 		std::perror(error.c_str());
-		return;
+		return false;
 	}
 	char* dlsymError;
 	typedef void* (*module_spawn_t)();
@@ -351,15 +358,16 @@ void ModuleInterface::loadModule(std::string modName, std::tr1::unordered_map<st
 	if (dlsymError) {
 		std::string error = "Could not load module " + modName + ": " + dlsymError;
 		std::perror(error.c_str());
-		return;
+		return false;
 	}
 	
 	Module* newModule = (Module*)spawnModule();
-	newModule->init(modConf, this, modName);
+	newModule->init(modConf->second, this, modName);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));
 	if (!startup)
 		newModule->onLoadComplete();
+	return true;
 }
 
 void ModuleInterface::unloadModule(std::string modName) {

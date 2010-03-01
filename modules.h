@@ -60,7 +60,7 @@ class Module {
 		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
 		void connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf);
 		void quitServer(std::string server, std::string reason);
-		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf);
+		bool loadModule(std::string modName);
 		void unloadModule(std::string modName);
 		void rehashBot();
 		unsigned int getBotVersion();
@@ -98,7 +98,7 @@ class ModuleInterface {
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 		void rehash();
 		void connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf);
-		void loadModule(std::string modName, std::tr1::unordered_map<std::string, std::string> modConf, bool startup);
+		bool loadModule(std::string modName, bool startup);
 		void unloadModule(std::string modName);
 		void removeServer(std::string server);
 	private:
