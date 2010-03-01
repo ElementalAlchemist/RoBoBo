@@ -15,11 +15,12 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	}
 	std::vector<std::string> abilities;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++) {
-		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
 		abilities = modIter->second->getAbilities();
 		for (unsigned int i = 0; i < abilities.size(); i++)
 			modAbilities.insert(std::pair<std::string, std::string> (abilities[i], modIter->first));
 	}
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
+		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); servConfIter++)
 		connectServer(servConfIter->first, servConfIter->second);
 	
