@@ -12,6 +12,7 @@ Beta 1
 	[ ] - Update docs
 [ ] - closedcc command to allow closing of DCC from bot end
 [ ] - Make bot detect when connection is severed
+[ ] - Move addition to map of known bot abilities to loadModule
 
 Sometime before release (either alpha or beta)
 ======================================
