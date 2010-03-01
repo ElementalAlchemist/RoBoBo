@@ -13,7 +13,6 @@ class Module {
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
 		virtual void onLoadComplete();
 		virtual void onRehash();
-		virtual std::vector<std::string> getAbilities();
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);
 		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -45,6 +44,7 @@ class Module {
 		virtual void onOutUserCTCPReply(std::string server, std::string target, std::string message);
 		
 		virtual std::string getDesc();
+		virtual std::vector<std::string> getAbilities();
 		virtual std::vector<std::string> supports();
 	protected:
 		std::string moduleName;
