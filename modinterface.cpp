@@ -327,12 +327,9 @@ void ModuleInterface::rehash() {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConf.begin(); modIter != moduleConf.end(); ++modIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modIter->first, modIter->second));
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConfigs.begin(); modIter != moduleConfigs.end(); ++modIter) {
-		std::tr1::unordered_map<std::string, Module*>::iterator module = modules.find(modIter->first);
-		if (module != modules.end()) {
-			module->second->reconf(modIter->second);
-			module->second->onRehash();
-		}
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter) {
+		modIter->second->reconf(modIter->second);
+		modIter->second->onRehash();
 	}
 }
 
