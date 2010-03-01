@@ -10,6 +10,8 @@ Beta 1
 [ ] - Admin command modules
 [ ] - Configure
 	[ ] - Update docs
+[ ] - closedcc command to allow closing of DCC from bot end
+[ ] - Make bot detect when connection is severed
 
 Sometime before release (either alpha or beta)
 ======================================
