@@ -1,8 +1,6 @@
 #include "connection.h"
-#include "user.cpp"
+//#include "user.cpp"
 
-#ifndef CHANNEL_CPP
-#define CHANNEL_CPP
 Channel::Channel(Server* thisServer) {
 	parentServer = thisServer;
 	topic = "";
@@ -85,4 +83,3 @@ char Channel::getStatus(std::string user) {
 std::string Channel::getTopic() {
 	return topic;
 }
-#endif

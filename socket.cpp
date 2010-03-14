@@ -1,21 +1,5 @@
 #include "socket.h"
 
-#ifndef SOCKET_CPP
-#define SOCKET_CPP
-class Socket {
-	public:
-		Socket();
-		~Socket();
-		void connectServer(std::string address, unsigned short port);
-		bool sendData(std::string message);
-		std::string receive();
-		void closeConnection();
-		bool isConnected();
-	private:
-		int socketfd;
-		sockaddr_in socketAddr;
-		bool connected;
-};
 
 Socket::Socket() {
 	socketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -83,4 +67,3 @@ std::string Socket::receive() {
 	}
 	return "";
 }
-#endif

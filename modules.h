@@ -1,10 +1,12 @@
+#ifndef MODULES_H
+#define MODULES_H
 #include "main.h"
-#include "config.cpp"
+#include "config.h"
 #include <dlfcn.h>
 #include <map>
 
-#ifndef MODULES_H
-#define MODULES_H
+class ModuleInterface; // Forward declaration
+class Server; // Forward declaration
 class Module {
 	public:
 		Module();

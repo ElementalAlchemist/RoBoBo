@@ -1,8 +1,7 @@
 #include "connection.h"
-#include "channel.cpp"
+#include "modules.h"
+//#include "channel.cpp"
 
-#ifndef SERVER_CPP
-#define SERVER_CPP
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	serverName = serverAddress;
@@ -431,4 +430,3 @@ std::vector<std::string> Server::separateBySpace(std::string joinedLine) {
 std::string Server::separateNickFromFullHostmask(std::string hostmask) {
 	return hostmask.substr(0, hostmask.find_first_of('!'));
 }
-#endif

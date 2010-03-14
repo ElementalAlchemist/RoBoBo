@@ -1,7 +1,6 @@
 #include "modules.h"
+#include "connection.h"
 
-#ifndef MODINTERFACE_CPP
-#define MODINTERFACE_CPP
 ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
@@ -436,4 +435,3 @@ std::pair<char, char> ModuleInterface::getUserStatus(std::string server, std::st
 	}
 	return std::pair<char, char> ('0', ' '); // if we're here return the pair for a statusless user
 }
-#endif

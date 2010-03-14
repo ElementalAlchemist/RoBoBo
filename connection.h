@@ -1,15 +1,17 @@
+#ifndef CONNECTION_H
+#define CONNECTION_H
 #include "main.h"
-#include "socket.cpp"
+#include "socket.h"
 
 #include <map>
 #include <sstream>
 #include <queue>
 #include <time.h>
 
-#ifndef CONNECTION_H
-#define CONNECTION_H
+// Forward declarations
 class Server;
 class Channel;
+class ModuleInterface;
 
 class User {
 	public:

@@ -1,7 +1,5 @@
 #include "modules.h"
 
-#ifndef MODBASE_CPP
-#define MODBASE_CPP
 Module::Module() {}
 
 Module::~Module() {}
@@ -222,4 +220,3 @@ std::list<std::string> Module::getChannelUsers(std::string server, std::string c
 std::pair<char, char> Module::getUserStatus(std::string server, std::string channel, std::string user) {
 	return serverData->getUserStatus(server, channel, user);
 }
-#endif

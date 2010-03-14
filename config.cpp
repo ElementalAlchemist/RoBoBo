@@ -1,18 +1,5 @@
 #include "config.h"
 
-#ifndef CONFIG_CPP
-#define CONFIG_CPP
-class ConfigReader {
-	public:
-		ConfigReader(std::string filename, std::string filedir);
-		void readConfig(std::string filename, std::string filedir);
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getServerConfig();
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > getModConfig(bool loading);
-	private:
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfig;
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modLoadConfig;
-		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > modKeepConfig;
-};
 
 ConfigReader::ConfigReader(std::string filename, std::string filedir) {
 	readConfig(filename, filedir);
@@ -176,4 +163,3 @@ std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::s
 		return modLoadConfig;
 	return modKeepConfig;
 }
-#endif
