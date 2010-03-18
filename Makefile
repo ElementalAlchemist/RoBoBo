@@ -7,7 +7,7 @@ SOURCES=modinterface.cpp server.cpp channel.cpp config.cpp modules.cpp server.cp
 default: makedepend robobo modules
 
 makedepend:
-	for i in *.cpp; do for inc in  $(awk '/^#include "/ {print $2}' $i | sed 's/"//g'); do echo "${i%.cpp}.o: $inc"; done; done > include.mk
+	for i in *.cpp; do for inc in  $(awk '/^#include "/ {print $2}' $i | sed 's/"//g'); do echo "${i%.cpp}.o: $inc"; done; done
  
 debug:
 	DEBUG="-g -O0" make -C .
@@ -23,5 +23,3 @@ clean:
 	make -C modules/ clean
 	rm -f robobo
 	rm -f $(SOURCES:.cpp=.o)
-
-include include.mk
