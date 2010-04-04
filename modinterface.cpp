@@ -395,6 +395,8 @@ void* ModuleInterface::processModUnloadQueue(void* ptr) {
 				modi->moduleFiles.erase(modFileIter);
 				modi->unloadingModules.erase(modi->unloadingModules.begin());
 			}
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modi->modules.begin(); modIter != modi->modules.end(); ++modIter)
+				modIter->second->onRehash(); // provide modules with a way to detect unloading
 		}
 	}
 	return NULL;
