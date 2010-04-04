@@ -117,5 +117,6 @@ class ModuleInterface {
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);
 		std::vector<std::string> unloadingModules;
+		pthread_t modunloadqueue;
 };
 #endif

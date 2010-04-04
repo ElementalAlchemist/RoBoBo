@@ -26,6 +26,7 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	moduleConf = config.getModConfig(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
+	pthread_create(&modunloadqueue, NULL, processModUnloadQueue, this);
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
@@ -379,7 +380,7 @@ void* ModuleInterface::processModUnloadQueue(void* ptr) {
 	int ttw = 30; // time to wait
 	while (true) {
 		sleep(ttw);
-		ttw = 15;
+		ttw = 10;
 		if (!modi->unloadingModules.empty()) {
 			ttw = 5;
 			while (modi->unloadingModules.size() > 0) {
