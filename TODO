@@ -7,7 +7,7 @@ Current TODO List
 
 Beta 1
 ======================================
-[ ] - Fix unloadModule crash
+[x] - Fix unloadModule crash
 [ ] - Admin command modules
 [ ] - Configure
 	[ ] - Update docs
