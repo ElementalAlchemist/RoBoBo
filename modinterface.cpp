@@ -379,7 +379,7 @@ void* ModuleInterface::processModUnloadQueue(void* ptr) {
 	int ttw = 30; // time to wait
 	while (true) {
 		sleep(ttw);
-		ttw = 10;
+		ttw = 15;
 		if (!modi->unloadingModules.empty()) {
 			ttw = 5;
 			while (modi->unloadingModules.size() > 0) {
