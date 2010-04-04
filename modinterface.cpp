@@ -371,14 +371,33 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 }
 
 void ModuleInterface::unloadModule(std::string modName) {
-	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(modName);
-	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modName);
-	if (modIter == modules.end())
-		return;
-	delete modIter->second;
-	modules.erase(modIter);
-	dlclose(modFileIter->second);
-	moduleFiles.erase(modFileIter);
+	unloadingModules.push_back(modName);
+}
+
+void* ModuleInterface::processModUnloadQueue(void* ptr) {
+	ModuleInterface* modi = (ModuleInterface*) ptr;
+	int ttw = 30; // time to wait
+	while (true) {
+		sleep(ttw);
+		ttw = 10;
+		if (!modi->unloadingModules.empty()) {
+			ttw = 5;
+			while (modi->unloadingModules.size() > 0) {
+				std::tr1::unordered_map<std::string, Module*>::iterator modIter = modi->modules.find(modi->unloadingModules[0]);
+				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = modi->moduleFiles.find(modi->unloadingModules[0]);
+				if (modIter == modi->modules.end()) {
+					modi->unloadingModules.erase(modi->unloadingModules.begin());
+					continue;
+				}
+				delete modIter->second;
+				modi->modules.erase(modIter);
+				dlclose(modFileIter->second);
+				modi->moduleFiles.erase(modFileIter);
+				modi->unloadingModules.erase(modi->unloadingModules.begin());
+			}
+		}
+	}
+	return NULL;
 }
 
 void ModuleInterface::removeServer(std::string server) {

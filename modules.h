@@ -102,6 +102,7 @@ class ModuleInterface {
 		void connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf);
 		bool loadModule(std::string modName, bool startup);
 		void unloadModule(std::string modName);
+		static void* processModUnloadQueue(void* ptr);
 		void removeServer(std::string server);
 	private:
 		std::tr1::unordered_map<std::string, Server*> servers;
@@ -115,5 +116,6 @@ class ModuleInterface {
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);
+		std::vector<std::string> unloadingModules;
 };
 #endif
