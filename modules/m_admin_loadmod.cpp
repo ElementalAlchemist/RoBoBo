@@ -42,6 +42,13 @@ std::vector<std::vector<std::string> > LoadModCommand::adminCommands() {
 }
 
 void LoadModCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (message == "") {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "Usage: loadmod <modulename>");
+		else
+			dccMod->dccSend(server + "/" + nick, "Usage: loadmod <modulename>");
+		return;
+	}
 	if (loadModule(message)) {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Module " + message + " loaded successfully.");
