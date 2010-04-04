@@ -9,8 +9,8 @@ Beta 1
 ======================================
 [x] - Fix unloadModule crash
 [ ] - Admin command modules
-[ ] - Configure
-	[ ] - Update docs
+[ ] - Configure (integrate into make?)
+	[ ] - Update docs (if applicable)
 [ ] - closedcc command to allow closing of DCC from bot end
 [ ] - Make bot detect when connection is severed
 [ ] - Move addition to map of known bot abilities to loadModule
