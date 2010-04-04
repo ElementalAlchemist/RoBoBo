@@ -5,7 +5,7 @@ DEPS=modinclude.h ../main.h ../connection.h ../modules.h ../config.cpp ../module
  
 all: modules
  
-modules: m_ctcppingreply.so m_ctcpversionreply.so m_ctcptimereply.so m_dccchat.so m_admin.so m_admin_loadmod.so
+modules: m_ctcppingreply.so m_ctcpversionreply.so m_ctcptimereply.so m_dccchat.so m_admin.so m_admin_loadmod.so m_admin_unloadmod.so
  
 m_ctcppingreply.so: m_ctcppingreply.o
 	$(CXX) $(LDFLAGS) $^ -o $@
@@ -19,6 +19,8 @@ m_admin.so: m_admin.o
 	$(CXX) $(LDFLAGS) $^ -o $@
 m_admin_loadmod.so: m_admin_loadmod.o
 	$(CXX) $(LDFLAGS) $^ -o $@
+m_admin_unloadmod.so: m_admin_unloadmod.o
+	$(CXX) $(LDFLAGS) $^ -o $@
  
 # Check for dependencies and recompile if required
 # Implicitly takes the cpp as a dependency
@@ -29,6 +31,7 @@ m_ctcptimereply.o: $(DEPS)
 m_dccchat.o: $(DEPS)
 m_admin.o: $(DEPS)
 m_admin_loadmod.o: $(DEPS)
+m_admin_unloadmod.o: $(DEPS)
  
 .PHONY: clean
  
