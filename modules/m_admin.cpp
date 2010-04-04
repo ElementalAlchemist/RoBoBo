@@ -437,7 +437,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			return;
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = getModules().find(comIter->second[0]);
 		AdminHook* adminCommandModule = (AdminHook*) modIter->second;
-		adminCommandModule->onAdminCommand(server, nick, splitMsg[0], message.substr(splitMsg[0].size() + 1), dccMod, (server == admins[0]["server"] && nick == admins[0]["nick"]));
+		adminCommandModule->onAdminCommand(server, nick, splitMsg[0], (message.size() > splitMsg[0].size()) ? message.substr(splitMsg[0].size() + 1) : "", dccMod, (server == admins[0]["server"] && nick == admins[0]["nick"]));
 	}
 }
 
