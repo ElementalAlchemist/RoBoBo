@@ -9,6 +9,7 @@ Beta 1
 ======================================
 [x] - Fix unloadModule crash
 [ ] - Admin command modules
+	[ ] - Default conf
 [ ] - Configure (integrate into make?)
 	[ ] - Update docs (if applicable)
 [ ] - closedcc command to allow closing of DCC from bot end
