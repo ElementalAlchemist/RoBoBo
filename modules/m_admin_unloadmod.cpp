@@ -69,6 +69,10 @@ void UnloadModuleCommand::onAdminCommand(std::string server, std::string nick, s
 		return;
 	}
 	unloadModule(message);
+	if (dccMod == NULL)
+		sendPrivMsg(server, nick, "Unloading module " + message);
+	else
+		dccMod->dccSend(server + "/" + nick, "Unloading module " + message);
 }
 
 extern "C" Module* spawn() {
