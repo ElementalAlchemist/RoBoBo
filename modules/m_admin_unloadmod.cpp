@@ -15,7 +15,7 @@ void UnloadModuleCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for m_admin_loadmod.  Unloading." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
 	}
 }
@@ -24,7 +24,7 @@ void UnloadModuleCommand::onRehash() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for m_admin_loadmod.  Unloading." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
 	}
 }
