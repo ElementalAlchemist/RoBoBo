@@ -1,6 +1,5 @@
 #include "config.h"
 
-
 ConfigReader::ConfigReader(std::string filename, std::string filedir) {
 	readConfig(filename, filedir);
 }
@@ -75,6 +74,8 @@ void ConfigReader::readConfig(std::string filename, std::string filedir) {
 			typingSection = true;
 			if (sectionType == "server")
 				serverConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
+			else if (sectionType == "serverconf")
+				serverKeepConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
 			else if (sectionType == "module")
 				modLoadConfig.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (sectionName, oneBlock));
 			else if (sectionType == "moduleconf")
@@ -154,8 +155,10 @@ void ConfigReader::readConfig(std::string filename, std::string filedir) {
 		readConfig(includes[i], filedir);
 }
 
-std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig() {
-	return serverConfig;
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig(bool connecting) {
+	if (connecting)
+		return serverConfig;
+	return serverKeepConfig;
 }
 
 std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getModConfig(bool loading) {

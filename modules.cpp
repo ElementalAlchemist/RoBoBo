@@ -132,8 +132,8 @@ void Module::sendOtherCommand(std::string server, std::string command, std::stri
 	serverData->sendToServer(server, command + " " + data);
 }
 
-void Module::connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf) {
-	serverData->connectServer(server, serverConf);
+bool Module::connectServer(std::string server) {
+	return serverData->connectServer(server);
 }
 
 void Module::quitServer(std::string server, std::string reason) {

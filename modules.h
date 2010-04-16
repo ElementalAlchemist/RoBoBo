@@ -60,7 +60,7 @@ class Module {
 		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
 		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
 		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
-		void connectServer(std::string server, std::tr1::unordered_map<std::string, std::string> serverConf);
+		bool connectServer(std::string server);
 		void quitServer(std::string server, std::string reason);
 		bool loadModule(std::string modName);
 		void unloadModule(std::string modName);
@@ -99,7 +99,7 @@ class ModuleInterface {
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 		void rehash();
-		void connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf);
+		bool connectServer(std::string serverName);
 		bool loadModule(std::string modName, bool startup);
 		void unloadModule(std::string modName);
 		static void* processModUnloadQueue(void* ptr);
@@ -108,6 +108,7 @@ class ModuleInterface {
 		std::tr1::unordered_map<std::string, Server*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
 		std::tr1::unordered_map<std::string, void*> moduleFiles;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfigs;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConfigs;
 		std::multimap<std::string, std::string> modAbilities;
 		unsigned short debugLevel;

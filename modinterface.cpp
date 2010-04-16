@@ -3,7 +3,7 @@
 
 ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
 	ConfigReader config (confname, confdir);
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig(true);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter) {
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
@@ -12,6 +12,7 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 		else
 			std::cout << "Module " << modConfIter->first << " failed to load." << std::endl;
 	}
+	
 	std::vector<std::string> abilities;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++) {
 		abilities = modIter->second->getAbilities();
@@ -20,12 +21,17 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	}
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
 		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); servConfIter++)
-		connectServer(servConfIter->first, servConfIter->second);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); ++servConfIter) {
+		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servConfIter->first, servConfIter->second));
+		connectServer(servConfIter->first);
+	}
 	
 	moduleConf = config.getModConfig(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
+	serverConf = config.getServerConfig(false);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); ++servConfIter)
+		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servConfIter->first, servConfIter->second));
 	pthread_create(&modunloadqueue, NULL, processModUnloadQueue, this);
 }
 
@@ -318,11 +324,11 @@ bool ModuleInterface::isChanType(char chanPrefix) {
 
 void ModuleInterface::rehash() {
 	ConfigReader config (configName, directory);
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig();
-	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servIter = serverConf.begin(); servIter != serverConf.end(); ++servIter) {
-		if (servers.find(servIter->first) == servers.end())
-			connectServer(servIter->first, servIter->second);
-	}
+	serverConfigs.clear();
+	serverConfigs = config.getServerConfig(true);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig(false);
+	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servIter = serverConf.begin(); servIter != serverConf.end(); ++servIter)
+		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servIter->first, servIter->second));
 	moduleConfigs.clear();
 	moduleConfigs = config.getModConfig(true);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(false);
@@ -337,8 +343,12 @@ void ModuleInterface::rehash() {
 	}
 }
 
-void ModuleInterface::connectServer(std::string serverName, std::tr1::unordered_map<std::string, std::string> serverConf) {
-	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, serverConf, this)));
+bool ModuleInterface::connectServer(std::string serverName) {
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConfigs.find(serverName);
+	if (servConfIter == serverConfigs.end())
+		return false;
+	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, servConfIter->second, this)));
+	return true;
 }
 
 bool ModuleInterface::loadModule(std::string modName, bool startup) {
