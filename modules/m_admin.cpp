@@ -349,6 +349,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				sendPrivMsg(server, nick, "RoBoBo Admin Help");
 				sendPrivMsg(server, nick, "help -> Gives help on using commands.");
 				sendPrivMsg(server, nick, "modules -> Lists loaded modules.");
+				sendPrivMsg(server, nick, "servers -> Lists connected servers.");
 				sendPrivMsg(server, nick, "admins -> Lists logged-in bot administrators.");
 				for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.begin(); comIter != botAdminCommands.end(); ++comIter)
 					sendPrivMsg(server, nick, comIter->first + " -> " + comIter->second[1]);
@@ -357,6 +358,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->dccSend(server + "/" + nick, "RoBoBo Admin Help");
 				dccMod->dccSend(server + "/" + nick, "help -> Gives help on using commands.");
 				dccMod->dccSend(server + "/" + nick, "modules -> Lists loaded modules.");
+				dccMod->dccSend(server + "/" + nick, "servers -> Lists connected servers.");
 				dccMod->dccSend(server + "/" + nick, "admins -> Lists logged-in bot administrators.");
 				for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.begin(); comIter != botAdminCommands.end(); ++comIter)
 					dccMod->dccSend(server + "/" + nick, comIter->first + " -> " + comIter->second[1]);
@@ -398,6 +400,20 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				}
 				return;
 			}
+			if (splitMsg[1] == "servers") {
+				if (dccMod == NULL) {
+					sendPrivMsg(server, nick, "servers implemented by module " + moduleName);
+					sendPrivMsg(server, nick, "Lists servers to which bot is connected.");
+					sendPrivMsg(server, nick, "This command lists all of the IRC servers to which this bot is connected.  This command takes no arguments.");
+					sendPrivMsg(server, nick, "End of help for servers");
+				} else {
+					dccMod->dccSend(server + "/" + nick, "servers implemented by module " + moduleName);
+					dccMod->dccSend(server + "/" + nick, "Lists servers to which bot is connected.");
+					dccMod->dccSend(server + "/" + nick, "This command lists all of the IRC servers to which this bot is connected.  This command takes no arguments.");
+					dccMod->dccSend(server + "/" + nick, "End of help for servers");
+				}
+				return;
+			}
 			std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(splitMsg[1]);
 			if (comIter == botAdminCommands.end())
 				return;
@@ -430,6 +446,19 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 					dccMod->dccSend(server + "/" + nick, admins[i]["nick"] + ", using server " + admins[i]["server"]);
 			}
 			dccMod->dccSend(server + "/" + nick, "End of online admin list.");
+		}
+	} else if (splitMsg[0] == "servers") {
+		std::list<std::string> serverList = getServers();
+		if (dccMod == NULL) {
+			sendPrivMsg(server, nick, "Connected Servers");
+			for (std::list<std::string>::iterator servIter = serverList.begin(); servIter != serverList.end(); ++servIter)
+				sendPrivMsg(server, nick, *servIter);
+			sendPrivMsg(server, nick, "End of server list.");
+		} else {
+			dccMod->dccSend(server + "/" + nick, "Connected Servers");
+			for (std::list<std::string>::iterator servIter = serverList.begin(); servIter != serverList.end(); ++servIter)
+				dccMod->dccSend(server + "/" + nick, *servIter);
+			dccMod->dccSend(server + "/" + nick, "End of server list.");
 		}
 	} else {
 		std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.find(splitMsg[0]);
