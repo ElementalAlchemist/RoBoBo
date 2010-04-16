@@ -36,6 +36,18 @@ module m_ctcptimereply.so {} # This module replies to CTCP TIME requests sent to
 
 module m_dccchat.so {} # This module allows the bot to accept DCC chat requests and open a DCC chat session.  There are no configurable options.
 
-module m_admin.so { # This module allows for administration of the bot.
-	# Options coming soon.
+module m_admin.so {
+	# Admins start with 0.  The module considers admin #0 as the bot master.
+	0/server = "irc.freenode.net"; # server name must be the same as the name of the server block (server name {...})
+	0/nick = "ElementAlchemist"; # your IRC nick
+	0/password = "password"; # the admin password you will use for the bot
+	0/verbose = "1"; # be verbose about what's happening with the bot with this admin?  DCC only.
 }
+
+module m_admin_loadmod.so {}
+
+module m_admin_unloadmod.so {}
+
+module m_admin_rehash.so {}
+
+module m_admin_say.so {}
