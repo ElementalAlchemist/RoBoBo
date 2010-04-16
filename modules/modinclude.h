@@ -8,5 +8,4 @@ class ModuleInterface; // forward-declare so it can be used in modules and serve
 #include "../modules.h"
 #include "../config.h"
 #include "../modules.h"
-//#include "../modinterface.cpp"
 #endif
