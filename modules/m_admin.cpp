@@ -1,5 +1,6 @@
 #include "modinclude.h"
 #include "bot_admin.h"
+#include <algorithm>
 
 class Admin : public AdminMod {
 	public:
@@ -291,6 +292,7 @@ bool Admin::isValidVerboseLevel(std::string verboseLevel) {
 
 void Admin::handleDCCMessage(std::string server, std::string nick, std::string message) {
 	std::vector<std::string> splitMsg = splitBySpace(message);
+	std::transform(splitMsg[0].begin(), splitMsg[0].end(), splitMsg[0].begin(), ::tolower);
 	if (splitMsg[0] == "login" || splitMsg[0] == "admin") {
 		int adminNum = -1;
 		for (unsigned int i = 0; i < admins.size(); i++) {
@@ -365,6 +367,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				dccMod->dccSend(server + "/" + nick, "End of command list!");
 			}
 		} else {
+			std::transform(splitMsg[1].begin(), splitMsg[1].end(), splitMsg[1].begin(), ::tolower);
 			if (splitMsg[1] == "modules") {
 				if (dccMod == NULL) {
 					sendPrivMsg(server, nick, "modules implemented by module " + moduleName);
