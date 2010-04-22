@@ -53,6 +53,8 @@ std::vector<std::vector<std::string> > LoadModCommand::adminCommands() {
 }
 
 void LoadModCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (!master) // masters only!
+		return;
 	if (message == "") {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Usage: loadmod <modulename>");
