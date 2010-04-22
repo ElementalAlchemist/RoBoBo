@@ -49,11 +49,13 @@ std::vector<std::vector<std::string> > ConnectServerCommand::adminCommands() {
 	connectCommand.push_back("Syntax: connect <server>");
 	connectCommand.push_back("When this command is issued, the bot will connect to the server specified.  The server parameter must be the server's address.");
 	connectCommand.push_back("There must be connection information in the configuration file in order for the bot to connect to the server.  If it's not, put it in the configuration and rehash the bot (requires a rehash module to be loaded), then try to connect.");
+	connectCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(connectCommand);
 	quitCommand.push_back("quit");
 	quitCommand.push_back("Makes the bot quit a server.");
 	quitCommand.push_back("Syntax: quit <server> <reason>");
 	quitCommand.push_back("When this command is issued, the bot will quit the server specified.  The server parameter must be the server address that was used to connect.");
+	quitCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(quitCommand);
 	disconnectCommand.push_back("disconnect");
 	disconnectCommand.push_back("Makes the bot disconnect from a server.");
@@ -64,8 +66,13 @@ std::vector<std::vector<std::string> > ConnectServerCommand::adminCommands() {
 }
 
 void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
-	if (!master) // masters only
+	if (!master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "This command is available only to the bot master.");
+		else
+			dccMod->dccSend(server + "/" + nick, "This command is available only to the bot master.");
 		return;
+	}
 	if (command == "connect") {
 		if (message.substr(0, message.find_first_of(' ')) != message) {
 			if (dccMod == NULL)

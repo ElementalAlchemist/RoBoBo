@@ -48,13 +48,19 @@ std::vector<std::vector<std::string> > LoadModCommand::adminCommands() {
 	aCommand.push_back("Syntax: loadmod <modulename>"); // help
 	aCommand.push_back("Example: loadmod m_admin.so");
 	aCommand.push_back("Loads the specified module if it exists and isn't already loaded.");
+	aCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(aCommand);
 	return theCommands;
 }
 
 void LoadModCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
-	if (!master) // masters only!
+	if (!master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "You must be the bot master to use this command.");
+		else
+			dccMod->dccSend(server + "/" + nick, "You must be the bot master to use this command.");
 		return;
+	}
 	if (message == "") {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Usage: loadmod <modulename>");

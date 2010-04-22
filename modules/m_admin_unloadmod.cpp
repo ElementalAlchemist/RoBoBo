@@ -47,11 +47,19 @@ std::vector<std::vector<std::string> > UnloadModuleCommand::adminCommands() {
 	aCommand.push_back("Syntax: unloadmod <module>");
 	aCommand.push_back("Example: unloadmod m_admin.so");
 	aCommand.push_back("This module unloads the module specified in the command parameter.");
+	aCommand.push_back("This module is available only to bot masters.");
 	theCommands.push_back(aCommand);
 	return theCommands;
 }
 
 void UnloadModuleCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (!master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "This module is available only to the bot master.");
+		else
+			sendPrivMsg(server, nick, "This module is available only to the bot master.");
+		return;
+	}
 	if (message == "") {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Usage: unloadmod <module>");

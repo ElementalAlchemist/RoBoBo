@@ -47,11 +47,19 @@ std::vector<std::vector<std::string> > RehashCommand::adminCommands() {
 	aCommand.push_back("Syntax: rehash");
 	aCommand.push_back("This command requires no parameters.");
 	aCommand.push_back("This command causes the bot to reread the configuration file and pass the changes on to the modules.");
+	aCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(aCommand);
 	return theCommands;
 }
 
 void RehashCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (!master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "This command is available only to the bot master.");
+		else
+			dccMod->dccSend(server + "/" + nick, "This command is available only to the bot master.");
+		return;
+	}
 	rehashBot();
 	if (dccMod == NULL)
 		sendPrivMsg(server, nick, "Bot rehashed.");
