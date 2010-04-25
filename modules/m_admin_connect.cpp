@@ -97,9 +97,9 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, 
 	std::string quitServerName = message.substr(0, message.find_first_of(' '));
 	std::string quitReason = message.substr(message.find_first_of(' ') + 1);
 	if (dccMod == NULL)
-		sendPrivMsg(server, nick, "Quitting server " + quitServerName + " with reason " + reason);
+		sendPrivMsg(server, nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	else
-		dccMod->dccSend(server + "/" + nick, "Quitting server " + quitServerName + " with reason " + reason);
+		dccMod->dccSend(server + "/" + nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	quitServer(quitServerName, quitReason);
 }
 
