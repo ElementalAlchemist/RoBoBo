@@ -21,8 +21,16 @@ server irc.example.com {
 	# These channels should be in an IRC-friendly format; that is, they will
 	# be sent as they appear here immediately after the JOIN command in IRC.
 	channels = "#robobo";
+}
 
-	# This will eventually support more stuff.
+serverconf irc.server.net { # This server will not be connected on startup, but its configuration will be saved so that it can be connected to later
+	port = "6667";
+	nick = "RoBoBo";
+	altnick = nick + "_";
+	ident = nick;
+	gecos = "RoBoBo-IRC-BoBo IRC Bot";
+	# password = "";
+	# channels = "";
 }
 
 module m_ctcpversionreply.so { # This module replies to CTCP VERSION requests sent to the bot.
@@ -51,3 +59,10 @@ module m_admin_unloadmod.so {}
 module m_admin_rehash.so {}
 
 module m_admin_say.so {}
+
+module m_admin_channels.so {}
+
+module m_admin_connect.so {}
+
+moduleconf m_admin_raw.so {} # This module is not loaded on start but can be loaded while the bot is running
+# You should not load m_admin_raw unless you know the IRC protocol.

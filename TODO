@@ -8,8 +8,8 @@ Current TODO List
 Beta 1
 ======================================
 [x] - Fix unloadModule crash
-[ ] - Admin command modules
-	[ ] - Default conf
+[x] - Admin command modules
+	[x] - Default conf
 [ ] - Events verbose to admins (level 2)
 [ ] - Configure (integrate into make?)
 	[ ] - Update docs (if applicable)
