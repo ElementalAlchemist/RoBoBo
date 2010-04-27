@@ -122,6 +122,10 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 			break;
 		std::string receivedMsg = listenSocket->receive();
 		std::cout << "DCC " << id << ":" << receivedMsg << std::endl;
+		if (receivedMsg == "closedcc") {
+			dccSend(id, "Disconnecting DCC...");
+			break;
+		}
 		std::tr1::unordered_map<std::string, Module*> modules = getModules(); // get a new one each time in case it is updated
 		for (std::tr1::unordered_map<std::string, std::string>::iterator hookIter = moduleTriggers.begin(); hookIter != moduleTriggers.end(); ++hookIter) {
 			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' '))) {
