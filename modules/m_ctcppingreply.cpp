@@ -8,13 +8,21 @@ class PingReply : public Module {
 };
 
 void PingReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	if (splitBySpace(message)[0] == "PING")
-		sendCTCPReply(server, nick, "PING", message.substr(message.find_first_of(' ')));
+	if (splitBySpace(message)[0] == "PING") {
+		if (message.size() > 4)
+			sendCTCPReply(server, nick, "PING", message.substr(message.find_first_of(' ')));
+		else
+			sendCTCPReply(server, nick, "PING", "");
+	}
 }
 
 void PingReply::onUserCTCP(std::string server, std::string nick, std::string message) {
-	if (splitBySpace(message)[0] == "PING")
-		sendCTCPReply(server, nick, "PING", message.substr(message.find_first_of(' ')));
+	if (splitBySpace(message)[0] == "PING") {
+		if (message.size() > 4)
+			sendCTCPReply(server, nick, "PING", message.substr(message.find_first_of(' ')));
+		else
+			sendCTCPReply(server, nick, "PING", "");
+	}
 }
 
 std::string PingReply::getDesc() {
