@@ -1,6 +1,5 @@
 #include "connection.h"
 #include "modules.h"
-//#include "channel.cpp"
 
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
