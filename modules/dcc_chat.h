@@ -11,6 +11,8 @@ class dccSender : public Module {
 		virtual void dccSend(std::string dccid, std::string message);
 		virtual bool hookDCCMessage(std::string modName, std::string hookMsg);
 		virtual void unhookDCCSession(std::string modName, std::string dccid);
+		virtual std::vector<std::string> getConnections();
+		virtual void closeDCCConnection(std::string dccid);
 };
 
 dccChat::~dccChat() {}
