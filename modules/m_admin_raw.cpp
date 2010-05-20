@@ -3,6 +3,7 @@
 
 class RawCommand : public AdminHook {
 	public:
+		int botAPIversion();
 		void onLoadComplete();
 		void onRehash();
 		std::string getDesc();
@@ -10,6 +11,10 @@ class RawCommand : public AdminHook {
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
+
+int RawCommand::botAPIversion() {
+	return 1000;
+}
 
 void RawCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();

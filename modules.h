@@ -11,6 +11,7 @@ class Module {
 	public:
 		Module();
 		virtual ~Module();
+		virtual int botAPIversion() = 0;
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName);
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
 		virtual void onLoadComplete();

@@ -378,6 +378,10 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*)spawnModule();
+	if (newModule->botAPIversion() != 1000) { // compare to current API version
+		dlclose(openModule);
+		return false;
+	}
 	newModule->init(modConf->second, this, modName);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));

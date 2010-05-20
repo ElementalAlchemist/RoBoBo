@@ -11,6 +11,7 @@ struct dccListenArg {
 
 class m_dccchat : public dccSender {
 	public:
+		int botAPIversion();
 		void onNickChange(std::string server, std::string oldNick, std::string newNick);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
@@ -28,6 +29,10 @@ class m_dccchat : public dccSender {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > reportingModules;
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
+
+int m_dccchat::botAPIversion() {
+	return 1000;
+}
 
 void m_dccchat::onNickChange(std::string server, std::string oldNick, std::string newNick) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(server + "/" + oldNick);

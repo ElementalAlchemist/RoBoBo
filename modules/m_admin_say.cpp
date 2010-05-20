@@ -3,6 +3,7 @@
 
 class AdminSay : public AdminHook {
 	public:
+		int botAPIversion();
 		void onLoadComplete();
 		void onRehash();
 		std::string getDesc();
@@ -10,6 +11,10 @@ class AdminSay : public AdminHook {
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
+
+int AdminSay::botAPIversion() {
+	return 1000;
+}
 
 void AdminSay::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();

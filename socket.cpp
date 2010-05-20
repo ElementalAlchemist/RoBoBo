@@ -59,9 +59,7 @@ std::string Socket::receive() {
 		do {
 			if (addPause)
 				sleep(1);
-			std::cout << socketfd << ":Calling recv()" << std::endl;
 			status = recv(socketfd, &inputBuffer, 1, 0);
-			std::cout << socketfd << ":recv() called:" << status << ":" << errno << std::endl;
 			addPause = true;
 		} while ((status < 0 && errno == EWOULDBLOCK) && status != 0);
 		addPause = false;

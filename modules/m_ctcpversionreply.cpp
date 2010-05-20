@@ -2,12 +2,17 @@
 
 class VersionReply : public Module {
 	public:
+		int botAPIversion();
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
 		std::string getDesc();
 	private:
 		void sendVersionReply(std::string server, std::string target);
 };
+
+int VersionReply::botAPIversion() {
+	return 1000;
+}
 
 void VersionReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "VERSION")

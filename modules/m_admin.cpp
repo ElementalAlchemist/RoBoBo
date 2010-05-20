@@ -4,6 +4,7 @@
 
 class Admin : public AdminMod {
 	public:
+		int botAPIversion();
 		void onLoadComplete();
 		void onRehash();
 		std::vector<std::string> getAbilities();
@@ -40,6 +41,10 @@ class Admin : public AdminMod {
 		void handleDCCMessage(std::string server, std::string nick, std::string message);
 		std::tr1::unordered_map<std::string, std::vector<std::string> > botAdminCommands;
 };
+
+int Admin::botAPIversion() {
+	return 1000;
+}
 
 void Admin::onLoadComplete() {
 	std::multimap<std::string, std::string> services = getModAbilities();
