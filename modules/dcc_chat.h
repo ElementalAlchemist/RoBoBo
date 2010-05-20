@@ -28,3 +28,10 @@ void dccSender::dccSend(std::string dccid, std::string message) {}
 bool dccSender::hookDCCMessage(std::string modName, std::string hookMsg) { return false; }
 
 void dccSender::unhookDCCSession(std::string modName, std::string dccid) {}
+
+std::vector<std::string> dccSender::getConnections() {
+	std::vector<std::string> connections;
+	return connections;
+}
+
+void dccSender::closeDCCConnection(std::string dccid) {}
