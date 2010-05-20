@@ -151,7 +151,10 @@ std::vector<std::string> Admin::getAbilities() {
 }
 
 void Admin::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	if (target == '0')
+		sendVerbose(2, server + ": " + nick + " -> " + channel + ": " + message);
+	else
+		sendVerbose(2, server + ": " + nick + " -> " + target + channel + ": " + message);
 }
 
 void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
@@ -179,48 +182,60 @@ void Admin::onUserMsg(std::string server, std::string nick, std::string message)
 		}
 	}
 	if (!dccMsg) {
-		// possibly do something here, depending on verbosity levels
+		sendVerbose(2, server + ": <" + nick + "> " + message);
 	}
 }
 
 void Admin::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	if (target == '0')
+		sendVerbose(2, server + ": -" + nick + "/" + channel + "- " + message);
+	else
+		sendVerbose(2, server + ": -" + nick + "/" + target + channel + "- " + message);
 }
 
 void Admin::onUserNotice(std::string server, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": --" + nick + "-- " + message);
 }
 
 void Admin::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	if (target == '0')
+		sendVerbose(2, server + ": (" + channel + ") * " + nick + " " + message);
+	else
+		sendVerbose(2, server + ": (" + target + channel + ") * " + nick + " " + message);
 }
 
 void Admin::onUserAction(std::string server, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": * " + nick + " " + message);
 }
 
 void Admin::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	if (target == '0')
+		sendVerbose(2, server + ": --> [" + nick + "/" + channel + "] " + message);
+	else
+		sendVerbose(2, server + ": --> [" + nick + "/" + target + channel + "] " + message);
 }
 
 void Admin::onUserCTCP(std::string server, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": --> [" + nick + "] " + message);
 }
 
 void Admin::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	if (target == '0')
+		sendVerbose(2, server + ": <-- [" + nick + "/" + channel + "] " + message);
+	else
+		sendVerbose(2, server + ": <-- [" + nick + "/" + target + channel + "] " + message);
 }
 
 void Admin::onUserCTCPReply(std::string server, std::string nick, std::string message) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": <-- [" + nick + "] " + message);
 }
 
 void Admin::onChannelJoin(std::string server, std::string channel, std::string hostmask) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": " + hostmask + " JOIN " + channel);
 }
 
 void Admin::onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": " + hostmask + " PART " + channel + " (" + reason + ")");
 }
 
 void Admin::onUserQuit(std::string server, std::string hostmask, std::string reason) {
@@ -230,7 +245,7 @@ void Admin::onUserQuit(std::string server, std::string hostmask, std::string rea
 				loggedIn[i] = false;
 		}
 	}
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": " + hostmask + " QUIT (" + reason + ")");
 }
 
 void Admin::onNickChange(std::string server, std::string oldNick, std::string newNick) {
@@ -240,23 +255,27 @@ void Admin::onNickChange(std::string server, std::string oldNick, std::string ne
 				admins[i]["nick"] = newNick;
 		}
 	}
-	// possibly do something depending on verbosity levels
+	sendVerbose(2, server + ": " + oldNick + " -> " + newNick);
 }
 
 void Admin::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": " + kicker + " KICK " + kickee + " from " + channel + " (" + reason + ")");
 }
 
 void Admin::onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, server + ": (" + channel + ") " + setter + " set MODE " + (add ? "+" : "-") + mode + " " + param);
 }
 
 void Admin::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {
-	// possibly do something here, depending on verbosity levels
+	sendVerbose(2, " -> " + server + " " + numeric + " " + parsedLine[3]);
 }
 
 void Admin::onOtherData(std::string server, std::vector<std::string> parsedLine) {
-	// possibly do something here, depending on verbosity levels
+	std::string message = "";
+	for (unsigned int i = 0; i < parsedLine.size(); i++) {
+		message += " " + parsedLine[i];
+	}
+	sendVerbose(2, message.substr(1));
 }
 
 void Admin::onDCCReceive(std::string dccid, std::string message) { // dccid = server/nick

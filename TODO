@@ -10,7 +10,7 @@ Beta 1
 [x] - Fix unloadModule crash
 [x] - Admin command modules
 	[x] - Default conf
-[ ] - Events verbose to admins (level 2)
+[x] - Events verbose to admins (level 2)
 [ ] - Configure (integrate into make?)
 	[ ] - Update docs (if applicable)
 [x] - closedcc command to allow closing of DCC from bot end
