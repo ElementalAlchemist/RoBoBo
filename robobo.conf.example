@@ -64,5 +64,7 @@ module m_admin_channels.so {}
 
 module m_admin_connect.so {}
 
+module m_admin_die.so {}
+
 moduleconf m_admin_raw.so {} # This module is not loaded on start but can be loaded while the bot is running
 # You should not load m_admin_raw unless you know the IRC protocol.
