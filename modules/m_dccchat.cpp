@@ -180,7 +180,6 @@ void m_dccchat::closeDCCConnection(std::string dccid) {
 		return;
 	dccConnection->second->closeConnection();
 }
-}
 
 extern "C" Module* spawn() {
 	return new m_dccchat;
