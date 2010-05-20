@@ -1,0 +1,79 @@
+#include "modinclude.h"
+#include "bot_admin.h"
+
+class DieCommand : public AdminHook {
+	public:
+		int botAPIversion();
+		void onLoadComplete();
+		void onRehash();
+		std::string getDesc();
+		std::vector<std::string> supports();
+		std::vector<std::vector<std::string> > adminCommands();
+		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+};
+
+int DieCommand::botAPIversion() {
+	return 1000;
+}
+
+void DieCommand::onLoadComplete() {
+	std::multimap<std::string, std::string> modAbilities = getModAbilities();
+	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
+	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
+		unloadModule(moduleName);
+	}
+}
+
+void DieCommand::onRehash() {
+	std::multimap<std::string, std::string> modAbilities = getModAbilities();
+	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
+	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
+		unloadModule(moduleName);
+	}
+}
+
+std::string DieCommand::getDesc() {
+	return "Allows the bot master to shut the bot down from IRC.";
+}
+
+std::vector<std::string> DieCommand::supports() {
+	std::vector<std::string> supporting;
+	supporting.push_back("BOT_ADMIN");
+	return supporting;
+}
+
+std::vector<std::vector<std::string> > DieCommand::adminCommands() {
+	std::vector<std::vector<std::string> > theCommands;
+	std::vector<std::string> dieCommand;
+	dieCommand.push_back("die");
+	dieCommand.push_back("Makes the bot shut down.");
+	dieCommand.push_back("Syntax: die [reason]");
+	dieCommand.push_back("This command causes the bot to shut down.  If a reason is given, it will be used as the quit reason on all servers.");
+	dieCommand.push_back("This command is available only to bot admins.");
+	theCommands.push_back(dieCommand);
+	return theCommands;
+}
+
+void DieCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (!master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "The die command is available only to bot masters.");
+		else
+			dccMod->dccSend(server + "/" + nick, "The die command is available only to bot masters.");
+		return;
+	}
+	std::list<std::string> connectedServers = getServers();
+	for (std::list<std::string>::iterator servIter = connectedServers.begin(); servIter != connectedServers.end(); servIter++)
+		quitServer(*servIter, message);
+	if (dccMod != NULL) {
+		std::vector<std::string> connectedDCC = dccMod->getConnections();
+		for (unsigned int i = 0; i < connectedDCC.size(); i++)
+			dccMod->closeDCCConnection(connectedDCC[i]);
+	} // with all threads gone except main, bot should shut down. modules that can't figure out to shut down threads when not connected is their own fault
+}
+
+extern "C" Module* spawn() {
+	return new DieCommand;
+}
