@@ -19,6 +19,7 @@ class m_dccchat : public dccSender {
 		std::vector<std::string> getAbilities();
 		bool hookDCCMessage(std::string modName, std::string hookMsg);
 		void unhookDCCSession(std::string modName, std::string dccid);
+		void closeDCCConnection(std::string dccid);
 		std::string getDesc();
 	private:
 		void dccConnect(std::string server, std::string nick, std::string ip, std::string port);
@@ -171,6 +172,14 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 	}
 	delete listenSocket;
 	activeConnections.erase(id);
+}
+
+void m_dccchat::closeDCCConnection(std::string dccid) {
+	std::tr1::unordered_map<std::string, Socket*>::iterator dccConnection = activeConnections.find(dccid);
+	if (dccConnection == activeConnections.end())
+		return;
+	dccConnection->second->closeConnection();
+}
 }
 
 extern "C" Module* spawn() {
