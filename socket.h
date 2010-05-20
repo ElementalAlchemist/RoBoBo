@@ -9,6 +9,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <cstdio>
+#include <fcntl.h>
 
 class Socket {
 	public:
