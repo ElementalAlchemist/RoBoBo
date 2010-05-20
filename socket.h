@@ -4,14 +4,11 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
 #include <cstdio>
-#include <fcntl.h>
-#include <ctype.h>
 
 class Socket {
 	public:
@@ -26,8 +23,6 @@ class Socket {
 		int socketfd;
 		sockaddr_in socketAddr;
 		bool connected;
-		fd_set fdlist;
-		timeval sockTimeout;
 };
 
 #endif
