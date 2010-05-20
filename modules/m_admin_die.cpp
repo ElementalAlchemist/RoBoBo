@@ -71,7 +71,9 @@ void DieCommand::onAdminCommand(std::string server, std::string nick, std::strin
 		std::vector<std::string> connectedDCC = dccMod->getConnections();
 		for (unsigned int i = 0; i < connectedDCC.size(); i++)
 			dccMod->closeDCCConnection(connectedDCC[i]);
-	} // with all threads gone except main, bot should shut down. modules that can't figure out to shut down threads when not connected is their own fault
+	}
+	std::cout << "Shutting down by admin command: die" << std::endl;
+	std::exit(0);
 }
 
 extern "C" Module* spawn() {
