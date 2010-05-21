@@ -13,12 +13,6 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 			std::cout << "Module " << modConfIter->first << " failed to load." << std::endl;
 	}
 	
-	std::vector<std::string> abilities;
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++) {
-		abilities = modIter->second->getAbilities();
-		for (unsigned int i = 0; i < abilities.size(); i++)
-			modAbilities.insert(std::pair<std::string, std::string> (abilities[i], modIter->first));
-	}
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); modIter++)
 		modIter->second->onLoadComplete(); // call the onLoadComplete hook in modules when all modules are loaded
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); ++servConfIter) {
@@ -385,6 +379,9 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	newModule->init(modConf->second, this, modName);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));
+	std::vector<std::string> abilities = newModule->getAbilities();
+	for (unsigned int i = 0; i < abilities.size(); i++)
+		modAbilities.insert(std::pair<std::string, std::string> (abilities[i], modName));
 	if (!startup)
 		newModule->onLoadComplete();
 	return true;
@@ -405,6 +402,15 @@ void* ModuleInterface::processModUnloadQueue(void* ptr) {
 			while (modi->unloadingModules.size() > 0) {
 				std::tr1::unordered_map<std::string, Module*>::iterator modIter = modi->modules.find(modi->unloadingModules[0]);
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = modi->moduleFiles.find(modi->unloadingModules[0]);
+				std::vector<std::string> abilities = modi->unloadingModules[0]->getAbilities();
+				for (unsigned int i = 0; i < abilities.size(); i++) {
+					std::multimap<std::string, std::string>::iterator anAbility = modAbilities.find(abilities[i]);
+					if (anAbility == modAbilities.end())
+						continue;
+					while (anAbility->second != modi->unloadingModules[0])
+						modAbilities.find(abilities[i]);
+					modAbilities.erase(anAbility);
+				}
 				if (modIter == modi->modules.end()) {
 					modi->unloadingModules.erase(modi->unloadingModules.begin());
 					continue;
