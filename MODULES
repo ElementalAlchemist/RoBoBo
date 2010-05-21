@@ -10,6 +10,7 @@ Table of Contents
 - 2.3. Other Hooks
 - 2.4. Sending Data to a Server
 3. Helpful Variables and Functions
+4. Interacting With Other Modules
 
 =======================
 1. SPECIFICS OF IMPLEMENTATION
@@ -309,3 +310,17 @@ std::vector<std::string> splitBySpace(std::string line)
 This function takes any line, and it splits it into pieces using a space as a
 delimiter.  Each word gets one position in the vector in the order in which the
 word was found.
+
+=======================
+4. INTERACTING WITH OTHER MODULES
+
+Interacting with modules using functions that are not part of the Module class
+requires the use of a custom class in a header file in the modules/ directory.
+A module must extend the class in the header file in order to provide those
+functions to other modules.  A module that takes advantage of another module's
+functionality must have the header file present to compile, regardless of
+whether the module that provides the functions your module is using is present
+when the bot is run.
+
+If your module relies on the presence of another module, you should check for
+the other module in both onLoadComplete() AND onRehash().
