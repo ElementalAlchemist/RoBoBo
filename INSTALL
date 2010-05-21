@@ -1,4 +1,20 @@
-This bot can be compiled using make, at which point the binary can be run
-directly from the base directory.
-Currently if you wish to load any modules, you must manually add them to the
-Makefile.  This will be changed in the future.
+RoBoBo is quite simple to install; installation is as simple as a slight
+variation of the traditional "./configure; make; make install" installation
+process.
+
+1. make: This builds the configure script.  You only need to do this once ever,
+unless you delete the entire project.
+
+2. ./configure: This finds the module source files and puts the correct
+Makefiles together.  This overwrites the Makefile that builds the configure
+script, so make sure that once you do this you don't delete the configure
+binary unless you have access to the original Makefile or know how to build it
+from command line.
+
+3. make: Now that the Makefile is different, this command will build the bot.
+
+Before you run the bot, you need to copy the file robobo.conf.example to
+robobo.conf and edit it completely.  You only need to do this once, unless you
+delete the robobo.conf file.
+
+After this, you can simply run the bot with the command ./robobo.

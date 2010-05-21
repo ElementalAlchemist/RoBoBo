@@ -11,8 +11,8 @@ Beta 1
 [x] - Admin command modules
 	[x] - Default conf
 [x] - Events verbose to admins (level 2)
-[ ] - Configure (integrate into make?)
-	[ ] - Update docs (if applicable)
+[x] - Configure (integrate into make?)
+	[x] - Update docs (if applicable)
 [x] - closedcc command to allow closing of DCC from bot end
 [x] - Make bot detect when connection is severed
 [ ] - Move addition to map of known bot abilities to loadModule
