@@ -22,12 +22,11 @@ void Channel::parseNames(std::vector<std::string> names) {
 			}
 		}
 		users.insert(std::pair<std::string, User*> (names[i], new User (this)));
-		for (unsigned int j = 0; j < modes.size(); j++) {
-			for (std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin(); userIter != users.end(); userIter++) {
-				if (names[i] == userIter->first)
-					userIter->second->status(true, modes[j]);
-			}
-		}
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(names[i]);
+		if (userIter == users.end())
+			continue;
+		for (unsigned int j = 0; j < modes.size(); j++)
+			userIter->second->status(true, modes[j]);
 		modes.clear();
 	}
 }
@@ -42,19 +41,15 @@ void Channel::setTopic(std::string newTopic) {
 
 void Channel::setMode(bool add, char mode, std::string param) {
 	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
-	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); it++) {
-		if (it->first == mode) {
-			bool exists = false;
-			for (std::tr1::unordered_map<std::string, User*>::iterator iter = users.begin(); iter != users.end(); iter++) {
-				if (iter->first == param) {
-					iter->second->status(add, mode);
-					exists = true;
-				}
-			}
-			if (!exists)
-				parentServer->resyncChannels();
-		}
+	std::tr1::unordered_map<char, char>::iterator it = prefixes.find(mode);
+	if (it == prefixes.end())
+		return;
+	std::tr1::unordered_map<std::string, User*>::iterator iter = users.find(param);
+	if (iter == users.end()) {
+		parentServer->resyncChannels();
+		return;
 	}
+	iter->second->status(add, mode);
 }
 
 void Channel::joinChannel(std::string nick) {
@@ -73,11 +68,10 @@ std::list<std::string> Channel::getUsers() {
 }
 
 char Channel::getStatus(std::string user) {
-	for (std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin(); userIter != users.end(); ++userIter) {
-		if (userIter->first == user)
-			return userIter->second->getStatus();
-	}
-	return '0';
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return '0';
+	return userIter->second->getStatus();
 }
 
 std::string Channel::getTopic() {

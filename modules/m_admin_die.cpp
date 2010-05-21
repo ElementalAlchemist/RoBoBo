@@ -65,7 +65,7 @@ void DieCommand::onAdminCommand(std::string server, std::string nick, std::strin
 		return;
 	}
 	std::list<std::string> connectedServers = getServers();
-	for (std::list<std::string>::iterator servIter = connectedServers.begin(); servIter != connectedServers.end(); servIter++)
+	for (std::list<std::string>::iterator servIter = connectedServers.begin(); servIter != connectedServers.end(); ++servIter)
 		quitServer(*servIter, message);
 	if (dccMod != NULL) {
 		std::vector<std::string> connectedDCC = dccMod->getConnections();

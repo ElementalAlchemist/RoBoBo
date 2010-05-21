@@ -1,6 +1,5 @@
 #include "connection.h"
 #include "modules.h"
-//#include "channel.cpp"
 
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
@@ -40,7 +39,7 @@ std::vector<char> Server::getChanTypes() {
 }
 
 void Server::resyncChannels() {
-	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); iter++)
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); ++iter)
 		sendLine("NAMES " + iter->first);
 }
 
@@ -52,29 +51,24 @@ std::list<std::string> Server::getChannels() {
 }
 
 std::string Server::getChannelTopic(std::string channel) {
-	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
-		if (chanIter->first == channel)
-			return chanIter->second->getTopic();
-	}
-	return "";
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return "";
+	return chanIter->second->getTopic();
 }
 
 std::list<std::string> Server::getChannelUsers(std::string channel) {
-	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
-		if (chanIter->first == channel)
-			return chanIter->second->getUsers();
-	}
-	return std::list<std::string> (); // Return a blank list for a nonexistant channel.
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return std::list<std::string> ();
+	return chanIter->second->getUsers();
 }
 
 std::pair<char, char> Server::getUserStatus(std::string channel, std::string user) {
-	char status = '0';
-	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
-		if (channel == chanIter->first)
-			status = chanIter->second->getStatus(user);
-	}
-	if (status == '0')
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
 		return std::pair<char, char> ('0', ' ');
+	char status = chanIter->second->getStatus(user);
 	return std::pair<char, char> (status, prefix[status]);
 }
 
@@ -103,20 +97,16 @@ void Server::handleData() {
 		} else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
 		else if (parsedLine[1] == "332") { // channel topic
-			for (std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
-				if (it->first == parsedLine[3])
-					it->second->setTopic(parsedLine[4]);
-			}
+			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
+			if (it != inChannels.end())
+				it->second->setTopic(parsedLine[4]);
 		} else if (parsedLine[1] == "353") { // NAMES reply
-			for (std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
-				if (it->first == parsedLine[4])
-					it->second->parseNames(separateBySpace(parsedLine[5]));
-			}
+			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[4]);
+			if (it != inChannels.end())
+				it->second->parseNames(separateBySpace(parsedLine[5]));
 		} else if (parsedLine[1] == "366") { // end of NAMES reply
-			for (std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.begin(); it != inChannels.end(); it++) {
-				if (it->first == parsedLine[3])
-					it->second->numeric366();
-			}
+			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
+				it->second->numeric366();
 		} else if (parsedLine[1] == "433" && !registered) { // nickname already in use
 			if (!altChanged) {
 				sendLine("NICK " + serverConf["altnick"]);
@@ -136,7 +126,7 @@ void Server::handleData() {
 						if (addMode)
 							userModes.push_back(parsedLine[3][i]);
 						else {
-							for (std::vector<char>::iterator uModeIter = userModes.begin(); uModeIter != userModes.end(); uModeIter++) {
+							for (std::vector<char>::iterator uModeIter = userModes.begin(); uModeIter != userModes.end(); ++uModeIter) {
 								if (parsedLine[3][i] == *uModeIter) {
 									userModes.erase(uModeIter);
 									break;
@@ -153,15 +143,11 @@ void Server::handleData() {
 					else if (parsedLine[3][i] == '-')
 						addMode = false;
 					else {
-						bool found = false;
 						int category;
-						for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefix.begin(); prefixIter != prefix.end(); prefixIter++) {
-							if (parsedLine[3][i] == prefixIter->first) {
-								found = true;
-								category = 0; // count it as a list mode since it's a list of users who hold a status
-							}
-						}
-						if (!found) {
+						std::tr1::unordered_map<char, char>::iterator prefixIter = prefix.find(parsedLine[3][i]);
+						category = 0; // count it as a list mode since it's a list of users who hold a status
+						if (prefixIter == prefix.end()) {
+							bool found = false;
 							for (unsigned int j = 0; j < chanModes.size(); j++) {
 								for (unsigned int k = 0; k < chanModes[j].size(); k++) {
 									if (parsedLine[3][i] == chanModes[j][k]) {
@@ -173,20 +159,18 @@ void Server::handleData() {
 								if (found)
 									break;
 							}
+							if (!found)
+								category = 4;
 						}
-						if (!found)
-							category = 4;
 						
 						if (category == 0 || category == 1 || (category == 2 && addMode)) {
-							for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
-								if (chanIter->first == parsedLine[2])
-									chanIter->second->setMode(addMode, parsedLine[3][i], parsedLine[currParam++]);
-							}
+							std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(parsedLine[2]);
+							if (chanIter != inChannels.end())
+								chanIter->second->setMode(addMode, parsedLine[3][i], parsedLine[currParam++]);
 						} else {
-							for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); chanIter++) {
-								if (chanIter->first == parsedLine[2])
-									chanIter->second->setMode(addMode, parsedLine[3][i], "");
-							}
+							std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(parsedLine[2]);
+							if (chanIter != inChannels.end())
+								chanIter->second->setMode(addMode, parsedLine[3][i], "");
 						}
 					}
 				}
