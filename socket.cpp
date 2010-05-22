@@ -1,9 +1,7 @@
 #include "socket.h"
 
-Socket::Socket() {
-	socketfd = socket(AF_INET, SOCK_STREAM, 0);
+Socket::Socket() : socketfd(socket(AF_INET, SOCK_STREAM, 0)), connected(false) {
 	socketAddr.sin_family = AF_INET;
-	connected = false;
 	fcntl(socketfd, F_SETFL, O_NONBLOCK);
 }
 

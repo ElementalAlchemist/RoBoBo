@@ -1,11 +1,6 @@
 #include "connection.h"
-//#include "user.cpp"
 
-Channel::Channel(Server* thisServer) {
-	parentServer = thisServer;
-	topic = "";
-	namesSync = false;
-}
+Channel::Channel(Server* thisServer) : parentServer(thisServer), topic(""), namesSync(false) {}
 
 void Channel::parseNames(std::vector<std::string> names) {
 	if (namesSync) {
