@@ -22,6 +22,13 @@ void RawCommand::onLoadComplete() {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'y')
+			config["masteronly"] = "yes";
+		else
+			config["masteronly"] = "no";
+	} else
+		config["masteronly"] = "no";
 }
 
 void RawCommand::onRehash() {
@@ -30,6 +37,13 @@ void RawCommand::onRehash() {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'y')
+			config["masteronly"] = "yes";
+		else
+			config["masteronly"] = "no";
+	} else
+		config["masteronly"] = "no";
 }
 
 std::string RawCommand::getDesc() {
@@ -53,11 +67,20 @@ std::vector<std::vector<std::string> > RawCommand::adminCommands() {
 	rawCommand.push_back("Allows the use of raw IRC text.  Use of this command requires knowledge of the IRC protocol.");
 	rawCommand.push_back("You may optionally provide a server command to send the raw command to a server other than the one on which you authenticated to this bot.");
 	rawCommand.push_back("I am not responsible for any breakage you may cause!");
+	if (config["masteronly"] == "yes")
+		rawCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(rawCommand);
 	return theCommands;
 }
 
 void RawCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (config["masteronly"] == "yes" && !master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "You must be the bot master to use this command.");
+		else
+			dccMod->dccSend(server + "/" + nick, "You must be the bot master to use this command.");
+		return;
+	}
 	if (message == "") {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "You did not give any parameters for raw.");

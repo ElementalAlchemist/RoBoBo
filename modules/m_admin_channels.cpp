@@ -23,6 +23,13 @@ void AdminChannelControl::onLoadComplete() {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'y')
+			config["masteronly"] = "yes";
+		else
+			config["masteronly"] = "no";
+	} else
+		config["masteronly"] = "no";
 }
 
 void AdminChannelControl::onRehash() {
@@ -32,6 +39,13 @@ void AdminChannelControl::onRehash() {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'y')
+			config["masteronly"] = "yes";
+		else
+			config["masteronly"] = "no";
+	} else
+		config["masteronly"] = "no";
 }
 
 std::string AdminChannelControl::getDesc() {
@@ -55,6 +69,8 @@ std::vector<std::vector<std::string> > AdminChannelControl::adminCommands() {
 	joinCommand.push_back("Example: join #privatechan thepassword");
 	joinCommand.push_back("Example: join irc.server.net/#channel");
 	joinCommand.push_back("This command makes RoBoBo join a channel.  The server part of the command is only necessary if you want RoBoBo to join a channel on a server different from the one from which you identified.");
+	if (config["masteronly"] == "yes")
+		joinCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(joinCommand);
 	std::vector<std::string> partCommand;
 	partCommand.push_back("part");
@@ -64,11 +80,20 @@ std::vector<std::vector<std::string> > AdminChannelControl::adminCommands() {
 	partCommand.push_back("Example: part #robobo Bye.");
 	partCommand.push_back("Example: part irc.server.net/#channel It's only when you look at ants through a magnifying glass that you realize how often they burst into flames.");
 	partCommand.push_back("This command makes RoBoBo part a channel.  The server part of the command is only necessary if you want RoBoBo to part a channel on a server different from the one from which you identified.");
+	if (config["masteronly"] == "yes")
+		partCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(partCommand);
 	return theCommands;
 }
 
 void AdminChannelControl::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (config["masteronly"] == "yes" && !master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "This command is only available to bot masters.");
+		else
+			dccMod->dccSend(server + "/" + nick, "This command is available only to bot masters.");
+		return;
+	}
 	std::string msgServer = message.substr(0, message.find_first_of('/'));
 	if (msgServer != message) {
 		server = msgServer;

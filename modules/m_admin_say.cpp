@@ -23,6 +23,13 @@ void AdminSay::onLoadComplete() {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'y')
+			config["masteronly"] = "yes";
+		else
+			config["masteronly"] = "no";
+	} else
+		config["masteronly"] = "no";
 }
 
 void AdminSay::onRehash() {
@@ -32,6 +39,13 @@ void AdminSay::onRehash() {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'y')
+			config["masteronly"] = "yes";
+		else
+			config["masteronly"] = "no";
+	} else
+		config["masteronly"] = "no";
 }
 
 std::string AdminSay::getDesc() {
@@ -58,6 +72,8 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	sayCommand.push_back("The target can be a user or a channel.");
 	sayCommand.push_back("The server portion of the target is required only when you are sending the message to a server");
 	sayCommand.push_back("other than the one from which you initiated the DCC connection to RoBoBo.");
+	if (config["masteronly"] == "yes")
+		sayCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(sayCommand);
 	std::vector<std::string> actCommand;
 	actCommand.push_back("act");
@@ -71,11 +87,20 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	actCommand.push_back("The target can be a user or a channel.");
 	actCommand.push_back("The server portion of the target is required only when you are sending the message to a server");
 	actCommand.push_back("other than the one from which you initiated the DCC connection to RoBoBo.");
+	if (config["masteronly"] == "yes")
+		actCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(actCommand);
 	return theCommands;
 }
 
 void AdminSay::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+	if (config["masteronly"] == "yes" && !master) {
+		if (dccMod == NULL)
+			sendPrivMsg(server, nick, "Only the bot admin has access to this command.");
+		else
+			dccMod->dccSend(server + "/" + nick, "Only the bot admin has access to this command.");
+		return;
+	}
 	std::string target = message.substr(0, message.find_first_of(' '));
 	std::string targetServer;
 	targetServer = target.substr(0, target.find_first_of('/'));

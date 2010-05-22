@@ -23,6 +23,13 @@ void DieCommand::onLoadComplete() {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'n')
+			config["masteronly"] = "no";
+		else
+			config["masteronly"] = "yes";
+	} else
+		config["masteronly"] = "yes";
 }
 
 void DieCommand::onRehash() {
@@ -32,6 +39,13 @@ void DieCommand::onRehash() {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'n')
+			config["masteronly"] = "no";
+		else
+			config["masteronly"] = "yes";
+	} else
+		config["masteronly"] = "yes";
 }
 
 std::string DieCommand::getDesc() {
@@ -51,13 +65,14 @@ std::vector<std::vector<std::string> > DieCommand::adminCommands() {
 	dieCommand.push_back("Makes the bot shut down.");
 	dieCommand.push_back("Syntax: die [reason]");
 	dieCommand.push_back("This command causes the bot to shut down.  If a reason is given, it will be used as the quit reason on all servers.");
-	dieCommand.push_back("This command is available only to bot admins.");
+	if (config["masteronly"] == "yes")
+		dieCommand.push_back("This command is available only to bot admins.");
 	theCommands.push_back(dieCommand);
 	return theCommands;
 }
 
 void DieCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
-	if (!master) {
+	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "The die command is available only to bot masters.");
 		else

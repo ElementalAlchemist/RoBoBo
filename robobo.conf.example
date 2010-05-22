@@ -52,19 +52,35 @@ module m_admin.so {
 	0/verbose = "1"; # be verbose about what's happening with the bot with this admin?  DCC only.
 }
 
-module m_admin_loadmod.so {}
+module m_admin_loadmod.so {
+	#masteronly = "yes"; # whether or not this command is to be available only to the bot master. Uncomment and change to change.
+}
 
-module m_admin_unloadmod.so {}
+module m_admin_unloadmod.so {
+	#masteronly = "yes";
+}
 
-module m_admin_rehash.so {}
+module m_admin_rehash.so {
+	#masteronly = "yes";
+}
 
-module m_admin_say.so {}
+module m_admin_say.so {
+	#masteronly = "no";
+}
 
-module m_admin_channels.so {}
+module m_admin_channels.so {
+	#masteronly = "no";
+}
 
-module m_admin_connect.so {}
+module m_admin_connect.so {
+	#masteronly = "yes";
+}
 
-module m_admin_die.so {}
+module m_admin_die.so {
+	#masteronly = "yes";
+}
 
-moduleconf m_admin_raw.so {} # This module is not loaded on start but can be loaded while the bot is running
+moduleconf m_admin_raw.so {
+	#masteronly = "no";
+} # This module is not loaded on start but can be loaded while the bot is running
 # You should not load m_admin_raw unless you know the IRC protocol.

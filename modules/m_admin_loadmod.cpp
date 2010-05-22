@@ -23,6 +23,13 @@ void LoadModCommand::onLoadComplete() {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'n')
+			config["masteronly"] = "no";
+		else
+			config["masteronly"] = "yes";
+	} else
+		config["masteronly"] = "yes";
 }
 
 void LoadModCommand::onRehash() {
@@ -32,6 +39,13 @@ void LoadModCommand::onRehash() {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
 	}
+	if (config["masteronly"] != "") {
+		if (config["masteronly"][0] == 'n')
+			config["masteronly"] = "no";
+		else
+			config["masteronly"] = "yes";
+	} else
+		config["masteronly"] = "yes";
 }
 
 
@@ -53,13 +67,14 @@ std::vector<std::vector<std::string> > LoadModCommand::adminCommands() {
 	aCommand.push_back("Syntax: loadmod <modulename>"); // help
 	aCommand.push_back("Example: loadmod m_admin.so");
 	aCommand.push_back("Loads the specified module if it exists and isn't already loaded.");
-	aCommand.push_back("This command is only available to bot masters.");
+	if (config["masteronly"] == "yes")
+		aCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(aCommand);
 	return theCommands;
 }
 
 void LoadModCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
-	if (!master) {
+	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "You must be the bot master to use this command.");
 		else
