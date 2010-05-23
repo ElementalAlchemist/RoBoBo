@@ -7,5 +7,4 @@ class ModuleInterface; // forward-declare so it can be used in modules and serve
 #include "../connection.h" // declare other classes that use it
 #include "../modules.h"
 #include "../config.h"
-#include "../modules.h"
 #endif
