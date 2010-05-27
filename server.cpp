@@ -1,7 +1,7 @@
 #include "connection.h"
 #include "modules.h"
 
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) : serverName(serverAddress), serverConf(confVars), moduleData(modFace) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) : serverName(serverAddress), moduleData(modFace), serverConf(confVars) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
