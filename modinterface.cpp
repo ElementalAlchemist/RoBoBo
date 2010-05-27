@@ -347,10 +347,9 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 		std::perror(error.c_str());
 		return false;
 	}
-	char* dlsymError;
 	typedef void* (*module_spawn_t)();
 	module_spawn_t spawnModule = (module_spawn_t) dlsym(openModule, "spawn");
-	dlsymError = dlerror();
+	const char* dlsymError = dlerror();
 	if (dlsymError) {
 		std::string error = "Could not load module " + modName + ": " + dlsymError;
 		std::perror(error.c_str());
