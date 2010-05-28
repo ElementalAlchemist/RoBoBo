@@ -333,6 +333,8 @@ bool ModuleInterface::connectServer(std::string serverName) {
 	if (servConfIter == serverConfigs.end())
 		return false;
 	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, servConfIter->second, this)));
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+		modIter->second->onConnect(serverName); // call onConnect hook
 	return true;
 }
 
@@ -357,8 +359,9 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*)spawnModule();
-	if (newModule->botAPIversion() != 1000) { // compare to current API version
+	if (newModule->botAPIversion() != 1001 && newModule->botAPIversion() != 1000) { // compare to current API version (1001 backwards compatible with 1000)
 		dlclose(openModule);
+		std::cout << "Module " << modName << " is not compatible with the current API." << std::endl;
 		return false;
 	}
 	newModule->init(modConf->second, this, modName);
@@ -419,6 +422,8 @@ void ModuleInterface::removeServer(std::string server) {
 		return;
 	delete servIter->second;
 	servers.erase(servIter);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+		modIter->second->onQuit(server); // call onQuit hook
 }
 
 std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {

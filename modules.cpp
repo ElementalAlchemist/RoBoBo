@@ -56,6 +56,10 @@ void Module::onNumeric(std::string server, std::string numeric, std::vector<std:
 
 void Module::onOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
+void Module::onConnect(std::string server) {}
+
+void Module::onQuit(std::string server) {}
+
 void Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) {}
 
 void Module::onOutUserMessage(std::string server, std::string target, std::string message) {}

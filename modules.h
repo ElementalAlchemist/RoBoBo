@@ -34,6 +34,8 @@ class Module {
 		virtual void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		virtual void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		virtual void onOtherData(std::string server, std::vector<std::string> parsedLine);
+		virtual void onConnect(std::string server);
+		virtual void onQuit(std::string server);
 		
 		virtual void onOutChannelMessage(std::string server, std::string target, char status, std::string message);
 		virtual void onOutUserMessage(std::string server, std::string target, std::string message);
