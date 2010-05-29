@@ -8,4 +8,4 @@ Current TODO List
 Before 1.0.0
 =======================================
 [>] - Use the bot for a while and try to find bugs
-[ ] - Fix m_admin.cpp
+[x] - Fix m_admin.cpp

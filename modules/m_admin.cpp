@@ -26,6 +26,8 @@ class Admin : public AdminMod {
 		void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
+		void onConnect(std::string server);
+		void onQuit(std::string server);
 		void onDCCReceive(std::string dccid, std::string message);
 		void onDCCEnd(std::string dccid);
 		std::string getDesc();
@@ -43,7 +45,7 @@ class Admin : public AdminMod {
 };
 
 int Admin::botAPIversion() {
-	return 1000;
+	return 1001;
 }
 
 void Admin::onLoadComplete() {
@@ -61,16 +63,18 @@ void Admin::onLoadComplete() {
 		}
 	}
 	
-	std::tr1::unordered_map<std::string, std::string> adminPrivs;
 	int i = 0;
 	while (true) {
+		std::tr1::unordered_map<std::string, std::string> adminPrivs;
 		std::ostringstream adminIndex;
 		adminIndex << i;
-		if (config[adminIndex.str()+"/nick"] == "")
+		if (config[adminIndex.str()+"/server"] == "" || config[adminIndex.str()+"/nick"] == "" || config[adminIndex.str()+"/password"] == "")
 			break;
 		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[adminIndex.str()+"/server"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[adminIndex.str()+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[adminIndex.str()+"/password"]));
+		if (config[adminIndex.str()+"/verbose"] == "")
+			config[adminIndex.str()+"/verbose"] = "0";
 		if (isValidVerboseLevel(config[adminIndex.str()+"/verbose"]))
 			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
@@ -103,16 +107,20 @@ void Admin::onLoadComplete() {
 
 void Admin::onRehash() {
 	admins.clear();
-	std::tr1::unordered_map<std::string, std::string> adminPrivs;
+	verbosity.clear();
+	loggedIn.clear();
 	int i = 0;
 	while (true) {
+		std::tr1::unordered_map<std::string, std::string> adminPrivs;
 		std::ostringstream adminIndex;
 		adminIndex << i;
-		if (config[adminIndex.str()+"/nick"] == "")
+		if (config[adminIndex.str()+"/server"] == "" || config[adminIndex.str()+"/nick"] == "" || config[adminIndex.str()+"/password"] == "")
 			break;
 		adminPrivs.insert(std::pair<std::string, std::string> ("server", config[adminIndex.str()+"/server"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("nick", config[adminIndex.str()+"/nick"]));
 		adminPrivs.insert(std::pair<std::string, std::string> ("password", config[adminIndex.str()+"/password"]));
+		if (config[adminIndex.str()+"/verbose"] == "")
+			config[adminIndex.str()+"/verbose"] = "0";
 		if (isValidVerboseLevel(config[adminIndex.str()+"/verbose"]))
 			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
@@ -278,6 +286,24 @@ void Admin::onOtherData(std::string server, std::vector<std::string> parsedLine)
 	sendVerbose(2, message.substr(1));
 }
 
+void Admin::onConnect(std::string server) {
+	if (!loggedIn[0])
+		return;
+	for (unsigned int i = 0; i < admins.size(); i++) {
+		if (admins[i]["server"] == server) {
+			dccMod->dccSend(admins[0]["server"] + "/" + admins[0]["nick"], "I've just connected to the server " + server + ", and there is an admin block for someone on that server.  Please rehash to update the admin list.");
+			break;
+		}
+	}
+}
+
+void Admin::onQuit(std::string server) {
+	for (std::vector<std::tr1::unordered_map<std::string, std::string> >::iterator adminIter = admins.begin(); adminIter != admins.end(); ++adminIter) {
+		if ((*adminIter)["server"] == server)
+			admins.erase(adminIter);
+	}
+}
+
 void Admin::onDCCReceive(std::string dccid, std::string message) { // dccid = server/nick
 	std::string server = dccid.substr(0, dccid.find_first_of('/'));
 	std::string nick = dccid.substr(dccid.find_first_of('/')+1);
@@ -325,8 +351,10 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 				break;
 			}
 		}
-		if (loggedIn[adminNum])
-			return; // stop!
+		if (adminNum != -1) {
+			if (loggedIn[adminNum])
+				return; // stop!
+		}
 		if (dccMod != NULL) { // the login code for no DCC is already handled in onUserMsg
 			if (splitMsg.size() == 1) {
 				dccMod->dccSend(server + "/" + nick, "Usage: " + splitMsg[0] + " <password>");
@@ -349,10 +377,13 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			dccMod->dccSend(server + "/" + nick, "You are now identified.");
 		} // at this point we've returned out all failures, so do the necessary stuff on authentication
 		loggedIn[adminNum] = true;
-		std::istringstream adminVerbosityLevel (config[adminNum+"/verbose"]);
+		std::ostringstream adminIndex;
+		adminIndex << adminNum;
+		std::istringstream adminVerbosityLevel (config[adminIndex.str()+"/verbose"]);
 		int verbose;
 		adminVerbosityLevel >> verbose;
 		verbosity[adminNum] = verbose;
+		std::cout << "Admin " << adminNum << " logged in with verbosity level " << verbose << std::endl;
 	} else if (splitMsg[0] == "modules") {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Loaded modules:");
