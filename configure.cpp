@@ -6,7 +6,7 @@
 int main(int argc, char** argv) {
 	std::string mainMakefile = "CC = g++\nLIBS = -ldl -lpthread\nLDFLAGS=$(LIBS) -rdynamic\nCXXFLAGS=-Wall -pthread $(DEBUG)\nSOURCES=modinterface.cpp server.cpp channel.cpp config.cpp modules.cpp server.cpp socket.cpp user.cpp\n\ndefault: makedepend robobo modules\n\n";
 	mainMakefile += "makedepend:\n\tfor i in *.cpp; do for inc in  $(awk '/^#include \"/ {print $2}' $i | sed 's/\"//g'); do echo \"${i%.cpp}.o: $inc\"; done; done\n\ndebug:\n\tDEBUG=\"-g -O0\" make -C .\n\nrobobo: $(SOURCES:.cpp=.o)\n\n.PHONY: modules clean\n\nmodules:\n\tmake -C modules/\n\nclean:\n\tmake -C modules/ clean\n\trm -f robobo\n\trm -f $(SOURCES:.cpp=.o)";
-	std::string moduleMakefileBegin = "CXX = g++\nCXXFLAGS=-fPIC -Wall -pipe -ansi -pedantic-errors $(DEBUG)\nLDFLAGS=-shared\nDEPS=modinclude.h ../main.h ../connection.h ../modules.h ../config.cpp ../modules.cpp ../modinterface.cpp\n\nall: ";
+	std::string moduleMakefileBegin = "CXX = g++\nCXXFLAGS=-fPIC -Wall -pipe -ansi $(DEBUG)\nLDFLAGS=-shared\nDEPS=modinclude.h ../main.h ../connection.h ../modules.h ../config.cpp ../modules.cpp ../modinterface.cpp\n\nall: ";
 	std::string moduleMakefileEnd = ".PHONY: clean\n\nclean:\n\trm -f *.o *.so";
 	std::ofstream makeOut;
 	std::string dir = argv[0];
