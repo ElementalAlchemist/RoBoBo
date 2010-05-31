@@ -6,6 +6,10 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
 	portNumber >> port;
+	if (serverConf["bind"] != "") {
+		if (!serverConnection.bindSocket(serverConf["bind"]))
+			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl;
+	}
 	serverConnection.connectServer(serverAddress, port);
 	sendLine("NICK " + serverConf["nick"]);
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);

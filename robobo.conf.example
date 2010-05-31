@@ -6,6 +6,9 @@ server irc.example.com {
 	# port: the port that the IRC server uses for client connections
 	# This is usually 6667
 	port = "6667";
+	# bind: the local IP address to bind to (optional)
+	# you shouldn't need this unless you're on a server with multiple IPs
+	#bind = "127.0.0.1";
 	# nick: the nick for the bot to be used on that server
 	nick = "RoBoBo";
 	# altnick: the nick the bot should use if the primary nick is already in use

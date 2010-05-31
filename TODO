@@ -9,4 +9,4 @@ Before 1.0.0
 =======================================
 [>] - Use the bot for a while and try to find bugs
 [x] - Fix m_admin.cpp
-[ ] - allow binding of connections
+[x] - allow binding of connections

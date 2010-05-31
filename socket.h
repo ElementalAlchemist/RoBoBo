@@ -15,6 +15,7 @@ class Socket {
 	public:
 		Socket();
 		~Socket();
+		bool bindSocket(std::string address);
 		void connectServer(std::string address, unsigned short port);
 		bool sendData(std::string message);
 		std::string receive();

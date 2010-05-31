@@ -9,6 +9,24 @@ Socket::~Socket() {
 	closeConnection();
 }
 
+bool Socket::bindSocket(std::string address) {
+	int trueint = 1;
+	if (setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &trueint, sizeof(trueint)) < 0) {
+		perror("Could not apply socket settings");
+		return false;
+	}
+	sockaddr_in bindAddr;
+	bindAddr.sin_family = AF_INET;
+	bindAddr.sin_port = htons(0);
+	inet_pton(AF_INET, address.c_str(), &bindAddr.sin_addr);
+	int status = bind(socketfd, (sockaddr*) &bindAddr, sizeof(bindAddr));
+	if (status < 0) {
+		perror("Could not bind to IP address");
+		return false;
+	}
+	return true;
+}
+
 void Socket::connectServer(std::string address, unsigned short port) {
 	hostent* serverHost = gethostbyname(address.c_str());
 	in_addr* serverAddress = (in_addr*) serverHost->h_addr_list[0];
