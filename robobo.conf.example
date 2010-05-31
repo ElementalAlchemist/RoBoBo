@@ -36,6 +36,15 @@ serverconf irc.server.net { # This server will not be connected on startup, but 
 	# channels = "";
 }
 
+module m_services_identify.so {
+	irc.server.net/service = "NickServ";
+	#irc.server.net/service = "AuthServ@service.server.net"; # Nickname should be in this form if the server requires identification to be sent to a nick like this
+	irc.server.net/command = "IDENTIFY";
+	#irc.server.net/nickname = ""; # This is only necessary on services that require it or if you're identifying to an account of a different nick (and services support it)
+	irc.server.net/password = "pass";
+	# Repeat for each server on which the bot should identify.
+}
+
 module m_ctcpversionreply.so { # This module replies to CTCP VERSION requests sent to the bot.
 	# replystring: Text added to the end of the VERSION reply sent from the bot. Optional.
 	#replystring = "";
