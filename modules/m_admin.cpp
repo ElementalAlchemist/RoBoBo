@@ -383,7 +383,6 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		int verbose;
 		adminVerbosityLevel >> verbose;
 		verbosity[adminNum] = verbose;
-		std::cout << "Admin " << adminNum << " logged in with verbosity level " << verbose << std::endl;
 	} else if (splitMsg[0] == "modules") {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Loaded modules:");
