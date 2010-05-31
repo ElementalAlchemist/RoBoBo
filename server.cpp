@@ -11,6 +11,7 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl;
 	}
 	serverConnection.connectServer(serverAddress, port);
+	sleep(1); // don't send right away in case of some sort of death
 	sendLine("NICK " + serverConf["nick"]);
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
 	if (serverConf["password"] != "")
