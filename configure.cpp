@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
 		makeOut << moduleFiles[i] << ".so ";
 	makeOut << "\n\n";
 	for (unsigned int i = 0; i < moduleFiles.size(); i++)
-		makeOut << moduleFiles[i] << ".so: " << moduleFiles[i] << ".o\n\t$(CXX) $(LDFLAGS) $^ -o $@\n";
+		makeOut << moduleFiles[i] << ".so: " << moduleFiles[i] << ".o\n\t$(CXX) $(LDFLAGS) " << moduleFiles[i] << ".o -o $@\n";
 	for (unsigned int i = 0; i < moduleFiles.size(); i++)
 		makeOut << moduleFiles[i] << ".o: $(DEPS)\n";
 	makeOut << moduleMakefileEnd;
