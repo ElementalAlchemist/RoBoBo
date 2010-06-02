@@ -26,7 +26,6 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	serverConf = config.getServerConfig(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); ++servConfIter)
 		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servConfIter->first, servConfIter->second));
-	pthread_create(&modunloadqueue, NULL, processModUnloadQueue, this);
 }
 
 void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
@@ -376,44 +375,41 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 }
 
 void ModuleInterface::unloadModule(std::string modName) {
-	unloadingModules.push_back(modName);
+	if (modules.find(modName) == modules.end())
+		return;
+	moduleToUnload.push_back(modName);
+	pthread_t tum;
+	pthread_create(&tum, NULL, tUnloadMod_thread, this);
 }
 
-void* ModuleInterface::processModUnloadQueue(void* ptr) {
-	ModuleInterface* modi = (ModuleInterface*) ptr;
-	int ttw = 30; // time to wait
-	while (true) {
-		sleep(ttw);
-		ttw = 10;
-		if (!modi->unloadingModules.empty()) {
-			ttw = 5;
-			while (modi->unloadingModules.size() > 0) {
-				std::tr1::unordered_map<std::string, Module*>::iterator modIter = modi->modules.find(modi->unloadingModules[0]);
-				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = modi->moduleFiles.find(modi->unloadingModules[0]);
-				std::vector<std::string> abilities = modIter->second->getAbilities();
-				for (unsigned int i = 0; i < abilities.size(); i++) {
-					std::multimap<std::string, std::string>::iterator anAbility = modi->modAbilities.find(abilities[i]);
-					if (anAbility == modi->modAbilities.end())
-						continue;
-					while (anAbility->second != modi->unloadingModules[0])
-						modi->modAbilities.find(abilities[i]);
-					modi->modAbilities.erase(anAbility);
-				}
-				if (modIter == modi->modules.end()) {
-					modi->unloadingModules.erase(modi->unloadingModules.begin());
-					continue;
-				}
-				delete modIter->second;
-				modi->modules.erase(modIter);
-				dlclose(modFileIter->second);
-				modi->moduleFiles.erase(modFileIter);
-				modi->unloadingModules.erase(modi->unloadingModules.begin());
-			}
-			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modi->modules.begin(); modIter != modi->modules.end(); ++modIter)
-				modIter->second->onRehash(); // provide modules with a way to detect unloading
-		}
-	}
+void* ModuleInterface::tUnloadMod_thread(void* mip) {
+	ModuleInterface* modi = (ModuleInterface*) mip;
+	modi->tUnloadMod();
 	return NULL;
+}
+
+void ModuleInterface::tUnloadMod() {
+	if (moduleToUnload.empty())
+		return;
+	sleep(1);
+	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(moduleToUnload[0]);
+	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(moduleToUnload[0]);
+	std::vector<std::string> abilities = modIter->second->getAbilities();
+	for (unsigned int i = 0; i < abilities.size(); i++) {
+		std::multimap<std::string, std::string>::iterator anAbility = modAbilities.find(abilities[i]);
+		if (anAbility == modAbilities.end())
+			continue;
+		while (anAbility->second != moduleToUnload[0])
+			anAbility = modAbilities.find(abilities[i]);
+		modAbilities.erase(anAbility);
+	}
+	delete modIter->second;
+	modules.erase(modIter);
+	dlclose(modFileIter->second);
+	moduleFiles.erase(modFileIter);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = modules.begin(); moduleIter != modules.end(); ++moduleIter)
+		moduleIter->second->onRehash(); // provide modules with a way to detect unloading
+	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we just removed
 }
 
 void ModuleInterface::removeServer(std::string server) {
