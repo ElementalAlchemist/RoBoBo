@@ -12,10 +12,10 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	}
 	serverConnection.connectServer(serverAddress, port);
 	sleep(1); // don't send right away in case of some sort of death
-	sendLine("NICK " + serverConf["nick"]);
-	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
 	if (serverConf["password"] != "")
 		sendLine("PASS " + serverConf["password"]);
+	sendLine("NICK " + serverConf["nick"]);
+	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
 	pthread_create(&dataReceiveThread, NULL, handleData_thread, this);
 	pthread_create(&dataSendThread, NULL, sendData_thread, this);
 }
