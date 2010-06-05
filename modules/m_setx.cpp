@@ -23,6 +23,7 @@ bool SetX::onLoadComplete() {
 			return true; // loading complete
 		serverList.substr(serverList.find_first_of(',') + 1);
 	}
+	return true;
 }
 
 void SetX::onRehash() {
