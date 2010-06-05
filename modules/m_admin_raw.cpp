@@ -4,7 +4,7 @@
 class RawCommand : public AdminHook {
 	public:
 		int botAPIversion();
-		void onLoadComplete();
+		bool onLoadComplete();
 		void onRehash();
 		std::string getDesc();
 		std::vector<std::string> supports();
@@ -13,14 +13,15 @@ class RawCommand : public AdminHook {
 };
 
 int RawCommand::botAPIversion() {
-	return 1000;
+	return 1002;
 }
 
-void RawCommand::onLoadComplete() {
+bool RawCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl;
 		unloadModule(moduleName);
+		return false;
 	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'y')
@@ -29,6 +30,7 @@ void RawCommand::onLoadComplete() {
 			config["masteronly"] = "no";
 	} else
 		config["masteronly"] = "no";
+	return true;
 }
 
 void RawCommand::onRehash() {

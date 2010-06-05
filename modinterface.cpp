@@ -358,7 +358,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*)spawnModule();
-	if (newModule->botAPIversion() != 1001 && newModule->botAPIversion() != 1000) { // compare to current API version (1001 backwards compatible with 1000)
+	if (newModule->botAPIversion() != 1002) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module " << modName << " is not compatible with the current API." << std::endl;
 		return false;
@@ -370,7 +370,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	for (unsigned int i = 0; i < abilities.size(); i++)
 		modAbilities.insert(std::pair<std::string, std::string> (abilities[i], modName));
 	if (!startup)
-		newModule->onLoadComplete();
+		return newModule->onLoadComplete();
 	return true;
 }
 

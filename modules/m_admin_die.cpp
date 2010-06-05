@@ -4,7 +4,7 @@
 class DieCommand : public AdminHook {
 	public:
 		int botAPIversion();
-		void onLoadComplete();
+		bool onLoadComplete();
 		void onRehash();
 		std::string getDesc();
 		std::vector<std::string> supports();
@@ -13,15 +13,16 @@ class DieCommand : public AdminHook {
 };
 
 int DieCommand::botAPIversion() {
-	return 1000;
+	return 1002;
 }
 
-void DieCommand::onLoadComplete() {
+bool DieCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
 		unloadModule(moduleName);
+		return false;
 	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'n')
@@ -30,6 +31,7 @@ void DieCommand::onLoadComplete() {
 			config["masteronly"] = "yes";
 	} else
 		config["masteronly"] = "yes";
+	return true;
 }
 
 void DieCommand::onRehash() {

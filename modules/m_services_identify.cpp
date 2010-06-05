@@ -8,7 +8,7 @@ class ServicesID : public Module {
 };
 
 int ServicesID::botAPIversion() {
-	return 1001;
+	return 1002;
 }
 
 void ServicesID::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {

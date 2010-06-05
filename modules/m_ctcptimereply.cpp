@@ -12,7 +12,7 @@ class TimeReply : public Module {
 };
 
 int TimeReply::botAPIversion() {
-	return 1000;
+	return 1002;
 }
 
 void TimeReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {

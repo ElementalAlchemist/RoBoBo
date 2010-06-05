@@ -4,7 +4,7 @@
 class AdminSay : public AdminHook {
 	public:
 		int botAPIversion();
-		void onLoadComplete();
+		bool onLoadComplete();
 		void onRehash();
 		std::string getDesc();
 		std::vector<std::string> supports();
@@ -13,15 +13,16 @@ class AdminSay : public AdminHook {
 };
 
 int AdminSay::botAPIversion() {
-	return 1000;
+	return 1002;
 }
 
-void AdminSay::onLoadComplete() {
+bool AdminSay::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator ableIter = modAbilities.find("BOT_ADMIN");
 	if (ableIter == modAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
 		unloadModule(moduleName);
+		return false;
 	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'y')
@@ -30,6 +31,7 @@ void AdminSay::onLoadComplete() {
 			config["masteronly"] = "no";
 	} else
 		config["masteronly"] = "no";
+	return true;
 }
 
 void AdminSay::onRehash() {

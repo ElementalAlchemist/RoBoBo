@@ -14,7 +14,7 @@ void Module::reconf(std::tr1::unordered_map<std::string, std::string> modConf) {
 	config = modConf;
 }
 
-void Module::onLoadComplete() {}
+bool Module::onLoadComplete() { return true; }
 
 void Module::onRehash() {}
 

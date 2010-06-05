@@ -32,7 +32,7 @@ class m_dccchat : public dccSender {
 };
 
 int m_dccchat::botAPIversion() {
-	return 1000;
+	return 1002;
 }
 
 void m_dccchat::onNickChange(std::string server, std::string oldNick, std::string newNick) {

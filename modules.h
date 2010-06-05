@@ -14,7 +14,7 @@ class Module {
 		virtual int botAPIversion() = 0;
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName);
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
-		virtual void onLoadComplete();
+		virtual bool onLoadComplete();
 		virtual void onRehash();
 		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		virtual void onUserMsg(std::string server, std::string nick, std::string message);

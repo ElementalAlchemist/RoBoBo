@@ -4,7 +4,7 @@
 class RehashCommand : public AdminHook {
 	public:
 		int botAPIversion();
-		void onLoadComplete();
+		bool onLoadComplete();
 		void onRehash();
 		std::string getDesc();
 		std::vector<std::string> supports();
@@ -13,15 +13,16 @@ class RehashCommand : public AdminHook {
 };
 
 int RehashCommand::botAPIversion() {
-	return 1000;
+	return 1002;
 }
 
-void RehashCommand::onLoadComplete() {
+bool RehashCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator ableIter = modAbilities.find("BOT_ADMIN");
 	if (ableIter == modAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
 		unloadModule(moduleName);
+		return false;
 	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'n')
@@ -30,6 +31,7 @@ void RehashCommand::onLoadComplete() {
 			config["masteronly"] = "yes";
 	} else
 		config["masteronly"] = "yes";
+	return true;
 }
 
 void RehashCommand::onRehash() {

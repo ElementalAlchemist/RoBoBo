@@ -5,7 +5,7 @@
 class Admin : public AdminMod {
 	public:
 		int botAPIversion();
-		void onLoadComplete();
+		bool onLoadComplete();
 		void onRehash();
 		std::vector<std::string> getAbilities();
 		void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -45,10 +45,10 @@ class Admin : public AdminMod {
 };
 
 int Admin::botAPIversion() {
-	return 1001;
+	return 1002;
 }
 
-void Admin::onLoadComplete() {
+bool Admin::onLoadComplete() {
 	std::multimap<std::string, std::string> services = getModAbilities();
 	std::multimap<std::string, std::string>::iterator serviceIter = services.find("DCC_CHAT");
 	if (serviceIter == services.end())
@@ -80,6 +80,7 @@ void Admin::onLoadComplete() {
 		else {
 			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl;
 			unloadModule(moduleName);
+			return false;
 		}
 		admins.push_back(adminPrivs);
 		verbosity.push_back(0); // verbosity should only be >0 with an open DCC chat session
@@ -103,6 +104,7 @@ void Admin::onLoadComplete() {
 			}
 		}
 	}
+	return true;
 }
 
 void Admin::onRehash() {

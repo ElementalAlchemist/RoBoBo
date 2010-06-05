@@ -3,7 +3,7 @@
 class SetX : public Module {
 	public:
 		int botAPIversion();
-		void onLoadComplete();
+		bool onLoadComplete();
 		void onRehash();
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 	private:
@@ -11,16 +11,16 @@ class SetX : public Module {
 };
 
 int SetX::botAPIversion() {
-	return 1001;
+	return 1002;
 }
 
-void SetX::onLoadComplete() {
+bool SetX::onLoadComplete() {
 	std::string serverList = config["servers"];
 	while (serverList != "") {
 		std::string aServer = serverList.substr(0, serverList.find_first_of(','));
 		xServers.push_back(aServer);
 		if (serverList.find_first_of(',') == std::string::npos)
-			return;
+			return true; // loading complete
 		serverList.substr(serverList.find_first_of(',') + 1);
 	}
 }
