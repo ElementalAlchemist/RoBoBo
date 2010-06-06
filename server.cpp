@@ -217,14 +217,11 @@ void Server::sendData() {
 	std::string sendingMessage = "";
 	std::string command = "";
 	pthread_create(&secondDecrementThread, NULL, secondDecrement_thread, this);
-	timespec halfSecond;
-	halfSecond.tv_sec = 0;
-	halfSecond.tv_nsec = 500000000; // 500 million nanoseconds = 0.5 seconds.
 	while (true) {
 		if (!serverConnection.isConnected())
 			break; // Thread must die when server isn't connected.
 		if (outData.empty()) {
-			nanosleep(&halfSecond, NULL); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
+			usleep(500000); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
 			continue; // check again for empty queue
 		}
 		sendingMessage = outData.front();
