@@ -12,3 +12,4 @@ Before 1.0.0
 [x] - allow binding of connections
 [x] - "Module m_xyz.so loaded successfully." Even when it didn't for reasons other than missing conf data
 [ ] - Debug levels other than "on" and "off"
+[ ] - Reconnect to servers when forced disconnect
