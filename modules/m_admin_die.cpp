@@ -90,6 +90,7 @@ void DieCommand::onAdminCommand(std::string server, std::string nick, std::strin
 			dccMod->closeDCCConnection(connectedDCC[i]);
 	}
 	std::cout << "Shutting down by admin command: die" << std::endl;
+	sleep(1);
 	std::exit(0);
 }
 
