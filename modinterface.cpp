@@ -2,6 +2,9 @@
 #include "connection.h"
 
 ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
+	pthread_attr_init(&detachedState);
+	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
+	pthread_create(&serverCheckThread, &detachedState, serverCheck_thread, this); // start thread that checks for disconnected servers
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig(true);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
@@ -463,4 +466,23 @@ std::pair<char, char> ModuleInterface::getUserStatus(std::string server, std::st
 	if (servIter == servers.end())
 		return std::pair<char, char> ('0', ' '); // pair for normal user
 	return servIter->second->getUserStatus(channel, user);
+}
+
+void* ModuleInterface::serverCheck_thread(void* ptr) {
+	ModuleInterface* modi = (ModuleInterface*) ptr;
+	modi->serverCheck();
+	return NULL;
+}
+
+void ModuleInterface::serverCheck() {
+	while (true) {
+		sleep(60); // one minute pause between checks
+		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+			if (!servIter->second->stillConnected()) {
+				delete servIter->second;
+				std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
+				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this); // make new server for reconnecting
+			}
+		}
+	}
 }

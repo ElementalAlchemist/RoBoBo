@@ -108,6 +108,8 @@ class ModuleInterface {
 		static void* tUnloadMod_thread(void* mip);
 		void tUnloadMod();
 		void removeServer(std::string server);
+		static void* serverCheck_thread(void* ptr);
+		void serverCheck();
 	private:
 		std::tr1::unordered_map<std::string, Server*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
@@ -122,5 +124,7 @@ class ModuleInterface {
 		bool charIsNumeric(char number);
 		bool isChanType(char chanPrefix);
 		std::vector<std::string> moduleToUnload;
+		pthread_t serverCheckThread;
+		pthread_attr_t detachedState;
 };
 #endif

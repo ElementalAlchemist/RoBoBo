@@ -45,6 +45,8 @@ class Channel {
 class Server {
 	public:
 		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace);
+		~Server();
+		bool stillConnected();
 		void sendLine(std::string line);
 		std::tr1::unordered_map<std::string, std::string> getInfo();
 		std::tr1::unordered_map<char, char> getPrefixes();
@@ -64,6 +66,7 @@ class Server {
 		pthread_t dataSendThread;
 		pthread_t secondDecrementThread;
 		pthread_mutex_t secondsmutex;
+		pthread_attr_t detachedState;
 		volatile unsigned short seconds; // seconds in the penalty system
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		std::tr1::unordered_map<std::string, Channel*> inChannels;

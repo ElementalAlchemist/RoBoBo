@@ -3,6 +3,8 @@
 
 Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) : serverName(serverAddress), moduleData(modFace), serverConf(confVars) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
+	pthread_attr_init(&detachedState);
+	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
 	portNumber >> port;
@@ -16,8 +18,18 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 		sendLine("PASS " + serverConf["password"]);
 	sendLine("NICK " + serverConf["nick"]);
 	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
-	pthread_create(&dataReceiveThread, NULL, handleData_thread, this);
-	pthread_create(&dataSendThread, NULL, sendData_thread, this);
+	pthread_create(&dataReceiveThread, &detachedState, handleData_thread, this);
+	pthread_create(&dataSendThread, &detachedState, sendData_thread, this);
+}
+
+Server::~Server() {
+	pthread_cancel(dataReceiveThread);
+	pthread_cancel(dataSendThread);
+	pthread_cancel(secondDecrementThread);
+}
+
+bool Server::stillConnected() {
+	return serverConnection.isConnected();
 }
 
 void Server::sendLine(std::string line) {
@@ -216,7 +228,7 @@ void Server::sendData() {
 	unsigned short secondsToAdd = 0;
 	std::string sendingMessage = "";
 	std::string command = "";
-	pthread_create(&secondDecrementThread, NULL, secondDecrement_thread, this);
+	pthread_create(&secondDecrementThread, &detachedState, secondDecrement_thread, this);
 	while (true) {
 		if (!serverConnection.isConnected())
 			break; // Thread must die when server isn't connected.
