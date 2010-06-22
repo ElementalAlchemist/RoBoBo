@@ -26,7 +26,8 @@ void VersionReply::onUserCTCP(std::string server, std::string nick, std::string 
 
 void VersionReply::sendVersionReply(std::string server, std::string target) {
 	std::string versionReply = "RoBoBo-IRC-BoBo IRC Bot ";
-	switch (getBotVersion()) { // get bot version, so this mod isn't restricted to one version of the bot and doesn't have to be updated with each version
+	unsigned int thisBotVersion = getBotVersion();
+	switch (thisBotVersion) { // get bot version, so this mod isn't restricted to one version of the bot and doesn't have to be updated with each version
 		case 900:
 			versionReply += "v1.0.0a1";
 			break;
@@ -36,9 +37,20 @@ void VersionReply::sendVersionReply(std::string server, std::string target) {
 		case 950:
 			versionReply += "v1.0.0b1";
 			break;
-		case 1000:
-			versionReply += "v1.0.0";
+		case 980:
+			versionReply += "v1.0.0rc1";
 			break;
+		default:
+			std::ostringstream thisVersion;
+			thisVersion << "v";
+			int majorVersion = thisBotVersion / 1000;
+			thisVersion << majorVersion;
+			thisBotVersion -= majorVersion * 1000;
+			int middleVersion = thisBotVersion / 100;
+			thisVersion << "." << middleVersion;
+			thisBotVersion -= middleVersion * 100;
+			thisVersion << "." << thisBotVersion;
+			versionReply += thisVersion.str();
 	} // More of these may be added as they exist.
 	if (config["replystring"] != "")
 		versionReply += " " + config["replystring"];
