@@ -20,7 +20,7 @@ bool ConnectServerCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -38,7 +38,7 @@ void ConnectServerCommand::onRehash() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
 		unloadModule(moduleName);
 	}
 	if (config["masteronly"] != "") {

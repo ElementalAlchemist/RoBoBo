@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 				confName = argv[i];
 				std::cout << "Looking for a configuration file named " << confName << std::endl;
 			} else if (strcmp(argv[i], "--debug") == 0 || strcmp(argv[i], "-d") == 0) {
-				if (i+1 >= argc || !(strcmp(argv[i+1], "0") == 0 || strcmp(argv[i+1], "1") == 0 || strcmp(argv[i+1], "2") == 0 || strcmp(argv[i+1], "3") == 0 || strcmp(argv[i+1], "4") == 0 || strcmp(argv[i+1], "5") == 0))
+				if (i+1 >= argc || !(strcmp(argv[i+1], "0") == 0 || strcmp(argv[i+1], "1") == 0 || strcmp(argv[i+1], "2") == 0 || strcmp(argv[i+1], "3") == 0))
 					debug = 1;
 				else {
 					std::istringstream debugNum (argv[++i]);
@@ -57,10 +57,9 @@ int main(int argc, char** argv) {
 		if (exitAfter)
 			return 0;
 	}
-	if (debug == 0) {
-		std::cout << "RoBoBo-IRC-BoBo started.  Forking..." << std::endl;
+	std::cout << "RoBoBo-IRC-BoBo started." << std::endl;
+	if (debug == 0)
 		daemon(1,0);
-	}
 	new ModuleInterface (confDir, confName, debug); //run actual bot
 	pthread_exit(NULL);
 }

@@ -78,7 +78,7 @@ bool Admin::onLoadComplete() {
 		if (isValidVerboseLevel(config[adminIndex.str()+"/verbose"]))
 			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
-			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl;
+			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl; // debug level 1
 			unloadModule(moduleName);
 			return false;
 		}
@@ -126,7 +126,7 @@ void Admin::onRehash() {
 		if (isValidVerboseLevel(config[adminIndex.str()+"/verbose"]))
 			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
-			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl;
+			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl; // debug level 1
 			unloadModule(moduleName);
 		}
 		admins.push_back(adminPrivs);

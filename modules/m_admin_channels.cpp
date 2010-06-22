@@ -20,7 +20,7 @@ bool AdminChannelControl::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator ableIter = modAbilities.find("BOT_ADMIN");
 	if (ableIter == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
+		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -38,7 +38,7 @@ void AdminChannelControl::onRehash() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator ableIter = modAbilities.find("BOT_ADMIN");
 	if (ableIter == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl;
+		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 	}
 	if (config["masteronly"] != "") {

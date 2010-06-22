@@ -129,7 +129,8 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 		std::string receivedMsg = listenSocket->receive();
 		if (receivedMsg == "")
 			break;
-		std::cout << "DCC " << id << ":" << receivedMsg << std::endl;
+		if (debugLevel >= 3)
+			std::cout << "DCC " << id << ":" << receivedMsg << std::endl;
 		if (receivedMsg == "closedcc") {
 			dccSend(id, "Disconnecting DCC...");
 			break;

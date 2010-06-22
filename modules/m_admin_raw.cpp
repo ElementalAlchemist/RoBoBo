@@ -19,7 +19,7 @@ int RawCommand::botAPIversion() {
 bool RawCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -36,7 +36,7 @@ bool RawCommand::onLoadComplete() {
 void RawCommand::onRehash() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 	}
 	if (config["masteronly"] != "") {

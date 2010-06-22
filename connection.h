@@ -44,7 +44,7 @@ class Channel {
 
 class Server {
 	public:
-		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace);
+		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug);
 		~Server();
 		bool stillConnected();
 		void sendLine(std::string line);
@@ -59,6 +59,7 @@ class Server {
 		std::pair<char, char> getUserStatus(std::string channel, std::string user);
 	private:
 		std::string serverName;
+		unsigned short debugLevel;
 		bool registered, altChanged;
 		Socket serverConnection;
 		ModuleInterface* moduleData;

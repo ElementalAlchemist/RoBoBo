@@ -12,7 +12,7 @@ class Module {
 		Module();
 		virtual ~Module();
 		virtual int botAPIversion() = 0;
-		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName);
+		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName, unsigned short debug);
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
 		virtual bool onLoadComplete();
 		virtual void onRehash();
@@ -53,6 +53,7 @@ class Module {
 		virtual std::vector<std::string> supports();
 	protected:
 		std::string moduleName;
+		unsigned short debugLevel;
 		std::tr1::unordered_map<std::string, std::string> config;
 		void sendPrivMsg(std::string server, std::string target, std::string message);
 		void sendNotice(std::string server, std::string target, std::string message);

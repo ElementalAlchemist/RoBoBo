@@ -4,10 +4,11 @@ Module::Module() {}
 
 Module::~Module() {}
 
-void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName) {
+void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName, unsigned short debug) {
 	config = modConf;
 	serverData = modFace;
 	moduleName = modName;
+	debugLevel = debug;
 }
 
 void Module::reconf(std::tr1::unordered_map<std::string, std::string> modConf) {

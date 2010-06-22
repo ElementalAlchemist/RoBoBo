@@ -10,10 +10,11 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter) {
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
-		if (loadModule(modConfIter->first, true))
-			std::cout << "Module " << modConfIter->first << " loaded successfully." << std::endl;
-		else
-			std::cout << "Module " << modConfIter->first << " failed to load." << std::endl;
+		if (loadModule(modConfIter->first, true)) {
+			if (debugLevel >= 2)
+				std::cout << "Module " << modConfIter->first << " loaded successfully." << std::endl;
+		} else
+			std::cout << "Module " << modConfIter->first << " failed to load." << std::endl; // debug level 1
 	}
 	
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
@@ -334,7 +335,7 @@ bool ModuleInterface::connectServer(std::string serverName) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConfigs.find(serverName);
 	if (servConfIter == serverConfigs.end())
 		return false;
-	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, servConfIter->second, this)));
+	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, servConfIter->second, this, debugLevel)));
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 		modIter->second->onConnect(serverName); // call onConnect hook
 	return true;
@@ -348,7 +349,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
 		std::string error = "Could not load module " + modName + ": " + dlerror();
-		std::perror(error.c_str());
+		std::perror(error.c_str()); // debug level 1
 		return false;
 	}
 	typedef void* (*module_spawn_t)();
@@ -356,17 +357,17 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	const char* dlsymError = dlerror();
 	if (dlsymError) {
 		std::string error = "Could not load module " + modName + ": " + dlsymError;
-		std::perror(error.c_str());
+		std::perror(error.c_str()); // debug level 1
 		return false;
 	}
 	
 	Module* newModule = (Module*)spawnModule();
 	if (newModule->botAPIversion() != 1002) { // compare to current API version
 		dlclose(openModule);
-		std::cout << "Module " << modName << " is not compatible with the current API." << std::endl;
+		std::cout << "Module " << modName << " is not compatible with the current API." << std::endl; // debug level 1
 		return false;
 	}
-	newModule->init(modConf->second, this, modName);
+	newModule->init(modConf->second, this, modName, debugLevel);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));
 	std::vector<std::string> abilities = newModule->getAbilities();
@@ -480,8 +481,9 @@ void ModuleInterface::serverCheck() {
 		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
 			if (!servIter->second->stillConnected()) {
 				delete servIter->second;
-				std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
-				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this); // make new server for reconnecting
+				if (debugLevel >= 2)
+					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
+				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
 			}
 		}
 	}

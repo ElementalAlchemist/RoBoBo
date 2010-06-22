@@ -1,7 +1,7 @@
 #include "connection.h"
 #include "modules.h"
 
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace) : serverName(serverAddress), moduleData(modFace), serverConf(confVars) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), moduleData(modFace), serverConf(confVars) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
@@ -10,10 +10,10 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	portNumber >> port;
 	if (serverConf["bind"] != "") {
 		if (!serverConnection.bindSocket(serverConf["bind"]))
-			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl;
+			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl; // debug level 1
 	}
 	serverConnection.connectServer(serverAddress, port);
-	sleep(1); // don't send right away in case of some sort of death
+	sleep(1); // don't send right away in case of some sort of death or slowness
 	if (serverConf["password"] != "")
 		sendLine("PASS " + serverConf["password"]);
 	sendLine("NICK " + serverConf["nick"]);
@@ -99,7 +99,8 @@ void Server::handleData() {
 		receivedLine = serverConnection.receive();
 		if (receivedLine == "")
 			break; // this case indicates a receive error
-		std::cout << receivedLine << std::endl;
+		if (debugLevel >= 3)
+			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
 		if (parsedLine.size() >= 1)
 			moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
@@ -290,7 +291,8 @@ void Server::sendData() {
 			sleep(1);
 		}
 		serverConnection.sendData(sendingMessage);
-		std::cout << " -> " << sendingMessage << std::endl;
+		if (debugLevel >= 3)
+			std::cout << " -> " << sendingMessage << std::endl;
 		moduleData->callHookOut(serverName, parseLine(sendingMessage));
 		pthread_mutex_lock(&secondsmutex);
 		seconds += secondsToAdd;

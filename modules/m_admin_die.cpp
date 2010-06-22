@@ -20,7 +20,7 @@ bool DieCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -38,7 +38,7 @@ void DieCommand::onRehash() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl;
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
 		unloadModule(moduleName);
 	}
 	if (config["masteronly"] != "") {
@@ -89,8 +89,8 @@ void DieCommand::onAdminCommand(std::string server, std::string nick, std::strin
 		for (unsigned int i = 0; i < connectedDCC.size(); i++)
 			dccMod->closeDCCConnection(connectedDCC[i]);
 	}
-	std::cout << "Shutting down by admin command: die" << std::endl;
-	sleep(1);
+	std::cout << "Shutting down by admin command: die" << std::endl; // debug level 1
+	sleep(1); // give the send queue a little time to flush quits
 	std::exit(0);
 }
 
