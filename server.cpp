@@ -102,8 +102,7 @@ void Server::handleData() {
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
-		if (parsedLine.size() >= 1)
-			moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
+		moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendLine("MODE " + serverConf["nick"] + " +B"); // set bot mode
 			if (serverConf["channels"] != "")
