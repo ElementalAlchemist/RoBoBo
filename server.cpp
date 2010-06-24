@@ -241,11 +241,14 @@ void Server::sendData() {
 		command = sendingMessage.substr(0,sendingMessage.find_first_of(' '));
 		
 		if (command == "MODE") { // consolidate modes into one line
+			secondsToAdd = 1;
 			std::vector<std::string> parsedLine = parseLine(sendingMessage);
 			std::string channel = parsedLine[1], modes = parsedLine[2], params = "";
-			bool addingMode = (modes[0] == '+') ? true : false;
+			bool addingMode = (modes[0] == '-') ? false : true;
 			if (parsedLine.size() > 3) // if there is a parameter, add it
 				params += " " + parsedLine[3];
+			if (modes[1] == 'x' && !moduleData->isChanType(channel[0], serverName))
+				secondsToAdd = 6; // because setting umode +x is apparently such an expensive operation.
 			
 			if (!outData.empty()) {
 				sendingMessage = outData.front();
@@ -261,6 +264,8 @@ void Server::sendData() {
 						addingMode = true;
 					else
 						addingMode = false;
+					if (*modes.rbegin() == 'x')
+						secondsToAdd = 6;
 					if (parsedLine.size() > 3)
 						params += " " + parsedLine[3];
 					limit++;
@@ -271,20 +276,20 @@ void Server::sendData() {
 				}
 			}
 			sendingMessage = "MODE " + channel + " " + modes + params; // set the sendingMessage to the final compilation forming the message we are sending
+		} else { // MODE processes its own penalty addition
+			if (command == "GLINE" || command == "KLINE" || (command == "NICK" && !registered) || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
+				secondsToAdd = 0;
+			else if (command == "JOIN" || command == "MAP" || command == "REHASH" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
+				secondsToAdd = 2;
+			else if (command == "CYCLE")
+				secondsToAdd = 3;
+			else if (command == "INVITE" || command == "NICK")
+				secondsToAdd = 4;
+			else if (command == "LIST" || command == "PART" || command == "KNOCK" || command == "MKPASSWD")
+				secondsToAdd = 5;
+			else // all commands not on the list are worth 1 second.
+				secondsToAdd = 1;
 		}
-		
-		if (command == "GLINE" || command == "KLINE" || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
-			secondsToAdd = 0;  // add the correct number of seconds for the command being sent
-		else if (command == "JOIN" || command == "MAP" || command == "REHASH" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
-			secondsToAdd = 2;
-		else if (command == "NICK" || command == "CYCLE")
-			secondsToAdd = 3;
-		else if (command == "INVITE")
-			secondsToAdd = 4;
-		else if (command == "LIST" || command == "PART" || command == "MKPASSWD")
-			secondsToAdd = 5;
-		else // all commands not on the list are worth 1 second.
-			secondsToAdd = 1;
 		
 		while (seconds + secondsToAdd > 10) {
 			sleep(1);

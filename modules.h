@@ -95,6 +95,7 @@ class ModuleInterface {
 		std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
 		void callHook(std::string server, std::vector<std::string> parsedLine);
 		void callHookOut(std::string server, std::vector<std::string> parsedLine);
+		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();
 		std::multimap<std::string, std::string> getModuleAbilities();
@@ -123,7 +124,6 @@ class ModuleInterface {
 		std::string configName;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
-		bool isChanType(char chanPrefix);
 		std::vector<std::string> moduleToUnload;
 		pthread_t serverCheckThread;
 		pthread_attr_t detachedState;

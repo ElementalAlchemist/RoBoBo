@@ -69,10 +69,10 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 				parsedLine[3] = parsedLine[3].substr(1);
 			
 			if (parsedLine[3].substr(0, parsedLine[3].find_first_of(' ')) == "ACTION") {
-				if (isChanType(parsedLine[2][0])) {
+				if (isChanType(parsedLine[2][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onChannelAction(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3].substr(7));
-				} else if (isChanType(parsedLine[2][1])) {
+				} else if (isChanType(parsedLine[2][1], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onChannelAction(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3].substr(7));
 				} else {
@@ -80,10 +80,10 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 						modIter->second->onUserAction(server, parseNickFromHost(parsedLine[0]), parsedLine[3].substr(7));
 				}
 			} else {
-				if (isChanType(parsedLine[2][0])) {
+				if (isChanType(parsedLine[2][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onChannelCTCP(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
-				} else if (isChanType(parsedLine[2][1])) {
+				} else if (isChanType(parsedLine[2][1], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onChannelCTCP(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
 				} else {
@@ -92,10 +92,10 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 				}
 			}
 		} else {
-			if (isChanType(parsedLine[2][0])) {
+			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onChannelMsg(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1])) {
+			} else if (isChanType(parsedLine[2][1], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onChannelMsg(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			} else {
@@ -110,10 +110,10 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 			else
 				parsedLine[3] = parsedLine[3].substr(1);
 			
-			if (isChanType(parsedLine[2][0])) {
+			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onChannelCTCPReply(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1])) {
+			} else if (isChanType(parsedLine[2][1], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onChannelCTCPReply(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			} else {
@@ -121,10 +121,10 @@ void ModuleInterface::callHook(std::string server, std::vector<std::string> pars
 					modIter->second->onUserCTCPReply(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			}
 		} else {
-			if (isChanType(parsedLine[2][0])) {
+			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onChannelNotice(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1])) {
+			} else if (isChanType(parsedLine[2][1], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onChannelNotice(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
 			} else {
@@ -220,10 +220,10 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 				parsedLine[3] = parsedLine[3].substr(1);
 			
 			if (parsedLine[3].substr(0, parsedLine[3].find_first_of(' ')) == "ACTION") {
-				if (isChanType(parsedLine[2][0])) {
+				if (isChanType(parsedLine[2][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onOutChannelAction(server, parsedLine[2], '0', parsedLine[3].substr(7));
-				} else if (isChanType(parsedLine[2][1])) {
+				} else if (isChanType(parsedLine[2][1], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onOutChannelAction(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3].substr(7));
 				} else {
@@ -231,10 +231,10 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 						modIter->second->onOutUserAction(server, parsedLine[2], parsedLine[3].substr(7));
 				}
 			} else {
-				if (isChanType(parsedLine[2][0])) {
+				if (isChanType(parsedLine[2][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onOutChannelCTCP(server, parsedLine[2], '0', parsedLine[3]);
-				} else if (isChanType(parsedLine[2][1])) {
+				} else if (isChanType(parsedLine[2][1], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 						modIter->second->onOutChannelCTCP(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3]);
 				} else {
@@ -243,10 +243,10 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 				}
 			}
 		} else {
-			if (isChanType(parsedLine[2][0])) {
+			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onOutChannelMessage(server, parsedLine[2], '0', parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1])) {
+			} else if (isChanType(parsedLine[2][1], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onOutChannelMessage(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3]);
 			} else {
@@ -261,10 +261,10 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 			else
 				parsedLine[3] = parsedLine[3].substr(1);
 			
-			if (isChanType(parsedLine[2][0])) {
+			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onOutChannelCTCPReply(server, parsedLine[2], '0', parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1])) {
+			} else if (isChanType(parsedLine[2][1], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onOutChannelCTCPReply(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3]);
 			} else {
@@ -272,10 +272,10 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 					modIter->second->onOutUserCTCPReply(server, parsedLine[2], parsedLine[3]);
 			}
 		} else {
-			if (isChanType(parsedLine[2][0])) {
+			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onOutChannelNotice(server, parsedLine[2], '0', parsedLine[3]);
-			} else if (isChanType(parsedLine[2][1])) {
+			} else if (isChanType(parsedLine[2][1], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 					modIter->second->onOutChannelNotice(server, parsedLine[2].substr(1), parsedLine[2][0], parsedLine[3]);
 			} else {
@@ -298,14 +298,13 @@ bool ModuleInterface::charIsNumeric(char number) {
 	return false;
 }
 
-bool ModuleInterface::isChanType(char chanPrefix) {
-	std::vector<char> prefixes;
-	for (std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.begin(); serverIter != servers.end(); ++serverIter) {
-		prefixes = serverIter->second->getChanTypes();
-		for (unsigned int i = 0; i < prefixes.size(); i++) {
-			if (chanPrefix == prefixes[i])
-				return true;
-		}
+bool ModuleInterface::isChanType(char chanPrefix, std::string server) {
+	if (servers.find(server) == servers.end())
+		return false;
+	std::vector<char> prefixes = servers.find(server)->second->getChanTypes();
+	for (unsigned int i = 0; i < prefixes.size(); i++) {
+		if (chanPrefix == prefixes[i])
+			return true;
 	}
 	return false;
 }
