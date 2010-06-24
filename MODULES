@@ -3,17 +3,32 @@ Creating Modules Help File
 =======================
 Table of Contents
 
-1. Specifics of Implementation
-2. Communicating with a Server
-- 2.1. Receiving Data from a Server
-- 2.2. Receiving Data Being Sent to a Server
-- 2.3. Other Hooks
-- 2.4. Sending Data to a Server
-3. Helpful Variables and Functions
-4. Interacting With Other Modules
+1. Current API
+2. Specifics of Implementation
+3. Communicating with a Server
+- 3.1. Receiving Data from a Server
+- 3.2. Receiving Data Being Sent to a Server
+- 3.3. Other Hooks
+- 3.4. Sending Data to a Server
+4. Helpful Variables and Functions
+5. Interacting With Other Modules
 
 =======================
-1. SPECIFICS OF IMPLEMENTATION
+1. CURRENT API
+
+The current API version is 1.0.2.
+
+int ModuleClass::botAPIversion() {
+	return 1002;
+}
+
+Version 1.0.2 of the API is incompatible with 1.0.1 and 1.0.0, both of which
+were used in the beta versions of 1.0.
+Module-breaking changes to the API are avoided starting with the release
+candidate.  The API version in use as of 1.0.0RC1 was 1.0.2.
+
+=======================
+2. SPECIFICS OF IMPLEMENTATION
 
 In order to interface with the bot, you will need to define a few things.
 
@@ -51,14 +66,20 @@ class mod_name : public Module {
 If you wish you may write a constructor for your modules, if you wish to
 initialize class variables.  No parameters are passed to the constructor, and,
 as such, there is not access to bot functions in the constructor.  Use
-onLoadComplete() instead (see below, section 2.3).
+onLoadComplete() instead (see below, section 3.3), which the bot calls once
+your module has been loaded.
+
+Finally, the Module class contains a pure virtual function, botAPIversion().
+This function must return an integer corresponding to the version of the bot
+API with which your module complies.  Information about the current API version
+is listed in section 1.
 
 From here you have the skeleton of your module.  The rest of this document
 outlines information you may want to know such as how to receive and be able to
 parse data from IRC servers, and how to send data to IRC servers.
 
 =======================
-2. COMMUNICATING WITH A SERVER
+3. COMMUNICATING WITH A SERVER
 
 As a module for an IRC bot, you can expect to be able to communicate with the
 servers the bot is connected to.  The subsections that follow describe how to
@@ -66,7 +87,7 @@ catch received and sent messages so that you can react to them as well as how
 to send messages from your module.
 
 =======================
-2.1. RECEIVING DATA FROM A SERVER
+3.1. RECEIVING DATA FROM A SERVER
 
 One direction of communication is receiving data.  This is provided through
 what the bot calls "hooks."  In order to use hooks you must simply define the
@@ -88,7 +109,7 @@ void onUserMsg(std::string server, std::string nick, std::string message);
 void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
 	This function is called when a NOTICE is received through a channel.  It is not triggered on CTCP reply.
 		server: The server from which the notice was received
-		channel: The channel through which the message was recevied
+		channel: The channel through which the message was receivied
 		target: The status character of the nicks who received the message.  If none, target == '0'
 		nick: The nick the notice is from
 		message: The contents of the message
@@ -97,15 +118,27 @@ void onUserNotice(std::string server, std::string nick, std::string message);
 		server: The server from which the notice was received
 		nick: The nick the notice is from
 		message: The contents of the message
+void onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
+	This function is called when a CTCP ACTION is received through a channel.
+		server: The server from which the action was received.
+		channel: The channel through which the action was received
+		target: The status character of the nicks who received the action.  If none, target == '0'
+		nick: The nick the action is from
+		message: The contents of the action message
+void onUserAction(std::string server, std::string nick, std::string message);
+	This function is ccalled when a CTCP ACTION is received directly from a user.
+		server: The server from which the action was received
+		nick: The nick the action is from
+		message: The contents of the action message
 void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-	This function is called when a CTCP request is received through a channel.
+	This function is called when a CTCP request (except ACTION) is received through a channel.
 		server: The server from which the request was received
 		channel: The channel through which the request was received
 		target: The status character of the nicks who received the request.  If none, target == '0'
 		nick: The nick the request is from
 		message: The contents of the request, including the type and any other data
 void onUserCTCP(std::string server, std::string nick, std::string message);
-	This function is called when a CTCP request is received directly from a user.
+	This function is called when a CTCP request (except ACTION) is received directly from a user.
 		server: The server from which the request was received
 		nick: The nick the request is from
 		message: The contents of the request, including the type and any other data
@@ -137,6 +170,12 @@ void onUserQuit(std::string server, std::string hostmask, std::string reason);
 		server: The server from which the QUIT was received.
 		hostmask: The hostmask of the user who quit
 		reason: The quit message
+void onNickChange(std::string server, std::string oldNick, std::string newNick);
+	This function is called when someone changes his/her nick.  This can be the bot or anyone else.
+	If the bot is changing names, this hook is called before the bot's nick is internally modified.
+		server: The server from which the NICK was received
+		oldNick: The former nick of the user
+		newNick: The new nick of the user
 void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
 	This function is called when someone is kicked from an IRC channel.
 		server: The server from which the KICK was received
@@ -163,7 +202,7 @@ void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		parsedLine: The entire line parsed as IRC parameters
 
 =======================
-2.2 RECEIVING DATA BEING SENT TO A SERVER
+3.2 RECEIVING DATA BEING SENT TO A SERVER
 
 Some hooks are defined to catch outgoing data, as well.  These hooks will be
 called when a matching line is sent, even if the hook being called belongs to
@@ -192,6 +231,17 @@ void onOutUserNotice(std::string server, std::string target, std::string message
 		server: The server the line was sent to
 		target: The nick the line was sent to
 		message: The actual message
+void onOutChannelAction(std::string server, std::string target, char status, std::string message);
+	This function is called when the bot sends a CTCP ACTION to a channel.
+		server: The server the line was sent to
+		target: The channel the line was sent to
+		status: The status level the line was sent to.  If there is none, target == '0'
+		message: The action message
+void onOutUserAction(std::string server, std::string target, std::string message);
+	This function is called when the bot sends a CTCP ACTION to a user.
+		server: The server the line was sent to
+		target: The nick the line was sent to
+		message: The action message
 void onOutChannelCTCP(std::string server, std::string target, char status, std::string message);
 	This function is called when the bot sends a CTCP request to a channel.
 		server: The server the CTCP request was sent to
@@ -216,17 +266,21 @@ void onOutUserCTCPReply(std::string server, std::string target, std::string mess
 		message: The actual reply, including the type and any given information
 
 =======================
-2.3. OTHER HOOKS
+3.3. OTHER HOOKS
 
 There are some other hooks, too.  When they are called depends on the hook.
 
 void onLoadComplete();
 	This function is called once all modules are loaded.  Modules will have the config and bot access loaded before this call.
 void onRehash();
-	This function is called when the bot is rehashed.  Modules will have an updated config loaded before this call.
+	This function is called when the bot is rehashed or when a module is loaded or unloaded.  Modules will have an updated config loaded before this call.
+void onConnect(std::string server);
+	This function is called when the bot connects to a server.
+void onQuit(std::string server);
+	This function is called when the bot quits from a server.
 
 =======================
-2.4. SENDING DATA TO A SERVER
+3.4. SENDING DATA TO A SERVER
 
 Some functions are provided to you free of charge in the Module class allowing
 you to easily perform certain actions.
@@ -276,20 +330,45 @@ void setMode(std::string server, std::string channel, char mode, bool add, std::
 		mode: The mode character you wish to setMode
 		add: TRUE if you wish to set the mode, FALSE if you wish to remove it
 		param: Optional. The parameter for the mode
+void sendOtherCommand(std::string server, std::string command, std::string data);
+	This function allows you to send any command not specified by another function.
+		server: The server to send the command to
+		command: The command itself
+		data: Any parameters for the command.  The command and data are separated by a space.
+bool connectServer(std::string server);
+	This function allows you to connect the bot to a server.  It returns true if it could connect, or false if it couldn't.
+		server: The server to connect to
 void quitServer(std::string server, std::string reason);
 	This function makes the bot quit a server.
 		server: The server to quit
 		reason: The quit reason to give
 
 =======================
-3. HELPFUL VARIABLES AND FUNCTIONS
+4. HELPFUL VARIABLES AND FUNCTIONS
 
 The Module class contains some functions that make it possible to code many
 modules and other functions that are just helpful.
 
+std::string moduleName;
+This variable contains the name for the module as known internallyby the bot.
+It's also the bot's filename.
+
+unsigned short debugLevel;
+The debug level the bot was started with.
+
 std::tr1::unordered_map<std::string, std::string> config;
 This variable contains all of the variables that correspond to the module and
 the values that the variables have as defined in the configuration file.
+
+void rehashBot();
+This function causes the bot to reload the configuration file and call
+onRehash() for all loaded modules.
+
+unsigned int getBotVersion();
+This function returns the version number of the bot core, in this format:
+1001 = 1.0.1
+1010 = 1.0.10
+1102 = 1.1.2
 
 std::list<std::string> getServers()
 This function returns a list of valid server names.  It gives the names of all
@@ -298,6 +377,14 @@ connected servers.
 std::tr1::unordered_map<std::string, Module*> getModules()
 This function returns currently loaded modules.  This is useful if you want
 your module to interact with another module.
+
+std::multimap<std::string, std::string> getModAbilities();
+This function returns a list of module abilities.  This multimap works as
+follows:
+first = provided ability
+second = module name
+You can use .find to find the module ability you're looking for, and then use
+->second (the module name) with getModules() to access the module instance.
 
 std::vector<std::string> splitHostmask(std::string hostmask)
 This function takes a hostmask.  The hostmask can be either in the form of a
@@ -311,8 +398,48 @@ This function takes any line, and it splits it into pieces using a space as a
 delimiter.  Each word gets one position in the vector in the order in which the
 word was found.
 
+std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
+This function returns the conf data held by the server class.  Any part of the
+configuration may be updated by the Server class during normal use (such as
+nick).
+
+std::vector<std::vector<char> > getServerChanModes(std::string server);
+This function returns all valid channel modes for the server as specified in
+005 CHANMODES.  The outer vector has four elements, split by 005 CHANMODES's
+commas:
+0 => list modes
+1 => modes that need a parameter to both set and unset (like +k)
+2 => modes that take a parameter but do not require it to unset
+3 => modes with no parameters
+The inner vectors are as long as necessary to hold all the modes of that type.
+
+std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
+This function returns all valid prefix/status modes for the server as specified
+in 005 PREFIX.  Each entry in the map holds two characters:
+first => mode char
+second => status prefix char
+
+std::list<std::string> getChannels(std::string server);
+This function returns a list of the names of all the channels the bot is in on
+the specified server.
+
+std::string getChannelTopic(std::string server, std::string channel);
+This function returns the topic of the specified channel on the specified
+server, if the bot is in it.
+
+std::list<std::string> getChannelUsers(std::string server, std::string channel);
+This function returns a list of all users in the specified channel on the
+specified server, if the bot is in it.
+
+std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
+This function returns the status of the specified user in the specified channel
+on the specified server, if both the bot and the user are in that channel.  The
+returned status is in this form:
+first => mode char
+second => status prefix char
+
 =======================
-4. INTERACTING WITH OTHER MODULES
+5. INTERACTING WITH OTHER MODULES
 
 Interacting with modules using functions that are not part of the Module class
 requires the use of a custom class in a header file in the modules/ directory.

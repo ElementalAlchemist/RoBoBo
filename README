@@ -2,39 +2,56 @@ RoBoBo-IRC-BoBo IRC Bot
 =======================
 TABLE OF CONTENTS
 
-1. Installing
-2. License
-3. Creating Modules
-4. Acknowledgements
+1. The Basics
+2. Configuring
+3. Installing
+4. License
+5. Creating Modules
+6. Acknowledgements
 
 =======================
-1. INSTALLING
+1. THE BASICS
+
+Thank you for using RoBoBo!  What is here is just the bot's core.  It will
+connect to an IRC server, but it won't do much more than just idle.  A few
+modules are provided to do things that ship in the core of most bots (DCC chat,
+admin commands, etc.).  The distribution modules can also provide good examples
+for how to do certain things with modules.
+If you want your bot to do something interesting, you can create your own
+modules (see section 5 below) or look for modules others have created.  We have
+a place designated for uploading and support for modules, located at
+http://s1.zetaboards.com/robobo/forum/1360960/
+To install new modules after you've installed the bot, simply run ./configure
+and make again.
+
+=======================
+2. CONFIGURING
+
+See the CONFIGURING file for help with modifying robobo.conf.
+
+=======================
+3. INSTALLING
 
 See the INSTALL file for information.
 
 =======================
-2. LICENSE
+4. LICENSE
 
 RoBoBo is licensed under the MIT License.
 For this license and related information see the LICENSE file.
 
 =======================
-3. CREATING MODULES
+5. CREATING MODULES
 
 Creating modules requires a knowledge of C++.  If you don't know it, Google can
 help you find a good tutorial.
 For the specifics on creating modules, see the MODULES file.  The MODULES file
-assumes you already know at least some C++ and jumps right into what you need
-to know just for this bot.
+assumes you have a basic grasp of C++ and jumps right into what you need to
+know just for this bot.
 
 =======================
-4. ACKNOWLEDGEMENTS
+6. ACKNOWLEDGEMENTS
 
 I would like to thank MasseR from GitHub for somehow finding this project at
 the very beginning and giving me a needed push in the right direction. :)
 Thanks also to him for knowing more about makefiles than me.
-
-I would also like to thank the InspIRCd project.  This isn't particularly
-because they are so awesome (even though they are).  RoBoBo's flood protection
-system is based on the idea of their penalty system, documented in their wiki
-somewhere.
