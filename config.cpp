@@ -34,14 +34,14 @@ void ConfigReader::readConfig(std::string filename, std::string filedir) {
 		} else if ((configuration == ' ' || configuration == '\t' || configuration == '\r' || configuration == '\n') && !writing) {
 			// ignore whitespace that's not part of a string
 		} else if (typingSection) {
-			while (configuration != ' ' && configFile.good()) {
+			while (configuration != ' ' && configuration != '\t' && configuration != '\r' && configuration != '\n' && configFile.good()) {
 				sectionType += configuration;
 				configuration = configFile.get();
 			}
 			typingSection = false;
 			namingSection = true;
 		} else if (namingSection) {
-			while (configuration != ' ' && configuration != '{' && configuration != ';' && configFile.good()) {
+			while (configuration != ' ' && configuration != '\t' && configuration != '\r' && configuration != '\n' && configuration != '{' && configuration != ';' && configFile.good()) {
 				sectionName += configuration;
 				configuration = configFile.get();
 			}
