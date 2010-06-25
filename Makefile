@@ -1,2 +1,2 @@
 default:
-	g++ configure.cpp -o configure
+	make src/configure.cpp -o configure

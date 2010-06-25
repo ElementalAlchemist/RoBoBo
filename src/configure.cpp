@@ -4,16 +4,15 @@
 #include <dirent.h>
 
 int main(int argc, char** argv) {
-	std::string mainMakefile = "CC = g++\nLIBS = -ldl -lpthread\nLDFLAGS=$(LIBS) -rdynamic\nCXXFLAGS=-Wall -pthread $(DEBUG)\nSOURCES=modinterface.cpp server.cpp channel.cpp config.cpp modules.cpp server.cpp socket.cpp user.cpp\n\ndefault: makedepend robobo modules\n\n";
-	mainMakefile += "makedepend:\n\tfor i in *.cpp; do for inc in  $(awk '/^#include \"/ {print $2}' $i | sed 's/\"//g'); do echo \"${i%.cpp}.o: $inc\"; done; done\n\ndebug:\n\tDEBUG=\"-g -O0\" make -C .\n\nrobobo: $(SOURCES:.cpp=.o)\n\n.PHONY: modules clean\n\nmodules:\n\tmake -C modules/\n\nclean:\n\tmake -C modules/ clean\n\trm -f robobo\n\trm -f $(SOURCES:.cpp=.o)";
+	std::string mainMakefile = "default:\n\tmake -C src/\n\tmv src/robobo .\n\tmv src/modules/*.so modules\n\ndebug:\n\tmake debug -C src/\n\tmv src/robobo .\n\tvm src/modules/*.so modules\n\nclean:\n\tmake clean -C src/\n\trm -f robobo\n\trm -f modules/*\n\techo \"Clean has been made.\"";
 	std::string moduleMakefileBegin = "CXX = g++\nCXXFLAGS=-fPIC -Wall -pipe -ansi $(DEBUG)\nLDFLAGS=-shared\nDEPS=modinclude.h ../main.h ../connection.h ../modules.h ../config.cpp ../modules.cpp ../modinterface.cpp\n\nall: ";
 	std::string moduleMakefileEnd = ".PHONY: clean\n\nclean:\n\trm -f *.o *.so";
 	std::ofstream makeOut;
 	std::string dir = argv[0];
 	dir = dir.substr(0, dir.find_last_of('/'));
-	std::string moddir = dir + "/modules";
+	std::string moddir = dir + "/src/modules";
 	std::string makedir = dir + "/Makefile";
-	std::string modmakedir = dir + "/modules/Makefile";
+	std::string modmakedir = dir + "/src/modules/Makefile";
 	makeOut.open(makedir.c_str(), std::ios::out | std::ios::trunc);
 	makeOut << mainMakefile;
 	makeOut.close();
