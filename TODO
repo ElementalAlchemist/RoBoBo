@@ -8,3 +8,4 @@ Current TODO List
 Before 1.0.0
 =======================================
 [ ] - Make a test suite module and make sure everything works
+[ ] - Check that module unloading removes the appropriate services from the module abilities map

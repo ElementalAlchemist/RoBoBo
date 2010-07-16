@@ -103,10 +103,8 @@ void AdminChannelControl::onAdminCommand(std::string server, std::string nick, s
 	}
 	std::string channel = message.substr(0, message.find_first_of(' '));
 	std::string keason = "";
-	if (channel != message) {
-		message = message.substr(0, message.find_first_of(' ') + 1);
-		keason = message;
-	}
+	if (channel != message)
+		keason = message.substr(message.find_first_of(' ') + 1);
 	if (command == "join")
 		joinChannel(server, channel, keason);
 	else if (command == "part")
