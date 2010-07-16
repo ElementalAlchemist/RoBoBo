@@ -397,14 +397,13 @@ void ModuleInterface::tUnloadMod() {
 	sleep(1);
 	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(moduleToUnload[0]);
 	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(moduleToUnload[0]);
-	std::vector<std::string> abilities = modIter->second->getAbilities();
-	for (unsigned int i = 0; i < abilities.size(); i++) {
-		std::multimap<std::string, std::string>::iterator anAbility = modAbilities.find(abilities[i]);
-		if (anAbility == modAbilities.end())
-			continue;
-		while (anAbility->second != moduleToUnload[0])
-			anAbility = modAbilities.find(abilities[i]);
-		modAbilities.erase(anAbility);
+	if (!modIter->second->getAbilities().empty()) {
+		for (std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin(); modAbleIter != modAbilities.end(); ++modAbleIter) {
+			if (modAbleIter->second == modIter->first) {
+				modAbilities.erase(modAbleIter);
+				--modAbleIter;
+			}
+		}
 	}
 	delete modIter->second;
 	modules.erase(modIter);
