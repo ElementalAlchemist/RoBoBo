@@ -33,8 +33,8 @@ candidate.  The API version in use as of 1.0.0RC1 was 1.0.2.
 In order to interface with the bot, you will need to define a few things.
 
 First, you will need to make a C++ file which includes some data from the bot.
-This file should be placed in the modules/ directory.  The file should be
-included as such:
+This file should be placed in the src/modules/ directory.  You'll need to
+include the bot information as such:
 
 #include "modinclude.h"
 
@@ -50,7 +50,7 @@ extern "C" Module* spawn() {
 	return new mod_name;
 }
 
-In this portion, the only thing that should change is the returned class in the
+In this snippet, the only thing that should change is the returned class in the
 spawn() function, which must be changed from mod_name to the name of your
 module class.  This must be placed after your class definition.  If you think
 you will forget about it, write it first, and then just define the class above
@@ -63,16 +63,16 @@ class mod_name : public Module {
 // Look!  A module!
 };
 
-If you wish you may write a constructor for your modules, if you wish to
-initialize class variables.  No parameters are passed to the constructor, and,
-as such, there is not access to bot functions in the constructor.  Use
-onLoadComplete() instead (see below, section 3.3), which the bot calls once
-your module has been loaded.
+If you wish you may write a constructor for your modules to initialize class
+variables.  No parameters are passed to the constructor, and, as such, there is
+not access to bot functions in the constructor.  Use onLoadComplete() instead
+(see below, section 3.3), which the bot calls once your module has been loaded
+(or if your module is loaded at startup, after all modules have been loaded).
 
 Finally, the Module class contains a pure virtual function, botAPIversion().
 This function must return an integer corresponding to the version of the bot
 API with which your module complies.  Information about the current API version
-is listed in section 1.
+is listed in section 1, above.
 
 From here you have the skeleton of your module.  The rest of this document
 outlines information you may want to know such as how to receive and be able to
@@ -126,7 +126,7 @@ void onChannelAction(std::string server, std::string channel, char target, std::
 		nick: The nick the action is from
 		message: The contents of the action message
 void onUserAction(std::string server, std::string nick, std::string message);
-	This function is ccalled when a CTCP ACTION is received directly from a user.
+	This function is called when a CTCP ACTION is received directly from a user.
 		server: The server from which the action was received
 		nick: The nick the action is from
 		message: The contents of the action message
@@ -195,11 +195,17 @@ void onNumeric(std::string server, std::string numeric, std::vector<std::string>
 	This function is called when the bot receives a numeric from the server.
 		server: The server that sent the numeric
 		numeric: The numeric
-		parsedLine: The entire line parsed as IRC parameters
+		parsedLine: The entire line parsed as IRC parameters.
+			parsedLine[0]: The server's name preceded with a colon
+			parsedLine[1]: The numeric
+			parsedLine[2+]: All the parameters of the numeric
 void onOtherData(std::string server, std::vector<std::string> parsedLine);
 	This function serves as a catch-all function.  All lines that don't call other hooks call this one.
 		server: The server the line was received from
 		parsedLine: The entire line parsed as IRC parameters
+			parsedLine[0]: The server's name or sender's hostmask, preceded with a colon
+			parsedLine[1]: The command
+			parsedLine[2+]: Any parameters to the command
 
 =======================
 3.2 RECEIVING DATA BEING SENT TO A SERVER
@@ -350,15 +356,18 @@ The Module class contains some functions that make it possible to code many
 modules and other functions that are just helpful.
 
 std::string moduleName;
-This variable contains the name for the module as known internallyby the bot.
+This variable contains the name for the module as known internally by the bot.
 It's also the bot's filename.
 
 unsigned short debugLevel;
-The debug level the bot was started with.
+The debug level the bot was started with.  This allows you to have your module
+output debug info based on the debug level the bot was started with.
 
 std::tr1::unordered_map<std::string, std::string> config;
 This variable contains all of the variables that correspond to the module and
-the values that the variables have as defined in the configuration file.
+the values that the variables have as defined in the configuration file.  The
+map key is the specified variable, and the map value is the variable's
+configured definition.
 
 void rehashBot();
 This function causes the bot to reload the configuration file and call
@@ -383,8 +392,6 @@ This function returns a list of module abilities.  This multimap works as
 follows:
 first = provided ability
 second = module name
-You can use .find to find the module ability you're looking for, and then use
-->second (the module name) with getModules() to access the module instance.
 
 std::vector<std::string> splitHostmask(std::string hostmask)
 This function takes a hostmask.  The hostmask can be either in the form of a
