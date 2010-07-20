@@ -5,21 +5,10 @@ Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
-	std::istringstream portNumber (serverConf["port"]);
-	unsigned short port;
-	portNumber >> port;
 	if (serverConf["bind"] != "") {
 		if (!serverConnection.bindSocket(serverConf["bind"]))
 			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl; // debug level 1
 	}
-	serverConnection.connectServer(serverAddress, port);
-	sleep(1); // don't send right away in case of some sort of death or slowness
-	if (serverConf["password"] != "")
-		sendLine("PASS " + serverConf["password"]);
-	sendLine("NICK " + serverConf["nick"]);
-	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
-	pthread_create(&dataReceiveThread, &detachedState, handleData_thread, this);
-	pthread_create(&dataSendThread, &detachedState, sendData_thread, this);
 }
 
 Server::~Server() {
@@ -27,6 +16,23 @@ Server::~Server() {
 	pthread_cancel(dataSendThread);
 	pthread_cancel(secondDecrementThread);
 }
+
+void Server::connectServer() {
+	moduleData->callPreConnectHook(serverName);
+	std::istringstream portNumber (serverConf["port"]);
+	unsigned short port;
+	portNumber >> port;
+	serverConnection.connectServer(serverName, port);
+	sleep(1); // don't send right away in case of some sort of death or slowness
+	moduleData->callConnectHook(serverName);
+	if (serverConf["password"] != "")
+		sendLine("PASS " + serverConf["password"]);
+	sendLine("NICK " + serverConf["nick"]);
+	sendLine("USER " + serverConf["ident"] + " here " + serverName + " :" + serverConf["gecos"]);
+	pthread_create(&dataReceiveThread, &detachedState, handleData_thread, this);
+	pthread_create(&dataSendThread, &detachedState, sendData_thread, this);
+}
+
 
 bool Server::stillConnected() {
 	return serverConnection.isConnected();

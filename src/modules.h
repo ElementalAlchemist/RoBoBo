@@ -117,6 +117,7 @@ class ModuleInterface {
 		void callPostHook(std::string server, std::vector<std::string> parsedLine);
 		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
 		void callHookSend(std::string server, std::vector<std::string> parsedLine);
+		void callPreConnectHook(std::string server);
 		void callConnectHook(std::string server);
 		void callQuitHook(std::string server);
 		bool isChanType(char chanPrefix, std::string server);

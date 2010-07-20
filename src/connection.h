@@ -55,6 +55,7 @@ class Server {
 	public:
 		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug);
 		~Server();
+		void connectServer();
 		bool stillConnected();
 		void sendLine(std::string line);
 		std::tr1::unordered_map<std::string, std::string> getInfo();

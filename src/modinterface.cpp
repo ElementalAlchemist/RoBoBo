@@ -503,6 +503,11 @@ void ModuleInterface::callHookSend(std::string server, std::vector<std::string> 
 	}
 }
 
+void ModuleInterface::callPreConnectHook(std::string server) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+		modIter->second->onPreConnect(server);
+}
+
 void ModuleInterface::callConnectHook(std::string server) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 		modIter->second->onConnect(server);
@@ -611,8 +616,7 @@ bool ModuleInterface::connectServer(std::string serverName) {
 	if (servConfIter == serverConfigs.end())
 		return false;
 	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, servConfIter->second, this, debugLevel)));
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-		modIter->second->onConnect(serverName); // call onConnect hook
+	servers.find(serverName)->second->connectServer();
 	return true;
 }
 
