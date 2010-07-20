@@ -62,20 +62,35 @@ std::tr1::unordered_map<char, char> ModuleInterface::getServerPrefixes(std::stri
 
 void ModuleInterface::callPreHook(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "JOIN") {
+		std::string hostmask = parsedLine[0].substr(1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onChannelJoinPre(server, parsedLine[2], parsedLine[0].substr(1));
+			modIter->second->onChannelJoinPre(server, parsedLine[2], hostmask);
 	} else if (parsedLine[1] == "PART") {
-		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onChannelPartPre(server, parsedLine[2], parsedLine[0].substr(1), (parsedLine.size() == 3 ? "" : parsedLine[3]));
+		std::string hostmask = parsedLine[0].substr(1);
+		if (parsedLine.size() == 3) {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+				modIter->second->onChannelPartPre(server, parsedLine[2], hostmask, "");
+		} else {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+				modIter->second->onChannelPartPre(server, parsedLine[2], hostmask, parsedLine[3]);
+		}
 	} else if (parsedLine[1] == "QUIT") {
-		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onUserQuitPre(server, parsedLine[0].substr(1), (parsedLine.size() == 2 ? "" : parsedLine[2]));
+		std::string hostmask = parsedLine[0].substr(1);
+		if (parsedLine.size() == 2) {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+				modIter->second->onUserQuitPre(server,hostmask, "");
+		} else {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+				modIter->second->onUserQuitPre(server, hostmask, parsedLine[2]);
+		}
 	} else if (parsedLine[1] == "NICK") {
+		std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onNickChangePre(server, parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[2]);
+			modIter->second->onNickChangePre(server, nick, parsedLine[2]);
 	} else if (parsedLine[1] == "KICK") {
+		std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onChannelKickPre(server, parsedLine[2], parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3], (parsedLine.size() == 4 ? "" : parsedLine[4]));
+			modIter->second->onChannelKickPre(server, parsedLine[2], nick, parsedLine[3], parsedLine[4]);
 	} else if (parsedLine[1] == "MODE") {
 		bool addMode = true;
 		int currParam = 4;
@@ -109,117 +124,131 @@ void ModuleInterface::callPreHook(std::string server, std::vector<std::string> p
 					if (!found)
 						category = 4;
 				}
-				
+				std::string from = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 				if (category == 0 || category == 1 || (category == 2 && addMode)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelModePre(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam]);
+						modIter->second->onChannelModePre(server, parsedLine[2], from, parsedLine[3][i], addMode, parsedLine[currParam]);
 					currParam++;
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelModePre(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
+						modIter->second->onChannelModePre(server, parsedLine[2], from, parsedLine[3][i], addMode, "");
 				}
 			}
 		}
 	}
 }
-/*void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {
-	if (parsedLine[1] == "PRIVMSG") {
-		if (parsedLine[3][0] == (char)1) { // CTCP
-			if (parsedLine[3][parsedLine[3].size()-1] == (char)1) // trim CTCP characters
-				parsedLine[3] = parsedLine[3].substr(1, parsedLine[3].size()-2);
-			else
-				parsedLine[3] = parsedLine[3].substr(1);
-			
-			if (parsedLine[3].substr(0, parsedLine[3].find_first_of(' ')) == "ACTION") {
+
+void ModuleInterface::callPostHook(std::string server, std::vector<std::string> parsedLine) {
+	if (parsedLine[1] == "PRIVMSG") { // lots of things!
+		std::string from = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
+		if (parsedLine[3][0] == (char)1) { // CTCP request
+			parsedLine[3] = parsedLine[3].substr(1);
+			if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+				parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+			if (parsedLine[3].substr(0, parsedLine[3].find_first_of(' ')) == "ACTION") { // CTCP ACTION
+				std::string message = parsedLine[3].substr(7);
 				if (isChanType(parsedLine[2][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelAction(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3].substr(7));
+						modIter->second->onChannelAction(server, parsedLine[2], '0', from, message);
 				} else if (isChanType(parsedLine[2][1], server)) {
+					char status = parsedLine[2][0];
+					std::string channel = parsedLine[2].substr(1);
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelAction(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3].substr(7));
+						modIter->second->onChannelAction(server, channel, status, from, message);
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onUserAction(server, parseNickFromHost(parsedLine[0]), parsedLine[3].substr(7));
+						modIter->second->onUserAction(server, from, message);
 				}
-			} else {
+			} else { // CTCP but not ACTION
 				if (isChanType(parsedLine[2][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelCTCP(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
+						modIter->second->onChannelCTCP(server, parsedLine[2], '0', from, parsedLine[3]);
 				} else if (isChanType(parsedLine[2][1], server)) {
+					char status = parsedLine[2][0];
+					std::string channel = parsedLine[2].substr(1);
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelCTCP(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
+						modIter->second->onChannelCTCP(server, channel, status, from, parsedLine[3]);
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onUserCTCP(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
+						modIter->second->onUserCTCP(server, from, parsedLine[3]);
 				}
 			}
-		} else {
+		} else { // it's a message!
 			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onChannelMsg(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onChannelMsg(server, parsedLine[2], '0', from, parsedLine[3]);
 			} else if (isChanType(parsedLine[2][1], server)) {
+				char status = parsedLine[2][0];
+				std::string channel = parsedLine[2].substr(1);
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onChannelMsg(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onChannelMsg(server, channel, status, from, parsedLine[3]);
 			} else {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onUserMsg(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onUserMsg(server, from, parsedLine[3]);
 			}
 		}
 	} else if (parsedLine[1] == "NOTICE") {
-		if (parsedLine[3][0] == (char)1) {
-			if (parsedLine[3][parsedLine[3].size()-1] == (char)1)
-				parsedLine[3] = parsedLine[3].substr(1, parsedLine[3].size()-2);
-			else
-				parsedLine[3] = parsedLine[3].substr(1);
-			
+		std::string from = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
+		if (parsedLine[3][0] == (char)1) { // CTCP reply
+			parsedLine[3] = parsedLine[3].substr(1);
+			if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+				parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
 			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onChannelCTCPReply(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onChannelCTCPReply(server, parsedLine[2], '0', from, parsedLine[3]);
 			} else if (isChanType(parsedLine[2][1], server)) {
+				char status = parsedLine[2][0];
+				std::string channel = parsedLine[2].substr(1);
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onChannelCTCPReply(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onChannelCTCPReply(server, channel, status, from, parsedLine[3]);
 			} else {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onUserCTCPReply(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onUserCTCPReply(server, from, parsedLine[3]);
 			}
-		} else {
+		} else { // it's a notice!
 			if (isChanType(parsedLine[2][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onChannelNotice(server, parsedLine[2], '0', parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onChannelNotice(server, parsedLine[2], '0', from, parsedLine[3]);
 			} else if (isChanType(parsedLine[2][1], server)) {
+				char status = parsedLine[2][0];
+				std::string channel = parsedLine[2].substr(1);
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onChannelNotice(server, parsedLine[2].substr(1), parsedLine[2][0], parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onChannelNotice(server, channel, status, from, parsedLine[3]);
 			} else {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-					modIter->second->onUserNotice(server, parseNickFromHost(parsedLine[0]), parsedLine[3]);
+					modIter->second->onUserNotice(server, from, parsedLine[3]);
 			}
 		}
 	} else if (parsedLine[1] == "JOIN") {
-		if (parsedLine[0][0] == ':')
-			parsedLine[0] = parsedLine[0].substr(1);
+		std::string hostmask = parsedLine[0].substr(1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onChannelJoin(server, parsedLine[2], parsedLine[0]);
+			modIter->second->onChannelJoinPost(server, parsedLine[2], hostmask);
 	} else if (parsedLine[1] == "PART") {
-		if (parsedLine[0][0] == ':')
-			parsedLine[0] = parsedLine[0].substr(1);
+		std::string hostmask = parsedLine[0].substr(1);
 		if (parsedLine.size() == 3) {
 			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-				modIter->second->onChannelPart(server, parsedLine[2], parsedLine[0], "");
+				modIter->second->onChannelPartPost(server, parsedLine[2], hostmask, "");
 		} else {
 			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-				modIter->second->onChannelPart(server, parsedLine[2], parsedLine[0], parsedLine[3]);
+				modIter->second->onChannelPartPost(server, parsedLine[2], hostmask, parsedLine[3]);
 		}
 	} else if (parsedLine[1] == "QUIT") {
-		if (parsedLine[0][0] == ':')
-			parsedLine[0] = parsedLine[0].substr(1);
-		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onUserQuit(server, parsedLine[0], parsedLine[2]);
+		std::string hostmask = parsedLine[0].substr(1);
+		if (parsedLine.size() == 2) {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+				modIter->second->onUserQuitPost(server, hostmask, "");
+		} else {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+				modIter->second->onUserQuitPost(server, hostmask, parsedLine[2]);
+		}
 	} else if (parsedLine[1] == "NICK") {
+		std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onNickChange(server, parseNickFromHost(parsedLine[0]), parsedLine[2]);
+			modIter->second->onNickChangePost(server, nick, parsedLine[2]);
 	} else if (parsedLine[1] == "KICK") {
+		std::string kicker = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-			modIter->second->onChannelKick(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3], parsedLine[4]);
+			modIter->second->onChannelKickPost(server, parsedLine[2], kicker, parsedLine[3], parsedLine[4]);
 	} else if (parsedLine[1] == "MODE") {
 		bool addMode = true;
 		int currParam = 4;
@@ -253,18 +282,18 @@ void ModuleInterface::callPreHook(std::string server, std::vector<std::string> p
 					if (!found)
 						category = 4;
 				}
-				
+				std::string from = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 				if (category == 0 || category == 1 || (category == 2 && addMode)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam]);
+						modIter->second->onChannelModePost(server, parsedLine[2], from, parsedLine[3][i], addMode, parsedLine[currParam]);
 					currParam++;
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->second->onChannelMode(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
+						modIter->second->onChannelModePost(server, parsedLine[2], from, parsedLine[3][i], addMode, "");
 				}
 			}
 		}
-	} else if (parsedLine[1].size() == 3 && charIsNumeric(parsedLine[1][0]) && charIsNumeric(parsedLine[1][1]) && charIsNumeric(parsedLine[1][2])) {
+	} else if (parsedLine[1].size() == 3 && charIsNumeric(parsedLine[1][0]) && charIsNumeric(parsedLine[1][1]) && charIsNumeric([1][2])) {
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 			modIter->second->onNumeric(server, parsedLine[1], parsedLine);
 	} else {
@@ -273,7 +302,19 @@ void ModuleInterface::callPreHook(std::string server, std::vector<std::string> p
 	}
 }
 
-void ModuleInterface::callHookOut(std::string server, std::vector<std::string> parsedLine) {
+std::string ModuleInterface::callHookOut(std::string server, std::vector<std::string> parsedLine) {
+	
+}
+
+void ModuleInterface::callHookSend(std::string server, std::vector<std::string> parsedLine) {
+	
+}
+
+void ModuleInterface::callConnectHook(std::string server) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+		modIter->second->onConnect(server);
+}
+/*void ModuleInterface::callHookOut(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "PRIVMSG") {
 		if (parsedLine[3][0] == (char)1) { // CTCP
 			if (parsedLine[3][parsedLine.size()-1] == (char)1) // trim CTCP characters
@@ -523,12 +564,6 @@ void ModuleInterface::serverCheck() {
 			}
 		}
 	}
-}
-
-std::string ModuleInterface::parseNickFromHost(std::string host) {
-	if (host[0] == ':')
-		host = host.substr(1);
-	return host.substr(0, host.find_first_of('!'));
 }
 
 bool ModuleInterface::charIsNumeric(char number) {

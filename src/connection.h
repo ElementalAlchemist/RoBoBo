@@ -37,7 +37,7 @@ class Channel {
 		void mode(bool add, char mode, std::string param = "");
 		void joinChannel(std::string nick);
 		void leaveChannel(std::string nick);
-		std::list<std::string> getUsers();
+		std::list<std::string> users();
 		void ident(std::string user, std::string host);
 		std::string ident(std::string user);
 		void host(std::string user, std::string host);

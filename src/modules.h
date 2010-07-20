@@ -116,6 +116,7 @@ class ModuleInterface {
 		void callPostHook(std::string server, std::vector<std::string> parsedLine);
 		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
 		void callHookSend(std::string server, std::vector<std::string> parsedLine);
+		void callConnectHook(std::string server);
 		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();
@@ -144,7 +145,6 @@ class ModuleInterface {
 		unsigned short debugLevel;
 		std::string directory;
 		std::string configName;
-		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
 		static void* tUnloadMod_thread(void* mip);
 		void tUnloadMod();
