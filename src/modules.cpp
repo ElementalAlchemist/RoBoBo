@@ -1,7 +1,5 @@
 #include "modules.h"
 
-Module::Module() {}
-
 Module::~Module() {}
 
 void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName, unsigned short debug) {
@@ -19,7 +17,7 @@ bool Module::onLoadComplete() { return true; }
 
 void Module::onRehash() {}
 
-std::vector<std::string> Module::getAbilities() { return std::vector<std::string> (); }
+void Module::onModuleChange() {}
 
 void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
@@ -41,17 +39,29 @@ void Module::onChannelCTCPReply(std::string server, std::string channel, char ta
 
 void Module::onUserCTCPReply(std::string server, std::string nick, std::string message) {}
 
-void Module::onChannelJoin(std::string server, std::string channel, std::string hostmask) {}
+void Module::onChannelJoinPre(std::string server, std::string channel, std::string hostmask) {}
 
-void Module::onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelJoinPost(std::string server, std::string channel, std::string hostmask) {}
 
-void Module::onUserQuit(std::string server, std::string hostmask, std::string reason) {}
+void Module::onChannelPartPre(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onNickChange(std::string server, std::string oldNick, std::string newNick) {}
+void Module::onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onUserQuitPre(std::string server, std::string hostmask, std::string reason) {}
 
-void Module::onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+void Module::onUserQuitPost(std::string server, std::string hostmask, std::string reason) {}
+
+void Module::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {}
+
+void Module::onNickChangePost(std::string server, std::string oldNick, std::string newNick) {}
+
+void Module::onChannelKickPre(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+
+void Module::onChannelKickPost(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+
+void Module::onChannelModePre(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+
+void Module::onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
 
 void Module::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {}
 
@@ -61,27 +71,49 @@ void Module::onConnect(std::string server) {}
 
 void Module::onQuit(std::string server) {}
 
-void Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) { return message; }
 
-void Module::onOutUserMessage(std::string server, std::string target, std::string message) {}
+void Module::onSendChannelMessage(std::string server, std::string target, char status, std::string message) {}
 
-void Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutUserMessage(std::string server, std::string target, std::string message) { return message; }
 
-void Module::onOutUserNotice(std::string server, std::string target, std::string message) {}
+void Module::onSendUserMessage(std::string server, std::string target, std::string message) {}
 
-void Module::onOutChannelAction(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) { return message; }
 
-void Module::onOutUserAction(std::string server, std::string target, std::string message) {}
+void Module::onSendChannelNotice(std::string server, std::string target, char status, std::string message) {}
 
-void Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutUserNotice(std::string server, std::string target, std::string message) { return message; }
 
-void Module::onOutUserCTCP(std::string server, std::string target, std::string message) {}
+void Module::onSendUserNotice(std::string server, std::string target, std::string message) {}
 
-void Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutChannelAction(std::string server, std::string target, char status, std::string message) { return message; }
 
-void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
+void Module::onSendChannelAction(std::string server, std::string target, char status, std::string message) {}
 
-std::string Module::getDesc() { return "This module has no description."; }
+std::string Module::onOutUserAction(std::string server, std::string target, std::string message) { return message; }
+
+void Module::onSendUserAction(std::string server, std::string target, std::string message) {}
+
+std::string Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) { return message; }
+
+void Module::onSendChannelCTCP(std::string server, std::string target, char status, std::string message) {}
+
+std::string Module::onOutUserCTCP(std::string server, std::string target, std::string message) { return message; }
+
+void Module::onSendUserCTCP(std::string server, std::string target, std::string message) {}
+
+std::string Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) { return message; }
+
+void Module::onSendChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
+
+std::string Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) { return message; }
+
+void Module::onSendUserCTCPReply(std::string server, std::string target, std::string message) {}
+
+std::string Module::description() { return "This module has not been described."; }
+
+std::vector<std::string> Module::abilities() { return std::vector<std::string> (); }
 
 std::vector<std::string> Module::supports() { return std::vector<std::string> (); }
 
@@ -158,7 +190,7 @@ void Module::rehashBot() {
 }
 
 unsigned int Module::getBotVersion() {
-	return 1000; // 1.0.0
+	return 1089; // 1.1 devel
 }
 
 std::vector<std::string> Module::splitHostmask(std::string hostmask) {
@@ -198,6 +230,10 @@ std::multimap<std::string, std::string> Module::getModAbilities() {
 	return serverData->getModuleAbilities();
 }
 
+std::tr1::unordered_map<std::string, std::vector<std::string> > Module::getModSupports() {
+	return serverData->getModuleSupports();
+}
+
 std::tr1::unordered_map<std::string, std::string> Module::getServerData(std::string server) {
 	return serverData->getServerData(server);
 }
@@ -220,6 +256,10 @@ std::string Module::getChannelTopic(std::string server, std::string channel) {
 
 std::list<std::string> Module::getChannelUsers(std::string server, std::string channel) {
 	return serverData->getChannelUsers(server, channel);
+}
+
+std::string Module::getUserHost(std::string server, std::string channel, std::string user) {
+	return serverData->getUserHost(server, channel, user);
 }
 
 std::pair<char, char> Module::getUserStatus(std::string server, std::string channel, std::string user) {

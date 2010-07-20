@@ -16,11 +16,14 @@ class ModuleInterface;
 class User {
 	public:
 		User(Channel* thisChannel);
+		void host(std::string newHost);
+		std::string getHost();
 		void status(bool add, char status);
 		char getStatus();
 		Channel* parentChannel;
 	private:
-		std::map<char, bool> hasStatus;
+		std::string host;
+		std::vector<std::pair<char, bool> > hasStatus;
 };
 
 class Channel {
@@ -33,6 +36,8 @@ class Channel {
 		void joinChannel(std::string nick);
 		void leaveChannel(std::string nick);
 		std::list<std::string> getUsers();
+		void setHost(std::string user, std::string host);
+		std::string getHost(std::string user);
 		char getStatus(std::string user);
 		std::string getTopic();
 		Server* parentServer;

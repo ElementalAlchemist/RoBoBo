@@ -361,7 +361,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*)spawnModule();
-	if (newModule->botAPIversion() != 1002) { // compare to current API version
+	if (newModule->botAPIversion() != 1100) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module " << modName << " is not compatible with the current API." << std::endl; // debug level 1
 		return false;

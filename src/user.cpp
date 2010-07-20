@@ -2,10 +2,19 @@
 
 #ifndef USER_CPP
 #define USER_CPP
-User::User(Channel* thisChannel) : parentChannel(thisChannel) {
+User::User(Channel* thisChannel) : parentChannel(thisChannel), host("") {
 	std::tr1::unordered_map<char, char> prefixes = parentChannel->parentServer->getPrefixes();
 	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); ++it)
 		hasStatus.insert(std::pair<char, bool> (it->first, false));
+}
+
+void User::host(std::string newHost) {
+	if (host == "")
+		host = newHost;
+}
+
+std::string User::getHost() {
+	return host;
 }
 
 void User::status(bool add, char status) {
