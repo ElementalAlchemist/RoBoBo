@@ -60,7 +60,69 @@ std::tr1::unordered_map<char, char> ModuleInterface::getServerPrefixes(std::stri
 	return serverIter->second->getPrefixes();
 }
 
-void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {
+void ModuleInterface::callPreHook(std::string server, std::vector<std::string> parsedLine) {
+	if (parsedLine[1] == "JOIN") {
+		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+			modIter->second->onChannelJoinPre(server, parsedLine[2], parsedLine[0].substr(1));
+	} else if (parsedLine[1] == "PART") {
+		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+			modIter->second->onChannelPartPre(server, parsedLine[2], parsedLine[0].substr(1), (parsedLine.size() == 3 ? "" : parsedLine[3]));
+	} else if (parsedLine[1] == "QUIT") {
+		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+			modIter->second->onUserQuitPre(server, parsedLine[0].substr(1), (parsedLine.size() == 2 ? "" : parsedLine[2]));
+	} else if (parsedLine[1] == "NICK") {
+		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+			modIter->second->onNickChangePre(server, parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[2]);
+	} else if (parsedLine[1] == "KICK") {
+		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+			modIter->second->onChannelKickPre(server, parsedLine[2], parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3], (parsedLine.size() == 4 ? "" : parsedLine[4]));
+	} else if (parsedLine[1] == "MODE") {
+		bool addMode = true;
+		int currParam = 4;
+		for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
+			if (parsedLine[3][i] == '+')
+				addMode = true;
+			else if (parsedLine[3][i] == '-')
+				addMode = false;
+			else {
+				std::vector<std::vector<char> > serverModes;
+				std::tr1::unordered_map<char, char> prefixes;
+				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+				serverModes = servIter->second->getChanModes();
+				prefixes = servIter->second->getPrefixes();
+				short category;
+				std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.find(parsedLine[3][i]);
+				category = 0;
+				if (prefixIter == prefixes.end()) {
+					bool found = false;
+					for (unsigned int j = 0; j < serverModes.size(); j++) {
+						for (unsigned int k = 0; k < serverModes[j].size(); k++) {
+							if (parsedLine[3][i] == serverModes[j][k]) {
+								found = true;
+								category = j;
+								break;
+							}
+						}
+						if (found)
+							break;
+					}
+					if (!found)
+						category = 4;
+				}
+				
+				if (category == 0 || category == 1 || (category == 2 && addMode)) {
+					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+						modIter->second->onChannelModePre(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, parsedLine[currParam]);
+					currParam++;
+				} else {
+					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+						modIter->second->onChannelModePre(server, parsedLine[2], parseNickFromHost(parsedLine[0]), parsedLine[3][i], addMode, "");
+				}
+			}
+		}
+	}
+}
+/*void ModuleInterface::callHook(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "PRIVMSG") {
 		if (parsedLine[3][0] == (char)1) { // CTCP
 			if (parsedLine[3][parsedLine[3].size()-1] == (char)1) // trim CTCP characters
@@ -284,20 +346,7 @@ void ModuleInterface::callHookOut(std::string server, std::vector<std::string> p
 			}
 		}
 	}
-}
-
-std::string ModuleInterface::parseNickFromHost(std::string host) {
-	if (host[0] == ':')
-		host = host.substr(1);
-	return host.substr(0, host.find_first_of('!'));
-}
-
-bool ModuleInterface::charIsNumeric(char number) {
-	if (number == '0' || number == '1' || number == '2' || number == '3' || number == '4' || number == '5' || number == '6' || number == '7' || number == '8' || number == '9')
-		return true;
-	return false;
-}
-
+}*/
 bool ModuleInterface::isChanType(char chanPrefix, std::string server) {
 	if (servers.find(server) == servers.end())
 		return false;
@@ -307,6 +356,67 @@ bool ModuleInterface::isChanType(char chanPrefix, std::string server) {
 			return true;
 	}
 	return false;
+}
+
+std::list<std::string> ModuleInterface::getServers() {
+	std::list<std::string> serverList;
+	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
+		serverList.insert(serverList.end(), servIter->first);
+	return serverList;
+}
+
+std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {
+	return modules;
+}
+
+std::multimap<std::string, std::string> ModuleInterface::getModuleAbilities() {
+	return modAbilities;
+}
+
+std::tr1::unordered_map<std::string, std::vector<std::string> > ModuleInterface::getModuleSupports() {
+	return modSupports;
+}
+
+std::list<std::string> ModuleInterface::getChannels(std::string server) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->getChannels();
+}
+
+std::string ModuleInterface::getChannelTopic(std::string server, std::string channel) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->getChannelTopic(channel);
+}
+
+std::list<std::string> ModuleInterface::getChannelUsers(std::string server, std::string channel) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> (); // return empty list to those who cannot provide a valid server name
+	return servIter->second->getChannelUsers(channel);
+}
+
+std::string ModuleInterface::getUserIdent(std::string server, std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->getUserIdent(channel, user);
+}
+
+std::string ModuleInterface::getUserHost(std::string server, std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->getUserHost(channel, user);
+}
+
+std::pair<char, char> ModuleInterface::getUserStatus(std::string server, std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::pair<char, char> ('0', ' '); // pair for normal user
+	return servIter->second->getUserStatus(channel, user);
 }
 
 void ModuleInterface::rehash() {
@@ -385,6 +495,48 @@ void ModuleInterface::unloadModule(std::string modName) {
 	pthread_create(&tum, NULL, tUnloadMod_thread, this);
 }
 
+void ModuleInterface::removeServer(std::string server) {
+	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	delete servIter->second;
+	servers.erase(servIter);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
+		modIter->second->onQuit(server); // call onQuit hook
+}
+
+void* ModuleInterface::serverCheck_thread(void* ptr) {
+	ModuleInterface* modi = (ModuleInterface*) ptr;
+	modi->serverCheck();
+	return NULL;
+}
+
+void ModuleInterface::serverCheck() {
+	while (true) {
+		sleep(60); // one minute pause between checks
+		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+			if (!servIter->second->stillConnected()) {
+				delete servIter->second;
+				if (debugLevel >= 2)
+					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
+				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
+			}
+		}
+	}
+}
+
+std::string ModuleInterface::parseNickFromHost(std::string host) {
+	if (host[0] == ':')
+		host = host.substr(1);
+	return host.substr(0, host.find_first_of('!'));
+}
+
+bool ModuleInterface::charIsNumeric(char number) {
+	if (number == '0' || number == '1' || number == '2' || number == '3' || number == '4' || number == '5' || number == '6' || number == '7' || number == '8' || number == '9')
+		return true;
+	return false;
+}
+
 void* ModuleInterface::tUnloadMod_thread(void* mip) {
 	ModuleInterface* modi = (ModuleInterface*) mip;
 	modi->tUnloadMod();
@@ -412,77 +564,4 @@ void ModuleInterface::tUnloadMod() {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = modules.begin(); moduleIter != modules.end(); ++moduleIter)
 		moduleIter->second->onRehash(); // provide modules with a way to detect unloading
 	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we just removed
-}
-
-void ModuleInterface::removeServer(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return;
-	delete servIter->second;
-	servers.erase(servIter);
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-		modIter->second->onQuit(server); // call onQuit hook
-}
-
-std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {
-	return modules;
-}
-
-std::list<std::string> ModuleInterface::getServers() {
-	std::list<std::string> serverList;
-	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
-		serverList.insert(serverList.end(), servIter->first);
-	return serverList;
-}
-
-std::multimap<std::string, std::string> ModuleInterface::getModuleAbilities() {
-	return modAbilities;
-}
-
-std::list<std::string> ModuleInterface::getChannels(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return std::list<std::string> ();
-	return servIter->second->getChannels();
-}
-
-std::string ModuleInterface::getChannelTopic(std::string server, std::string channel) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return "";
-	return servIter->second->getChannelTopic(channel);
-}
-
-std::list<std::string> ModuleInterface::getChannelUsers(std::string server, std::string channel) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return std::list<std::string> (); // return empty list to those who cannot provide a valid server name
-	return servIter->second->getChannelUsers(channel);
-}
-
-std::pair<char, char> ModuleInterface::getUserStatus(std::string server, std::string channel, std::string user) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return std::pair<char, char> ('0', ' '); // pair for normal user
-	return servIter->second->getUserStatus(channel, user);
-}
-
-void* ModuleInterface::serverCheck_thread(void* ptr) {
-	ModuleInterface* modi = (ModuleInterface*) ptr;
-	modi->serverCheck();
-	return NULL;
-}
-
-void ModuleInterface::serverCheck() {
-	while (true) {
-		sleep(60); // one minute pause between checks
-		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
-			if (!servIter->second->stillConnected()) {
-				delete servIter->second;
-				if (debugLevel >= 2)
-					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
-				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
-			}
-		}
-	}
 }

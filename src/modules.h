@@ -98,6 +98,7 @@ class Module {
 		std::list<std::string> getChannels(std::string server);
 		std::string getChannelTopic(std::string server, std::string channel);
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);
+		std::string getUserIdent(std::string server, std::string channel, std::string user);
 		std::string getUserHost(std::string server, std::string channel, std::string user);
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 	private:
@@ -111,8 +112,10 @@ class ModuleInterface {
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		std::vector<std::vector<char> > getServerChanModes(std::string server);
 		std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
-		void callHook(std::string server, std::vector<std::string> parsedLine);
-		void callHookOut(std::string server, std::vector<std::string> parsedLine);
+		void callPreHook(std::string server, std::vector<std::string> parsedLine);
+		void callPostHook(std::string server, std::vector<std::string> parsedLine);
+		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
+		void callHookSend(std::string server, std::vector<std::string> parsedLine);
 		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();
@@ -121,14 +124,13 @@ class ModuleInterface {
 		std::list<std::string> getChannels(std::string server);
 		std::string getChannelTopic(std::string server, std::string channel);
 		std::list<std::string> getChannelUsers(std::string server, std::string channel);
+		std::string getUserIdent(std::string server, std::string channel, std::string user);
 		std::string getUserHost(std::string server, std::string channel, std::string user);
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 		void rehash();
 		bool connectServer(std::string serverName);
 		bool loadModule(std::string modName, bool startup);
 		void unloadModule(std::string modName);
-		static void* tUnloadMod_thread(void* mip);
-		void tUnloadMod();
 		void removeServer(std::string server);
 		static void* serverCheck_thread(void* ptr);
 		void serverCheck();
@@ -144,6 +146,8 @@ class ModuleInterface {
 		std::string configName;
 		std::string parseNickFromHost(std::string host);
 		bool charIsNumeric(char number);
+		static void* tUnloadMod_thread(void* mip);
+		void tUnloadMod();
 		std::vector<std::string> moduleToUnload;
 		pthread_t serverCheckThread;
 		pthread_attr_t detachedState;

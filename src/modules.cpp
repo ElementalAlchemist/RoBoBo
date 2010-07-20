@@ -258,6 +258,10 @@ std::list<std::string> Module::getChannelUsers(std::string server, std::string c
 	return serverData->getChannelUsers(server, channel);
 }
 
+std::string Module::getUserIdent(std::string server, std::string channel, std::string user) {
+	return serverData->getUserIdent(server, channel, user);
+}
+
 std::string Module::getUserHost(std::string server, std::string channel, std::string user) {
 	return serverData->getUserHost(server, channel, user);
 }

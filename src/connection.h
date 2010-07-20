@@ -16,13 +16,15 @@ class ModuleInterface;
 class User {
 	public:
 		User(Channel* thisChannel);
+		void ident(std::string newIdent);
+		std::string ident();
 		void host(std::string newHost);
-		std::string getHost();
+		std::string host();
 		void status(bool add, char status);
-		char getStatus();
+		char status();
 		Channel* parentChannel;
 	private:
-		std::string host;
+		std::string ident, host;
 		std::vector<std::pair<char, bool> > hasStatus;
 };
 
@@ -31,15 +33,17 @@ class Channel {
 		Channel(Server* thisServer);
 		void parseNames(std::vector<std::string> names);
 		void numeric366();
-		void setTopic(std::string newTopic);
-		void setMode(bool add, char mode, std::string param = "");
+		void topic(std::string newTopic);
+		void mode(bool add, char mode, std::string param = "");
 		void joinChannel(std::string nick);
 		void leaveChannel(std::string nick);
 		std::list<std::string> getUsers();
-		void setHost(std::string user, std::string host);
-		std::string getHost(std::string user);
-		char getStatus(std::string user);
-		std::string getTopic();
+		void ident(std::string user, std::string host);
+		std::string ident(std::string user);
+		void host(std::string user, std::string host);
+		std::string host(std::string user);
+		char status(std::string user);
+		std::string topic();
 		Server* parentServer;
 	private:
 		std::tr1::unordered_map<std::string, User*> users;
@@ -61,6 +65,7 @@ class Server {
 		std::list<std::string> getChannels();
 		std::string getChannelTopic(std::string channel);
 		std::list<std::string> getChannelUsers(std::string channel);
+		std::string getUserHost(std::string channel, std::string user);
 		std::pair<char, char> getUserStatus(std::string channel, std::string user);
 	private:
 		std::string serverName;
