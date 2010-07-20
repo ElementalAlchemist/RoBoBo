@@ -40,6 +40,7 @@ class Module {
 		virtual void onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		virtual void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		virtual void onOtherData(std::string server, std::vector<std::string> parsedLine);
+		virtual void onPreConnect(std::string server);
 		virtual void onConnect(std::string server);
 		virtual void onQuit (std::string server);
 		
@@ -117,6 +118,7 @@ class ModuleInterface {
 		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
 		void callHookSend(std::string server, std::vector<std::string> parsedLine);
 		void callConnectHook(std::string server);
+		void callQuitHook(std::string server);
 		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> getModules();
 		std::list<std::string> getServers();

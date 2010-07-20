@@ -209,7 +209,7 @@ void Server::handleData() {
 			if (parsedLine[1].size() > 12) {
 				if (parsedLine[1].substr(0,12) == "Closing Link") {
 					serverConnection.closeConnection();
-					moduleData->removeServer(serverName);
+					moduleData->callQuitHook(serverName);
 					break;
 				}
 			}
@@ -312,8 +312,10 @@ void* Server::secondDecrement_thread(void* ptr) {
 
 void Server::secondDecrement() {
 	while (true) {
-		if (!serverConnection.isConnected())
+		if (!serverConnection.isConnected()) {
+			moduleData->callQuitHook(serverName);
 			break; // thread must die when server isn't connected anymore
+		}
 		sleep(1);
 		if (seconds > 0) {
 			pthread_mutex_lock(&secondsmutex);

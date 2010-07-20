@@ -67,6 +67,8 @@ void Module::onNumeric(std::string server, std::string numeric, std::vector<std:
 
 void Module::onOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
+void Module::onPreConnect(std::string server) {}
+
 void Module::onConnect(std::string server) {}
 
 void Module::onQuit(std::string server) {}
