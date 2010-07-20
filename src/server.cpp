@@ -102,7 +102,7 @@ void Server::handleData() {
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
-		moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
+		moduleData->callPreHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendLine("MODE " + serverConf["nick"] + " +B"); // set bot mode
 			if (serverConf["channels"] != "")
@@ -214,6 +214,7 @@ void Server::handleData() {
 				}
 			}
 		}
+		moduleData->callPostHook(serverName, parsedLine);
 	}
 }
 
@@ -227,6 +228,7 @@ void Server::sendData() {
 	seconds = 0;
 	unsigned short secondsToAdd = 0;
 	std::string sendingMessage = "";
+	std::vector<std::string> parsedLine;
 	std::string command = "";
 	pthread_create(&secondDecrementThread, &detachedState, secondDecrement_thread, this);
 	while (true) {
@@ -238,11 +240,17 @@ void Server::sendData() {
 		}
 		sendingMessage = outData.front();
 		outData.pop();
-		command = sendingMessage.substr(0,sendingMessage.find_first_of(' '));
-		
+		parsedLine = parseLine(sendingMessage);
+		command = parsedLine[0];
+		if (command == "PRIVMSG" || command == "NOTICE") {
+			std::string newMessage = moduleData->callHookOut(serverName, parsedLine);
+			if (newMessage == "")
+				continue; // do not send this canceled message
+			sendingMessage = parsedLine[0] + " " + parsedLine[1] + " :" + newMessage;
+			parsedLine = parseLine(sendingMessage);
+		}
 		if (command == "MODE") { // consolidate modes into one line
 			secondsToAdd = 1;
-			std::vector<std::string> parsedLine = parseLine(sendingMessage);
 			std::string channel = parsedLine[1], modes = parsedLine[2], params = "";
 			bool addingMode = (modes[0] == '-') ? false : true;
 			if (parsedLine.size() > 3) // if there is a parameter, add it
@@ -297,7 +305,7 @@ void Server::sendData() {
 		serverConnection.sendData(sendingMessage);
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
-		moduleData->callHookOut(serverName, parseLine(sendingMessage));
+		moduleData->callHookSend(serverName, parsedLine);
 		pthread_mutex_lock(&secondsmutex);
 		seconds += secondsToAdd;
 		pthread_mutex_unlock(&secondsmutex);
