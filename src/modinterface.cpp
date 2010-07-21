@@ -649,11 +649,22 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	newModule->init(modConf->second, this, modName, debugLevel);
 	modules.insert(std::pair<std::string, Module*> (modName, newModule));
 	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));
-	std::vector<std::string> abilities = newModule->getAbilities();
+	std::vector<std::string> abilities = newModule->abilities();
 	for (unsigned int i = 0; i < abilities.size(); i++)
 		modAbilities.insert(std::pair<std::string, std::string> (abilities[i], modName));
-	if (!startup)
-		return newModule->onLoadComplete();
+	std::vector<std::string> supports = newModule->supports();
+	for (unsigned int i = 0; i < supports.size(); i++)
+		modSupports[supports[i]].push_back(modName);
+	if (!startup) {
+		if (newModule->onLoadComplete()) {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter) {
+				if (modIter->first != modName)
+					modIter->second->onModuleChange();
+			}
+			return true;
+		} else
+			return false;
+	}
 	return true;
 }
 
@@ -713,11 +724,21 @@ void ModuleInterface::tUnloadMod() {
 	sleep(1);
 	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(moduleToUnload[0]);
 	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(moduleToUnload[0]);
-	if (!modIter->second->getAbilities().empty()) {
+	if (!modIter->second->abilities().empty()) {
 		for (std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin(); modAbleIter != modAbilities.end(); ++modAbleIter) {
 			if (modAbleIter->second == modIter->first) {
 				modAbilities.erase(modAbleIter);
 				--modAbleIter;
+			}
+		}
+	}
+	if (!modIter->second->supports().empty()) {
+		for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSuppIter = modSupports.begin(); modSuppIter != modSupports.end(); ++modSuppIter) {
+			for (unsigned int i = 0; i < modSuppIter->second.size(); i++) {
+				if (modSuppIter->second[i] == modIter->first) {
+					modSuppIter->second.erase(modSuppIter->second.begin() + i);
+					break;
+				}
 			}
 		}
 	}
@@ -726,6 +747,6 @@ void ModuleInterface::tUnloadMod() {
 	dlclose(modFileIter->second);
 	moduleFiles.erase(modFileIter);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = modules.begin(); moduleIter != modules.end(); ++moduleIter)
-		moduleIter->second->onRehash(); // provide modules with a way to detect unloading
+		moduleIter->second->onModuleChange(); // provide modules with a way to detect unloading
 	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we just removed
 }

@@ -12,7 +12,7 @@ Before release.  Duh.
 [x] - Allow the on*Out() hooks to modify the message being sent.
 [x] - prefix/status mode storage: use something ordered rather than an
 		unordered_map
-[>] - supports map for better support lookup.  probably like this:
+[x] - supports map for better support lookup.  probably like this:
 		std::tr1::unordered_map<std::string, std::vector<std::string> >
 		where key = service and value = vector of names of supporting modules
 [ ] - Pretty much everything else here requires some sort of update to MODULES.
