@@ -138,6 +138,12 @@ void Server::handleData() {
 			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
 			if (it != inChannels.end())
 				it->second->setTopic(parsedLine[4]);
+		} else if (parsedLine[1] == "352") {
+			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
+			if (it != inChannels.end()) {
+				it->second->ident(parsedLine[7], parsedLine[4]);
+				it->second->host(parsedLine[7], parsedLine[5]);
+			}
 		} else if (parsedLine[1] == "353") { // NAMES reply
 			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[4]);
 			if (it != inChannels.end())
