@@ -46,7 +46,7 @@ std::tr1::unordered_map<std::string, std::string> Server::getInfo() {
 	return serverConf;
 }
 
-std::tr1::unordered_map<char, char> Server::getPrefixes() {
+std::vector<std::pair<char, char> > Server::getPrefixes() {
 	return prefix;
 }
 
@@ -84,12 +84,30 @@ std::list<std::string> Server::getChannelUsers(std::string channel) {
 	return chanIter->second->getUsers();
 }
 
+std::string Server::getUserIdent(std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return "";
+	return chanIter->second->ident(user);
+}
+
+std::string Server::getUserHost(std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return "";
+	return chanIter->second->host(user);
+}
+
 std::pair<char, char> Server::getUserStatus(std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
 	if (chanIter == inChannels.end())
 		return std::pair<char, char> ('0', ' ');
 	char status = chanIter->second->getStatus(user);
-	return std::pair<char, char> (status, prefix[status]);
+	for (unsigned int i = 0; i < prefix.size(); i++) {
+		if (status == prefix[i].first)
+			return std::pair<char, char> (status, prefix[i].second);
+	}
+	return std::pair<char, char> ('0', ' ');
 }
 
 void* Server::handleData_thread(void* ptr) {
@@ -164,10 +182,14 @@ void Server::handleData() {
 						addMode = false;
 					else {
 						int category;
-						std::tr1::unordered_map<char, char>::iterator prefixIter = prefix.find(parsedLine[3][i]);
-						category = 0; // count it as a list mode since it's a list of users who hold a status
-						if (prefixIter == prefix.end()) {
-							bool found = false;
+						bool found = false;
+						for (unsigned int i = 0; i < prefix.size(); i++) {
+							if (prefix[i].first == parsedLine[3][i]) {
+								category = 0; // count it as a list mode since it's a list of users who hold a status
+								found = true;
+							}
+						}
+						if (!found) {
 							for (unsigned int j = 0; j < chanModes.size(); j++) {
 								for (unsigned int k = 0; k < chanModes[j].size(); k++) {
 									if (parsedLine[3][i] == chanModes[j][k]) {
@@ -197,17 +219,30 @@ void Server::handleData() {
 			}
 		} else if (parsedLine[1] == "NICK" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot's nick changed
 			serverConf["nick"] = parsedLine[2];
-		else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
+		else if (parsedLine[1] == "NICK") {
+			for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
+				chanIter->second->nick(separateNickFromFullHostmask(parsedLine[0].substr(1)), parsedLine[2]);
+		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) { // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (this)));
+			sendLine("WHO " + parsedLine[2]);
+		} else if (parsedLine[1] == "JOIN")
+			inChannels.find(parsedLine[2])->joinChannel(parsedLine[0].substr(1));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
+		else if (parsedLine[1] == "PART")
+			inChannels.find(parsedLine[2])->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1));
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
 			serverConnection.closeConnection();
 			moduleData->removeServer(serverName); // The server is disconnected. Remove its instance.
+			quitHooked = true;
 			break;
+		} else if (parsedLine[1] == "QUIT") {
+			for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
+				chanIter->second->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			serverConnection.closeConnection();
 			moduleData->removeServer(serverName);
+			quitHooked = true;
 			break;
 		} else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
@@ -216,6 +251,7 @@ void Server::handleData() {
 				if (parsedLine[1].substr(0,12) == "Closing Link") {
 					serverConnection.closeConnection();
 					moduleData->callQuitHook(serverName);
+					quitHooked = true;
 					break;
 				}
 			}
@@ -327,7 +363,9 @@ void* Server::secondDecrement_thread(void* ptr) {
 void Server::secondDecrement() {
 	while (true) {
 		if (!serverConnection.isConnected()) {
-			moduleData->callQuitHook(serverName);
+			if (!quitHooked)
+				moduleData->callQuitHook(serverName);
+			quitHooked = false;
 			break; // thread must die when server isn't connected anymore
 		}
 		sleep(1);
@@ -353,7 +391,7 @@ void Server::parse005(std::vector<std::string> parsedLine) {
 				std::string modes = data.substr(0, data.find_first_of(')'));
 				std::string chars = data.substr(data.find_first_of(')') + 1);
 				for (unsigned int i = 0; i < modes.size(); i++)
-					prefix.insert(std::pair<char, char> (modes[i], chars[i]));
+					prefix.push_back(std::pair<char, char> (modes[i], chars[i]));
 			}
 		}
 		if (parsedLine[i].size() > 10) { // Channel types

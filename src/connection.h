@@ -16,6 +16,7 @@ class ModuleInterface;
 class User {
 	public:
 		User(Channel* thisChannel);
+		User(std::string theIdent, std::string theHost, Channel* thisChannel);
 		void ident(std::string newIdent);
 		std::string ident();
 		void host(std::string newHost);
@@ -35,10 +36,11 @@ class Channel {
 		void numeric366();
 		void topic(std::string newTopic);
 		void mode(bool add, char mode, std::string param = "");
-		void joinChannel(std::string nick);
+		void joinChannel(std::string hostmask);
 		void leaveChannel(std::string nick);
+		void nick(std::string oldNick, std::string newNick);
 		std::list<std::string> users();
-		void ident(std::string user, std::string host);
+		void ident(std::string user, std::string ident);
 		std::string ident(std::string user);
 		void host(std::string user, std::string host);
 		std::string host(std::string user);
@@ -59,19 +61,20 @@ class Server {
 		bool stillConnected();
 		void sendLine(std::string line);
 		std::tr1::unordered_map<std::string, std::string> getInfo();
-		std::tr1::unordered_map<char, char> getPrefixes();
+		std::vector<std::pair<char, char> > getPrefixes();
 		std::vector<std::vector<char> > getChanModes();
 		std::vector<char> getChanTypes();
 		void resyncChannels();
 		std::list<std::string> getChannels();
 		std::string getChannelTopic(std::string channel);
 		std::list<std::string> getChannelUsers(std::string channel);
+		std::string getUserIdent(std::string channel, std::string user);
 		std::string getUserHost(std::string channel, std::string user);
 		std::pair<char, char> getUserStatus(std::string channel, std::string user);
 	private:
 		std::string serverName;
 		unsigned short debugLevel;
-		bool registered, altChanged;
+		bool registered, altChanged, quitHooked;
 		Socket serverConnection;
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;
@@ -85,7 +88,7 @@ class Server {
 		std::string network;
 		unsigned short maxModes;
 		std::vector<char> userModes;
-		std::tr1::unordered_map<char, char> prefix;
+		std::vector<std::pair<char, char> > prefix;
 		std::vector<char> chanTypes;
 		std::vector<std::vector<char> > chanModes;
 		std::queue<std::string> outData;

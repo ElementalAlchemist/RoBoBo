@@ -3,9 +3,15 @@
 #ifndef USER_CPP
 #define USER_CPP
 User::User(Channel* thisChannel) : parentChannel(thisChannel), ident(""), host("") {
-	std::tr1::unordered_map<char, char> prefixes = parentChannel->parentServer->getPrefixes();
-	for (std::tr1::unordered_map<char, char>::iterator it = prefixes.begin(); it != prefixes.end(); ++it)
-		hasStatus.insert(std::pair<char, bool> (it->first, false));
+	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->getPrefixes();
+	for (unsigned int i = 0; i < prefixes.size(); i++)
+		hasStatus.push_back(std::pair<char, bool> (prefixes[i].first, false));
+}
+
+User::User(std::string theIdent, std::string theHost, Channel* thisChannel) : parentChannel(thisChannel), ident(theIdent), host(theHost) {
+	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->getPrefixes();
+	for (unsigned int i = 0; i < prefixes.size(); i++)
+		hasStatus.push_back(std::pair<char, bool> (prefixes[i].first, false));
 }
 
 void User::ident(std::string newIdent) {
