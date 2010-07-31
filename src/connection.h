@@ -35,6 +35,7 @@ class Channel {
 		std::list<std::string> getUsers();
 		char getStatus(std::string user);
 		std::string getTopic();
+		void changeNick(std::string oldNick, std::string newNick);
 		Server* parentServer;
 	private:
 		std::tr1::unordered_map<std::string, User*> users;

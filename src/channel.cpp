@@ -52,7 +52,10 @@ void Channel::joinChannel(std::string nick) {
 }
 
 void Channel::leaveChannel(std::string nick) {
-	users.erase(nick);
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(nick);
+	if (userIter == users.end())
+		return;
+	users.erase(userIter);
 }
 
 std::list<std::string> Channel::getUsers() {
@@ -71,4 +74,13 @@ char Channel::getStatus(std::string user) {
 
 std::string Channel::getTopic() {
 	return topic;
+}
+
+void Channel::changeNick(std::string oldNick, std::string newNick) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(oldNick);
+	if (userIter == users.end())
+		return;
+	User* userData = userIter->second;
+	users.erase(userIter);
+	users.insert(std::pair<std::string, User*> (newNick, userData));
 }
