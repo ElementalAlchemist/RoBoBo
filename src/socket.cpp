@@ -74,7 +74,7 @@ std::string Socket::receive() {
 	while (true) {
 		do {
 			if (addPause)
-				usleep(500000);
+				usleep(100000);
 			status = recv(socketfd, &inputBuffer, 1, 0);
 			addPause = true;
 		} while ((status < 0 && errno == EWOULDBLOCK) && status != 0);

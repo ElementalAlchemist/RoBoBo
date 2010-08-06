@@ -283,7 +283,7 @@ void Server::sendData() {
 		if (!serverConnection.isConnected())
 			break; // Thread must die when server isn't connected.
 		if (outData.empty()) {
-			usleep(500000); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
+			usleep(100000); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
 			continue; // check again for empty queue
 		}
 		sendingMessage = outData.front();
