@@ -16,16 +16,14 @@ Table of Contents
 =======================
 1. CURRENT API
 
-The current API version is 1.0.2.
+The current API version is 1.1.0.
 
 int ModuleClass::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
-Version 1.0.2 of the API is incompatible with 1.0.1 and 1.0.0, both of which
-were used in the beta versions of 1.0.
 Module-breaking changes to the API are avoided starting with the release
-candidate.  The API version in use as of 1.0.0RC1 was 1.0.2.
+candidate.  The API version in use as of 1.1.0RC1 was 1.1.0.
 
 =======================
 2. SPECIFICS OF IMPLEMENTATION
@@ -47,7 +45,7 @@ order for the bot to load your module, you must define a way to load your
 module.  This is done most simply as such:
 
 extern "C" Module* spawn() {
-	return new mod_name;
+	return new ModName;
 }
 
 In this snippet, the only thing that should change is the returned class in the
@@ -59,7 +57,7 @@ it.
 Now that you've defined those, you are ready to make your class!  Your class
 must extend the Module class.
 
-class mod_name : public Module {
+class ModName : public Module {
 // Look!  A module!
 };
 
@@ -67,7 +65,8 @@ If you wish you may write a constructor for your modules to initialize class
 variables.  No parameters are passed to the constructor, and, as such, there is
 not access to bot functions in the constructor.  Use onLoadComplete() instead
 (see below, section 3.3), which the bot calls once your module has been loaded
-(or if your module is loaded at startup, after all modules have been loaded).
+(or if your module is loaded at startup, after all startup modules have been
+loaded).
 
 Finally, the Module class contains a pure virtual function, botAPIversion().
 This function must return an integer corresponding to the version of the bot
@@ -83,8 +82,8 @@ parse data from IRC servers, and how to send data to IRC servers.
 
 As a module for an IRC bot, you can expect to be able to communicate with the
 servers the bot is connected to.  The subsections that follow describe how to
-catch received and sent messages so that you can react to them as well as how
-to send messages from your module.
+catch received and sent data so that you can react to them as well as how to
+send messages from your module.
 
 =======================
 3.1. RECEIVING DATA FROM A SERVER
@@ -95,117 +94,192 @@ functions corresponding to the hooks you need, which are declared as virtual in
 the base Module class.
 
 void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-	This function is called when a PRIVMSG is received through a channel.  It is not triggered on CTCP.
-		server: The server from which the message was received
-		channel: The channel through which the message was received
-		target: The status character of the nicks who received the message.  If none, target == '0'
-		nick: The nick the message is from
-		message: The contents of the message
+	This function is called whenever a channel message is received by the bot.
+	server: the server from which the message was received
+	channel: the channel to which the message was sent
+	target: the target character to which the message was sent (e.g. if the message was sent to @#channel)
+		if the message was sent to everyone in the channel, the target character is '0' (the number zero)
+	nick: the nick of the user who sent the message
+	message: the message sent
+
 void onUserMsg(std::string server, std::string nick, std::string message);
-	This function is called when a PRIVMSG is received directly from a user.  It is not triggered on CTCP.
-		server: The server from which the message was received
-		nick: The nick the message is from
-		message: The contents of the message
+	This function is called whenever a user message is received by the bot.
+	server: the server from which the message was received
+	nick: the nick of the user who sent the message
+	message: the message sent
+
 void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
-	This function is called when a NOTICE is received through a channel.  It is not triggered on CTCP reply.
-		server: The server from which the notice was received
-		channel: The channel through which the message was receivied
-		target: The status character of the nicks who received the message.  If none, target == '0'
-		nick: The nick the notice is from
-		message: The contents of the message
+	This function is called whenever a channel notice is received by the bot.
+	server: the server from which the notice was received
+	channel: the channel to which the notice was sent
+	target: the target character to which the message was sent (e.g. if the message was sent to @#channel)
+		if the message was sent to everyone in the channel, the target character is '0' (the number zero)
+	nick: the nick of the user who sent the notice
+	message: the notice sent
+
 void onUserNotice(std::string server, std::string nick, std::string message);
-	This function is called when a NOTICE is received directly from a user.  It is not triggered on CTCP reply.
-		server: The server from which the notice was received
-		nick: The nick the notice is from
-		message: The contents of the message
+	This function is called whenever a user notice is received by the bot.
+	server: the server from which the notice was received
+	nick: the nick of the user who sent the notice
+	message: the notice sent
+
 void onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
-	This function is called when a CTCP ACTION is received through a channel.
-		server: The server from which the action was received.
-		channel: The channel through which the action was received
-		target: The status character of the nicks who received the action.  If none, target == '0'
-		nick: The nick the action is from
-		message: The contents of the action message
+	This function is called whenever a channel action is received by the bot.
+	server: the server from which the action was received
+	channel: the channel to which the action was sent
+	target: the target character to which the message was sent (e.g. if the message was sent to @#channel)
+		if the message was sent to everyone in the channel, the target character is '0' (the number zero)
+	nick: the nick of the user who acted
+	message: the action (e.g. if the user sent /me stabs and the action was * ElementalAlchemist stabs, the message
+		would simply be "stabs")
+
 void onUserAction(std::string server, std::string nick, std::string message);
-	This function is called when a CTCP ACTION is received directly from a user.
-		server: The server from which the action was received
-		nick: The nick the action is from
-		message: The contents of the action message
+	This function is called whenever a user action is received by the bot.
+	server: the server from which the action was received
+	nick: the nick of the user who acted
+	message: the action (e.g. if the user sent /me stabs and the action was * ElementalAlchemist stabs, the message
+		would simply be "stabs")
+
 void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-	This function is called when a CTCP request (except ACTION) is received through a channel.
-		server: The server from which the request was received
-		channel: The channel through which the request was received
-		target: The status character of the nicks who received the request.  If none, target == '0'
-		nick: The nick the request is from
-		message: The contents of the request, including the type and any other data
+	This function is called whenever a channel CTCP is received by the bot, except for ACTION (see onChannelAction).
+	server: the server from which the CTCP was received
+	channel: the channel to which the CTCP was sent
+	target: the target character to which the message was sent (e.g. if the message was sent to @#channel)
+		if the message was sent to everyone in the channel, the target character is '0' (the number zero)
+	nick: the nick of the user who sent the CTCP
+	message: the CTCP (the first word is the CTCP type, and the rest are the parameters)
+
 void onUserCTCP(std::string server, std::string nick, std::string message);
-	This function is called when a CTCP request (except ACTION) is received directly from a user.
-		server: The server from which the request was received
-		nick: The nick the request is from
-		message: The contents of the request, including the type and any other data
+	This function is called whenever a user CTCP is received by the bot, except for ACTION (see onUserAction).
+	server: the server from which the CTCP was received
+	nick: the nick of the user who sent the CTCP
+	message: the CTCP (the first word is the CTCP type, and the rest are the parameters)
+
 void onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
-	This function is called when a CTCP reply is received through a channel.
-		server: The server from which the reply was received
-		channel: The channel through which the reply was received
-		target: The status character of the nicks who received the reply.  If none, target == '0'
-		nick: The nick the reply is from
-		message: The contents of the reply, including the type and any other data
+	This function is called whenever a channel CTCP reply is received by the bot.
+	server: the server from which the CTCP reply was received
+	channel: the channel to which the CTCP reply was sent
+	target: the target character to which the message was sent (e.g. if the message was sent to @#channel)
+		if the message was sent to everyone in the channel, the target character is '0' (the number zero)
+	nick: the nick of the user who sent the CTCP reply
+	message: the CTCP reply (the first word is the CTCP type, and the rest are the parameters)
+
 void onUserCTCPReply(std::string server, std::string nick, std::string message);
-	This function is called when a CTCP reply is received directly from a user.
-		server: The server from which the reply was received
-		nick: The nick the reply is from
-		message: The contents of the reply, including the type and any other data
-void onChannelJoin(std::string server, std::string channel, std::string hostmask);
-	This function is called when someone joins a channel.  This can be the bot or anyone else.
-		server: The server from which the JOIN was received
-		channel: The channel that was joined
-		hostmask: The hostmask of the user who joined
-void onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason);
-	This function is called when someone parts a channel.  This can be the bot or anyone else.
-		server: The server from which the PART was received.
-		channel: The channel that was parted
-		hostmask: The hostmask of the user who parted
-		reason: The part reason
-void onUserQuit(std::string server, std::string hostmask, std::string reason);
-	This function is called when someone quits the IRC server.  This can be the bot or anyone else.
-		server: The server from which the QUIT was received.
-		hostmask: The hostmask of the user who quit
-		reason: The quit message
-void onNickChange(std::string server, std::string oldNick, std::string newNick);
-	This function is called when someone changes his/her nick.  This can be the bot or anyone else.
-	If the bot is changing names, this hook is called before the bot's nick is internally modified.
-		server: The server from which the NICK was received
-		oldNick: The former nick of the user
-		newNick: The new nick of the user
-void onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
-	This function is called when someone is kicked from an IRC channel.
-		server: The server from which the KICK was received
-		channel: The channel a user was kicked from
-		kicker: The nick of the user who kicked
-		kickee: The nick of the user who was kicked
-		reason: The kick reason
-void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
-	This function is called when someone sets a mode on an IRC channel.
-		server: The server from which the MODE was received
-		channel: The channel in which the mode was set
-		setter: The user who set the mode
-		mode: The mode character
-		add: TRUE if the mode was added and FALSE if the mode was removed
-		param: Any parameters with the mode; empty string if there were no parameters
+	This function is called whenever a user CTCP reply is received by the bot.
+	server: the server from which the CTCP reply is received
+	nick: the nick fo the user who sent the CTCP reply
+	message: the CTCP reply (the first word is the CTCP type, and the rest are the parameters)
+
+void onChannelJoinPre(std::string server, std::string channel, std::string hostmask);
+	This function is called whenever a user (either the bot or someone else) joins a channel.
+		This function is called before any processing occurs in the core (i.e. a User is created for the Channel).
+	server: the server from which the JOIN notice is received
+	channel: the channel that the user joined
+	hostmask: the hostmask (nick!user@host) of the user who joined the channel
+
+void onChannelJoinPost(std::string server, std::string channel, std::string hostmask);
+	This function is called whenever a user (either the bot or someone else) joins a channel.
+		This function is called after any processing occurs in the core.
+	server: the server from which the JOIN notice is received
+	channel: the channel that the user joined
+	hostmask: the hostmask (nick!user@host) of the user who joined the channel
+
+void onChannelPartPre(std::string server, std::string channel, std::string hostmask, std::string reason);
+	This function is called whenever a user (either the bot or someone else) parts a channel.
+		This function is called before any processing occurs in the core.
+	server: the server from which the PART notice is received
+	channel: the channel from which the user parted
+	hostmask: the hostmask (nick!user@host) of the user who parted the channel
+	reason: the reason provided in the part message (or an empty string for no reason)
+
+void onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason);
+	This function is called whenever a user (either the bot or someone else) parts a channel.
+		This function is called after any processing occurs in the core.
+	server: the server from which the PART notice is received
+	channel: the channel from which the user parted
+	hostmask: the hostmask (nick!user@host) of the user who parted the channel
+	reason: the reason provided in the part message (or an empty string for no reason)
+
+void onUserQuitPre(std::string server, std::string hostmask, std::string reason);
+	This function is called whenever a user (either the bot or someone else) quits from the server.
+		This function is called before any processing occurs in the core.
+		For detecting bot disconnections, it is recommended you use onQuit (see below, section 3.3).
+	server: the server from which the QUIT notice is received
+	hostmask: the hostmask (nick!user@host) of the user who quit the server
+	reason: the reason provided in the quit message
+
+void onUserQuitPost(std::string server, std::string hostmask, std::string reason);
+	This function is called whenever a user (either the bot or someone else) quits from the server.
+		This function is called after any processing occurs in the core.
+		For detecting bot disconnections, it is recomended you use onQuit (see below, section 3.3).
+	server: the server from which the QUIT notice is received
+	hostmask: the hostmask (nick!user@host) of the user who quit the server
+	reason: the reason provided in the quit message
+
+void onNickChangePre(std::string server, std::string oldNick, std::string newNick);
+	This function is called whenever a user (either the bot or someone else) changes nicks.
+		This function is called before any processing occurs in the core.
+	server: the server from which the NICK notice is received
+	oldNick: the old nick of the user
+	newNick: the new nick of the user
+
+void onNickChangePost(std::string server, std::string oldNick, std::string newNick);
+	This function is called whenever a user (either the bot or someone else) changes nicks.
+		This function is called after any processing occurs in the core.
+	server: the server from which the NICK notice is received
+	oldNick: the old nick of the user
+	newNick: the new nick of the user
+
+void onChannelKickPre(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+	This function is called whenever a user (either the bot or someone else) kicks another user (either the bot
+		or someone else) from a channel.
+		This function is called before any processing occurs in the core.
+	server: the server from which the KICK notice is received
+	channel: the channel from which the user was kicked
+	kicker: the nick of the user who kicked
+	kickee: the nick of the user who got kicked
+	reason: the kick reason provided
+
+void onChannelKickPost(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+	This function is called whenever a user (either the bot or someone else) kicks another user (either the bot
+		or someone else) from a channel.
+		This function is called after any processing occurs in the core.
+	server: the server from which the KICK notice is received
+	channel: the channel from which the user was kicked
+	kicker: the nick of the user who kicked
+	kickee: the nick of the user who got kicked
+	reason: the kick reason provided
+
+void onChannelModePre(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
+	This function is called whenever a mode is changed on a channel.
+		This function is called before any processing occurs in the core.
+	server: the server from which the MODE notice is received
+	channel: the channel in which the mode was changed
+	setter: the nick of the user who changed the mode
+	mode: the mode letter
+	add: true if the mode was added to the channel, and false if it was removed
+	param: the mode's parameter (an empty string if the mode does not take a parameter)
+
+void onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
+	This function is called whenever a mode is changed on a channel.
+		This function is called after any processing occurs in the core.
+	server: the server from which the MODE notice is received
+	channel: the channel in which the mode was changed
+	setter: the nick of the user who changed the mode
+	mode: the mode letter
+	add: true if the mode was added to the channel, and false if it was removed
+	param: the mode's parameter (an empty string if the mode does not take a parameter)
+
 void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
-	This function is called when the bot receives a numeric from the server.
-		server: The server that sent the numeric
-		numeric: The numeric
-		parsedLine: The entire line parsed as IRC parameters.
-			parsedLine[0]: The server's name preceded with a colon
-			parsedLine[1]: The numeric
-			parsedLine[2+]: All the parameters of the numeric
+	This function is called whenever a numeric is received by the bot.
+	server: the server from which the numeric was received
+	numeric: the numeric that was received
+	parsedLine: an IRC parsed line containing the contents of the entire line
+
 void onOtherData(std::string server, std::vector<std::string> parsedLine);
-	This function serves as a catch-all function.  All lines that don't call other hooks call this one.
-		server: The server the line was received from
-		parsedLine: The entire line parsed as IRC parameters
-			parsedLine[0]: The server's name or sender's hostmask, preceded with a colon
-			parsedLine[1]: The command
-			parsedLine[2+]: Any parameters to the command
+	This function is called whenever data is received that does not call any of the other functions.
+	server: the server from which the data was received
+	parsedLine: an IRC parsed line containing the contents of the entire line
 
 =======================
 3.2 RECEIVING DATA BEING SENT TO A SERVER
@@ -215,75 +289,217 @@ called when a matching line is sent, even if the hook being called belongs to
 the module that sent the line.  Outgoing hooks are not defined for data that is
 returned when successful (i.e. MODE, etc.).
 
-void onOutChannelMessage(std::string server, std::string target, char status, std::string message);
-	This function is called whenever the bot sends a PRIVMSG to a channel.
-		server: The server the line was sent to
-		target: The channel the line was sent to
-		status: The status level the line was sent to.  If there is none, target == '0'
-		message: The actual message
-void onOutUserMessage(std::string server, std::string target, std::string message);
-	This function is called whenever the bot sends a PRIVMSG to a user.
-		server: The server the line was sent to
-		target: The nick the line was sent to
-		message: The actual message
-void onOutChannelNotice(std::string server, std::string target, char status, std::string message);
-	This function is called when the bot sends a notice to the channel.
-		server: The server the line was sent to
-		target: The channel the line was sent to
-		status: The status level the line was sent to.  If there is none, target == '0'
-		message: The actual message
-void onOutUserNotice(std::string server, std::string target, std::string message);
-	This function is called when the bot sends a notice to a user.
-		server: The server the line was sent to
-		target: The nick the line was sent to
-		message: The actual message
-void onOutChannelAction(std::string server, std::string target, char status, std::string message);
-	This function is called when the bot sends a CTCP ACTION to a channel.
-		server: The server the line was sent to
-		target: The channel the line was sent to
-		status: The status level the line was sent to.  If there is none, target == '0'
-		message: The action message
-void onOutUserAction(std::string server, std::string target, std::string message);
-	This function is called when the bot sends a CTCP ACTION to a user.
-		server: The server the line was sent to
-		target: The nick the line was sent to
-		message: The action message
-void onOutChannelCTCP(std::string server, std::string target, char status, std::string message);
-	This function is called when the bot sends a CTCP request to a channel.
-		server: The server the CTCP request was sent to
-		target: The channel the CTCP request was sent to
-		status: The status level the line was sent to.  If there is none, target == '0'
-		message: The actual CTCP request, including the type and other sent data
-void onOutUserCTCP(std::string server, std::string target, std::string message);
-	This function is called when the bot sends a CTCP request to a user.
-		server: The server the CTCP request was sent to
-		target: The nick the CTCP request was sent to
-		message: The actual request, including the type and other sent data
-void onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
-	This function is called when the bot sends a CTCP reply to a channel.
-		server: The server the CTCP reply was sent to
-		target: The channel the CTCP reply was sent to
-		status: The status level the line was sent to.  If there is none, target == '0'
-		message: The actual CTCP reply, including the type and other given information
-void onOutUserCTCPReply(std::string server, std::string target, std::string message);
-	This function is called when the bot sends a CTCP reply to a user.
-		server: The server the CTCP reply was sent to
-		target: The user the CTCP reply was sent to
-		message: The actual reply, including the type and any given information
+std::string onOutChannelMessage(std::string server, std::string target, char status, std::string message);
+	This function is called whenever a channel message is about to be sent from the bot to the server.
+	server: the server to which the message is to be sent
+	target: the channel to which the message is to be sent
+	status: the status char to which the message is to be sent (e.g. if the message is to be sent to @#channel)
+		if the message is sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the message to be sent
+	std::string: return the new message to be sent.  If you wish to not change the message, return the original
+		message.  If you wish to cancel sending this message, return an empty string.
+
+void onSendChannelMessage(std::string server, std::string target, char status, std::string message);
+	This function is called whenever a channel message is sent from the bot to the server.
+		It is called immediately after the message is sent.
+	server: the server to which the message was sent
+	target: the channel to which the message was sent
+	status: the status char to which the message was sent (e.g. if the message was sent to @#channel)
+		if the message was sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the message that was sent
+
+std::string onOutUserMessage(std::string server, std::string target, std::string message);
+	This function is called whenever a user message is about to be sent from the bot to the server.
+	server: the server to which the message is to be sent
+	target: the nick of the user to which the message is to be sent
+	message: the message to be sent
+	std::string: return the new message to be sent.  If you wish to not change the message, return the original
+		message.  If you wish to cancel sending this message, return an empty string.
+
+void onSendUserMessage(std::string server, std::string target, std::string message);
+	This function is called whenever a user message is sent from the bot to the server.
+		It is called immediately after the message is sent.
+	server: the server to which the message was sent
+	target: the nick of the user to whom the message was sent
+	message: the message that was sent
+
+std::string onOutChannelNotice(std::string server, std::string target, char status, std::string message);
+	This function is called whenever a channel notice is about to be sent from the bot to the server.
+	server: the server to which the message is to be sent
+	target: the channel to which the message is to be sent
+	status: the status char to which the message is to be sent (e.g. if the message was sent to @#channel)
+		if the notice is sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the message that is to be sent
+	std::string: return the new message to be sent.  If you wish to not change the message, return the original
+		message.  If you wish to cancel sending this message, return an empty string.
+
+void onSendChannelNotice(std::string server, std::string target, char status, std::string message);
+	This function is called whenever a channel notice is sent from the bot to the server.
+		It is called immediately after the message is sent.
+	server: the server to which the message was sent
+	target: the channel to which the message was sent
+	status: the status char to which the message was sent (e.g. if the message was sent to @#channel)
+		if the notice was sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the message that was sent
+
+std::string onOutUserNotice(std::string server, std::string target, std::string message);
+	This function is called whenever a user notice is about to be sent from the bot to the server.
+	server: the server to which the message is to be sent
+	target: the nick of the user to which the message is to be sent
+	message: the message to be sent
+	std::string: return the new message to be sent.  If you wish to not change the message, return the original
+		message.  If you wish to cancel sending this message, return an empty string.
+
+void onSendUserNotice(std::string server, std::string target, std::string message);
+	This function is called whenever a user notice is sent from the bot to the server.
+		It is called immediately after the message is sent
+	server: the server to which the message was sent
+	target: the nick of the user to whom the message was sent
+	message: the message that was sent
+
+std::string onOutChannelAction(std::string server, std::string target, char status, std::string message);
+	This function is called whenever a channel action is about to be sent from the bot to the server.
+	server: the server to which the action is to be sent
+	target: the channel to which the action is to be sent
+	status: the status char to which the action is to be sent (e.g. if the message was sent to @#channel)
+		if the action is sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the action to be sent (e.g. if sending ^AACTION does stuff^A, the message would be "does stuff")
+	std::string: return the new action to be sent in the same format as the message.  If you wish to not change
+		the action, return the original message.  If you wish to cancel sending this action, return an empty string.
+
+void onSendChannelAction(std::string server, std::string target, char status, std::string message);
+	This function is called whenever a channel action is sent from the bot to the server.
+		It is called immediately after the action is sent
+	server: the server to which the action was sent
+	target: the channel to which the action was sent
+	status: the status char to which the action was sent (e.g. if the action was sent to @#channel)
+		if the action is sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the action to be sent (e.g. if sending ^AACTION does stuff^A, the message would be "does stuff")
+
+std::string onOutUserAction(std::string server, std::string target, std::string message);
+	This function is called whenever a user action is about to be sent from the bot to the server.
+	server: the server to which the action is to be sent
+	target: the user to which the action is to be sent
+	message: the action to be sent (e.g. if sending ^AACTION does stuff^A, the message would be "does stuff")
+	std::string: return the new action to be sent in the same format as the message.  If you wish to not change
+		the action, return the original message.  If you wish to cancel sending this action, return an empty string.
+
+void onSendUserAction(std::string server, std::string target, std::string message);
+	This function is called whenever a user action is sent from the bot to the server.
+		It is called immediately after the action is sent.
+	server: the server to which the action was sent
+	target: the user to whom the action was sent
+	message: the action that was sent (e.g. if ^AACTION does stuff^A was sent, the message would be "does stuff")
+
+std::string onOutChannelCTCP(std::string server, std::string target, char status, std::string message);
+	This function is called when a channel CTCP is about to be sent from the bot to the server.
+	server: the server to which the CTCP is to be sent
+	target: the channel to which the CTCP is to be sent
+	status: the status char to which the CTCP is to be sent (e.g. if the CTCP was sent to @#channel)
+		if the CTCP is to be sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the CTCP request
+	std::string: return the new CTCP request to send.  If you wish to not change the CTCP, return the original
+		message.  If you wish to cancel sending this CTCP, return an empty string.
+
+void onSendChannelCTCP(std::string server, std::string target, char status, std::string message);
+	This function is called when a channel CTCP is sent from the bot to the server.
+		It is called immediately after the CTCP is sent.
+	server: the server to which the CTCP was sent
+	target: the channel to which the CTCP was sent
+	status: the status char to which the CTCP was sent (e.g. if the CTCP was sent to @#channel)
+	message: the CTCP request
+
+std::string onOutUserCTCP(std::string server, std::string target, std::string message);
+	This function is called when a user CTCP is about to be sent from the bot to the server.
+	server: the server to which the CTCP is to be sent
+	target: the nick of the user to whom the CTCP is to be sent
+	message: the CTCP request
+	std::string: return the new CTCP request to send.  If you wish to not change the CTCP, return the original
+		message.  If you wish to cancel sending this CTCP, return an empty string.
+
+void onSendUserCTCP(std::string server, std::string target, std::string message);
+	This function is called when a user CTCP is sent from the bot to the server.
+		It is called immediately after the CTCP is sent.
+	server: the server to which the CTCP was sent
+	target: the nick of the user to whom the CTCP was sent
+	message: the CTCP request
+
+std::string onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message);
+	This function is called when a channel CTCP reply is about to be sent from the bot to the server.
+	server: the server to which the CTCP reply is to be sent
+	target: the channel to which the CTCP reply is to be sent
+	status: the status char to which the CTCP reply is to be sent (e.g. if the CTCP reply is being sent to @#channel)
+		if the CTCP reply is being sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the CTCP reply
+	std::string: return the new CTCP reply to send.  If you wish to not change the CTCP reply, return the original
+		message.  If you wish to cancel sending this CTCP reply, return an empty string.
+
+void onSendChannelCTCPReply(std::string server, std::string target, char status, std::string message);
+	This function is called when a channel CTCP reply is sent from the bot to the server.
+		It is called immediately after the reply is sent.
+	server: the server to which the CTCP reply was sent
+	target: the channel to which the CTCP reply was sent
+	status: the status char to which the CTCP reply was sent (e.g. if the CTCP reply was sent to @#channel)
+		if the CTCP reply was sent to everyone in the channel, the status character is '0' (the number zero)
+	message: the CTCP reply
+
+std::string onOutUserCTCPReply(std::string server, std::string target, std::string message);
+	This function is called when a user CTCP reply is about to be sent from the bot to the server.
+	server: the server to which the CTCP reply is to be sent
+	target: the nick of the user to whom the CTCP reply is to be sent
+	message: the CTCP reply
+	std::string: return the new CTCP reply to send.  If you wish to not change the CTCP reply, return the original
+		message.  If you wish to cancel sending this CTCP reply, return an empty string.
+
+void onSendUserCTCPReply(std::string server, std::string target, std::string message);
+	This function is called when a user CTCP reply is sent from the bot to the server.
+		It is called immediately after the CTCP reply is sent.
+	server: the server to which the CTCP reply was sent
+	target: the nick of the user to whom the CTCP reply was sent
+	message: the CTCP reply
 
 =======================
 3.3. OTHER HOOKS
 
 There are some other hooks, too.  When they are called depends on the hook.
 
-void onLoadComplete();
-	This function is called once all modules are loaded.  Modules will have the config and bot access loaded before this call.
+bool onLoadComplete();
+	This function is called when your module is loaded or, if the module is loaded during startup,
+	after all the startup modules have been loaded.  You should return true unless during your
+	checking in this function you determine that something is preventing your module from loading
+	properly.  Note that returning false does not automatically unload your module.
+
 void onRehash();
-	This function is called when the bot is rehashed or when a module is loaded or unloaded.  Modules will have an updated config loaded before this call.
+	This function is called whenever the bot is rehashed.  A new copy of the configuration data
+	is loaded into each module before this function is called.
+
+void onModuleChange();
+	This function is called whenever a different module is loaded or unloaded.
+
+void onPreConnect(std::string server);
+	This function is called immediately before a bot connects to a server.
+
 void onConnect(std::string server);
-	This function is called when the bot connects to a server.
-void onQuit(std::string server);
-	This function is called when the bot quits from a server.
+	This function is called when the bot connects to a server, immediately before the bot sends
+	the registration information.
+
+void onQuit (std::string server);
+	This function is called whenever the bot quits or is removed from a server.
+
+std::string description();
+	This function allows you to provide a short description of your module.
+
+std::vector<std::string> abilities();
+	This function allows you to provide a list of abilities that your module provides (for example,
+	the included admin module provides "BOT_ADMIN").  You can name your ability whatever you want, so
+	long as it isn't the same as the name of another ability which does something different.  (Name
+	conflicts may affect modules which use that ability.)
+
+std::vector<std::string> supports();
+	This function allows you to provide a list of abilities that your module uses/supports.  These may
+	be required or optional dependencies.  This list typically helps modules providing each ability your
+	module supports find your module.  This may or may not be required depending on the details of the
+	ability.
 
 =======================
 3.4. SENDING DATA TO A SERVER
@@ -369,6 +585,14 @@ the values that the variables have as defined in the configuration file.  The
 map key is the specified variable, and the map value is the variable's
 configured definition.
 
+bool loadModule(std::string modName);
+This function causes the bot to load the module with the filename modName and
+call onModuleChange() for all loaded modules.
+
+void unloadModule(std::string modName);
+This function causes the bot to unload the module with the filename modName
+and call onModuleChange() for all loaded modules.
+
 void rehashBot();
 This function causes the bot to reload the configuration file and call
 onRehash() for all loaded modules.
@@ -392,6 +616,12 @@ This function returns a list of module abilities.  This multimap works as
 follows:
 first = provided ability
 second = module name
+
+std::tr1::unordered_map<std::string, std::vector<std::string> > getModSupports();
+This function returns a list of abilities that modules support.  This unordered_map
+works as follows:
+first = ability
+second = list of modules that support it
 
 std::vector<std::string> splitHostmask(std::string hostmask)
 This function takes a hostmask.  The hostmask can be either in the form of a
@@ -420,11 +650,12 @@ commas:
 3 => modes with no parameters
 The inner vectors are as long as necessary to hold all the modes of that type.
 
-std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
+std::vector<std::pair<char, char> > getServerPrefixes(std::string server);
 This function returns all valid prefix/status modes for the server as specified
-in 005 PREFIX.  Each entry in the map holds two characters:
+in 005 PREFIX.  Each entry holds two characters:
 first => mode char
 second => status prefix char
+The modes are in order from 0 (highest precedence) to .size()-1 (lowest precedence).
 
 std::list<std::string> getChannels(std::string server);
 This function returns a list of the names of all the channels the bot is in on
@@ -438,6 +669,14 @@ std::list<std::string> getChannelUsers(std::string server, std::string channel);
 This function returns a list of all users in the specified channel on the
 specified server, if the bot is in it.
 
+std::string getUserIdent(std::string server, std::string channel, std::string user);
+This function returns the ident of the specified user.  Due to how the bot stores
+user data, you'll need to supply a channel that both the bot and the user are in.
+
+std::string getUserHost(std::string server, std::string channel, std::string user);
+This function returns the host of the specified user.  Due to how the bot stores
+user data, you'll need to specify a channel that both the bot and the user are in.
+
 std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 This function returns the status of the specified user in the specified channel
 on the specified server, if both the bot and the user are in that channel.  The
@@ -449,7 +688,7 @@ second => status prefix char
 5. INTERACTING WITH OTHER MODULES
 
 Interacting with modules using functions that are not part of the Module class
-requires the use of a custom class in a header file in the modules/ directory.
+requires the use of a custom class in a header file in the src/modules/ directory.
 A module must extend the class in the header file in order to provide those
 functions to other modules.  A module that takes advantage of another module's
 functionality must have the header file present to compile, regardless of
@@ -457,4 +696,4 @@ whether the module that provides the functions your module is using is present
 when the bot is run.
 
 If your module relies on the presence of another module, you should check for
-the other module in both onLoadComplete() AND onRehash().
+the other module in both onLoadComplete() AND onModuleChange().
