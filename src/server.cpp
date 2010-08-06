@@ -197,11 +197,11 @@ void Server::handleData() {
 		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (this)));
 		else if (parsedLine[1] == "JOIN")
-			inChannels.find(parsedLine[2]).joinChannel(separateNickFromFullHostmask(parsedLine[0].substr(1));
+			inChannels.find(parsedLine[2])->second->joinChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
 		else if (parsedLine[1] == "PART")
-			inChannels.find(parsedLine[2]).leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
+			inChannels.find(parsedLine[2])->second->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
 			serverConnection.closeConnection();
 			moduleData->removeServer(serverName); // The server is disconnected. Remove its instance.
