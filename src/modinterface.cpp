@@ -313,6 +313,8 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 				if (isChanType(parsedLine[1][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 						message = modIter->second->onOutChannelAction(server, parsedLine[1], '0', message);
+					if (message == "")
+						return "";
 					std::ostringstream result;
 					result << (char)1 << "ACTION " << message << (char)1;
 					return result.str();
@@ -321,15 +323,19 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 					std::string channel = parsedLine[1].substr(1);
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 						message = modIter->second->onOutChannelAction(server, channel, status, message);
+					if (message == "")
+						return "";
 					std::ostringstream result;
 					result << (char)1 << "ACTION " << message << (char)1;
 					return result.str();
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 						message = modIter->second->onOutUserAction(server, parsedLine[1], message);
+					if (message == "")
+						return "";
 					std::ostringstream result;
 					result << (char)1 << "ACTION " << message << (char)1;
-					return message;
+					return result.str();
 				}
 			} else {
 				message = message.substr(1);
@@ -338,6 +344,8 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 				if (isChanType(parsedLine[1][0], server)) {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 						message = modIter->second->onOutChannelCTCP(server, parsedLine[1], '0', message);
+					if (message == "")
+						return "";
 					std::ostringstream result;
 					result << (char)1 << message << (char)1;
 					return result.str();
@@ -346,12 +354,16 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 					std::string channel = parsedLine[1].substr(1);
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 						message = modIter->second->onOutChannelCTCP(server, channel, status, message);
+					if (message == "")
+						return "";
 					std::ostringstream result;
 					result << (char)1 << message << (char)1;
 					return result.str();
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 						message = modIter->second->onOutUserCTCP(server, parsedLine[1], message);
+					if (message == "")
+						return "";
 					std::ostringstream result;
 					result << (char)1 << message << (char)1;
 					return result.str();
@@ -382,6 +394,8 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 			if (isChanType(parsedLine[1][0], server)) {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 					message = modIter->second->onOutChannelCTCPReply(server, parsedLine[1], '0', message);
+				if (message == "")
+					return "";
 				std::ostringstream result;
 				result << (char)1 << message << (char)1;
 				return result.str();
@@ -390,12 +404,16 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 				std::string channel = parsedLine[1].substr(1);
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 					message = modIter->second->onOutChannelCTCPReply(server, channel, status, message);
+				if (message == "")
+					return "";
 				std::ostringstream result;
 				result << (char)1 << message << (char)1;
 				return result.str();
 			} else {
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end() && message != ""; ++modIter)
 					message = modIter->second->onOutUserCTCPReply(server, parsedLine[1], message);
+				if (message == "")
+					return "";
 				std::ostringstream result;
 				result << (char)1 << message << (char)1;
 				return result.str();
