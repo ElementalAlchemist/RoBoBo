@@ -6,12 +6,13 @@ class SetX : public Module {
 		bool onLoadComplete();
 		void onRehash();
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
+		std::string description();
 	private:
 		std::vector<std::string> xServers;
 };
 
 int SetX::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 bool SetX::onLoadComplete() {
@@ -40,6 +41,10 @@ void SetX::onNumeric(std::string server, std::string numeric, std::vector<std::s
 			return;
 		}
 	}
+}
+
+std::string SetX::description() {
+	return "Allows the automatic setting of usermode x on servers.";
 }
 
 extern "C" Module* spawn() {

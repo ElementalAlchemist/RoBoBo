@@ -6,21 +6,21 @@ class UnloadModuleCommand : public AdminHook {
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
-		std::string getDesc();
+		void onModuleChange();
+		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int UnloadModuleCommand::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 bool UnloadModuleCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -35,12 +35,6 @@ bool UnloadModuleCommand::onLoadComplete() {
 }
 
 void UnloadModuleCommand::onRehash() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
-		unloadModule(moduleName);
-	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'n')
 			config["masteronly"] = "no";
@@ -50,7 +44,15 @@ void UnloadModuleCommand::onRehash() {
 		config["masteronly"] = "yes";
 }
 
-std::string UnloadModuleCommand::getDesc() {
+void UnloadModuleCommand::onModuleChange() {
+	std::multimap<std::string, std::string> modAbilities = getModAbilities();
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
+		unloadModule(moduleName);
+	}
+}
+
+std::string UnloadModuleCommand::description() {
 	return "Allows you to unload other modules.";
 }
 

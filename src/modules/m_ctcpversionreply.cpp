@@ -5,13 +5,13 @@ class VersionReply : public Module {
 		int botAPIversion();
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
-		std::string getDesc();
+		std::string description();
 	private:
 		void sendVersionReply(std::string server, std::string target);
 };
 
 int VersionReply::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 void VersionReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
@@ -40,6 +40,9 @@ void VersionReply::sendVersionReply(std::string server, std::string target) {
 		case 980:
 			versionReply += "v1.0.0rc1";
 			break;
+		case 1089:
+			versionReply += "v1.1.0-devel";
+			break;
 		default:
 			std::ostringstream thisVersion;
 			thisVersion << "v";
@@ -57,7 +60,7 @@ void VersionReply::sendVersionReply(std::string server, std::string target) {
 	sendCTCPReply(server, target, "VERSION", versionReply);
 }
 
-std::string VersionReply::getDesc() {
+std::string VersionReply::description() {
 	return "This module sends a reply to CTCP version.";
 }
 

@@ -6,13 +6,13 @@ class TimeReply : public Module {
 		int botAPIversion();
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
-		std::string getDesc();
+		std::string description();
 	private:
 		void sendTime(std::string server, std::string target);
 };
 
 int TimeReply::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 void TimeReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
@@ -25,7 +25,7 @@ void TimeReply::onUserCTCP(std::string server, std::string nick, std::string mes
 		sendTime(server, nick);
 }
 
-std::string TimeReply::getDesc() {
+std::string TimeReply::description() {
 	return "Responds to CTCP TIME requests.";
 }
 

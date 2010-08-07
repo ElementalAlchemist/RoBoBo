@@ -7,7 +7,7 @@ class Admin : public AdminMod {
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
-		std::vector<std::string> getAbilities();
+		void onModuleChange();
 		void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserMsg(std::string server, std::string nick, std::string message);
 		void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
@@ -26,11 +26,12 @@ class Admin : public AdminMod {
 		void onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
-		void onConnect(std::string server);
+		void onPreConnect(std::string server);
 		void onQuit(std::string server);
 		void onDCCReceive(std::string dccid, std::string message);
 		void onDCCEnd(std::string dccid);
-		std::string getDesc();
+		std::string description();
+		std::vector<std::string> abilities();
 		std::vector<std::string> supports();
 		void sendVerbose(int verboseLevel, std::string message);
 	private:
@@ -45,7 +46,7 @@ class Admin : public AdminMod {
 };
 
 int Admin::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 bool Admin::onLoadComplete() {
@@ -62,7 +63,6 @@ bool Admin::onLoadComplete() {
 			}
 		}
 	}
-	
 	int i = 0;
 	while (true) {
 		std::tr1::unordered_map<std::string, std::string> adminPrivs;
@@ -87,20 +87,17 @@ bool Admin::onLoadComplete() {
 		loggedIn.push_back(false);
 		i++;
 	}
-	
 	std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
-		std::vector<std::string> modSupports = modIter->second->supports();
-		for (unsigned int i = 0; i < modSupports.size(); i++) {
-			if (modSupports[i] == "BOT_ADMIN") {
-				AdminHook* adminCommandMod = (AdminHook*) modIter->second;
-				std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
-				for (unsigned int i = 0; i < adminSupport.size(); i++) {
-					std::string command = adminSupport[i][0];
-					adminSupport[i][0] = modIter->first;
-					botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[i]));
-				}
-				break;
+	std::tr1::unordered_map<std::string, std::vector<std::string> > modSupports = getModSupports();
+	if (modSupports.find("BOT_ADMIN") != modSupports.end()) {
+		std::vector<std::string> adminModules = modSupports.find("BOT_ADMIN")->second;
+		for (unsigned int i = 0; i < adminModules.size(); i++) {
+			AdminHook* adminCommandMod = (AdminHook*) getModules.find(adminModules[i])->second;
+			std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
+			for (unsigned int j = 0; j < adminSupport.size(); j++) {
+				std::string command = adminSupport[j][0];
+				adminSupport[j][0] = adminModules[i];
+				botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[i]));
 			}
 		}
 	}
@@ -134,30 +131,24 @@ void Admin::onRehash() {
 		loggedIn.push_back(false);
 		i++;
 	}
-	
+}
+
+void Admin::onModuleChange() {
 	botAdminCommands.clear();
 	std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
-		std::vector<std::string> modSupports = modIter->second->supports();
-		for (unsigned int i = 0; i < modSupports.size(); i++) {
-			if (modSupports[i] == "BOT_ADMIN") {
-				AdminHook* adminCommandMod = (AdminHook*) modIter->second;
-				std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
-				for (unsigned int i = 0; i < adminSupport.size(); i++) {
-					std::string command = adminSupport[i][0];
-					adminSupport[i][0] = modIter->first;
-					botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[i]));
-				}
-				break;
+	std::tr1::unordered_map<std::string, std::vector<std::string> > modSupports = getModSupports();
+	if (modSupports.find("BOT_ADMIN") != modSupports.end()) {
+		std::vector<std::string> adminModules = modSupports.find("BOT_ADMIN")->second;
+		for (unsigned int i = 0; i < adminModules.size(); i++) {
+			AdminHook* adminCommandModule = (AdminHook*) getModules().find(adminModules[i])->second;
+			std::vector<std::vector<std::string> > adminSupport = adminCommandModule.adminCommands();
+			for (unsigned int j = 0; j < adminSupport.size(); j++) {
+				std::string command = adminSupport[j][0];
+				adminSupport[j][0] = adminModules[i];
+				botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[j]));
 			}
 		}
 	}
-}
-
-std::vector<std::string> Admin::getAbilities() {
-	std::vector<std::string> abilities;
-	abilities.push_back("BOT_ADMIN");
-	return abilities;
 }
 
 void Admin::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
@@ -288,12 +279,12 @@ void Admin::onOtherData(std::string server, std::vector<std::string> parsedLine)
 	sendVerbose(2, message.substr(1));
 }
 
-void Admin::onConnect(std::string server) {
-	if (!loggedIn[0])
+void Admin::onPreConnect(std::string server) {
+	if (verbosity[0] == 0) // not logged in
 		return;
 	for (unsigned int i = 0; i < admins.size(); i++) {
 		if (admins[i]["server"] == server) {
-			dccMod->dccSend(admins[0]["server"] + "/" + admins[0]["nick"], "I've just connected to the server " + server + ", and there is an admin block for someone on that server.  Please rehash to update the admin list.");
+			dccMod->dccSend(admins[0]["server"] + "/" + admins[0]["nick"], "I'm connecting to the server " + server + ", and there is an admin block for someone on that server.  Please rehash to update the admin list.");
 			break;
 		}
 	}
@@ -321,8 +312,14 @@ void Admin::onDCCEnd(std::string dccid) {
 	}
 }
 
-std::string Admin::getDesc() {
+std::string Admin::description() {
 	return "This module provides administration features for the bot.";
+}
+
+std::vector<std::string> Admin::abilities() {
+	std::vector<std::string> abilities;
+	abilities.push_back("BOT_ADMIN");
+	return abilities;
 }
 
 std::vector<std::string> Admin::supports() {
@@ -393,9 +390,9 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		std::tr1::unordered_map<std::string, Module*> loadedModules = getModules();
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, modIter->first + ": " + modIter->second->getDesc());
+				sendPrivMsg(server, nick, modIter->first + ": " + modIter->second->description());
 			else
-				dccMod->dccSend(server + "/" + nick, modIter->first + ": " + modIter->second->getDesc());
+				dccMod->dccSend(server + "/" + nick, modIter->first + ": " + modIter->second->description());
 		}
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "End of module list.");

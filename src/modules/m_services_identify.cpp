@@ -4,11 +4,11 @@ class ServicesID : public Module {
 	public:
 		int botAPIversion();
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
-		std::string getDesc();
+		std::string description();
 };
 
 int ServicesID::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 void ServicesID::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {
@@ -16,7 +16,7 @@ void ServicesID::onNumeric(std::string server, std::string numeric, std::vector<
 		sendPrivMsg(server, config[server+"/service"], config[server+"/command"] + " " + (config[server+"/nickname"] != "" ? config[server+"/nickname"] + " " : "") + config[server+"/password"]);
 }
 
-std::string ServicesID::getDesc() {
+std::string ServicesID::description() {
 	return "Allows identification/authentification to services.";
 }
 

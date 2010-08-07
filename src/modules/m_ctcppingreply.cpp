@@ -5,11 +5,11 @@ class PingReply : public Module {
 		int botAPIversion();
 		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
-		std::string getDesc();
+		std::string description();
 };
 
 int PingReply::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 void PingReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
@@ -30,7 +30,7 @@ void PingReply::onUserCTCP(std::string server, std::string nick, std::string mes
 	}
 }
 
-std::string PingReply::getDesc() {
+std::string PingReply::description() {
 	return "Responds to CTCP PING requests.";
 }
 
