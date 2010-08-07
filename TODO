@@ -20,6 +20,6 @@ Before release.  Duh.
 [x] - Use WHO and store user hosts in the bot as well
 [ ] - Implement CAP (m_cap) with some sort of interface
 [x] - Port all the modules to API version 1.1
-[ ] - Make removing servers actually remove the server
-[ ] - Keep track of own ident and host, and add line breaker
+[x] - Make removing servers actually remove the server
+[x] - Keep track of own ident and host, and add line breaker
 [>] - Keep the Current API section of MODULES updated through release

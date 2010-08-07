@@ -138,9 +138,13 @@ void Server::handleData() {
 			if (serverConf["channels"] != "")
 				sendLine("JOIN " + serverConf["channels"]);
 			registered = true;
+			sendLine("WHOIS " + serverConf["nick"]);
 		} else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
-		else if (parsedLine[1] == "332") { // channel topic
+		else if (parsedLine[1] == "311" && parsedLine[3] == serverConf["nick"]) {
+			serverConf["ident"] = parsedLine[4];
+			serverConf["host"] = parsedLine[5];
+		} else if (parsedLine[1] == "332") { // channel topic
 			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
 			if (it != inChannels.end())
 				it->second->topic(parsedLine[4]);
@@ -316,7 +320,7 @@ void Server::sendData() {
 				sendingMessage = outData.front();
 				parsedLine = parseLine(sendingMessage);
 				unsigned short limit = 1;
-				while (!outData.empty() && parsedLine[0] == "MODE" && parsedLine[1] == channel && limit <= maxModes) {
+				while (!outData.empty() && parsedLine[0] == "MODE" && parsedLine[1] == channel && limit <= maxModes && std::string(":" + serverConf["nick"] + "!" + serverConf["ident"] + "@" + serverConf["host"] + " MODE " + channel + " " + modes + parsedLine[2] + " " + params + (parsedLine.size() > 3 ? (" " + parsedLine[3]) : "")).size() <= 510) {
 					outData.pop(); // remove the message we are parsing
 					if ((parsedLine[2][0] == '+') == addingMode) // if we're doing the same thing as the operation already occurring on the mode string
 						modes += parsedLine[2][1];
@@ -352,10 +356,17 @@ void Server::sendData() {
 			else // all commands not on the list are worth 1 second.
 				secondsToAdd = 1;
 		}
-		
-		while (seconds + secondsToAdd > 10) {
-			sleep(1);
+		std::string hostInfo = ":" + serverConf["nick"] + "!" + serverConf["ident"] + "@" + serverConf["host"] + " ";
+		if (hostInfo.size() + sendingMessage.size() > 510) {
+			std::string extraMessage = sendingMessage.substr(510 - hostInfo.size());
+			sendingMessage = sendingMessage.substr(0, 510 - hostInfo.size()) + "\r\n";
+			for (unsigned int i = 0; i < parsedLine.size() - 1; i++)
+				sendingMessage += parsedLine[i] + " ";
+			sendingMessage += extraMessage;
+			secondsToAdd *= 2;
 		}
+		while (seconds + secondsToAdd > 10)
+			sleep(1);
 		serverConnection.sendData(sendingMessage);
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
