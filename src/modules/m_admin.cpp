@@ -27,7 +27,6 @@ class Admin : public AdminMod {
 		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		void onPreConnect(std::string server);
-		void onQuit(std::string server);
 		void onDCCReceive(std::string dccid, std::string message);
 		void onDCCEnd(std::string dccid);
 		std::string description();
@@ -280,23 +279,9 @@ void Admin::onOtherData(std::string server, std::vector<std::string> parsedLine)
 }
 
 void Admin::onPreConnect(std::string server) {
-	if (verbosity[0] == 0) // not logged in
-		return;
-	for (unsigned int i = 0; i < admins.size(); i++) {
-		if (admins[i]["server"] == server) {
-			dccMod->dccSend(admins[0]["server"] + "/" + admins[0]["nick"], "I'm connecting to the server " + server + ", and there is an admin block for someone on that server.  Please rehash to update the admin list.");
-			break;
-		}
-	}
-}
-
-void Admin::onQuit(std::string server) {
-	for (unsigned int i = 0; i < admins.size(); i++) {
-		if (admins[i]["server"] == server) {
-			admins.erase(admins.begin() + i);
-			i--;
-		}
-	}
+	sendVerbose(1, "Connecting to " + server + ".");
+	if (verbosity[0] != 0) // not logged in
+		dccMod->dccSend(admins[0]["server"] + "/" + admins[0]["nick"], "I am now connecting to " + server + ".  It may be necessary to rehash for admins on that server to be able to log in.");
 }
 
 void Admin::onDCCReceive(std::string dccid, std::string message) { // dccid = server/nick
