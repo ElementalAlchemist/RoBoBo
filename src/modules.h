@@ -135,7 +135,6 @@ class ModuleInterface {
 		bool connectServer(std::string serverName);
 		bool loadModule(std::string modName, bool startup);
 		void unloadModule(std::string modName);
-		void removeServer(std::string server);
 		static void* serverCheck_thread(void* ptr);
 		void serverCheck();
 	private:

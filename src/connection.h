@@ -59,6 +59,7 @@ class Server {
 		~Server();
 		void connectServer();
 		bool stillConnected();
+		bool shouldReset();
 		void sendLine(std::string line);
 		std::tr1::unordered_map<std::string, std::string> getInfo();
 		std::vector<std::pair<char, char> > getPrefixes();
@@ -74,7 +75,7 @@ class Server {
 	private:
 		std::string serverName;
 		unsigned short debugLevel;
-		bool registered, altChanged, quitHooked;
+		bool registered, altChanged, quitHooked, keepServer;
 		Socket serverConnection;
 		ModuleInterface* moduleData;
 		pthread_t dataReceiveThread;

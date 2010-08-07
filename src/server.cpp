@@ -1,7 +1,7 @@
 #include "connection.h"
 #include "modules.h"
 
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), moduleData(modFace), serverConf(confVars) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), moduleData(modFace), serverConf(confVars), keepServer(true) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
@@ -36,6 +36,10 @@ void Server::connectServer() {
 
 bool Server::stillConnected() {
 	return serverConnection.isConnected();
+}
+
+bool Server::shouldReset() {
+	return keepServer;
 }
 
 void Server::sendLine(std::string line) {
@@ -239,16 +243,16 @@ void Server::handleData() {
 			inChannels.find(parsedLine[2])->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1));
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
 			serverConnection.closeConnection();
-			moduleData->removeServer(serverName); // The server is disconnected. Remove its instance.
 			quitHooked = true;
+			keepServer = false;
 			break;
 		} else if (parsedLine[1] == "QUIT") {
 			for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 				chanIter->second->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			serverConnection.closeConnection();
-			moduleData->removeServer(serverName);
 			quitHooked = true;
+			keepServer = false;
 			break;
 		} else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
@@ -354,6 +358,11 @@ void Server::sendData() {
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
 		moduleData->callHookSend(serverName, parsedLine);
+		if (command == "QUIT") {
+			serverConnection.closeConnection();
+			keepServer = false;
+			break;
+		}
 		pthread_mutex_lock(&secondsmutex);
 		seconds += secondsToAdd;
 		pthread_mutex_unlock(&secondsmutex);

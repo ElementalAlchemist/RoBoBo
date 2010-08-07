@@ -694,16 +694,6 @@ void ModuleInterface::unloadModule(std::string modName) {
 	pthread_create(&tum, NULL, tUnloadMod_thread, this);
 }
 
-void ModuleInterface::removeServer(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return;
-	delete servIter->second;
-	servers.erase(servIter);
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-		modIter->second->onQuit(server); // call onQuit hook
-}
-
 void* ModuleInterface::serverCheck_thread(void* ptr) {
 	ModuleInterface* modi = (ModuleInterface*) ptr;
 	modi->serverCheck();
@@ -715,10 +705,14 @@ void ModuleInterface::serverCheck() {
 		sleep(60); // one minute pause between checks
 		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
 			if (!servIter->second->stillConnected()) {
+				bool restartServer = servIter->second->shouldReset();
 				delete servIter->second;
 				if (debugLevel >= 2)
 					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
-				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
+				if (restartServer)
+					servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
+				else
+					servers.erase(servIter);
 			}
 		}
 	}
