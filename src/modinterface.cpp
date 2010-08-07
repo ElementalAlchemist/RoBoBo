@@ -480,7 +480,7 @@ void ModuleInterface::serverCheck() {
 			if (!servIter->second->stillConnected()) {
 				delete servIter->second;
 				if (debugLevel >= 2)
-					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
+					std::cout << servIter->first << " lost connection.  Reconnecting..." << std::endl;
 				servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
 			}
 		}
