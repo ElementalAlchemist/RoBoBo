@@ -97,7 +97,7 @@ bool Admin::onLoadComplete() {
 			for (unsigned int j = 0; j < adminSupport.size(); j++) {
 				std::string command = adminSupport[j][0];
 				adminSupport[j][0] = adminModules[i];
-				botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[i]));
+				botAdminCommands.insert(std::pair<std::string, std::vector<std::string> > (command, adminSupport[j]));
 			}
 		}
 	}
