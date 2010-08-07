@@ -291,9 +291,11 @@ void Admin::onPreConnect(std::string server) {
 }
 
 void Admin::onQuit(std::string server) {
-	for (std::vector<std::tr1::unordered_map<std::string, std::string> >::iterator adminIter = admins.begin(); adminIter != admins.end(); ++adminIter) {
-		if ((*adminIter)["server"] == server)
-			admins.erase(adminIter);
+	for (unsigned int i = 0; i < admins.size(); i++) {
+		if (admins[i]["server"] == server) {
+			admins.erase(admins.begin() + i);
+			i--;
+		}
 	}
 }
 
