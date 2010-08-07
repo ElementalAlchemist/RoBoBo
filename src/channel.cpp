@@ -9,7 +9,7 @@ void Channel::parseNames(std::vector<std::string> names) {
 		theUsers.clear();
 		namesSync = false;
 	}
-	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
 	std::vector<char> modes;
 	for (unsigned int i = 0; i < names.size(); i++) {
 		for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); prefixIter++) {
@@ -35,16 +35,18 @@ void Channel::topic(std::string newTopic) {
 }
 
 void Channel::mode(bool add, char mode, std::string param) {
-	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
-	std::tr1::unordered_map<char, char>::iterator it = prefixes.find(mode);
-	if (it == prefixes.end())
-		return;
 	std::tr1::unordered_map<std::string, User*>::iterator iter = theUsers.find(param);
 	if (iter == theUsers.end()) {
 		parentServer->resyncChannels();
 		return;
 	}
-	iter->second->status(add, mode);
+	std::vector<std::string> prefixes = parentServer->getPrefixes();
+	for (unsigned int i = 0; i < prefixes.size(); i++) {
+		if (mode == prefixes[i].first) {
+			iter->second->status(add, mode);
+			break;
+		}
+	}
 }
 
 void Channel::joinChannel(std::string hostmask) {
@@ -64,7 +66,7 @@ void Channel::leaveChannel(std::string nick) {
 }
 
 void Channel::nick(std::string oldNick, std::string newNick) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(nick);
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(oldNick);
 	if (userIter == theUsers.end())
 		return;
 	User* userData = userIter->second;
@@ -94,24 +96,24 @@ std::string Channel::ident(std::string user) {
 }
 
 void Channel::host(std::string user, std::string host) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
-	if (userIter == users.end())
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
 		return;
 	userIter->second->host(host);
 }
 
 std::string Channel::host(std::string user) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
-	if (userIter == users.end())
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
 		return "";
 	return userIter->second->host();
 }
 
 char Channel::status(std::string user) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
-	if (userIter == users.end())
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
 		return '0';
-	return userIter->second->getStatus();
+	return userIter->second->status();
 }
 
 std::string Channel::topic() {
