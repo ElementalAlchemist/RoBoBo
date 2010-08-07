@@ -12,9 +12,9 @@ void Channel::parseNames(std::vector<std::string> names) {
 	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
 	std::vector<char> modes;
 	for (unsigned int i = 0; i < names.size(); i++) {
-		for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); prefixIter++) {
-			if (prefixIter->second == names[i][0]) {
-				modes.push_back(prefixIter->first);
+		for (unsigned int j = 0; j < prefixes.size(); j++) {
+			if (prefixes[i].second == names[i][0]) {
+				modes.push_back(prefixes[i].first);
 				names[i] = names[i].substr(1);
 			}
 		}
@@ -40,7 +40,7 @@ void Channel::mode(bool add, char mode, std::string param) {
 		parentServer->resyncChannels();
 		return;
 	}
-	std::vector<std::string> prefixes = parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
 	for (unsigned int i = 0; i < prefixes.size(); i++) {
 		if (mode == prefixes[i].first) {
 			iter->second->status(add, mode);
