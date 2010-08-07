@@ -84,11 +84,9 @@ std::string Socket::receive() {
 			closeConnection();
 			break;
 		}
-		if (inputBuffer[0] == '\0')
-			return messageString;
 		if (inputBuffer[0] == '\n')
 			return messageString;
-		if (inputBuffer[0] != '\n' && inputBuffer[0] != '\r')
+		if (inputBuffer[0] != '\r')
 			messageString += inputBuffer[0];
 	}
 	return "";
