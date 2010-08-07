@@ -33,13 +33,18 @@ std::string User::host() {
 }
 
 void User::status(bool add, char status) {
-	hasStatus[status] = add;
+	for (unsigned int i = 0; i < hasStatus.size(); i++) {
+		if (hasStatus[i].first == status) {
+			hasStatus[i].second = add;
+			break;
+		}
+	}
 }
 
 char User::status() {
-	for (std::map<char, bool>::iterator statusIter = hasStatus.begin(); statusIter != hasStatus.end(); ++statusIter) {
-		if (statusIter->second)
-			return statusIter->first;
+	for (unsigned int i = 0; i < hasStatus.size(); i++) {
+		if (hasStatus[i].second)
+			return hasStatus[i].first;
 	}
 	return '0';
 }
