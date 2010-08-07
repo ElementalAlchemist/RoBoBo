@@ -105,11 +105,16 @@ void ModuleInterface::callPreHook(std::string server, std::vector<std::string> p
 				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 				serverModes = servIter->second->getChanModes();
 				prefixes = servIter->second->getPrefixes();
-				short category;
-				std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.find(parsedLine[3][i]);
-				category = 0;
-				if (prefixIter == prefixes.end()) {
-					bool found = false;
+				short category = 0;
+				bool found = false;
+				for (unsigned int j = 0; j < prefixes.size(); j++) {
+					if (prefixes[j].first == parsedLine[3][i]) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					found = false;
 					for (unsigned int j = 0; j < serverModes.size(); j++) {
 						for (unsigned int k = 0; k < serverModes[j].size(); k++) {
 							if (parsedLine[3][i] == serverModes[j][k]) {
@@ -259,15 +264,20 @@ void ModuleInterface::callPostHook(std::string server, std::vector<std::string> 
 				addMode = false;
 			else {
 				std::vector<std::vector<char> > serverModes;
-				std::tr1::unordered_map<char, char> prefixes;
+				std::vector<std::pair<char, char> > prefixes;
 				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 				serverModes = servIter->second->getChanModes();
 				prefixes = servIter->second->getPrefixes();
-				short category;
-				std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.find(parsedLine[3][i]);
-				category = 0;
-				if (prefixIter == prefixes.end()) {
-					bool found = false;
+				short category = 0;
+				bool found = false;
+				for (unsigned int j = 0; j < prefixes.size(); j++) {
+					if (prefixes[i].first == parsedLine[3][i]) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					found = false;
 					for (unsigned int j = 0; j < serverModes.size(); j++) {
 						for (unsigned int k = 0; k < serverModes[j].size(); k++) {
 							if (parsedLine[3][i] == serverModes[j][k]) {
