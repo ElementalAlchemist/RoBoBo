@@ -99,7 +99,7 @@ void RawCommand::onAdminCommand(std::string server, std::string nick, std::strin
 		toServer = message.substr(0, message.find_first_of('/'));
 		message = message.substr(message.find_first_of('/') + 1);
 	}
-	sendOtherCommand(toServer, message.substr(0, message.find_first_of(' ')), message.substr(message.find_first_of(' ') + 1));
+	sendOtherCommand(toServer, message.substr(0, message.find_first_of(' ')), message.find_first_of(' ') == std::string::npos ? "" : message.substr(message.find_first_of(' ') + 1));
 	if (dccMod == NULL)
 		sendPrivMsg(server, nick, "Command sent.");
 	else
