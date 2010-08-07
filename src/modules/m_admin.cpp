@@ -92,7 +92,7 @@ bool Admin::onLoadComplete() {
 	if (modSupports.find("BOT_ADMIN") != modSupports.end()) {
 		std::vector<std::string> adminModules = modSupports.find("BOT_ADMIN")->second;
 		for (unsigned int i = 0; i < adminModules.size(); i++) {
-			AdminHook* adminCommandMod = (AdminHook*) getModules.find(adminModules[i])->second;
+			AdminHook* adminCommandMod = (AdminHook*) getModules().find(adminModules[i])->second;
 			std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
 			for (unsigned int j = 0; j < adminSupport.size(); j++) {
 				std::string command = adminSupport[j][0];
@@ -141,7 +141,7 @@ void Admin::onModuleChange() {
 		std::vector<std::string> adminModules = modSupports.find("BOT_ADMIN")->second;
 		for (unsigned int i = 0; i < adminModules.size(); i++) {
 			AdminHook* adminCommandModule = (AdminHook*) getModules().find(adminModules[i])->second;
-			std::vector<std::vector<std::string> > adminSupport = adminCommandModule.adminCommands();
+			std::vector<std::vector<std::string> > adminSupport = adminCommandModule->adminCommands();
 			for (unsigned int j = 0; j < adminSupport.size(); j++) {
 				std::string command = adminSupport[j][0];
 				adminSupport[j][0] = adminModules[i];
