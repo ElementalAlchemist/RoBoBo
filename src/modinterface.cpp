@@ -53,10 +53,10 @@ std::vector<std::vector<char> > ModuleInterface::getServerChanModes(std::string 
 	return serverIter->second->getChanModes();
 }
 
-std::tr1::unordered_map<char, char> ModuleInterface::getServerPrefixes(std::string server) {
+std::vector<std::pair<char, char> > ModuleInterface::getServerPrefixes(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
-		return std::tr1::unordered_map<char, char> ();
+		return std::vector<std::pair<char, char> > ();
 	return serverIter->second->getPrefixes();
 }
 
@@ -101,7 +101,7 @@ void ModuleInterface::callPreHook(std::string server, std::vector<std::string> p
 				addMode = false;
 			else {
 				std::vector<std::vector<char> > serverModes;
-				std::tr1::unordered_map<char, char> prefixes;
+				std::vector<std::pair<char, char> > prefixes;
 				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 				serverModes = servIter->second->getChanModes();
 				prefixes = servIter->second->getPrefixes();
@@ -293,7 +293,7 @@ void ModuleInterface::callPostHook(std::string server, std::vector<std::string> 
 				}
 			}
 		}
-	} else if (parsedLine[1].size() == 3 && charIsNumeric(parsedLine[1][0]) && charIsNumeric(parsedLine[1][1]) && charIsNumeric([1][2])) {
+	} else if (parsedLine[1].size() == 3 && charIsNumeric(parsedLine[1][0]) && charIsNumeric(parsedLine[1][1]) && charIsNumeric(parsedLine[1][2])) {
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 			modIter->second->onNumeric(server, parsedLine[1], parsedLine);
 	} else {
@@ -470,7 +470,7 @@ void ModuleInterface::callHookSend(std::string server, std::vector<std::string> 
 						modIter->second->onSendChannelCTCP(server, channel, status, parsedLine[2]);
 				} else {
 					for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
-						modIter->onSendUserCTCP(server, parsedLine[1], parsedLine[2]);
+						modIter->second->onSendUserCTCP(server, parsedLine[1], parsedLine[2]);
 				}
 			}
 		} else {

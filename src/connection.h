@@ -16,7 +16,7 @@ class ModuleInterface;
 class User {
 	public:
 		User(Channel* thisChannel);
-		User(std::string theIdent, std::string theHost, Channel* thisChannel);
+		User(std::string theTheIdent, std::string theTheHost, Channel* thisChannel);
 		void ident(std::string newIdent);
 		std::string ident();
 		void host(std::string newHost);
@@ -25,7 +25,7 @@ class User {
 		char status();
 		Channel* parentChannel;
 	private:
-		std::string ident, host;
+		std::string theIdent, theHost;
 		std::vector<std::pair<char, bool> > hasStatus;
 };
 
@@ -48,8 +48,8 @@ class Channel {
 		std::string topic();
 		Server* parentServer;
 	private:
-		std::tr1::unordered_map<std::string, User*> users;
-		std::string topic;
+		std::tr1::unordered_map<std::string, User*> theUsers;
+		std::string theTopic;
 		bool namesSync;
 };
 

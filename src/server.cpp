@@ -63,8 +63,10 @@ std::vector<char> Server::getChanTypes() {
 }
 
 void Server::resyncChannels() {
-	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); ++iter)
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); ++iter) {
 		sendLine("NAMES " + iter->first);
+		sendLine("WHO " + iter->first);
+	}
 }
 
 std::list<std::string> Server::getChannels() {

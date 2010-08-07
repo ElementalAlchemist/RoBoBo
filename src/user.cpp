@@ -2,34 +2,34 @@
 
 #ifndef USER_CPP
 #define USER_CPP
-User::User(Channel* thisChannel) : parentChannel(thisChannel), ident(""), host("") {
+User::User(Channel* thisChannel) : parentChannel(thisChannel), theIdent(""), theHost("") {
 	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->getPrefixes();
 	for (unsigned int i = 0; i < prefixes.size(); i++)
 		hasStatus.push_back(std::pair<char, bool> (prefixes[i].first, false));
 }
 
-User::User(std::string theIdent, std::string theHost, Channel* thisChannel) : parentChannel(thisChannel), ident(theIdent), host(theHost) {
+User::User(std::string theTheIdent, std::string theTheHost, Channel* thisChannel) : parentChannel(thisChannel), theIdent(theTheIdent), theHost(theTheHost) {
 	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->getPrefixes();
 	for (unsigned int i = 0; i < prefixes.size(); i++)
 		hasStatus.push_back(std::pair<char, bool> (prefixes[i].first, false));
 }
 
 void User::ident(std::string newIdent) {
-	if (ident == "")
-		ident = newIdent;
+	if (theIdent == "")
+		theIdent = newIdent;
 }
 
 std::string User::ident() {
-	return ident;
+	return theIdent;
 }
 
 void User::host(std::string newHost) {
-	if (host == "")
-		host = newHost;
+	if (theHost == "")
+		theHost = newHost;
 }
 
 std::string User::host() {
-	return host;
+	return theHost;
 }
 
 void User::status(bool add, char status) {

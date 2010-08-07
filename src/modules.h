@@ -112,7 +112,7 @@ class ModuleInterface {
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		std::vector<std::vector<char> > getServerChanModes(std::string server);
-		std::tr1::unordered_map<char, char> getServerPrefixes(std::string server);
+		std::vector<std::pair<char, char> > getServerPrefixes(std::string server);
 		void callPreHook(std::string server, std::vector<std::string> parsedLine);
 		void callPostHook(std::string server, std::vector<std::string> parsedLine);
 		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
