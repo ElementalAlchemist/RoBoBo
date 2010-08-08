@@ -5,7 +5,7 @@ Current TODO List
 [>] - in progress
 [x] - complete
 
-Before release.  Duh.
+Alpha 1
 =======================================
 [x] - Move onConnect hook to right before sending registration stuff,
 		to allow for neater things when connecting.
@@ -22,4 +22,11 @@ Before release.  Duh.
 [x] - Port all the modules to API version 1.1
 [x] - Make removing servers actually remove the server
 [x] - Keep track of own ident and host, and add line breaker
+
+Beta 1
+=======================================
+[ ] - Update example conf with new modules
+
+Stable Release
+=======================================
 [>] - Keep the Current API section of MODULES updated through release

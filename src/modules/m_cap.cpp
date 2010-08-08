@@ -91,6 +91,7 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 			}
 			if (ackReply != "")
 				sendOtherCommand(server, "CAP", "ACK :" + ackReply.substr(1));
+			endCap(server);
 		} else if (parsedLine[3] == "NAK")
 			endCap(server);
 	}
