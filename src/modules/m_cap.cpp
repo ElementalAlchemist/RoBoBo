@@ -12,7 +12,7 @@ class Cap : public CapModule {
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);
 	private:
-		void endCap();
+		void endCap(std::string server);
 		std::tr1::unordered_map<std::string, std::vector<std::string> > capCommands;
 		std::tr1::unordered_map<std::string, std::vector<std::string> > blockingModules;
 };
