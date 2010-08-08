@@ -60,6 +60,8 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 				if (capIter != capCommands.end()) {
 					capReq += " " + serverCapab[i];
 					for (unsigned int j = 0; j < capIter->second.size(); j++) {
+						if (capIter->second[j] == "")
+							continue;
 						CapClient* lsMod = (CapClient*) getModules().find(capIter->second[j])->second;
 						lsMod->onCapExists(server, serverCapab[i]);
 					}
