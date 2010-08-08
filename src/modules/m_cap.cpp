@@ -75,7 +75,7 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 					capModifier = capAcknowledge[i][0];
 					capAcknowledge[i] = capAcknowledge[i].substr(1);
 				}
-				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator capAck = capCommands.find(capAcknowledge);
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator capAck = capCommands.find(capAcknowledge[i]);
 				if (capAck != capCommands.end()) {
 					for (unsigned int j = 0; j < capAck->second.size(); j++) {
 						if (capAck->second[j] == "")
