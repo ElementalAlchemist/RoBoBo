@@ -45,6 +45,7 @@ void VersionReply::sendVersionReply(std::string server, std::string target) {
 			break;
 		case 1090:
 			versionReply += "v1.1.0a1";
+			break;
 		default:
 			std::ostringstream thisVersion;
 			thisVersion << "v";
