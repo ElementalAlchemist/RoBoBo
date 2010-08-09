@@ -9,7 +9,7 @@ Alpha 1
 =======================================
 [x] - Move onConnect hook to right before sending registration stuff,
 		to allow for neater things when connecting.
-[x] - Allow the on*Out() hooks to modify the message being sent.
+[x] - Allow the onOut() hooks to modify the message being sent.
 [x] - prefix/status mode storage: use something ordered rather than an
 		unordered_map
 [x] - supports map for better support lookup.  probably like this:
