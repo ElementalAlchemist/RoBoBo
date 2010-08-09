@@ -1,0 +1,34 @@
+RoBoBo-IRC-BoBo
+Current TODO List
+
+[ ] - not done
+[>] - in progress
+[x] - complete
+
+Alpha 1
+=======================================
+[x] - Move onConnect hook to right before sending registration stuff,
+		to allow for neater things when connecting.
+[x] - Allow the onOut() hooks to modify the message being sent.
+[x] - prefix/status mode storage: use something ordered rather than an
+		unordered_map
+[x] - supports map for better support lookup.  probably like this:
+		std::tr1::unordered_map<std::string, std::vector<std::string> >
+		where key = service and value = vector of names of supporting modules
+[x] - Pretty much everything else here requires some sort of update to MODULES.
+		An occasional update to docs would be nice.
+[x] - Use WHO and store user hosts in the bot as well
+[x] - Implement CAP (m_cap) with some sort of interface
+[x] - Port all the modules to API version 1.1
+[x] - Make removing servers actually remove the server
+[x] - Keep track of own ident and host, and add line breaker
+
+Beta 1
+=======================================
+[ ] - Update example conf with new modules
+[x] - Allow modules to be loaded without conf, and have modules that require a
+		conf check that it exists
+
+Stable Release
+=======================================
+[>] - Keep the Current API section of MODULES updated through release
