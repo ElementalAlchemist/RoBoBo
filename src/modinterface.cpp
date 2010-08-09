@@ -650,8 +650,10 @@ bool ModuleInterface::connectServer(std::string serverName) {
 
 bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConf = moduleConfigs.find(modName);
-	if (modConf == moduleConfigs.end())
-		return false;
+	if (modConf == moduleConfigs.end()) { // give module a blank config and let the module reject it if it wants
+		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modName, std::tr1::unordered_map<std::string, std::string> ()));
+		modConf = moduleConfigs.find(modName);
+	}
 	std::string fileLoc = directory + "/modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
 	if (openModule == NULL) {
