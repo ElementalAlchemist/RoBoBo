@@ -13,8 +13,8 @@ void Channel::parseNames(std::vector<std::string> names) {
 	std::vector<char> modes;
 	for (unsigned int i = 0; i < names.size(); i++) {
 		for (unsigned int j = 0; j < prefixes.size(); j++) {
-			if (prefixes[i].second == names[i][0]) {
-				modes.push_back(prefixes[i].first);
+			if (prefixes[j].second == names[i][0]) {
+				modes.push_back(prefixes[j].first);
 				names[i] = names[i].substr(1);
 			}
 		}
