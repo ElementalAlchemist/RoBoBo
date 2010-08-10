@@ -103,10 +103,6 @@ void Cap::onConnect(std::string server) {
 	blockingModules[server].clear();
 }
 
-void Cap::onQuit(std::string server) {
-	blockingModules[server].clear();
-}
-
 void Cap::capRegister(std::string moduleName, std::string capCommand) {
 	capCommands[capCommand].push_back(moduleName);
 }
