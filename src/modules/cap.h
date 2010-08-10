@@ -7,7 +7,6 @@ class CapModule : public Module {
 
 class CapClient : public Module {
 	public:
-		void onCapExists(std::string server, std::string capCommand);
 		void onCapAccept(std::string server, std::string capCommand);
 };
 

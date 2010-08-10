@@ -58,17 +58,13 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 				if (serverCapab[i][0] == '=' || serverCapab[i][0] == '~')
 					serverCapab[i] = serverCapab[i].substr(1);
 				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator capIter = capCommands.find(serverCapab[i]);
-				if (capIter != capCommands.end()) {
+				if (capIter != capCommands.end())
 					capReq += " " + serverCapab[i];
-					for (unsigned int j = 0; j < capIter->second.size(); j++) {
-						if (capIter->second[j] == "")
-							continue;
-						CapClient* lsMod = (CapClient*) getModules().find(capIter->second[j])->second;
-						lsMod->onCapExists(server, serverCapab[i]);
-					}
-				}
 			}
-			sendOtherCommand(server, "CAP", "REQ :" + capReq.substr(1));
+			if (capReq == "")
+				sendOtherCommand(server, "CAP", "END");
+			else
+				sendOtherCommand(server, "CAP", "REQ :" + capReq.substr(1));
 		} else if (parsedLine[3] == "ACK") {
 			std::vector<std::string> capAcknowledge = splitBySpace(parsedLine[4]);
 			std::string ackReply = "";
