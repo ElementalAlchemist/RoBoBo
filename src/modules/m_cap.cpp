@@ -8,6 +8,7 @@ class Cap : public CapModule {
 		void onModuleChange();
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		void onConnect(std::string server);
+		void onQuit(std::string server);
 		void capRegister(std::string moduleName, std::string capCommand);
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);
@@ -99,6 +100,10 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 
 void Cap::onConnect(std::string server) {
 	sendOtherCommand(server, "CAP", "LS");
+	blockingModules[server].clear();
+}
+
+void Cap::onQuit(std::string server) {
 	blockingModules[server].clear();
 }
 
