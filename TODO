@@ -25,9 +25,11 @@ Alpha 1
 
 Beta 1
 =======================================
-[ ] - Update example conf with new modules
+[x] - Update example conf with new modules
 [x] - Allow modules to be loaded without conf, and have modules that require a
 		conf check that it exists
+[ ] - Add a function which returns a version of a string stripped of bold,
+		underline, and color characters
 
 Stable Release
 =======================================

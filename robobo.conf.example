@@ -36,6 +36,8 @@ serverconf irc.server.net { # This server will not be connected on startup, but 
 	# channels = "";
 }
 
+module m_cap.so {}
+
 module m_services_identify.so {
 	irc.server.net/service = "NickServ";
 	#irc.server.net/service = "AuthServ@service.server.net"; # Nickname should be in this form if the server requires identification to be sent to a nick like this
