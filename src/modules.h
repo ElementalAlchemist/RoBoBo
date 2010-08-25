@@ -93,6 +93,7 @@ class Module {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > getModSupports();
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
+		std::string stripColors(std::string message);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		std::vector<std::vector<char> > getServerChanModes(std::string server);
 		std::vector<std::pair<char, char> > getServerPrefixes(std::string server);

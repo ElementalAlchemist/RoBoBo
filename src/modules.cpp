@@ -220,6 +220,35 @@ std::vector<std::string> Module::splitBySpace(std::string line) {
 	return split;
 }
 
+std::string Module::stripColors(std::string message) {
+	while (message.find_first_of((char)2) != std::string::npos)
+		message.erase(message.find_first_of((char)2), 1);
+	while (message.find_first_of((char)31) != std::string::npos)
+		message.erase(message.find_first_of((char)31), 1);
+	while (message.find_first_of((char)3) != std::string::npos) {
+		size_t colorpos = message.find_first_of((char)3);
+		std::string afterColor = message.substr(colorpos, 6);
+		if (afterColor.size() == 1) { // afterColor's size could be less than 6 if the color char is close to the end of the string
+			message.erase(colorpos, 1);
+			break;
+		}
+		bool comma = false;
+		for (unsigned int i = 1; i < afterColor.size(); i++) {
+			if (afterColor[i] == '0' || afterColor[i] == '1' || afterColor[i] == '2' || afterColor[i] == '3' || afterColor[i] == '4' || afterColor[i] == '5' || afterColor[i] == '6' || afterColor[i] == '7' || afterColor[i] == '8' || afterColor[i] == '9')
+				continue;
+			if (afterColor[i] == ',' && !comma) {
+				comma = true;
+				continue;
+			}
+			message.erase(colorpos, i);
+			break;
+		}
+		message.erase(colorpos, afterColor.size());
+		break;
+	}
+	return message;
+}
+
 std::list<std::string> Module::getServers() {
 	return serverData->getServers();
 }
