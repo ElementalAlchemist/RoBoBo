@@ -635,6 +635,10 @@ This function takes any line, and it splits it into pieces using a space as a
 delimiter.  Each word gets one position in the vector in the order in which the
 word was found.
 
+std::string stripColors(std::string message)
+This function takes any message from any user, and strips out any bold,
+underline, and color codes (as well as the color parameters).
+
 std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 This function returns the conf data held by the server class.  Any part of the
 configuration may be updated by the Server class during normal use (such as
