@@ -8,7 +8,6 @@ class Cap : public CapModule {
 		void onModuleChange();
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		void onConnect(std::string server);
-		void onQuit(std::string server);
 		void capRegister(std::string moduleName, std::string capCommand);
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);

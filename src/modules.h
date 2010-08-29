@@ -42,7 +42,7 @@ class Module {
 		virtual void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		virtual void onPreConnect(std::string server);
 		virtual void onConnect(std::string server);
-		virtual void onQuit (std::string server);
+		virtual void onQuit(std::string server);
 		
 		virtual std::string onOutChannelMessage(std::string server, std::string target, char status, std::string message);
 		virtual void onSendChannelMessage(std::string server, std::string target, char status, std::string message);
