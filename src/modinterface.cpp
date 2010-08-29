@@ -655,7 +655,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 		modConf = moduleConfigs.find(modName);
 	}
 	std::string fileLoc = directory + "/modules/" + modName;
-	void* openModule = dlopen(fileLoc.c_str(), RTLD_LAZY);
+	void* openModule = dlopen(fileLoc.c_str(), RTLD_NOW);
 	if (openModule == NULL) {
 		std::string error = "Could not load module " + modName + ": " + dlerror();
 		std::perror(error.c_str()); // debug level 1
@@ -673,7 +673,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	Module* newModule = (Module*)spawnModule();
 	if (newModule->botAPIversion() != 1100) { // compare to current API version
 		dlclose(openModule);
-		std::cout << "Module " << modName << " is not compatible with the current API." << std::endl; // debug level 1
+		std::cout << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
 		return false;
 	}
 	newModule->init(modConf->second, this, modName, debugLevel);
