@@ -16,6 +16,4 @@ void CapModule::blockCap(std::string server, std::string moduleName) {}
 
 void CapModule::continueCap(std::string server, std::string moduleName) {}
 
-void CapClient::onCapExists(std::string server, std::string capCommand) {}
-
 void CapClient::onCapAccept(std::string server, std::string capCommand) {}
