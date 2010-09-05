@@ -233,18 +233,17 @@ std::string Module::stripColors(std::string message) {
 			break;
 		}
 		bool comma = false;
-		for (unsigned int i = 1; i < afterColor.size(); i++) {
+		unsigned int i;
+		for (i = 1; i < afterColor.size(); i++) {
 			if (afterColor[i] == '0' || afterColor[i] == '1' || afterColor[i] == '2' || afterColor[i] == '3' || afterColor[i] == '4' || afterColor[i] == '5' || afterColor[i] == '6' || afterColor[i] == '7' || afterColor[i] == '8' || afterColor[i] == '9')
 				continue;
 			if (afterColor[i] == ',' && !comma) {
 				comma = true;
 				continue;
 			}
-			message.erase(colorpos, i);
 			break;
 		}
-		message.erase(colorpos, afterColor.size());
-		break;
+		message.erase(colorpos, i);
 	}
 	return message;
 }
