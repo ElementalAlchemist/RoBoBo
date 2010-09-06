@@ -1,25 +1,14 @@
 #include "connection.h"
 #include "modules.h"
 
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), moduleData(modFace), serverConf(confVars) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), keepServer(true), moduleData(modFace), serverConf(confVars) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
-	std::istringstream portNumber (serverConf["port"]);
-	unsigned short port;
-	portNumber >> port;
 	if (serverConf["bind"] != "") {
 		if (!serverConnection.bindSocket(serverConf["bind"]))
 			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl; // debug level 1
 	}
-	serverConnection.connectServer(serverAddress, port);
-	sleep(1); // don't send right away in case of some sort of death or slowness
-	if (serverConf["password"] != "")
-		sendLine("PASS " + serverConf["password"]);
-	sendLine("NICK " + serverConf["nick"]);
-	sendLine("USER " + serverConf["ident"] + " here " + serverAddress + " :" + serverConf["gecos"]);
-	pthread_create(&dataReceiveThread, &detachedState, handleData_thread, this);
-	pthread_create(&dataSendThread, &detachedState, sendData_thread, this);
 }
 
 Server::~Server() {
@@ -28,8 +17,29 @@ Server::~Server() {
 	pthread_cancel(secondDecrementThread);
 }
 
+void Server::connectServer() {
+	moduleData->callPreConnectHook(serverName);
+	std::istringstream portNumber (serverConf["port"]);
+	unsigned short port;
+	portNumber >> port;
+	serverConnection.connectServer(serverName, port);
+	sleep(1); // don't send right away in case of some sort of death or slowness
+	moduleData->callConnectHook(serverName);
+	if (serverConf["password"] != "")
+		sendLine("PASS " + serverConf["password"]);
+	sendLine("NICK " + serverConf["nick"]);
+	sendLine("USER " + serverConf["ident"] + " here " + serverName + " :" + serverConf["gecos"]);
+	pthread_create(&dataReceiveThread, &detachedState, handleData_thread, this);
+	pthread_create(&dataSendThread, &detachedState, sendData_thread, this);
+}
+
+
 bool Server::stillConnected() {
 	return serverConnection.isConnected();
+}
+
+bool Server::shouldReset() {
+	return keepServer;
 }
 
 void Server::sendLine(std::string line) {
@@ -40,7 +50,7 @@ std::tr1::unordered_map<std::string, std::string> Server::getInfo() {
 	return serverConf;
 }
 
-std::tr1::unordered_map<char, char> Server::getPrefixes() {
+std::vector<std::pair<char, char> > Server::getPrefixes() {
 	return prefix;
 }
 
@@ -53,8 +63,10 @@ std::vector<char> Server::getChanTypes() {
 }
 
 void Server::resyncChannels() {
-	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); ++iter)
+	for (std::tr1::unordered_map<std::string, Channel*>::iterator iter = inChannels.begin(); iter != inChannels.end(); ++iter) {
 		sendLine("NAMES " + iter->first);
+		sendLine("WHO " + iter->first);
+	}
 }
 
 std::list<std::string> Server::getChannels() {
@@ -68,22 +80,40 @@ std::string Server::getChannelTopic(std::string channel) {
 	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
 	if (chanIter == inChannels.end())
 		return "";
-	return chanIter->second->getTopic();
+	return chanIter->second->topic();
 }
 
 std::list<std::string> Server::getChannelUsers(std::string channel) {
 	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
 	if (chanIter == inChannels.end())
 		return std::list<std::string> ();
-	return chanIter->second->getUsers();
+	return chanIter->second->users();
+}
+
+std::string Server::getUserIdent(std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return "";
+	return chanIter->second->ident(user);
+}
+
+std::string Server::getUserHost(std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return "";
+	return chanIter->second->host(user);
 }
 
 std::pair<char, char> Server::getUserStatus(std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(channel);
 	if (chanIter == inChannels.end())
 		return std::pair<char, char> ('0', ' ');
-	char status = chanIter->second->getStatus(user);
-	return std::pair<char, char> (status, prefix[status]);
+	char status = chanIter->second->status(user);
+	for (unsigned int i = 0; i < prefix.size(); i++) {
+		if (status == prefix[i].first)
+			return std::pair<char, char> (status, prefix[i].second);
+	}
+	return std::pair<char, char> ('0', ' ');
 }
 
 void* Server::handleData_thread(void* ptr) {
@@ -102,18 +132,28 @@ void Server::handleData() {
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
-		moduleData->callHook(serverName, parsedLine); // call module hooks for the received message
+		moduleData->callPreHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendLine("MODE " + serverConf["nick"] + " +B"); // set bot mode
 			if (serverConf["channels"] != "")
 				sendLine("JOIN " + serverConf["channels"]);
 			registered = true;
+			sendLine("WHOIS " + serverConf["nick"]);
 		} else if (parsedLine[1] == "005") // server features
 			parse005(parsedLine);
-		else if (parsedLine[1] == "332") { // channel topic
+		else if (parsedLine[1] == "311" && parsedLine[3] == serverConf["nick"]) {
+			serverConf["ident"] = parsedLine[4];
+			serverConf["host"] = parsedLine[5];
+		} else if (parsedLine[1] == "332") { // channel topic
 			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
 			if (it != inChannels.end())
-				it->second->setTopic(parsedLine[4]);
+				it->second->topic(parsedLine[4]);
+		} else if (parsedLine[1] == "352") {
+			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[3]);
+			if (it != inChannels.end()) {
+				it->second->ident(parsedLine[7], parsedLine[4]);
+				it->second->host(parsedLine[7], parsedLine[5]);
+			}
 		} else if (parsedLine[1] == "353") { // NAMES reply
 			std::tr1::unordered_map<std::string, Channel*>::iterator it = inChannels.find(parsedLine[4]);
 			if (it != inChannels.end())
@@ -158,10 +198,14 @@ void Server::handleData() {
 						addMode = false;
 					else {
 						int category;
-						std::tr1::unordered_map<char, char>::iterator prefixIter = prefix.find(parsedLine[3][i]);
-						category = 0; // count it as a list mode since it's a list of users who hold a status
-						if (prefixIter == prefix.end()) {
-							bool found = false;
+						bool found = false;
+						for (unsigned int j = 0; j < prefix.size(); j++) {
+							if (prefix[j].first == parsedLine[3][i]) {
+								category = 0; // count it as a list mode since it's a list of users who hold a status
+								found = true;
+							}
+						}
+						if (!found) {
 							for (unsigned int j = 0; j < chanModes.size(); j++) {
 								for (unsigned int k = 0; k < chanModes[j].size(); k++) {
 									if (parsedLine[3][i] == chanModes[j][k]) {
@@ -180,11 +224,11 @@ void Server::handleData() {
 						if (category == 0 || category == 1 || (category == 2 && addMode)) {
 							std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								chanIter->second->setMode(addMode, parsedLine[3][i], parsedLine[currParam++]);
+								chanIter->second->mode(addMode, parsedLine[3][i], parsedLine[currParam++]);
 						} else {
 							std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								chanIter->second->setMode(addMode, parsedLine[3][i], "");
+								chanIter->second->mode(addMode, parsedLine[3][i], "");
 						}
 					}
 				}
@@ -193,25 +237,28 @@ void Server::handleData() {
 			serverConf["nick"] = parsedLine[2];
 		else if (parsedLine[1] == "NICK") {
 			for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
-				chanIter->second->changeNick(separateNickFromFullHostmask(parsedLine[0].substr(1)), parsedLine[2]);
-		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) // bot joined a channel
+				chanIter->second->nick(separateNickFromFullHostmask(parsedLine[0].substr(1)), parsedLine[2]);
+		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) { // bot joined a channel
 			inChannels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (this)));
-		else if (parsedLine[1] == "JOIN")
-			inChannels.find(parsedLine[2])->second->joinChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
+			sendLine("WHO " + parsedLine[2]);
+		} else if (parsedLine[1] == "JOIN")
+			inChannels.find(parsedLine[2])->second->joinChannel(parsedLine[0].substr(1));
 		else if (parsedLine[1] == "PART" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1)))
 			inChannels.erase(parsedLine[2]);
 		else if (parsedLine[1] == "PART")
 			inChannels.find(parsedLine[2])->second->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == separateNickFromFullHostmask(parsedLine[0].substr(1))) {
 			serverConnection.closeConnection();
-			moduleData->removeServer(serverName); // The server is disconnected. Remove its instance.
+			quitHooked = true;
+			keepServer = false;
 			break;
 		} else if (parsedLine[1] == "QUIT") {
 			for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 				chanIter->second->leaveChannel(separateNickFromFullHostmask(parsedLine[0].substr(1)));
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			serverConnection.closeConnection();
-			moduleData->removeServer(serverName);
+			quitHooked = true;
+			keepServer = false;
 			break;
 		} else if (parsedLine[0] == "PING") // server ping
 			sendLine("PONG " + parsedLine[1]);
@@ -219,11 +266,13 @@ void Server::handleData() {
 			if (parsedLine[1].size() > 12) {
 				if (parsedLine[1].substr(0,12) == "Closing Link") {
 					serverConnection.closeConnection();
-					moduleData->removeServer(serverName);
+					moduleData->callQuitHook(serverName);
+					quitHooked = true;
 					break;
 				}
 			}
 		}
+		moduleData->callPostHook(serverName, parsedLine);
 	}
 }
 
@@ -237,22 +286,29 @@ void Server::sendData() {
 	seconds = 0;
 	unsigned short secondsToAdd = 0;
 	std::string sendingMessage = "";
+	std::vector<std::string> parsedLine;
 	std::string command = "";
 	pthread_create(&secondDecrementThread, &detachedState, secondDecrement_thread, this);
 	while (true) {
 		if (!serverConnection.isConnected())
 			break; // Thread must die when server isn't connected.
 		if (outData.empty()) {
-			usleep(500000); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
+			usleep(100000); // sleep for a half-second to avoid processor abuse while being ready for data to arrive
 			continue; // check again for empty queue
 		}
 		sendingMessage = outData.front();
 		outData.pop();
-		command = sendingMessage.substr(0,sendingMessage.find_first_of(' '));
-		
+		parsedLine = parseLine(sendingMessage);
+		command = parsedLine[0];
+		if (command == "PRIVMSG" || command == "NOTICE") {
+			std::string newMessage = moduleData->callHookOut(serverName, parsedLine);
+			if (newMessage == "")
+				continue; // do not send this canceled message
+			sendingMessage = parsedLine[0] + " " + parsedLine[1] + " :" + newMessage;
+			parsedLine = parseLine(sendingMessage);
+		}
 		if (command == "MODE") { // consolidate modes into one line
 			secondsToAdd = 1;
-			std::vector<std::string> parsedLine = parseLine(sendingMessage);
 			std::string channel = parsedLine[1], modes = parsedLine[2], params = "";
 			bool addingMode = (modes[0] == '-') ? false : true;
 			if (parsedLine.size() > 3) // if there is a parameter, add it
@@ -264,7 +320,7 @@ void Server::sendData() {
 				sendingMessage = outData.front();
 				parsedLine = parseLine(sendingMessage);
 				unsigned short limit = 1;
-				while (!outData.empty() && parsedLine[0] == "MODE" && parsedLine[1] == channel && limit <= maxModes) {
+				while (!outData.empty() && parsedLine[0] == "MODE" && parsedLine[1] == channel && limit <= maxModes && std::string(":" + serverConf["nick"] + "!" + serverConf["ident"] + "@" + serverConf["host"] + " MODE " + channel + " " + modes + parsedLine[2] + " " + params + (parsedLine.size() > 3 ? (" " + parsedLine[3]) : "")).size() <= 510) {
 					outData.pop(); // remove the message we are parsing
 					if ((parsedLine[2][0] == '+') == addingMode) // if we're doing the same thing as the operation already occurring on the mode string
 						modes += parsedLine[2][1];
@@ -300,14 +356,26 @@ void Server::sendData() {
 			else // all commands not on the list are worth 1 second.
 				secondsToAdd = 1;
 		}
-		
-		while (seconds + secondsToAdd > 10) {
-			sleep(1);
+		std::string hostInfo = ":" + serverConf["nick"] + "!" + serverConf["ident"] + "@" + serverConf["host"] + " ";
+		if (hostInfo.size() + sendingMessage.size() > 510) {
+			std::string extraMessage = sendingMessage.substr(510 - hostInfo.size());
+			sendingMessage = sendingMessage.substr(0, 510 - hostInfo.size()) + "\r\n";
+			for (unsigned int i = 0; i < parsedLine.size() - 1; i++)
+				sendingMessage += parsedLine[i] + " ";
+			sendingMessage += extraMessage;
+			secondsToAdd *= 2;
 		}
+		while (seconds + secondsToAdd > 10)
+			sleep(1);
 		serverConnection.sendData(sendingMessage);
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
-		moduleData->callHookOut(serverName, parseLine(sendingMessage));
+		moduleData->callHookSend(serverName, parsedLine);
+		if (command == "QUIT") {
+			serverConnection.closeConnection();
+			keepServer = false;
+			break;
+		}
 		pthread_mutex_lock(&secondsmutex);
 		seconds += secondsToAdd;
 		pthread_mutex_unlock(&secondsmutex);
@@ -322,8 +390,12 @@ void* Server::secondDecrement_thread(void* ptr) {
 
 void Server::secondDecrement() {
 	while (true) {
-		if (!serverConnection.isConnected())
+		if (!serverConnection.isConnected()) {
+			if (!quitHooked)
+				moduleData->callQuitHook(serverName);
+			quitHooked = false;
 			break; // thread must die when server isn't connected anymore
+		}
 		sleep(1);
 		if (seconds > 0) {
 			pthread_mutex_lock(&secondsmutex);
@@ -347,7 +419,7 @@ void Server::parse005(std::vector<std::string> parsedLine) {
 				std::string modes = data.substr(0, data.find_first_of(')'));
 				std::string chars = data.substr(data.find_first_of(')') + 1);
 				for (unsigned int i = 0; i < modes.size(); i++)
-					prefix.insert(std::pair<char, char> (modes[i], chars[i]));
+					prefix.push_back(std::pair<char, char> (modes[i], chars[i]));
 			}
 		}
 		if (parsedLine[i].size() > 10) { // Channel types

@@ -6,21 +6,21 @@ class ConnectServerCommand : public AdminHook {
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
-		std::string getDesc();
+		void onModuleChange();
+		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int ConnectServerCommand::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 bool ConnectServerCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -35,12 +35,6 @@ bool ConnectServerCommand::onLoadComplete() {
 }
 
 void ConnectServerCommand::onRehash() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading." << std::endl; // debug level 1
-		unloadModule(moduleName);
-	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'n')
 			config["masteronly"] = "no";
@@ -50,7 +44,16 @@ void ConnectServerCommand::onRehash() {
 		config["masteronly"] = "yes";
 }
 
-std::string ConnectServerCommand::getDesc() {
+void ConnectServerCommand::onModuleChange() {
+	std::multimap<std::string, std::string> modAbilities = getModAbilities();
+	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
+		unloadModule(moduleName);
+	}
+}
+
+std::string ConnectServerCommand::description() {
 	return "Allows admins to connect to and disconnect from servers.";
 }
 

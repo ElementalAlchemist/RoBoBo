@@ -1,7 +1,5 @@
 #include "modules.h"
 
-Module::Module() {}
-
 Module::~Module() {}
 
 void Module::init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName, unsigned short debug) {
@@ -19,7 +17,7 @@ bool Module::onLoadComplete() { return true; }
 
 void Module::onRehash() {}
 
-std::vector<std::string> Module::getAbilities() { return std::vector<std::string> (); }
+void Module::onModuleChange() {}
 
 void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
 
@@ -41,47 +39,83 @@ void Module::onChannelCTCPReply(std::string server, std::string channel, char ta
 
 void Module::onUserCTCPReply(std::string server, std::string nick, std::string message) {}
 
-void Module::onChannelJoin(std::string server, std::string channel, std::string hostmask) {}
+void Module::onChannelJoinPre(std::string server, std::string channel, std::string hostmask) {}
 
-void Module::onChannelPart(std::string server, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelJoinPost(std::string server, std::string channel, std::string hostmask) {}
 
-void Module::onUserQuit(std::string server, std::string hostmask, std::string reason) {}
+void Module::onChannelPartPre(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onNickChange(std::string server, std::string oldNick, std::string newNick) {}
+void Module::onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onChannelKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onUserQuitPre(std::string server, std::string hostmask, std::string reason) {}
 
-void Module::onChannelMode(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+void Module::onUserQuitPost(std::string server, std::string hostmask, std::string reason) {}
+
+void Module::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {}
+
+void Module::onNickChangePost(std::string server, std::string oldNick, std::string newNick) {}
+
+void Module::onChannelKickPre(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+
+void Module::onChannelKickPost(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+
+void Module::onChannelModePre(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+
+void Module::onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
 
 void Module::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {}
 
 void Module::onOtherData(std::string server, std::vector<std::string> parsedLine) {}
 
+void Module::onPreConnect(std::string server) {}
+
 void Module::onConnect(std::string server) {}
 
 void Module::onQuit(std::string server) {}
 
-void Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) { return message; }
 
-void Module::onOutUserMessage(std::string server, std::string target, std::string message) {}
+void Module::onSendChannelMessage(std::string server, std::string target, char status, std::string message) {}
 
-void Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutUserMessage(std::string server, std::string target, std::string message) { return message; }
 
-void Module::onOutUserNotice(std::string server, std::string target, std::string message) {}
+void Module::onSendUserMessage(std::string server, std::string target, std::string message) {}
 
-void Module::onOutChannelAction(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) { return message; }
 
-void Module::onOutUserAction(std::string server, std::string target, std::string message) {}
+void Module::onSendChannelNotice(std::string server, std::string target, char status, std::string message) {}
 
-void Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutUserNotice(std::string server, std::string target, std::string message) { return message; }
 
-void Module::onOutUserCTCP(std::string server, std::string target, std::string message) {}
+void Module::onSendUserNotice(std::string server, std::string target, std::string message) {}
 
-void Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
+std::string Module::onOutChannelAction(std::string server, std::string target, char status, std::string message) { return message; }
 
-void Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) {}
+void Module::onSendChannelAction(std::string server, std::string target, char status, std::string message) {}
 
-std::string Module::getDesc() { return "This module has no description."; }
+std::string Module::onOutUserAction(std::string server, std::string target, std::string message) { return message; }
+
+void Module::onSendUserAction(std::string server, std::string target, std::string message) {}
+
+std::string Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) { return message; }
+
+void Module::onSendChannelCTCP(std::string server, std::string target, char status, std::string message) {}
+
+std::string Module::onOutUserCTCP(std::string server, std::string target, std::string message) { return message; }
+
+void Module::onSendUserCTCP(std::string server, std::string target, std::string message) {}
+
+std::string Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) { return message; }
+
+void Module::onSendChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
+
+std::string Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) { return message; }
+
+void Module::onSendUserCTCPReply(std::string server, std::string target, std::string message) {}
+
+std::string Module::description() { return "This module has not been described."; }
+
+std::vector<std::string> Module::abilities() { return std::vector<std::string> (); }
 
 std::vector<std::string> Module::supports() { return std::vector<std::string> (); }
 
@@ -158,7 +192,7 @@ void Module::rehashBot() {
 }
 
 unsigned int Module::getBotVersion() {
-	return 1001; // 1.0.1
+	return 1096; // 1.1 RC 1
 }
 
 std::vector<std::string> Module::splitHostmask(std::string hostmask) {
@@ -186,6 +220,34 @@ std::vector<std::string> Module::splitBySpace(std::string line) {
 	return split;
 }
 
+std::string Module::stripColors(std::string message) {
+	while (message.find_first_of((char)2) != std::string::npos)
+		message.erase(message.find_first_of((char)2), 1);
+	while (message.find_first_of((char)31) != std::string::npos)
+		message.erase(message.find_first_of((char)31), 1);
+	while (message.find_first_of((char)3) != std::string::npos) {
+		size_t colorpos = message.find_first_of((char)3);
+		std::string afterColor = message.substr(colorpos, 6);
+		if (afterColor.size() == 1) { // afterColor's size could be less than 6 if the color char is close to the end of the string
+			message.erase(colorpos, 1);
+			break;
+		}
+		bool comma = false;
+		unsigned int i;
+		for (i = 1; i < afterColor.size(); i++) {
+			if (afterColor[i] == '0' || afterColor[i] == '1' || afterColor[i] == '2' || afterColor[i] == '3' || afterColor[i] == '4' || afterColor[i] == '5' || afterColor[i] == '6' || afterColor[i] == '7' || afterColor[i] == '8' || afterColor[i] == '9')
+				continue;
+			if (afterColor[i] == ',' && !comma) {
+				comma = true;
+				continue;
+			}
+			break;
+		}
+		message.erase(colorpos, i);
+	}
+	return message;
+}
+
 std::list<std::string> Module::getServers() {
 	return serverData->getServers();
 }
@@ -198,6 +260,10 @@ std::multimap<std::string, std::string> Module::getModAbilities() {
 	return serverData->getModuleAbilities();
 }
 
+std::tr1::unordered_map<std::string, std::vector<std::string> > Module::getModSupports() {
+	return serverData->getModuleSupports();
+}
+
 std::tr1::unordered_map<std::string, std::string> Module::getServerData(std::string server) {
 	return serverData->getServerData(server);
 }
@@ -206,7 +272,7 @@ std::vector<std::vector<char> > Module::getServerChanModes(std::string server) {
 	return serverData->getServerChanModes(server);
 }
 
-std::tr1::unordered_map<char, char> Module::getServerPrefixes(std::string server) {
+std::vector<std::pair<char, char> > Module::getServerPrefixes(std::string server) {
 	return serverData->getServerPrefixes(server);
 }
 
@@ -220,6 +286,14 @@ std::string Module::getChannelTopic(std::string server, std::string channel) {
 
 std::list<std::string> Module::getChannelUsers(std::string server, std::string channel) {
 	return serverData->getChannelUsers(server, channel);
+}
+
+std::string Module::getUserIdent(std::string server, std::string channel, std::string user) {
+	return serverData->getUserIdent(server, channel, user);
+}
+
+std::string Module::getUserHost(std::string server, std::string channel, std::string user) {
+	return serverData->getUserHost(server, channel, user);
 }
 
 std::pair<char, char> Module::getUserStatus(std::string server, std::string channel, std::string user) {

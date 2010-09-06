@@ -74,7 +74,7 @@ std::string Socket::receive() {
 	while (true) {
 		do {
 			if (addPause)
-				usleep(500000);
+				usleep(100000);
 			status = recv(socketfd, &inputBuffer, 1, 0);
 			addPause = true;
 		} while ((status < 0 && errno == EWOULDBLOCK) && status != 0);
@@ -84,11 +84,9 @@ std::string Socket::receive() {
 			closeConnection();
 			break;
 		}
-		if (inputBuffer[0] == '\0')
-			return messageString;
 		if (inputBuffer[0] == '\n')
 			return messageString;
-		if (inputBuffer[0] != '\n' && inputBuffer[0] != '\r')
+		if (inputBuffer[0] != '\r')
 			messageString += inputBuffer[0];
 	}
 	return "";

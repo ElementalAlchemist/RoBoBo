@@ -6,14 +6,15 @@ class RawCommand : public AdminHook {
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
-		std::string getDesc();
+		void onModuleChange();
+		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int RawCommand::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 bool RawCommand::onLoadComplete() {
@@ -34,11 +35,6 @@ bool RawCommand::onLoadComplete() {
 }
 
 void RawCommand::onRehash() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl; // debug level 1
-		unloadModule(moduleName);
-	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'y')
 			config["masteronly"] = "yes";
@@ -48,7 +44,15 @@ void RawCommand::onRehash() {
 		config["masteronly"] = "no";
 }
 
-std::string RawCommand::getDesc() {
+void RawCommand::onModuleChange() {
+	std::multimap<std::string, std::string> modAbilities = getModAbilities();
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << " but was not found.  Unloading..." << std::endl; // debug level 1
+		unloadModule(moduleName);
+	}
+}
+
+std::string RawCommand::description() {
 	return "Allows bot admins to send raw IRC text.";
 }
 
@@ -95,7 +99,7 @@ void RawCommand::onAdminCommand(std::string server, std::string nick, std::strin
 		toServer = message.substr(0, message.find_first_of('/'));
 		message = message.substr(message.find_first_of('/') + 1);
 	}
-	sendOtherCommand(toServer, message.substr(0, message.find_first_of(' ')), message.substr(message.find_first_of(' ') + 1));
+	sendOtherCommand(toServer, message.substr(0, message.find_first_of(' ')), message.find_first_of(' ') == std::string::npos ? "" : message.substr(message.find_first_of(' ') + 1));
 	if (dccMod == NULL)
 		sendPrivMsg(server, nick, "Command sent.");
 	else

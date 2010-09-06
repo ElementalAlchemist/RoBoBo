@@ -16,11 +16,11 @@ class m_dccchat : public dccSender {
 		void onUserCTCP(std::string server, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
 		void dccSend(std::string recipient, std::string message);
-		std::vector<std::string> getAbilities();
+		std::vector<std::string> abilities();
 		bool hookDCCMessage(std::string modName, std::string hookMsg);
 		void unhookDCCSession(std::string modName, std::string dccid);
 		void closeDCCConnection(std::string dccid);
-		std::string getDesc();
+		std::string description();
 	private:
 		void dccConnect(std::string server, std::string nick, std::string ip, std::string port);
 		void dccListen(std::string id, Socket* listenSocket);
@@ -32,7 +32,7 @@ class m_dccchat : public dccSender {
 };
 
 int m_dccchat::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 void m_dccchat::onNickChange(std::string server, std::string oldNick, std::string newNick) {
@@ -68,7 +68,7 @@ void m_dccchat::dccSend(std::string recipient, std::string message) {
 	dccIter->second->sendData(message);
 }
 
-std::vector<std::string> m_dccchat::getAbilities() {
+std::vector<std::string> m_dccchat::abilities() {
 	std::vector<std::string> abilities;
 	abilities.push_back("DCC_CHAT");
 	return abilities;
@@ -92,7 +92,7 @@ void m_dccchat::unhookDCCSession(std::string modName, std::string dccid) {
 	}
 }
 
-std::string m_dccchat::getDesc() {
+std::string m_dccchat::description() {
 	return "This module gives the bot DCC CHAT support, allowing users to enter in DCC CHAT communication with the bot.";
 }
 

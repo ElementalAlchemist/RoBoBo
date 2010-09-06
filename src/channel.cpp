@@ -1,25 +1,25 @@
 #include "connection.h"
 
-Channel::Channel(Server* thisServer) : parentServer(thisServer), topic(""), namesSync(false) {}
+Channel::Channel(Server* thisServer) : parentServer(thisServer), theTopic(""), namesSync(false) {}
 
 void Channel::parseNames(std::vector<std::string> names) {
 	if (namesSync) {
-		users.clear();
+		for (std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.begin(); userIter != theUsers.end(); ++userIter)
+			delete userIter->second;
+		theUsers.clear();
 		namesSync = false;
 	}
-	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
 	std::vector<char> modes;
 	for (unsigned int i = 0; i < names.size(); i++) {
-		for (std::tr1::unordered_map<char, char>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); prefixIter++) {
-			if (prefixIter->second == names[i][0]) {
-				modes.push_back(prefixIter->first);
+		for (unsigned int j = 0; j < prefixes.size(); j++) {
+			if (prefixes[j].second == names[i][0]) {
+				modes.push_back(prefixes[j].first);
 				names[i] = names[i].substr(1);
 			}
 		}
-		users.insert(std::pair<std::string, User*> (names[i], new User (this)));
-		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(names[i]);
-		if (userIter == users.end())
-			continue;
+		theUsers.insert(std::pair<std::string, User*> (names[i], new User (this)));
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(names[i]);
 		for (unsigned int j = 0; j < modes.size(); j++)
 			userIter->second->status(true, modes[j]);
 		modes.clear();
@@ -30,57 +30,92 @@ void Channel::numeric366() {
 	namesSync = true;
 }
 
-void Channel::setTopic(std::string newTopic) {
-	topic = newTopic;
+void Channel::topic(std::string newTopic) {
+	theTopic = newTopic;
 }
 
-void Channel::setMode(bool add, char mode, std::string param) {
-	std::tr1::unordered_map<char, char> prefixes = parentServer->getPrefixes();
-	std::tr1::unordered_map<char, char>::iterator it = prefixes.find(mode);
-	if (it == prefixes.end())
-		return;
-	std::tr1::unordered_map<std::string, User*>::iterator iter = users.find(param);
-	if (iter == users.end()) {
+void Channel::mode(bool add, char mode, std::string param) {
+	std::tr1::unordered_map<std::string, User*>::iterator iter = theUsers.find(param);
+	if (iter == theUsers.end()) {
 		parentServer->resyncChannels();
 		return;
 	}
-	iter->second->status(add, mode);
+	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
+	for (unsigned int i = 0; i < prefixes.size(); i++) {
+		if (mode == prefixes[i].first) {
+			iter->second->status(add, mode);
+			break;
+		}
+	}
 }
 
-void Channel::joinChannel(std::string nick) {
-	users.insert(std::pair<std::string, User*> (nick, new User (this)));
+void Channel::joinChannel(std::string hostmask) {
+	std::string nick = hostmask.substr(0, hostmask.find_first_of('!'));
+	std::string ident = hostmask.substr(hostmask.find_first_of('!') + 1);
+	ident = ident.substr(0, ident.find_first_of('@'));
+	std::string host = hostmask.substr(hostmask.find_first_of('@') + 1);
+	theUsers.insert(std::pair<std::string, User*> (nick, new User (ident, host, this)));
 }
 
 void Channel::leaveChannel(std::string nick) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(nick);
-	if (userIter == users.end())
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(nick);
+	if (userIter == theUsers.end())
 		return;
-	users.erase(userIter);
+	delete userIter->second;
+	theUsers.erase(nick);
 }
 
-std::list<std::string> Channel::getUsers() {
+void Channel::nick(std::string oldNick, std::string newNick) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(oldNick);
+	if (userIter == theUsers.end())
+		return;
+	User* userData = userIter->second;
+	theUsers.erase(userIter);
+	theUsers.insert(std::pair<std::string, User*> (newNick, userData));
+}
+
+std::list<std::string> Channel::users() {
 	std::list<std::string> channelUsers;
-	for (std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin(); userIter != users.end(); ++userIter)
+	for (std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.begin(); userIter != theUsers.end(); ++userIter)
 		channelUsers.insert(channelUsers.end(), userIter->first);
 	return channelUsers;
 }
 
-char Channel::getStatus(std::string user) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
-	if (userIter == users.end())
-		return '0';
-	return userIter->second->getStatus();
-}
-
-std::string Channel::getTopic() {
-	return topic;
-}
-
-void Channel::changeNick(std::string oldNick, std::string newNick) {
-	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(oldNick);
-	if (userIter == users.end())
+void Channel::ident(std::string user, std::string ident) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
 		return;
-	User* userData = userIter->second;
-	users.erase(userIter);
-	users.insert(std::pair<std::string, User*> (newNick, userData));
+	userIter->second->ident(ident);
+}
+
+std::string Channel::ident(std::string user) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
+		return "";
+	return userIter->second->ident();
+}
+
+void Channel::host(std::string user, std::string host) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
+		return;
+	userIter->second->host(host);
+}
+
+std::string Channel::host(std::string user) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
+		return "";
+	return userIter->second->host();
+}
+
+char Channel::status(std::string user) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = theUsers.find(user);
+	if (userIter == theUsers.end())
+		return '0';
+	return userIter->second->status();
+}
+
+std::string Channel::topic() {
+	return theTopic;
 }

@@ -6,21 +6,21 @@ class AdminChannelControl : public AdminHook {
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
-		std::string getDesc();
+		void onModuleChange();
+		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int AdminChannelControl::botAPIversion() {
-	return 1002;
+	return 1100;
 }
 
 bool AdminChannelControl::onLoadComplete() {
 	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator ableIter = modAbilities.find("BOT_ADMIN");
-	if (ableIter == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl; // debug level 1
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+		std::cout << "A module providing BOT_ADMIN was not found, but it is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
 	}
@@ -35,12 +35,6 @@ bool AdminChannelControl::onLoadComplete() {
 }
 
 void AdminChannelControl::onRehash() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator ableIter = modAbilities.find("BOT_ADMIN");
-	if (ableIter == modAbilities.end()) {
-		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading..." << std::endl; // debug level 1
-		unloadModule(moduleName);
-	}
 	if (config["masteronly"] != "") {
 		if (config["masteronly"][0] == 'y')
 			config["masteronly"] = "yes";
@@ -50,7 +44,15 @@ void AdminChannelControl::onRehash() {
 		config["masteronly"] = "no";
 }
 
-std::string AdminChannelControl::getDesc() {
+void AdminChannelControl::onModuleChange() {
+	std::multimap<std::string, std::string> modAbilities = getModAbilities();
+	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+		std::cout << "A module providing BOT_ADMIN was not found, but it is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
+		unloadModule(moduleName);
+	}
+}
+
+std::string AdminChannelControl::description() {
 	return "Allows admins to make the bot join and part channels.";
 }
 
