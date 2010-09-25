@@ -192,7 +192,7 @@ void Module::rehashBot() {
 }
 
 unsigned int Module::getBotVersion() {
-	return 1100;
+	return 1900; // 2.0.0-devel
 }
 
 std::vector<std::string> Module::splitHostmask(std::string hostmask) {
