@@ -94,7 +94,7 @@ class Module {
 		std::vector<std::string> splitHostmask(std::string hostmask);
 		std::vector<std::string> splitBySpace(std::string line);
 		std::string stripColors(std::string message);
-		std::tr1::unordered_map<std::string, std::string> serverData(std::string server);
+		std::tr1::unordered_map<std::string, std::string> serverInfo(std::string server);
 		std::vector<std::vector<char> > serverChanModes(std::string server);
 		std::vector<std::pair<char, char> > serverPrefixes(std::string server);
 		std::list<std::string> channels(std::string server);
