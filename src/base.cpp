@@ -6,8 +6,8 @@ Base::Base(std::string confdir, std::string confname, unsigned short debug) : de
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
 	pthread_create(&serverCheckThread, &detachedState, serverCheck_thread, this); // start thread that checks for disconnected servers
 	ConfigReader config (confname, confdir);
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig(true);
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(true);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.servers(true);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.modules(true);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter) {
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
 		if (loadModule(modConfIter->first, true)) {
@@ -24,10 +24,10 @@ Base::Base(std::string confdir, std::string confname, unsigned short debug) : de
 		connectServer(servConfIter->first);
 	}
 	
-	moduleConf = config.getModConfig(false);
+	moduleConf = config.modules(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConfIter = moduleConf.begin(); modConfIter != moduleConf.end(); ++modConfIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
-	serverConf = config.getServerConfig(false);
+	serverConf = config.servers(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConf.begin(); servConfIter != serverConf.end(); ++servConfIter)
 		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servConfIter->first, servConfIter->second));
 }
@@ -39,25 +39,25 @@ void Base::sendToServer(std::string server, std::string rawLine) {
 	serverIter->second->sendLine(rawLine);
 }
 
-std::tr1::unordered_map<std::string, std::string> Base::getServerData(std::string server) {
+std::tr1::unordered_map<std::string, std::string> Base::serverData(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::tr1::unordered_map<std::string, std::string> (); // a blank map for a nonexistent server
-	return serverIter->second->getInfo();
+	return serverIter->second->info();
 }
 
-std::vector<std::vector<char> > Base::getServerChanModes(std::string server) {
+std::vector<std::vector<char> > Base::serverChanModes(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::vector<char> > (); // Empty structure for whoever can't check the server list for real servers
-	return serverIter->second->getChanModes();
+	return serverIter->second->channelModes();
 }
 
-std::vector<std::pair<char, char> > Base::getServerPrefixes(std::string server) {
+std::vector<std::pair<char, char> > Base::serverPrefixes(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::pair<char, char> > ();
-	return serverIter->second->getPrefixes();
+	return serverIter->second->prefixes();
 }
 
 void Base::callPreHook(std::string server, std::vector<std::string> parsedLine) {
@@ -103,8 +103,8 @@ void Base::callPreHook(std::string server, std::vector<std::string> parsedLine) 
 				std::vector<std::vector<char> > serverModes;
 				std::vector<std::pair<char, char> > prefixes;
 				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-				serverModes = servIter->second->getChanModes();
-				prefixes = servIter->second->getPrefixes();
+				serverModes = servIter->second->channelModes();
+				prefixes = servIter->second->prefixes();
 				short category = 0;
 				bool found = false;
 				for (unsigned int j = 0; j < prefixes.size(); j++) {
@@ -266,8 +266,8 @@ void Base::callPostHook(std::string server, std::vector<std::string> parsedLine)
 				std::vector<std::vector<char> > serverModes;
 				std::vector<std::pair<char, char> > prefixes;
 				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
-				serverModes = servIter->second->getChanModes();
-				prefixes = servIter->second->getPrefixes();
+				serverModes = servIter->second->channelModes();
+				prefixes = servIter->second->prefixes();
 				short category = 0;
 				bool found = false;
 				for (unsigned int j = 0; j < prefixes.size(); j++) {
@@ -549,7 +549,7 @@ void Base::callQuitHook(std::string server) {
 bool Base::isChanType(char chanPrefix, std::string server) {
 	if (servers.find(server) == servers.end())
 		return false;
-	std::vector<char> prefixes = servers.find(server)->second->getChanTypes();
+	std::vector<char> prefixes = servers.find(server)->second->channelTypes();
 	for (unsigned int i = 0; i < prefixes.size(); i++) {
 		if (chanPrefix == prefixes[i])
 			return true;
@@ -557,77 +557,77 @@ bool Base::isChanType(char chanPrefix, std::string server) {
 	return false;
 }
 
-std::list<std::string> Base::getServers() {
-	std::list<std::string> serverList;
+std::list<std::string> Base::serverList() {
+	std::list<std::string> listOfServers;
 	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
-		serverList.insert(serverList.end(), servIter->first);
-	return serverList;
+		listOfServers.insert(listOfServers.end(), servIter->first);
+	return listOfServers;
 }
 
-std::tr1::unordered_map<std::string, Module*> Base::getModules() {
+std::tr1::unordered_map<std::string, Module*> Base::loadedModules() {
 	return modules;
 }
 
-std::multimap<std::string, std::string> Base::getModuleAbilities() {
+std::multimap<std::string, std::string> Base::moduleAbilities() {
 	return modAbilities;
 }
 
-std::tr1::unordered_map<std::string, std::vector<std::string> > Base::getModuleSupports() {
+std::tr1::unordered_map<std::string, std::vector<std::string> > Base::moduleSupports() {
 	return modSupports;
 }
 
-std::list<std::string> Base::getChannels(std::string server) {
+std::list<std::string> Base::channels(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> ();
-	return servIter->second->getChannels();
+	return servIter->second->channels();
 }
 
-std::string Base::getChannelTopic(std::string server, std::string channel) {
+std::string Base::channelTopic(std::string server, std::string channel) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
-	return servIter->second->getChannelTopic(channel);
+	return servIter->second->channelTopic(channel);
 }
 
-std::list<std::string> Base::getChannelUsers(std::string server, std::string channel) {
+std::list<std::string> Base::channelUsers(std::string server, std::string channel) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> (); // return empty list to those who cannot provide a valid server name
-	return servIter->second->getChannelUsers(channel);
+	return servIter->second->channelUsers(channel);
 }
 
-std::string Base::getUserIdent(std::string server, std::string channel, std::string user) {
+std::string Base::userIdent(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
-	return servIter->second->getUserIdent(channel, user);
+	return servIter->second->userIdent(channel, user);
 }
 
-std::string Base::getUserHost(std::string server, std::string channel, std::string user) {
+std::string Base::userHost(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
-	return servIter->second->getUserHost(channel, user);
+	return servIter->second->userHost(channel, user);
 }
 
-std::pair<char, char> Base::getUserStatus(std::string server, std::string channel, std::string user) {
+std::pair<char, char> Base::userStatus(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::pair<char, char> ('0', ' '); // pair for normal user
-	return servIter->second->getUserStatus(channel, user);
+	return servIter->second->userStatus(channel, user);
 }
 
 void Base::rehash() {
 	ConfigReader config (configName, directory);
 	serverConfigs.clear();
-	serverConfigs = config.getServerConfig(true);
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.getServerConfig(false);
+	serverConfigs = config.servers(true);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.servers(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servIter = serverConf.begin(); servIter != serverConf.end(); ++servIter)
 		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servIter->first, servIter->second));
 	moduleConfigs.clear();
-	moduleConfigs = config.getModConfig(true);
-	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.getModConfig(false);
+	moduleConfigs = config.modules(true);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.modules(false);
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConf.begin(); modIter != moduleConf.end(); ++modIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modIter->first, modIter->second));
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConfigs.begin(); modIter != moduleConfigs.end(); ++modIter) {

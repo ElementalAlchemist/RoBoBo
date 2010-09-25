@@ -155,13 +155,13 @@ void ConfigReader::readConfig(std::string filename, std::string filedir) {
 		readConfig(includes[i], filedir);
 }
 
-std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getServerConfig(bool connecting) {
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::servers(bool connecting) {
 	if (connecting)
 		return serverConfig;
 	return serverKeepConfig;
 }
 
-std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::getModConfig(bool loading) {
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > ConfigReader::modules(bool loading) {
 	if (loading)
 		return modLoadConfig;
 	return modKeepConfig;

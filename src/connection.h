@@ -61,17 +61,17 @@ class Server {
 		bool stillConnected();
 		bool shouldReset();
 		void sendLine(std::string line);
-		std::tr1::unordered_map<std::string, std::string> getInfo();
-		std::vector<std::pair<char, char> > getPrefixes();
-		std::vector<std::vector<char> > getChanModes();
-		std::vector<char> getChanTypes();
+		std::tr1::unordered_map<std::string, std::string> info();
+		std::vector<std::pair<char, char> > prefixes();
+		std::vector<std::vector<char> > channelModes();
+		std::vector<char> channelTypes();
 		void resyncChannels();
-		std::list<std::string> getChannels();
-		std::string getChannelTopic(std::string channel);
-		std::list<std::string> getChannelUsers(std::string channel);
-		std::string getUserIdent(std::string channel, std::string user);
-		std::string getUserHost(std::string channel, std::string user);
-		std::pair<char, char> getUserStatus(std::string channel, std::string user);
+		std::list<std::string> channels();
+		std::string channelTopic(std::string channel);
+		std::list<std::string> channelUsers(std::string channel);
+		std::string userIdent(std::string channel, std::string user);
+		std::string userHost(std::string channel, std::string user);
+		std::pair<char, char> userStatus(std::string channel, std::string user);
 	private:
 		std::string serverName;
 		unsigned short debugLevel;

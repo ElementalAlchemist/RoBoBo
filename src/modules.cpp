@@ -191,7 +191,7 @@ void Module::rehashBot() {
 	serverData->rehash();
 }
 
-unsigned int Module::getBotVersion() {
+unsigned int Module::botVersion() {
 	return 1900; // 2.0.0-devel
 }
 
@@ -248,54 +248,54 @@ std::string Module::stripColors(std::string message) {
 	return message;
 }
 
-std::list<std::string> Module::getServers() {
-	return serverData->getServers();
+std::list<std::string> Module::servers() {
+	return serverData->serverList();
 }
 
-std::tr1::unordered_map<std::string, Module*> Module::getModules() {
-	return serverData->getModules();
+std::tr1::unordered_map<std::string, Module*> Module::modules() {
+	return serverData->loadedModules();
 }
 
-std::multimap<std::string, std::string> Module::getModAbilities() {
-	return serverData->getModuleAbilities();
+std::multimap<std::string, std::string> Module::modAbilities() {
+	return serverData->moduleAbilities();
 }
 
-std::tr1::unordered_map<std::string, std::vector<std::string> > Module::getModSupports() {
-	return serverData->getModuleSupports();
+std::tr1::unordered_map<std::string, std::vector<std::string> > Module::modSupports() {
+	return serverData->moduleSupports();
 }
 
-std::tr1::unordered_map<std::string, std::string> Module::getServerData(std::string server) {
-	return serverData->getServerData(server);
+std::tr1::unordered_map<std::string, std::string> Module::serverData(std::string server) {
+	return serverData->serverData(server);
 }
 
-std::vector<std::vector<char> > Module::getServerChanModes(std::string server) {
-	return serverData->getServerChanModes(server);
+std::vector<std::vector<char> > Module::serverChanModes(std::string server) {
+	return serverData->serverChanModes(server);
 }
 
-std::vector<std::pair<char, char> > Module::getServerPrefixes(std::string server) {
-	return serverData->getServerPrefixes(server);
+std::vector<std::pair<char, char> > Module::serverPrefixes(std::string server) {
+	return serverData->serverPrefixes(server);
 }
 
-std::list<std::string> Module::getChannels(std::string server) {
-	return serverData->getChannels(server);
+std::list<std::string> Module::channels(std::string server) {
+	return serverData->channels(server);
 }
 
-std::string Module::getChannelTopic(std::string server, std::string channel) {
-	return serverData->getChannelTopic(server, channel);
+std::string Module::channelTopic(std::string server, std::string channel) {
+	return serverData->channelTopic(server, channel);
 }
 
-std::list<std::string> Module::getChannelUsers(std::string server, std::string channel) {
-	return serverData->getChannelUsers(server, channel);
+std::list<std::string> Module::channelUsers(std::string server, std::string channel) {
+	return serverData->channelUsers(server, channel);
 }
 
-std::string Module::getUserIdent(std::string server, std::string channel, std::string user) {
-	return serverData->getUserIdent(server, channel, user);
+std::string Module::userIdent(std::string server, std::string channel, std::string user) {
+	return serverData->userIdent(server, channel, user);
 }
 
-std::string Module::getUserHost(std::string server, std::string channel, std::string user) {
-	return serverData->getUserHost(server, channel, user);
+std::string Module::userHost(std::string server, std::string channel, std::string user) {
+	return serverData->userHost(server, channel, user);
 }
 
-std::pair<char, char> Module::getUserStatus(std::string server, std::string channel, std::string user) {
-	return serverData->getUserStatus(server, channel, user);
+std::pair<char, char> Module::userStatus(std::string server, std::string channel, std::string user) {
+	return serverData->userStatus(server, channel, user);
 }
