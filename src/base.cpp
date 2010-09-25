@@ -39,7 +39,7 @@ void Base::sendToServer(std::string server, std::string rawLine) {
 	serverIter->second->sendLine(rawLine);
 }
 
-std::tr1::unordered_map<std::string, std::string> Base::serverInfo(std::string server) {
+std::tr1::unordered_map<std::string, std::string> Base::serverData(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::tr1::unordered_map<std::string, std::string> (); // a blank map for a nonexistent server
