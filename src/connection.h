@@ -11,7 +11,7 @@
 // Forward declarations
 class Server;
 class Channel;
-class ModuleInterface;
+class Base;
 
 class User {
 	public:
@@ -55,7 +55,7 @@ class Channel {
 
 class Server {
 	public:
-		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug);
+		Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* modFace, unsigned short debug);
 		~Server();
 		void connectServer();
 		bool stillConnected();
@@ -77,7 +77,7 @@ class Server {
 		unsigned short debugLevel;
 		bool registered, altChanged, quitHooked, keepServer;
 		Socket serverConnection;
-		ModuleInterface* moduleData;
+		Base* moduleData;
 		pthread_t dataReceiveThread;
 		pthread_t dataSendThread;
 		pthread_t secondDecrementThread;

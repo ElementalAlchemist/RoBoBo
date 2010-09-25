@@ -60,6 +60,6 @@ int main(int argc, char** argv) {
 	std::cout << "RoBoBo-IRC-BoBo started." << std::endl;
 	if (debug == 0)
 		daemon(1,0);
-	new ModuleInterface (confDir, confName, debug); //run actual bot
+	new Base (confDir, confName, debug); //run actual bot
 	pthread_exit(NULL);
 }

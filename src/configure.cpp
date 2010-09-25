@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv) {
 	std::string mainMakefile = "default:\n\tmake -C src/\n\tmv src/robobo .\n\tmv src/modules/*.so modules\n\ndebug:\n\tmake debug -C src/\n\tmv src/robobo .\n\tmv src/modules/*.so modules\n\nclean:\n\tmake clean -C src/\n\trm -f robobo\n\trm -f modules/*.so\n\t@echo \"Clean has been made.\"";
-	std::string moduleMakefileBegin = "CXX = g++\nCXXFLAGS=-fPIC -Wall -pipe -ansi $(DEBUG)\nLDFLAGS=-shared\nDEPS=modinclude.h ../main.h ../connection.h ../modules.h ../config.cpp ../modules.cpp ../modinterface.cpp\n\nall: ";
+	std::string moduleMakefileBegin = "CXX = g++\nCXXFLAGS=-fPIC -Wall -pipe -ansi $(DEBUG)\nLDFLAGS=-shared\nDEPS=modinclude.h ../main.h ../connection.h ../modules.h ../config.cpp ../modules.cpp ../base.cpp\n\nall: ";
 	std::string moduleMakefileEnd = ".PHONY: clean\n\nclean:\n\trm -f *.o *.so";
 	std::ofstream makeOut;
 	std::string dir = argv[0];

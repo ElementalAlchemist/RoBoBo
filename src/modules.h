@@ -5,13 +5,13 @@
 #include <dlfcn.h>
 #include <map>
 
-class ModuleInterface; // Forward declaration
+class Base; // Forward declaration
 class Server; // Forward declaration
 class Module {
 	public:
 		virtual ~Module();
 		virtual int botAPIversion() = 0;
-		void init(std::tr1::unordered_map<std::string, std::string> modConf, ModuleInterface* modFace, std::string modName, unsigned short debug);
+		void init(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug);
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
 		virtual bool onLoadComplete();
 		virtual void onRehash();
@@ -104,12 +104,12 @@ class Module {
 		std::string getUserHost(std::string server, std::string channel, std::string user);
 		std::pair<char, char> getUserStatus(std::string server, std::string channel, std::string user);
 	private:
-		ModuleInterface* serverData;
+		Base* serverData;
 };
 
-class ModuleInterface {
+class Base {
 	public:
-		ModuleInterface(std::string confdir, std::string confname, unsigned short debug);
+		Base(std::string confdir, std::string confname, unsigned short debug);
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> getServerData(std::string server);
 		std::vector<std::vector<char> > getServerChanModes(std::string server);

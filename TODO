@@ -7,7 +7,7 @@ Current TODO List
 
 Before release.  Duh.
 =======================================
-[ ] - Rename ModuleInterface to Base or something
+[x] - Rename ModuleInterface to Base or something
 [ ] - Destroy the word "get"
 [ ] - Protocol modules!
 	[ ] - Move Socket class

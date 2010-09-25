@@ -1,7 +1,7 @@
 #include "modules.h"
 #include "connection.h"
 
-ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
+Base::Base(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
 	pthread_create(&serverCheckThread, &detachedState, serverCheck_thread, this); // start thread that checks for disconnected servers
@@ -32,35 +32,35 @@ ModuleInterface::ModuleInterface(std::string confdir, std::string confname, unsi
 		serverConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (servConfIter->first, servConfIter->second));
 }
 
-void ModuleInterface::sendToServer(std::string server, std::string rawLine) {
+void Base::sendToServer(std::string server, std::string rawLine) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return;
 	serverIter->second->sendLine(rawLine);
 }
 
-std::tr1::unordered_map<std::string, std::string> ModuleInterface::getServerData(std::string server) {
+std::tr1::unordered_map<std::string, std::string> Base::getServerData(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::tr1::unordered_map<std::string, std::string> (); // a blank map for a nonexistent server
 	return serverIter->second->getInfo();
 }
 
-std::vector<std::vector<char> > ModuleInterface::getServerChanModes(std::string server) {
+std::vector<std::vector<char> > Base::getServerChanModes(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::vector<char> > (); // Empty structure for whoever can't check the server list for real servers
 	return serverIter->second->getChanModes();
 }
 
-std::vector<std::pair<char, char> > ModuleInterface::getServerPrefixes(std::string server) {
+std::vector<std::pair<char, char> > Base::getServerPrefixes(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::pair<char, char> > ();
 	return serverIter->second->getPrefixes();
 }
 
-void ModuleInterface::callPreHook(std::string server, std::vector<std::string> parsedLine) {
+void Base::callPreHook(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "JOIN") {
 		std::string hostmask = parsedLine[0].substr(1);
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
@@ -143,7 +143,7 @@ void ModuleInterface::callPreHook(std::string server, std::vector<std::string> p
 	}
 }
 
-void ModuleInterface::callPostHook(std::string server, std::vector<std::string> parsedLine) {
+void Base::callPostHook(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "PRIVMSG") { // lots of things!
 		std::string from = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 		if (parsedLine[3][0] == (char)1) { // CTCP request
@@ -312,7 +312,7 @@ void ModuleInterface::callPostHook(std::string server, std::vector<std::string> 
 	}
 }
 
-std::string ModuleInterface::callHookOut(std::string server, std::vector<std::string> parsedLine) {
+std::string Base::callHookOut(std::string server, std::vector<std::string> parsedLine) {
 	std::string message = parsedLine[2];
 	if (parsedLine[0] == "PRIVMSG") {
 		if (message[0] == (char)1) {
@@ -449,7 +449,7 @@ std::string ModuleInterface::callHookOut(std::string server, std::vector<std::st
 	return "";
 }
 
-void ModuleInterface::callHookSend(std::string server, std::vector<std::string> parsedLine) {
+void Base::callHookSend(std::string server, std::vector<std::string> parsedLine) {
 	if (parsedLine[0] == "PRIVMSG") {
 		if (parsedLine[2][0] == (char)1) {
 			parsedLine[2] = parsedLine[2].substr(1);
@@ -531,22 +531,22 @@ void ModuleInterface::callHookSend(std::string server, std::vector<std::string> 
 	}
 }
 
-void ModuleInterface::callPreConnectHook(std::string server) {
+void Base::callPreConnectHook(std::string server) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 		modIter->second->onPreConnect(server);
 }
 
-void ModuleInterface::callConnectHook(std::string server) {
+void Base::callConnectHook(std::string server) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 		modIter->second->onConnect(server);
 }
 
-void ModuleInterface::callQuitHook(std::string server) {
+void Base::callQuitHook(std::string server) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.begin(); modIter != modules.end(); ++modIter)
 		modIter->second->onQuit(server);
 }
 
-bool ModuleInterface::isChanType(char chanPrefix, std::string server) {
+bool Base::isChanType(char chanPrefix, std::string server) {
 	if (servers.find(server) == servers.end())
 		return false;
 	std::vector<char> prefixes = servers.find(server)->second->getChanTypes();
@@ -557,68 +557,68 @@ bool ModuleInterface::isChanType(char chanPrefix, std::string server) {
 	return false;
 }
 
-std::list<std::string> ModuleInterface::getServers() {
+std::list<std::string> Base::getServers() {
 	std::list<std::string> serverList;
 	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
 		serverList.insert(serverList.end(), servIter->first);
 	return serverList;
 }
 
-std::tr1::unordered_map<std::string, Module*> ModuleInterface::getModules() {
+std::tr1::unordered_map<std::string, Module*> Base::getModules() {
 	return modules;
 }
 
-std::multimap<std::string, std::string> ModuleInterface::getModuleAbilities() {
+std::multimap<std::string, std::string> Base::getModuleAbilities() {
 	return modAbilities;
 }
 
-std::tr1::unordered_map<std::string, std::vector<std::string> > ModuleInterface::getModuleSupports() {
+std::tr1::unordered_map<std::string, std::vector<std::string> > Base::getModuleSupports() {
 	return modSupports;
 }
 
-std::list<std::string> ModuleInterface::getChannels(std::string server) {
+std::list<std::string> Base::getChannels(std::string server) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> ();
 	return servIter->second->getChannels();
 }
 
-std::string ModuleInterface::getChannelTopic(std::string server, std::string channel) {
+std::string Base::getChannelTopic(std::string server, std::string channel) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->getChannelTopic(channel);
 }
 
-std::list<std::string> ModuleInterface::getChannelUsers(std::string server, std::string channel) {
+std::list<std::string> Base::getChannelUsers(std::string server, std::string channel) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> (); // return empty list to those who cannot provide a valid server name
 	return servIter->second->getChannelUsers(channel);
 }
 
-std::string ModuleInterface::getUserIdent(std::string server, std::string channel, std::string user) {
+std::string Base::getUserIdent(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->getUserIdent(channel, user);
 }
 
-std::string ModuleInterface::getUserHost(std::string server, std::string channel, std::string user) {
+std::string Base::getUserHost(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->getUserHost(channel, user);
 }
 
-std::pair<char, char> ModuleInterface::getUserStatus(std::string server, std::string channel, std::string user) {
+std::pair<char, char> Base::getUserStatus(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::pair<char, char> ('0', ' '); // pair for normal user
 	return servIter->second->getUserStatus(channel, user);
 }
 
-void ModuleInterface::rehash() {
+void Base::rehash() {
 	ConfigReader config (configName, directory);
 	serverConfigs.clear();
 	serverConfigs = config.getServerConfig(true);
@@ -639,7 +639,7 @@ void ModuleInterface::rehash() {
 	}
 }
 
-bool ModuleInterface::connectServer(std::string serverName) {
+bool Base::connectServer(std::string serverName) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConfigs.find(serverName);
 	if (servConfIter == serverConfigs.end())
 		return false;
@@ -648,7 +648,7 @@ bool ModuleInterface::connectServer(std::string serverName) {
 	return true;
 }
 
-bool ModuleInterface::loadModule(std::string modName, bool startup) {
+bool Base::loadModule(std::string modName, bool startup) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConf = moduleConfigs.find(modName);
 	if (modConf == moduleConfigs.end()) { // give module a blank config and let the module reject it if it wants
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modName, std::tr1::unordered_map<std::string, std::string> ()));
@@ -698,7 +698,7 @@ bool ModuleInterface::loadModule(std::string modName, bool startup) {
 	return true;
 }
 
-void ModuleInterface::unloadModule(std::string modName) {
+void Base::unloadModule(std::string modName) {
 	if (modules.find(modName) == modules.end())
 		return;
 	moduleToUnload.push_back(modName);
@@ -706,13 +706,13 @@ void ModuleInterface::unloadModule(std::string modName) {
 	pthread_create(&tum, NULL, tUnloadMod_thread, this);
 }
 
-void* ModuleInterface::serverCheck_thread(void* ptr) {
-	ModuleInterface* modi = (ModuleInterface*) ptr;
+void* Base::serverCheck_thread(void* ptr) {
+	Base* modi = (Base*) ptr;
 	modi->serverCheck();
 	return NULL;
 }
 
-void ModuleInterface::serverCheck() {
+void Base::serverCheck() {
 	while (true) {
 		sleep(60); // one minute pause between checks
 		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
@@ -730,19 +730,19 @@ void ModuleInterface::serverCheck() {
 	}
 }
 
-bool ModuleInterface::charIsNumeric(char number) {
+bool Base::charIsNumeric(char number) {
 	if (number == '0' || number == '1' || number == '2' || number == '3' || number == '4' || number == '5' || number == '6' || number == '7' || number == '8' || number == '9')
 		return true;
 	return false;
 }
 
-void* ModuleInterface::tUnloadMod_thread(void* mip) {
-	ModuleInterface* modi = (ModuleInterface*) mip;
+void* Base::tUnloadMod_thread(void* mip) {
+	Base* modi = (Base*) mip;
 	modi->tUnloadMod();
 	return NULL;
 }
 
-void ModuleInterface::tUnloadMod() {
+void Base::tUnloadMod() {
 	if (moduleToUnload.empty())
 		return;
 	sleep(1);

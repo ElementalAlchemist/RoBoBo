@@ -1,7 +1,7 @@
 #include "connection.h"
 #include "modules.h"
 
-Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, ModuleInterface* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), keepServer(true), moduleData(modFace), serverConf(confVars) {
+Server::Server(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* modFace, unsigned short debug) : serverName(serverAddress), debugLevel(debug), keepServer(true), moduleData(modFace), serverConf(confVars) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
