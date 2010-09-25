@@ -3,13 +3,13 @@
 #ifndef USER_CPP
 #define USER_CPP
 User::User(Channel* thisChannel) : parentChannel(thisChannel), theIdent(""), theHost("") {
-	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->prefixes();
 	for (unsigned int i = 0; i < prefixes.size(); i++)
 		hasStatus.push_back(std::pair<char, bool> (prefixes[i].first, false));
 }
 
 User::User(std::string theTheIdent, std::string theTheHost, Channel* thisChannel) : parentChannel(thisChannel), theIdent(theTheIdent), theHost(theTheHost) {
-	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentChannel->parentServer->prefixes();
 	for (unsigned int i = 0; i < prefixes.size(); i++)
 		hasStatus.push_back(std::pair<char, bool> (prefixes[i].first, false));
 }

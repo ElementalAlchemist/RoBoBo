@@ -9,7 +9,7 @@ void Channel::parseNames(std::vector<std::string> names) {
 		theUsers.clear();
 		namesSync = false;
 	}
-	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentServer->prefixes();
 	std::vector<char> modes;
 	for (unsigned int i = 0; i < names.size(); i++) {
 		for (unsigned int j = 0; j < prefixes.size(); j++) {
@@ -40,7 +40,7 @@ void Channel::mode(bool add, char mode, std::string param) {
 		parentServer->resyncChannels();
 		return;
 	}
-	std::vector<std::pair<char, char> > prefixes = parentServer->getPrefixes();
+	std::vector<std::pair<char, char> > prefixes = parentServer->prefixes();
 	for (unsigned int i = 0; i < prefixes.size(); i++) {
 		if (mode == prefixes[i].first) {
 			iter->second->status(add, mode);
