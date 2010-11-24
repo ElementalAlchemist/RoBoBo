@@ -10,7 +10,7 @@ Before release.  Duh.
 [x] - Rename ModuleInterface to Base or something
 [x] - Destroy the word "get"
 [>] - Protocol modules!
-	[ ] - Move Socket class
+	[x] - Move Socket class
 	[ ] - Move most of current connection stuff to p_client
 	[ ] - Protocol modules for current versions of popular IRCds
 		[ ] - InspIRCd
