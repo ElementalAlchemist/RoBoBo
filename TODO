@@ -11,7 +11,7 @@ Before release.  Duh.
 [x] - Destroy the word "get"
 [>] - Protocol modules!
 	[x] - Move Socket class
-	[ ] - Move most of current connection stuff to p_client
+	[x] - Move most of current connection stuff to p_client
 	[ ] - Protocol modules for current versions of popular IRCds
 		[ ] - InspIRCd
 		[ ] - Unreal 4 if/when it's ever released
@@ -20,10 +20,10 @@ Before release.  Duh.
 		[ ] - Protocol modules
 			[ ] - p_client - defaults with configurable changes
 		[ ] - Module API
-[ ] - Modular sockets: allow protocol modules to pick a socket class to use
+[>] - Modular sockets: allow protocol modules to pick a socket class to use
 	[ ] - allows more than just plaintext, e.g. SSL without stunnel, etc.
-[ ] - Change how users are handled (p_client)
-	[ ] - Server has channels and users
+[x] - Change how users are handled (p_client)
+	[x] - Server has channels and users
 [ ] - Provide a per-server option to bypass core flood control (clients only--servers don't need flood control)
 [ ] - Change module API to adjust, of course
 	[ ] - Server functions and client versions

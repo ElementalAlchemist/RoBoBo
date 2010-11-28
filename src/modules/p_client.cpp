@@ -47,7 +47,7 @@ class Client : public Protocol {
 		void secondsDecrement();
 		std::queue<std::string> dataToSend;
 		volatile unsigned int seconds;
-		bool registered, altChanged, quitHooked, keepServer, floodControl;
+		bool registered, altChanged, quitHooked, floodControl;
 		std::tr1::unordered_map<std::string, User*> users;
 		std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > channels;
 		std::tr1::unordered_map<std::string, bool> readingNames;

@@ -9,11 +9,11 @@ Protocol::~Protocol() {}
 void Protocol::connectServer() {}
 
 bool Protocol::stillConnected() {
-	return false;
+	return connection->isConnected();
 }
 
 bool Protocol::shouldReset() {
-	return false;
+	return !keepServer;
 }
 
 bool Protocol::isClient() {

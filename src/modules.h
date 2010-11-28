@@ -2,11 +2,11 @@
 #define MODULES_H
 #include "main.h"
 #include "config.h"
+#include "protocol.h"
 #include <dlfcn.h>
 #include <map>
 
 class Base; // Forward declaration
-class Server; // Forward declaration
 class Module {
 	public:
 		virtual ~Module();
@@ -139,7 +139,7 @@ class Base {
 		static void* serverCheck_thread(void* ptr);
 		void serverCheck();
 	private:
-		std::tr1::unordered_map<std::string, Server*> servers;
+		std::tr1::unordered_map<std::string, Protocol*> servers;
 		std::tr1::unordered_map<std::string, Module*> modules;
 		std::tr1::unordered_map<std::string, void*> moduleFiles;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfigs, moduleConfigs;

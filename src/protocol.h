@@ -1,9 +1,9 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 #include "main.h"
-#include "modules.h"
 #include "socket.h"
 
+class Base;
 class Protocol {
 	public:
 		Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug);
@@ -41,6 +41,7 @@ class Protocol {
 		virtual void sendOther(std::string rawLine);
 	protected:
 		std::string serverName;
+		bool keepServer;
 		unsigned short debugLevel;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		Socket* connection;
