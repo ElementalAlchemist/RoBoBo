@@ -1,5 +1,4 @@
-#include "modules.h"
-#include "connection.h"
+#include "base.h"
 
 Base::Base(std::string confdir, std::string confname, unsigned short debug) : debugLevel(debug), directory(confdir), configName(confname) {
 	pthread_attr_init(&detachedState);
@@ -618,6 +617,36 @@ std::pair<char, char> Base::userStatus(std::string server, std::string channel, 
 	return servIter->second->userStatus(channel, user);
 }
 
+Socket* Base::assignSocket(std::string socketType) {
+	void* openSocket;
+	if (socketFiles.find(socketType) == socketFiles.end()) {
+		std::string fileLoc = directory + "/modules/s_" + socketType + ".so";
+		openSocket = dlopen(fileLoc.c_str(), RTLD_NOW);
+		if (openSocket == NULL) {
+			std::string error = "Could not open socket type " + socketType + ": " + dlerror();
+			std::perror(error.c_str()); // debug level 1
+			return NULL;
+		}
+	} else
+		openSocket = socketFiles.find(socketType)->second;
+	module_spawn_t spawnSocket = (module_spawn_t) dlsym(openSocket, "spawn");
+	const char* dlsymError = dlerror();
+	if (dlsymError) {
+		std::string error = "Could not load socket type " + socketType + ": " + dlsymError;
+		std::perror(error.c_str()); // debug level 1
+		return NULL;
+	}
+	
+	Socket* newSocket = (Socket*) spawnSocket();
+	if (newSocket->apiVersion() != 2000) { // compare to current API version
+		dlclose(openSocket);
+		std::cout << "The socket type " << socketType << " that attempted to load is not compatible with this version of RoBoBo." << std::endl;
+		return NULL;
+	}
+	socketFiles.insert(std::pair<std::string, void*> (socketType, openSocket));
+	return newSocket;
+}
+
 void Base::rehash() {
 	ConfigReader config (configName, directory);
 	serverConfigs.clear();
@@ -657,11 +686,10 @@ bool Base::loadModule(std::string modName, bool startup) {
 	std::string fileLoc = directory + "/modules/" + modName;
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_NOW);
 	if (openModule == NULL) {
-		std::string error = "Could not load module " + modName + ": " + dlerror();
+		std::string error = "Could not open module " + modName + ": " + dlerror();
 		std::perror(error.c_str()); // debug level 1
 		return false;
 	}
-	typedef void* (*module_spawn_t)();
 	module_spawn_t spawnModule = (module_spawn_t) dlsym(openModule, "spawn");
 	const char* dlsymError = dlerror();
 	if (dlsymError) {
@@ -671,7 +699,7 @@ bool Base::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*)spawnModule();
-	if (newModule->botAPIversion() != 1100) { // compare to current API version
+	if (newModule->botAPIversion() != 2000) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
 		return false;

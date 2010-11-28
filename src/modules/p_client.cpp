@@ -140,6 +140,11 @@ unsigned int Client::apiVersion() {
 }
 
 void Client::connectServer() {
+	if (connection == NULL) {
+		std::cout << "p_client: " << serverName << ": Socket handle could not be obtained." << std::endl;
+		keepServer = false;
+		return;
+	}
 	botBase->callPreConnectHook(serverName);
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
