@@ -566,3 +566,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 void Client::parseNames(std::string namesList) {
 	
 }
+
+extern "C" Protocol* spawn() {
+	return new Client;
+}
