@@ -1,6 +1,8 @@
 #include "protocol.h"
 
-Protocol::Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : serverName(serverAddress), serverConf(confVars), botBase(theBase), debugLevel(debug) {}
+Protocol::Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : serverName(serverAddress), serverConf(confVars), botBase(theBase), debugLevel(debug) {
+	connection = theBase->assignSocket(confVars["sockettype"]);
+}
 
 Protocol::~Protocol() {}
 
@@ -64,7 +66,7 @@ void Protocol::setMode(std::string target, std::string mode) {}
 void Protocol::removeMode(std::string target, std::string mode) {}
 void Protocol::joinChannel(std::string channel, std::string key = "") {}
 void Protocol::partChannel(std::string channel, std::string reason = "") {}
-void Protocol::quitServer() {}
+void Protocol::quitServer(std::string reason) {}
 void Protocol::kickUser(std::string channel, std::string user, std::string reason) {}
 
 void Protocol::sendNumeric(std::string numeric, std::string target, std::vector<std::string> numericData) {}

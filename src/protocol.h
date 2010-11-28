@@ -1,6 +1,7 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 #include "main.h"
+#include "modules.h"
 #include "socket.h"
 
 class Protocol {
@@ -28,8 +29,9 @@ class Protocol {
 		virtual void removeMode(std::string target, std::string mode);
 		virtual void joinChannel(std::string channel, std::string key = "");
 		virtual void partChannel(std::string channel, std::string reason = "");
-		virtual void quitServer();
+		virtual void quitServer(std::string reason);
 		virtual void kickUser(std::string channel, std::string user, std::string reason);
+		virtual void changeNick(std::string newNick);
 		
 		virtual void sendNumeric(std::string numeric, std::string target, std::vector<std::string> numericData);
 		virtual void killUser(std::string user, std::string reason);
@@ -41,8 +43,7 @@ class Protocol {
 		std::string serverName;
 		unsigned short debugLevel;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
-	private:
-		Base* botBase;
 		Socket* connection;
+		Base* botBase;
 };
 #endif

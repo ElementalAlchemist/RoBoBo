@@ -33,7 +33,6 @@ void Server::connectServer() {
 	pthread_create(&dataSendThread, &detachedState, sendData_thread, this);
 }
 
-
 bool Server::stillConnected() {
 	return serverConnection.isConnected();
 }
