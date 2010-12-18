@@ -6,7 +6,7 @@
 #include <dlfcn.h>
 #include <map>
 
-class Base; // Forward declaration
+class Base;
 class Module {
 	public:
 		virtual ~Module();

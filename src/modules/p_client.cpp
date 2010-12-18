@@ -62,14 +62,13 @@ class Client : public Protocol {
 		std::string convertUserMode(char mode);
 		std::vector<std::string> parseLine(std::string rawLine);
 		void parse005(std::vector<std::string> parsedLine);
-		void parseNames(std::string namesList);
+		void parseNames(std::string channel, std::string namesList);
 };
 
 User::User(std::string ident, std::string host) : userIdent(ident), userHost(host) {}
 
 void User::ident(std::string ident) {
-	if (userIdent == "")
-		userIdent = ident;
+	userIdent = ident;
 }
 
 std::string User::ident() {
@@ -77,8 +76,7 @@ std::string User::ident() {
 }
 
 void User::host(std::string host) {
-	if (userHost == "")
-		userHost = host;
+	userHost = host;
 }
 
 std::string User::host() {
@@ -241,7 +239,7 @@ void Client::handleData() {
 				userIter->second->host(parsedLine[5]);
 			}
 		} else if (parsedLine[1] == "353") // NAMES reply
-			parseNames(parsedLine[5]);
+			parseNames(parsedLine[4], parsedLine[5]);
 		else if (parsedLine[1] == "366") // end of NAMES reply
 			readingNames[parsedLine[3]] = false;
 		else if (parsedLine[1] == "433" && !registered) { // nickname already in use
@@ -568,8 +566,63 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 	
 }
 
-void Client::parseNames(std::string namesList) {
-	
+void Client::parseNames(std::string channel, std::string namesList) {
+	if (!readingNames[channel]) {
+		for (std::list<std::string>::iterator nickIter = channels[channel].second.second.second.begin(); nickIter != channels[channel].second.second.second.end(); ++nickIter) {
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(*nickIter);
+			if (userIter == users.end())
+				continue;
+			userIter->second->removeChannel(channel);
+			if (userIter->second->channelList().empty()) {
+				delete userIter->second;
+				users.erase(userIter);
+			}
+		}
+		channels[channel].second.second.second.clear();
+		readingNames[channel] = true;
+	}
+	std::vector<std::string> names;
+	std::string name = "";
+	for (size_t i = 0; i < namesList.size(); i++) {
+		if (namesList[i] == ' ') {
+			names.push_back(name);
+			name = "";
+		} else
+			name += namesList[i];
+	}
+	if (name != "")
+		names.push_back(name);
+	for (unsigned int i = 0; i < names.size(); i++) {
+		std::vector<char> rank;
+		for (std::list<std::pair<char, char> >::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter) {
+			if ((*prefixIter).second == names[i][0]) {
+				rank.push_back((*prefixIter).first);
+				names[i] = names[i].substr(1);
+			}
+		}
+		std::string nick, ident = "", host = "";
+		size_t exclamation = names[i].find_first_of('!');
+		if (exclamation == std::string::npos)
+			nick = names[i];
+		else {
+			size_t at = names[i].find_first_of('@');
+			nick = names[i].substr(0, exclamation);
+			ident = names[i].substr(exclamation + 1, at - exclamation - 1);
+			host = names[i].substr(at + 1);
+		}
+		std::tr1::unordered_map<std::string, User*>::iterator joiningUser = users.find(nick);
+		if (joiningUser == users.end()) {
+			users.insert(std::pair<std::string, User*> (nick, new User(ident, host)));
+			joiningUser = users.find(nick);
+		} else {
+			joiningUser->second->ident(ident);
+			joiningUser->second->host(host);
+		}
+		channels[channel].second.second.second.insert(nick);
+		joiningUser->second->addChannel(channel);
+		for (unsigned int i = 0; i < rank.size(); i++)
+			joiningUser->second->status(channel, rank, true);
+	}
 }
 
 extern "C" Protocol* spawn() {
