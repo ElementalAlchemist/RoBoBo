@@ -92,3 +92,7 @@ std::string PlainText::receive() {
 	}
 	return "";
 }
+
+extern "C" Socket* spawn() {
+	return new PlainText;
+}
