@@ -54,6 +54,8 @@ class Client : public Protocol {
 		std::list<std::string> userModes;
 		std::list<std::pair<char, char> > prefixes;
 		std::vector<std::vector<char> > chanModes;
+		std::list<char> chanTypes;
+		unsigned int maxModes;
 		void setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param = "");
 		void setStatus(bool addMode, std::string channel, std::string status, std::string user);
 		char convertChanMode(std::string mode);
@@ -113,7 +115,7 @@ char User::status(std::string channel) {
 	return channels.find(channel)->second;
 }
 
-Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : Protocol(serverAddress, confVars, theBase, debug) {
+Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : Protocol(serverAddress, confVars, theBase, debug), maxModes(1) {
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
@@ -417,6 +419,17 @@ void Client::sendData() {
 			}
 			if (tempStr != "")
 				splitLine.push_back(tempStr);
+			if (splitLine.size() > maxModes) {
+				unsigned int i = 0;
+				std::vector<std::string> keepModes;
+				std::string newModeCommand = "MODE " + parsedLine[1];
+				for (; i < maxModes; i++)
+					keepModes.push_back(splitLine[i]);
+				for (; i < splitLine.size(); i++)
+					newModeCommand += " " + splitLine[i];
+				splitLine = keepModes;
+				dataToSend.push(newModeCommand);
+			}
 			for (unsigned int i = 0; i < splitLine.size(); i++) {
 				if (splitLine[i] == "cloak")
 					secondsToAdd = 6; // because cloaking/setting umode +x is apparently such an expensive operation.
@@ -563,7 +576,35 @@ std::vector<std::string> Client::parseLine(std::string rawLine) {
 }
 
 void Client::parse005(std::vector<std::string> parsedLine) {
-	
+	for (unsigned int i = 0; i < parsedLine.size(); i++) {
+		if (parsedLine[i].size() > 8 && parsedLine.substr(0, 7) == "PREFIX=") {
+			std::queue<char> prefixModes;
+			unsigned int j = 8;
+			for (; parsedLine[i][j] != ')'; j++)
+				prefixModes.push(parsedLine[i][j]);
+			for (j++; !prefixModes.empty(); j++) {
+				prefixes.push_back(std::pair<char, char> (prefixModes.front(), parsedLine[i][j]));
+				prefixModes.pop();
+			}
+		} else if (parsedLine[i].size() > 10 && parsedLine.substr(0, 10) == "CHANMODES=") {
+			std::vector<char> modes;
+			for (unsigned int j = 10; j < parsedLine[i].size(); j++) {
+				if (parsedLine[i][j] == ',') {
+					chanModes.push_back(modes);
+					modes.clear();
+				} else
+					modes.push_back(parsedLine[i][j]);
+			}
+			if (!modes.empty())
+				chanModes.push_back(modes);
+		} else if (parsedLine[i].size() > 10 && parsedLine.substr(0, 10) == "CHANTYPES=") {
+			for (unsigned int j = 10; j < parsedLine[i].size(); j++)
+				chanTypes.push_back(parsedLine[i][j]);
+		} else if (parsedLine[i].size() > 6 && parsedLine.substr(0, 6) == "MODES=") {
+			std::istringstream modeNum (parsedLine[i].substr(6));
+			modeNum >> maxModes;
+		}
+	}
 }
 
 void Client::parseNames(std::string channel, std::string namesList) {
