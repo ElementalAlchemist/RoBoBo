@@ -21,6 +21,7 @@ Cap::Cap() {
 	std::vector<std::string> theCore;
 	theCore.push_back("");
 	capCommands.insert(std::pair<std::string, std::vector<std::string> > ("multi-prefix", theCore));
+	capCommands.insert(std::pair<std::string, std::vector<std::string> > ("userhost-in-names", theCore));
 }
 
 int Cap::botAPIversion() {
