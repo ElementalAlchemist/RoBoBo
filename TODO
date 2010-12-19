@@ -34,7 +34,7 @@ Before release.  Duh.
 [ ] - Get rid of PROTOCTL NAMESX and just use CAP multi-prefix from 1.1
 [ ] - Use CAP userhost-in-names where possible rather than WHO
 	[ ] - Include the userhost-in-names CAP capability in m_cap as part of the core (like multi-prefix)
-	[ ] - Delegate the call to WHO to the NAMES processor in case the server doesn't support userhost-in-names
+	[x] - Delegate the call to WHO to the NAMES processor in case the server doesn't support userhost-in-names
 	[ ] - Consider whether to keep the WHOIS command sent on connect to get the bot's ident and host
 [ ] - User status class for each server
 	[ ] - keep status order

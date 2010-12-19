@@ -70,7 +70,8 @@ class Client : public Protocol {
 User::User(std::string ident, std::string host) : userIdent(ident), userHost(host) {}
 
 void User::ident(std::string ident) {
-	userIdent = ident;
+	if (ident != "")
+		userIdent = ident;
 }
 
 std::string User::ident() {
@@ -78,7 +79,8 @@ std::string User::ident() {
 }
 
 void User::host(std::string host) {
-	userHost = host;
+	if (host != "")
+		userHost = host;
 }
 
 std::string User::host() {
@@ -608,6 +610,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 }
 
 void Client::parseNames(std::string channel, std::string namesList) {
+	bool firstNames = false;
 	if (!readingNames[channel]) {
 		for (std::list<std::string>::iterator nickIter = channels[channel].second.second.second.begin(); nickIter != channels[channel].second.second.second.end(); ++nickIter) {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(*nickIter);
@@ -620,7 +623,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 			}
 		}
 		channels[channel].second.second.second.clear();
-		readingNames[channel] = true;
+		readingNames[channel] = firstNames = true;
 	}
 	std::vector<std::string> names;
 	std::string name = "";
@@ -663,6 +666,10 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		joiningUser->second->addChannel(channel);
 		for (unsigned int i = 0; i < rank.size(); i++)
 			joiningUser->second->status(channel, rank, true);
+	}
+	if (firstNames) {
+		if (users.find(name)->second->ident() == "" || users.find(name)->second->host() == "")
+			dataToSend.push("WHO " + channel);
 	}
 }
 
