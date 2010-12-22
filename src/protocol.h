@@ -39,6 +39,11 @@ class Protocol {
 		virtual void removeXLine(char lineType, std::string hostmask);
 		
 		virtual void sendOther(std::string rawLine);
+		
+		virtual void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
+		virtual std::list<std::string> clients();
+		virtual std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
+		virtual std::list<std::string> userModes(std::string client);
 	protected:
 		std::string serverName;
 		bool keepServer;

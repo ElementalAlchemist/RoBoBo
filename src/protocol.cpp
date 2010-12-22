@@ -14,53 +14,29 @@ bool Protocol::stillConnected() {
 	return connection->isConnected();
 }
 
-bool Protocol::shouldReset() {
-	return keepServer;
-}
+bool Protocol::shouldReset() { return keepServer; }
 
-bool Protocol::isClient() {
-	return false; // most protocol modules won't be clients
-}
+bool Protocol::isClient() { return false; } // most protocol modules won't be clients
 
-std::tr1::unordered_map<std::string, std::string> Protocol::info() {
-	return std::tr1::unordered_map<std::string, std::string> ();
-}
+std::tr1::unordered_map<std::string, std::string> Protocol::info() { return std::tr1::unordered_map<std::string, std::string> (); }
 
-std::list<std::pair<char, char> > Protocol::prefixes() { // for now; to be status class
-	return std::list<std::pair<char, char> > ();
-}
+std::list<std::pair<char, char> > Protocol::prefixes() { return std::list<std::pair<char, char> > (); } // for now; to be status class or similar
 
-std::vector<std::vector<char> > Protocol::channelModes() {
-	return std::vector<std::vector<char> > ();
-}
+std::vector<std::vector<char> > Protocol::channelModes() { return std::vector<std::vector<char> > (); }
 
-std::vector<char> Protocol::channelTypes() {
-	return std::vector<char> ();
-}
+std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
 
-std::list<std::string> Protocol::channels() {
-	return std::list<std::string> ();
-}
+std::list<std::string> Protocol::channels() { return std::list<std::string> (); }
 
-std::string Protocol::channelTopic(std::string channel) {
-	return "";
-}
+std::string Protocol::channelTopic(std::string channel) { return ""; }
 
-std::list<std::string> Protocol::channelUsers(std::string channel) {
-	return std::list<std::string> ();
-}
+std::list<std::string> Protocol::channelUsers(std::string channel) { return std::list<std::string> (); }
 
-std::string Protocol::userIdent(std::string user) {
-	return "";
-}
+std::string Protocol::userIdent(std::string user) { return ""; }
 
-std::string Protocol::userHost(std::string user) {
-	return "";
-}
+std::string Protocol::userHost(std::string user) { return ""; }
 
-std::pair<char, char> Protocol::userStatus(std::string channel, std::string user) {
-	return std::pair<char, char> ('0', ' ');
-}
+std::pair<char, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<char, char> ('0', ' '); }
 
 void Protocol::sendMsg(std::string target, std::string message) {}
 void Protocol::sendNotice(std::string target, std::string message) {}
@@ -77,3 +53,8 @@ void Protocol::setXLine(char lineType, std::string hostmask, std::string time, s
 void Protocol::removeXLine(char lineType, std::string hostmask) {}
 
 void Protocol::sendOther(std::string rawLine) {}
+
+void Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {}
+std::list<std::string> Protocol::clients() { return std::list<std::string> (); }
+std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
+std::list<std::string> Protocol::userModes(std::string client) { return std::list<char> (); }

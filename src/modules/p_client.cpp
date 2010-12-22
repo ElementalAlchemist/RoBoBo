@@ -35,6 +35,9 @@ class Client : public Protocol {
 		void kickUser(std::string channel, std::string user, std::string reason);
 		void changeNick(std::string newNick);
 		void sendOther(std::string rawLine);
+		std::list<std::string> clients();
+		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
+		std::list<char> userModes(std::string client);
 	private:
 		pthread_t receiveThread, sendThread, secondsThread;
 		pthread_attr_t detachedState;
@@ -51,7 +54,7 @@ class Client : public Protocol {
 		std::tr1::unordered_map<std::string, User*> users;
 		std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > channels;
 		std::tr1::unordered_map<std::string, bool> readingNames;
-		std::list<std::string> userModes;
+		std::list<std::string> uModes;
 		std::list<std::pair<char, char> > prefixes;
 		std::vector<std::vector<char> > chanModes;
 		std::list<char> chanTypes;
@@ -263,11 +266,11 @@ void Client::handleData() {
 						addMode = false;
 					else {
 						if (addMode)
-							userModes.push_back(convertUserMode(parsedLine[3][i]));
+							uModes.push_back(convertUserMode(parsedLine[3][i]));
 						else {
-							for (std::list<std::string>::iterator uModeIter = userModes.begin(); uModeIter != userModes.end(); ++uModeIter) {
+							for (std::list<std::string>::iterator uModeIter = uModes.begin(); uModeIter != uModes.end(); ++uModeIter) {
 								if (convertUserMode(parsedLine[3][i]) == *uModeIter) {
-									userModes.erase(uModeIter);
+									uModes.erase(uModeIter);
 									break;
 								}
 							}
@@ -671,6 +674,28 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		if (users.find(name)->second->ident() == "" || users.find(name)->second->host() == "")
 			dataToSend.push("WHO " + channel);
 	}
+}
+
+std::list<std::string> Client::clients() {
+	std::list<std::string> ircClients;
+	ircClients.push_back(serverConf["nick"]);
+	return ircClients;
+}
+
+std::tr1::unordered_map<std::string, std::string> Client::clientInfo(std::string client) {
+	std::tr1::unordered_map<std::string, std::string> info;
+	info.insert(std::pair<std::string, std::string> ("nick", serverConf["nick"]));
+	info.insert(std::pair<std::string, std::string> ("gecos", serverConf["gecos"]));
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(serverConf["nick"]);
+	if (userIter == users.end())
+		return info;
+	info.insert(std::pair<std::string, std::string> ("ident", userIter->second->ident()));
+	info.insert(std::pair<std::string, std::string> ("host", userIter->second->host()));
+	return info;
+}
+
+std::list<std::string> Client::userModes(std::string client) {
+	return uModes;
 }
 
 extern "C" Protocol* spawn() {
