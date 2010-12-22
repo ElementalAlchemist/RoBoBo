@@ -6,6 +6,8 @@
 #include <dlfcn.h>
 #include <map>
 
+enum Priority { HIGH, MEDIUM_HIGH, NORMAL, MEDIUM_LOW, LOW };
+
 class Base;
 class Module {
 	public:
@@ -13,6 +15,7 @@ class Module {
 		virtual int botAPIversion() = 0;
 		void init(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug);
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
+		virtual Priority receivePriority();
 		virtual bool onLoadComplete();
 		virtual void onRehash();
 		virtual void onModuleChange();

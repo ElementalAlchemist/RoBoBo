@@ -177,8 +177,13 @@ void Client::sendNotice(std::string target, std::string message) {
 	dataToSend.push("NOTICE " + target + " :" + message);
 }
 
-void Client::setMode(std::string target, std::string mode);
-void Client::removeMode(std::string target, std::string mode);
+void Client::setMode(std::string target, std::string mode) {
+	
+}
+
+void Client::removeMode(std::string target, std::string mode) {
+	
+}
 
 void Client::joinChannel(std::string channel, std::string key) {
 	if (key == "")

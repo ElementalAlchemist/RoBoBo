@@ -18,6 +18,13 @@ class Base {
 		void callPreConnectHook(std::string server);
 		void callConnectHook(std::string server);
 		void callQuitHook(std::string server);
+		void callPreModulesHook(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
+		void callPostModulesHook(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
+		std::string callModulesHookOut(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
+		void callModulesHookSend(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
+		void callPreConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
+		void callConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
+		void callQuitModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
 		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> loadedModules();
 		std::list<std::string> serverList();
@@ -38,7 +45,7 @@ class Base {
 		void serverCheck();
 	private:
 		std::tr1::unordered_map<std::string, Protocol*> servers;
-		std::tr1::unordered_map<std::string, Module*> modules;
+		std::tr1::unordered_map<std::string, Module*> highModules, mediumHighModules, normalModules, mediumLowModules, lowModules;
 		std::tr1::unordered_map<std::string, void*> moduleFiles;
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfigs, moduleConfigs;
 		std::multimap<std::string, std::string> modAbilities;

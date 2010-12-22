@@ -13,6 +13,8 @@ void Module::reconf(std::tr1::unordered_map<std::string, std::string> modConf) {
 	config = modConf;
 }
 
+Priority Module::receivePriority() { return NORMAL; }
+
 bool Module::onLoadComplete() { return true; }
 
 void Module::onRehash() {}
