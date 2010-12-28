@@ -320,7 +320,7 @@ void Server::sendData() {
 				sendingMessage = outData.front();
 				parsedLine = parseLine(sendingMessage);
 				unsigned short limit = 1;
-				while (!outData.empty() && parsedLine[0] == "MODE" && parsedLine[1] == channel && limit <= maxModes && std::string(":" + serverConf["nick"] + "!" + serverConf["ident"] + "@" + serverConf["host"] + " MODE " + channel + " " + modes + parsedLine[2] + " " + params + (parsedLine.size() > 3 ? (" " + parsedLine[3]) : "")).size() <= 510) {
+				while (!outData.empty() && parsedLine[0] == "MODE" && parsedLine[1] == channel && limit < maxModes && std::string(":" + serverConf["nick"] + "!" + serverConf["ident"] + "@" + serverConf["host"] + " MODE " + channel + " " + modes + parsedLine[2] + " " + params + (parsedLine.size() > 3 ? (" " + parsedLine[3]) : "")).size() <= 510) {
 					outData.pop(); // remove the message we are parsing
 					if ((parsedLine[2][0] == '+') == addingMode) // if we're doing the same thing as the operation already occurring on the mode string
 						modes += parsedLine[2][1];
