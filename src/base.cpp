@@ -823,7 +823,7 @@ bool Base::loadModule(std::string modName, bool startup) {
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modName, std::tr1::unordered_map<std::string, std::string> ()));
 		modConf = moduleConfigs.find(modName);
 	}
-	std::string fileLoc = directory + "/modules/" + modName;
+	std::string fileLoc = directory + "/modules/m_" + modName + ".so";
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_NOW);
 	if (openModule == NULL) {
 		std::string error = "Could not open module " + modName + ": " + dlerror();

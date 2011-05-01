@@ -15,11 +15,11 @@ Before release.  Duh.
 	[ ] - Protocol modules for current versions of popular IRCds
 		[ ] - InspIRCd
 		[ ] - maybe others?
-	[ ] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
+	[>] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
 		[ ] - Protocol modules
 			[>] - p_client - defaults with configurable changes
-		[ ] - Module API
-[>] - Modular sockets: allow protocol modules to pick a socket class to use
+		[>] - Module API
+[x] - Modular sockets: allow protocol modules to pick a socket class to use
 	[ ] - allows more than just plaintext, e.g. SSL without stunnel, etc.
 [x] - Change how users are handled (p_client)
 	[x] - Server has channels and users
@@ -37,6 +37,6 @@ Before release.  Duh.
 [ ] - User status class for each server
 	[ ] - keep status order
 	[ ] - overloaded operators for comparisons
-[ ] - Configuration: remove the need for users to type the m_ prefix and the .so extension
-	[ ] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
+[x] - Configuration: remove the need for users to type the m_ prefix and the .so extension
+	[x] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
 [ ] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo
