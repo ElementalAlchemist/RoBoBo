@@ -721,9 +721,10 @@ void ModuleInterface::serverCheck() {
 				delete servIter->second;
 				if (debugLevel >= 2)
 					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
-				if (restartServer)
+				if (restartServer) {
 					servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
-				else
+					servIter->second->connectServer();
+				} else
 					servers.erase(servIter);
 			}
 		}
