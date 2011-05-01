@@ -748,10 +748,34 @@ void Base::rehash() {
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConf.begin(); modIter != moduleConf.end(); ++modIter)
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modIter->first, modIter->second));
 	for (std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modIter = moduleConfigs.begin(); modIter != moduleConfigs.end(); ++modIter) {
-		std::tr1::unordered_map<std::string, Module*>::iterator module = modules.find(modIter->first);
-		if (module != modules->end()) {
+		std::tr1::unordered_map<std::string, Module*>::iterator module = highModules.find(modIter->first);
+		if (module != highModules.end()) {
 			module->second->reconf(modIter->second);
 			module->second->onRehash();
+		} else {
+			module = mediumHighModules.find(modIter->first);
+			if (module != mediumHighModules.end()) {
+				module->second->reconf(modIter->second);
+				module->second->onRehash();
+			} else {
+				module = normalModules.find(modIter->first);
+				if (module != normalModules.end()) {
+					module->second->reconf(modIter->second);
+					module->second->onRehash();
+				} else {
+					module = mediumLowModules.find(modIter->first);
+					if (module != mediumLowModules.end()) {
+						module->second->reconf(modIter->second);
+						module->second->onRehash();
+					} else {
+						module = lowModules.find(modIter->first);
+						if (module != lowModules.end()) {
+							module->second->reconf(modIter->second);
+							module->second->onRehash();
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -845,7 +869,23 @@ bool Base::loadModule(std::string modName, bool startup) {
 		modSupports[supports[i]].push_back(modName);
 	if (!startup) {
 		if (newModule->onLoadComplete()) {
-			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->begin(); modIter != modules->end(); ++modIter) {
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter) {
+				if (modIter->first != modName)
+					modIter->second->onModuleChange();
+			}
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter) {
+				if (modIter->first != modName)
+					modIter->second->onModuleChange();
+			}
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter) {
+				if (modIter->first != modName)
+					modIter->second->onModuleChange();
+			}
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter) {
+				if (modIter->first != modName)
+					modIter->second->onModuleChange();
+			}
+			for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter) {
 				if (modIter->first != modName)
 					modIter->second->onModuleChange();
 			}
