@@ -40,28 +40,28 @@ Base::Base(std::string confdir, std::string confname, unsigned short debug) : de
 }
 
 void Base::sendToServer(std::string server, std::string rawLine) {
-	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return;
-	serverIter->second->sendLine(rawLine);
+	serverIter->second->sendLine(rawLine); // change to suit new protocol function format
 }
 
 std::tr1::unordered_map<std::string, std::string> Base::serverData(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::tr1::unordered_map<std::string, std::string> (); // a blank map for a nonexistent server
 	return serverIter->second->info();
 }
 
 std::vector<std::vector<char> > Base::serverChanModes(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::vector<char> > (); // Empty structure for whoever can't check the server list for real servers
 	return serverIter->second->channelModes();
 }
 
 std::vector<std::pair<char, char> > Base::serverPrefixes(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator serverIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::pair<char, char> > ();
 	return serverIter->second->prefixes();
@@ -178,7 +178,7 @@ void Base::callPreModulesHook(std::string server, std::vector<std::string> parse
 			else {
 				std::vector<std::vector<char> > serverModes;
 				std::vector<std::pair<char, char> > prefixes;
-				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+				std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 				serverModes = servIter->second->channelModes();
 				prefixes = servIter->second->prefixes();
 				short category = 0;
@@ -341,7 +341,7 @@ void Base::callPostModulesHook(std::string server, std::vector<std::string> pars
 			else {
 				std::vector<std::vector<char> > serverModes;
 				std::vector<std::pair<char, char> > prefixes;
-				std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+				std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 				serverModes = servIter->second->channelModes();
 				prefixes = servIter->second->prefixes();
 				short category = 0;
@@ -635,7 +635,7 @@ bool Base::isChanType(char chanPrefix, std::string server) {
 
 std::list<std::string> Base::serverList() {
 	std::list<std::string> listOfServers;
-	for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
+	for (std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
 		listOfServers.insert(listOfServers.end(), servIter->first);
 	return listOfServers;
 }
@@ -664,42 +664,42 @@ std::tr1::unordered_map<std::string, std::vector<std::string> > Base::moduleSupp
 }
 
 std::list<std::string> Base::channels(std::string server) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> ();
 	return servIter->second->channels();
 }
 
 std::string Base::channelTopic(std::string server, std::string channel) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->channelTopic(channel);
 }
 
 std::list<std::string> Base::channelUsers(std::string server, std::string channel) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> (); // return empty list to those who cannot provide a valid server name
 	return servIter->second->channelUsers(channel);
 }
 
 std::string Base::userIdent(std::string server, std::string channel, std::string user) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->userIdent(channel, user);
 }
 
 std::string Base::userHost(std::string server, std::string channel, std::string user) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->userHost(channel, user);
 }
 
 std::pair<char, char> Base::userStatus(std::string server, std::string channel, std::string user) {
-	std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.find(server);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::pair<char, char> ('0', ' '); // pair for normal user
 	return servIter->second->userStatus(channel, user);
@@ -717,7 +717,7 @@ Socket* Base::assignSocket(std::string socketType) {
 		}
 	} else
 		openSocket = socketFiles.find(socketType)->second;
-	module_spawn_t spawnSocket = (module_spawn_t) dlsym(openSocket, "spawn");
+	socket_spawn_t spawnSocket = (socket_spawn_t) dlsym(openSocket, "spawn");
 	const char* dlsymError = dlerror();
 	if (dlsymError) {
 		std::string error = "Could not load socket type " + socketType + ": " + dlsymError;
@@ -760,7 +760,35 @@ bool Base::connectServer(std::string serverName) {
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator servConfIter = serverConfigs.find(serverName);
 	if (servConfIter == serverConfigs.end())
 		return false;
-	servers.insert(std::pair<std::string, Server*> (serverName, new Server (serverName, servConfIter->second, this, debugLevel)));
+	if (servConfIter->second["protocol"] == "")
+		return false;
+	void* protoFile;
+	if (protocolFiles.find(servConfIter->second["protocol"]) == protocolFiles.end()) {
+		std::string fileLoc = "/modules/p_" + servConfIter->second["protocol"] + ".so";
+		protoFile = dlopen(fileLoc.c_str, RTLD_NOW);
+		if (protoFile == NULL) {
+			std::string error = "Could not open protocol " + servConfIter->second["protocol"] + ": " + dlerror();
+			std::perror(error.c_str()); // debug level 1
+			return false;
+		}
+	} else
+		protoFile = protocolFiles.find(servConfIter->second["protocol"])->second;
+	proto_spawn_t spawnProto = (proto_spawn_t) dlsym(protoFile, "spawn");
+	const char* dlsymError = dlerror();
+	if (dlsymError) {
+		std::string error = "Could not open protocol " + servConfIter->second["protocol"] + ": " + dlsymError;
+		std::perror(error.c_str()); // debug level 1
+		return false;
+	}
+	
+	Protocol* newProto = (Protocol*) spawnProto(serverName, servConfIter->second, this, debugLevel);
+	if (newProto->apiVersion() != 2000) { // compare to current API version
+		dlclose(protoFile);
+		std::cout << "The protocol type " << servConfIter->second["protocol"] << " that attempted to load is not compatible with this version of RoBoBo." << std::endl;
+		return false;
+	}
+	protocolFiles.insert(std::pair<std::string, void*> (servConfIter->second["protocol"], protoFile));
+	servers.insert(std::pair<std::string, Protocol*> (serverName, newProto));
 	servers.find(serverName)->second->connectServer();
 	return true;
 }
@@ -786,13 +814,12 @@ bool Base::loadModule(std::string modName, bool startup) {
 		return false;
 	}
 	
-	Module* newModule = (Module*)spawnModule();
+	Module* newModule = (Module*) spawnModule(modConf->second, this, modName, debugLevel);
 	if (newModule->botAPIversion() != 2000) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
 		return false;
 	}
-	newModule->init(modConf->second, this, modName, debugLevel);
 	switch (newModule->receivePriority()) {
 		case HIGH:
 			highModules.insert(std::pair<std::string, Module*> (modName, newModule));

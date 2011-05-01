@@ -14,7 +14,6 @@ Before release.  Duh.
 	[x] - Move most of current connection stuff to p_client
 	[ ] - Protocol modules for current versions of popular IRCds
 		[ ] - InspIRCd
-		[ ] - Unreal 4 if/when it's ever released
 		[ ] - maybe others?
 	[ ] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
 		[ ] - Protocol modules

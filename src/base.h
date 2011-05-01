@@ -2,7 +2,9 @@
 #define BASE_H
 #include "modules.h"
 
-typedef void* (*module_spawn_t)();
+typedef void* (*module_spawn_t)(std::tr1::unordered_map<std::string, std::string>, Base*, std::string, unsigned short);
+typedef void* (*proto_spawn_t)(std::string, std::tr1::unordered_map<std::string, std::string>, Base*, unsigned short);
+typedef void* (*socket_spawn_t)();
 
 class Base {
 	public:
@@ -50,6 +52,7 @@ class Base {
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfigs, moduleConfigs;
 		std::multimap<std::string, std::string> modAbilities;
 		std::tr1::unordered_map<std::string, std::vector<std::string> > modSupports;
+		std::tr1::unordered_map<std::string, void*> protocolFiles;
 		std::tr1::unordered_map<std::string, void*> socketFiles;
 		unsigned short debugLevel;
 		std::string directory;
