@@ -911,14 +911,16 @@ void* Base::serverCheck_thread(void* ptr) {
 void Base::serverCheck() {
 	while (true) {
 		sleep(60); // one minute pause between checks
-		for (std::tr1::unordered_map<std::string, Server*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+		for (std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
 			if (!servIter->second->stillConnected()) {
 				bool restartServer = servIter->second->shouldReset();
 				delete servIter->second;
+				std::string serverName = servIter->first;
+				servers.erase(servIter);
 				if (debugLevel >= 2)
-					std::cout << servIter->second << " lost connection.  Reconnecting..." << std::endl;
+					std::cout << serverName << " lost connection.  Reconnecting..." << std::endl;
 				if (restartServer)
-					servIter->second = new Server(servIter->first, serverConfigs[servIter->first], this, debugLevel); // make new server for reconnecting
+					connectServer(serverName); // make new server for reconnecting
 				else
 					servers.erase(servIter);
 			}
