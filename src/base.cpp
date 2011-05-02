@@ -60,10 +60,10 @@ std::vector<std::vector<char> > Base::serverChanModes(std::string server) {
 	return serverIter->second->channelModes();
 }
 
-std::vector<std::pair<char, char> > Base::serverPrefixes(std::string server) {
+std::list<std::pair<char, char> > Base::serverPrefixes(std::string server) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
-		return std::vector<std::pair<char, char> > ();
+		return std::list<std::pair<char, char> > ();
 	return serverIter->second->prefixes();
 }
 
@@ -84,23 +84,23 @@ void Base::callPostHook(std::string server, std::vector<std::string> parsedLine)
 }
 
 std::string Base::callHookOut(std::string server, std::vector<std::string> parsedLine) {
-	std::string resultMessage = callHookOut(server, parsedLine, &highModules);
+	std::string resultMessage = callModulesHookOut(server, parsedLine, &highModules);
 	if (resultMessage == "")
 		return "";
 	parsedLine[2] = resultMessage;
-	resultMessage = callHookOut(server, parsedLine, &mediumHighModules);
+	resultMessage = callModulesHookOut(server, parsedLine, &mediumHighModules);
 	if (resultMessage == "")
 		return "";
 	parsedLine[2] = resultMessage;
-	resultMessage = callHookOut(server, parsedLine, &normalModules);
+	resultMessage = callModulesHookOut(server, parsedLine, &normalModules);
 	if (resultMessage == "")
 		return "";
 	parsedLine[2] = resultMessage;
-	resultMessage = callHookOut(server, parsedLine, &mediumLowModules);
+	resultMessage = callModulesHookOut(server, parsedLine, &mediumLowModules);
 	if (resultMessage == "")
 		return "";
 	parsedLine[2] = resultMessage;
-	resultMessage = callHookOut(server, parsedLine, &lowModules);
+	resultMessage = callModulesHookOut(server, parsedLine, &lowModules);
 	return resultMessage;
 }
 
@@ -112,28 +112,28 @@ void Base::callHookSend(std::string server, std::vector<std::string> parsedLine)
 	callModulesHookSend(server, parsedLine, &lowModules);
 }
 
-void Base::callPreConnectHook(std::string server, std::vector<std::string> parsedLine) {
-	callPreConnectModulesHook(server, parsedLine, &highModules);
-	callPreConnectModulesHook(server, parsedLine, &mediumHighModules);
-	callPreConnectModulesHook(server, parsedLine, &normalModules);
-	callPreConnectModulesHook(server, parsedLine, &mediumLowModules);
-	callPreConnectModulesHook(server, parsedLine, &lowModules);
+void Base::callPreConnectHook(std::string server) {
+	callPreConnectModulesHook(server, &highModules);
+	callPreConnectModulesHook(server, &mediumHighModules);
+	callPreConnectModulesHook(server, &normalModules);
+	callPreConnectModulesHook(server, &mediumLowModules);
+	callPreConnectModulesHook(server, &lowModules);
 }
 
-void Base::callConnectHook(std::string server, std::vector<std::string> parsedLine) {
-	callConnectModulesHook(server, parsedLine, &highModules);
-	callConnectModulesHook(server, parsedLine, &mediumHighModules);
-	callConnectModulesHook(server, parsedLine, &normalModules);
-	callConnectModulesHook(server, parsedLine, &mediumLowModules);
-	callConnectModulesHook(server, parsedLine, &lowModules);
+void Base::callConnectHook(std::string server) {
+	callConnectModulesHook(server, &highModules);
+	callConnectModulesHook(server, &mediumHighModules);
+	callConnectModulesHook(server, &normalModules);
+	callConnectModulesHook(server, &mediumLowModules);
+	callConnectModulesHook(server, &lowModules);
 }
 
-void Base::callQuitHook(std::string server, std::vector<std::string> parsedLine) {
-	callQuitModulesHook(server, parsedLine, &highModules);
-	callQuitModulesHook(server, parsedLine, &mediumHighModules);
-	callQuitModulesHook(server, parsedLine, &normalModules);
-	callQuitModulesHook(server, parsedLine, &mediumLowModules);
-	callQuitModulesHook(server, parsedLine, &lowModules);
+void Base::callQuitHook(std::string server) {
+	callQuitModulesHook(server, &highModules);
+	callQuitModulesHook(server, &mediumHighModules);
+	callQuitModulesHook(server, &normalModules);
+	callQuitModulesHook(server, &mediumLowModules);
+	callQuitModulesHook(server, &lowModules);
 }
 
 void Base::callPreModulesHook(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules) {
@@ -176,15 +176,13 @@ void Base::callPreModulesHook(std::string server, std::vector<std::string> parse
 			else if (parsedLine[3][i] == '-')
 				addMode = false;
 			else {
-				std::vector<std::vector<char> > serverModes;
-				std::vector<std::pair<char, char> > prefixes;
 				std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
-				serverModes = servIter->second->channelModes();
-				prefixes = servIter->second->prefixes();
+				std::vector<std::vector<char> > serverModes = servIter->second->channelModes();
+				std::list<std::pair<char, char> > prefixList = servIter->second->prefixes();
 				short category = 0;
 				bool found = false;
-				for (unsigned int j = 0; j < prefixes.size(); j++) {
-					if (prefixes[j].first == parsedLine[3][i]) {
+				for (std::list<std::pair<char, char> >::iterator prefixIter = prefixList.begin(); prefixIter != prefixList.end(); ++prefixIter) {
+					if ((*prefixIter).first == parsedLine[3][i]) {
 						found = true;
 						break;
 					}
@@ -339,15 +337,13 @@ void Base::callPostModulesHook(std::string server, std::vector<std::string> pars
 			else if (parsedLine[3][i] == '-')
 				addMode = false;
 			else {
-				std::vector<std::vector<char> > serverModes;
-				std::vector<std::pair<char, char> > prefixes;
 				std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
-				serverModes = servIter->second->channelModes();
-				prefixes = servIter->second->prefixes();
+				std::vector<std::vector<char> > serverModes = servIter->second->channelModes();
+				std::list<std::pair<char, char> > prefixList = servIter->second->prefixes();
 				short category = 0;
 				bool found = false;
-				for (unsigned int j = 0; j < prefixes.size(); j++) {
-					if (prefixes[i].first == parsedLine[3][i]) {
+				for (std::list<std::pair<char, char> >::iterator prefixIter = prefixList.begin(); prefixIter != prefixList.end(); ++prefixIter) {
+					if ((*prefixIter).first == parsedLine[3][i]) {
 						found = true;
 						break;
 					}
@@ -643,15 +639,15 @@ std::list<std::string> Base::serverList() {
 std::tr1::unordered_map<std::string, Module*> Base::loadedModules() {
 	std::tr1::unordered_map<std::string, Module*> modules;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modules.insert(modIter);
+		modules.insert(std::pair<std::string, Module*> (modIter->first, modIter->second));
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modules.insert(modIter);
+		modules.insert(std::pair<std::string, Module*> (modIter->first, modIter->second));
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modules.insert(modIter);
+		modules.insert(std::pair<std::string, Module*> (modIter->first, modIter->second));
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modules.insert(modIter);
+		modules.insert(std::pair<std::string, Module*> (modIter->first, modIter->second));
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modules.insert(modIter);
+		modules.insert(std::pair<std::string, Module*> (modIter->first, modIter->second));
 	return modules;
 }
 
@@ -691,18 +687,18 @@ std::list<std::string> Base::channelUsers(std::string server, std::string channe
 	return servIter->second->channelUsers(channel);
 }
 
-std::string Base::userIdent(std::string server, std::string channel, std::string user) {
+std::string Base::userIdent(std::string server, std::string user) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
-	return servIter->second->userIdent(channel, user);
+	return servIter->second->userIdent(user);
 }
 
-std::string Base::userHost(std::string server, std::string channel, std::string user) {
+std::string Base::userHost(std::string server, std::string user) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
-	return servIter->second->userHost(channel, user);
+	return servIter->second->userHost(user);
 }
 
 std::pair<char, char> Base::userStatus(std::string server, std::string channel, std::string user) {
@@ -796,7 +792,7 @@ bool Base::connectServer(std::string serverName) {
 	void* protoFile;
 	if (protocolFiles.find(servConfIter->second["protocol"]) == protocolFiles.end()) {
 		std::string fileLoc = "/modules/p_" + servConfIter->second["protocol"] + ".so";
-		protoFile = dlopen(fileLoc.c_str, RTLD_NOW);
+		protoFile = dlopen(fileLoc.c_str(), RTLD_NOW);
 		if (protoFile == NULL) {
 			std::string error = "Could not open protocol " + servConfIter->second["protocol"] + ": " + dlerror();
 			std::perror(error.c_str()); // debug level 1
@@ -960,7 +956,7 @@ void Base::tUnloadMod() {
 		modules = &normalModules;
 	else if (mediumLowModules.find(moduleToUnload[0]) != mediumLowModules.end())
 		modules = &mediumLowModules;
-	else if (lowModules.find(moduleToUnload[0] != lowModules.end())
+	else if (lowModules.find(moduleToUnload[0]) != lowModules.end())
 		modules = &lowModules;
 	else
 		return;

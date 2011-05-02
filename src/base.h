@@ -12,7 +12,7 @@ class Base {
 		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> serverData(std::string server);
 		std::vector<std::vector<char> > serverChanModes(std::string server);
-		std::vector<std::pair<char, char> > serverPrefixes(std::string server);
+		std::list<std::pair<char, char> > serverPrefixes(std::string server);
 		void callPreHook(std::string server, std::vector<std::string> parsedLine);
 		void callPostHook(std::string server, std::vector<std::string> parsedLine);
 		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
@@ -36,8 +36,8 @@ class Base {
 		std::list<std::string> channels(std::string server);
 		std::string channelTopic(std::string server, std::string channel);
 		std::list<std::string> channelUsers(std::string server, std::string channel);
-		std::string userIdent(std::string server, std::string channel, std::string user);
-		std::string userHost(std::string server, std::string channel, std::string user);
+		std::string userIdent(std::string server, std::string user);
+		std::string userHost(std::string server, std::string user);
 		std::pair<char, char> userStatus(std::string server, std::string channel, std::string user);
 		Socket* assignSocket(std::string socketType);
 		void rehash();
