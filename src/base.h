@@ -32,6 +32,7 @@ class Base {
 		std::list<std::string> serverList();
 		std::multimap<std::string, std::string> moduleAbilities();
 		std::tr1::unordered_map<std::string, std::vector<std::string> > moduleSupports();
+		bool serverIsClient(std::string server);
 		std::list<std::string> channels(std::string server);
 		std::string channelTopic(std::string server, std::string channel);
 		std::list<std::string> channelUsers(std::string server, std::string channel);

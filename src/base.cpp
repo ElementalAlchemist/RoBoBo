@@ -663,6 +663,13 @@ std::tr1::unordered_map<std::string, std::vector<std::string> > Base::moduleSupp
 	return modSupports;
 }
 
+bool Base::serverIsClient(std::string server) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->isClient();
+}
+
 std::list<std::string> Base::channels(std::string server) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())

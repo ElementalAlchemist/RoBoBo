@@ -261,6 +261,10 @@ std::tr1::unordered_map<std::string, std::vector<std::string> > Module::modSuppo
 	return serverData->moduleSupports();
 }
 
+bool Module::serverIsClient(std::string server) {
+	return serverData->serverIsClient(server);
+}
+
 std::tr1::unordered_map<std::string, std::string> Module::serverInfo(std::string server) {
 	return serverData->serverData(server);
 }
