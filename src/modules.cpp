@@ -1,6 +1,6 @@
 #include "modules.h"
 
-Module::Module(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) : config(modConf), serverData(modFace), moduleName(modName), debugLevel(debug) {}
+Module::Module(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) : moduleName(modName), debugLevel(debug), config(modConf), serverData(modFace) {}
 
 Module::~Module() {}
 
@@ -117,7 +117,7 @@ std::vector<std::string> Module::abilities() { return std::vector<std::string> (
 std::vector<std::string> Module::supports() { return std::vector<std::string> (); }
 
 void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
-	serverData->sendMsg(server, target, message);
+	serverData->sendPrivMsg(server, target, message);
 }
 
 void Module::sendNotice(std::string server, std::string target, std::string message) {
