@@ -611,7 +611,7 @@ void Base::callQuitModulesHook(std::string server, std::tr1::unordered_map<std::
 		modIter->second->onQuit(server);
 }
 
-void Base::sendMsg(std::string server, std::string target, std::string message) {
+void Base::sendPrivMsg(std::string server, std::string target, std::string message) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
