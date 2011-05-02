@@ -22,6 +22,8 @@ std::tr1::unordered_map<std::string, std::string> Protocol::info() { return std:
 
 std::list<std::pair<char, char> > Protocol::prefixes() { return std::list<std::pair<char, char> > (); } // for now; to be status class or similar
 
+std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
+
 std::vector<std::vector<char> > Protocol::channelModes() { return std::vector<std::vector<char> > (); }
 
 std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
