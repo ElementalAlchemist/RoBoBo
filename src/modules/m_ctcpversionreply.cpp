@@ -11,7 +11,7 @@ class VersionReply : public Module {
 };
 
 int VersionReply::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 void VersionReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
@@ -26,7 +26,7 @@ void VersionReply::onUserCTCP(std::string server, std::string nick, std::string 
 
 void VersionReply::sendVersionReply(std::string server, std::string target) {
 	std::string versionReply = "RoBoBo-IRC-BoBo IRC Bot ";
-	unsigned int thisBotVersion = getBotVersion();
+	unsigned int thisBotVersion = botVersion();
 	switch (thisBotVersion) { // get bot version, so this mod isn't restricted to one version of the bot and doesn't have to be updated with each version
 		case 900:
 			versionReply += "v1.0.0a1";

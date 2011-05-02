@@ -14,12 +14,12 @@ class LoadModCommand : public AdminHook {
 };
 
 int LoadModCommand::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 bool LoadModCommand::onLoadComplete() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
@@ -45,9 +45,9 @@ void LoadModCommand::onRehash() {
 }
 
 void LoadModCommand::onModuleChange() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	std::multimap<std::string, std::string>::iterator botAdminAbility = moduleAbilities.find("BOT_ADMIN");
+	if (botAdminAbility == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 	}

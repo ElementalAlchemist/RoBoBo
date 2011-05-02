@@ -8,7 +8,7 @@ class Cap : public CapModule {
 		void onModuleChange();
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
 		void onConnect(std::string server);
-		void capRegister(std::string moduleName, std::string capCommand);
+		void capRegister(std::string capCommand, std::string moduleName);
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);
 	private:
@@ -25,11 +25,11 @@ Cap::Cap() {
 }
 
 int Cap::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 void Cap::onModuleChange() {
-	std::tr1::unordered_map<std::string, Module*> modulesList = getModules();
+	std::tr1::unordered_map<std::string, Module*> modulesList = modules();
 	for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator capIter = capCommands.begin(); capIter != capCommands.end(); ++capIter) {
 		for (unsigned int i = 0; i < capIter->second.size(); i++) {
 			if (modulesList.find(capIter->second[i]) == modulesList.end()) {
@@ -79,7 +79,7 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 					for (unsigned int j = 0; j < capAck->second.size(); j++) {
 						if (capAck->second[j] == "")
 							continue;
-						CapClient* ackMod = (CapClient*) getModules().find(capAck->second[j])->second;
+						CapClient* ackMod = (CapClient*) modules().find(capAck->second[j])->second;
 						ackMod->onCapAccept(server, capAck->first);
 					}
 				}
@@ -95,11 +95,13 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 }
 
 void Cap::onConnect(std::string server) {
-	sendOtherCommand(server, "CAP", "LS");
-	blockingModules[server].clear();
+	if (serverIsClient(server)) {
+		sendOtherCommand(server, "CAP", "LS");
+		blockingModules[server].clear();
+	}
 }
 
-void Cap::capRegister(std::string moduleName, std::string capCommand) {
+void Cap::capRegister(std::string capCommand, std::string moduleName) {
 	capCommands[capCommand].push_back(moduleName);
 }
 

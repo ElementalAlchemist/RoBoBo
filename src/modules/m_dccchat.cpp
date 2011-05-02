@@ -1,5 +1,6 @@
 #include "modinclude.h"
 #include "dcc_chat.h"
+#include "s_plaintext.cpp" // steal use of existing socket system
 #include <pthread.h>
 
 class m_dccchat;
@@ -12,7 +13,7 @@ struct dccListenArg {
 class m_dccchat : public dccSender {
 	public:
 		int botAPIversion();
-		void onNickChange(std::string server, std::string oldNick, std::string newNick);
+		void onNickChangePre(std::string server, std::string oldNick, std::string newNick);
 		void onUserCTCP(std::string server, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
 		void dccSend(std::string recipient, std::string message);
@@ -32,10 +33,10 @@ class m_dccchat : public dccSender {
 };
 
 int m_dccchat::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
-void m_dccchat::onNickChange(std::string server, std::string oldNick, std::string newNick) {
+void m_dccchat::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(server + "/" + oldNick);
 	if (dccIter != activeConnections.end()) {
 		Socket* thisSocket = dccIter->second;
@@ -97,7 +98,7 @@ std::string m_dccchat::description() {
 }
 
 void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip, std::string port) {
-	Socket* dccSocket = new Socket();
+	Socket* dccSocket = new PlainText();
 	std::istringstream portNumber (port);
 	unsigned short dccPort;
 	portNumber >> dccPort;
@@ -165,7 +166,7 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 			}
 		}
 	}
-	std::tr1::unordered_map<std::string, Module*> modules = getModules();
+	std::tr1::unordered_map<std::string, Module*> modules = modules();
 	for (unsigned int i = 0; i < ourReportingModules->second.size(); i++) {
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules->second[i]);
 		dccChat* dccMod = (dccChat*) modIter->second;

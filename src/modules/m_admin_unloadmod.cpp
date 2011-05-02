@@ -14,12 +14,12 @@ class UnloadModuleCommand : public AdminHook {
 };
 
 int UnloadModuleCommand::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 bool UnloadModuleCommand::onLoadComplete() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
@@ -45,8 +45,8 @@ void UnloadModuleCommand::onRehash() {
 }
 
 void UnloadModuleCommand::onModuleChange() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 	}
@@ -91,9 +91,9 @@ void UnloadModuleCommand::onAdminCommand(std::string server, std::string nick, s
 			dccMod->dccSend(server + "/" + nick, "Usage: unloadmod <module>");
 		return;
 	}
-	std::tr1::unordered_map<std::string, Module*> modules = getModules();
-	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(message);
-	if (modIter == modules.end()) {
+	std::tr1::unordered_map<std::string, Module*> loadedModules = modules();
+	std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.find(message);
+	if (modIter == loadedModules.end()) {
 		if (dccMod == NULL)
 			sendPrivMsg(server, nick, "Could not unload module " + message + ": does not exist.");
 		else

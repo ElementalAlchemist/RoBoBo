@@ -12,7 +12,7 @@ class SetX : public Module {
 };
 
 int SetX::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 bool SetX::onLoadComplete() {
@@ -37,7 +37,7 @@ void SetX::onNumeric(std::string server, std::string numeric, std::vector<std::s
 		return;
 	for (unsigned int i = 0; i < xServers.size(); i++) {
 		if (xServers[i] == server) {
-			setMode(server, getServerData(server)["nick"], 'x', true);
+			setMode(server, serverData(server)["nick"], 'x', true);
 			return;
 		}
 	}

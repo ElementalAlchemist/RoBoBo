@@ -14,12 +14,12 @@ class AdminChannelControl : public AdminHook {
 };
 
 int AdminChannelControl::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 bool AdminChannelControl::onLoadComplete() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but it is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
 		unloadModule(moduleName);
 		return false;
@@ -45,8 +45,8 @@ void AdminChannelControl::onRehash() {
 }
 
 void AdminChannelControl::onModuleChange() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but it is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
 		unloadModule(moduleName);
 	}

@@ -9,7 +9,7 @@ class PingReply : public Module {
 };
 
 int PingReply::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 void PingReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
