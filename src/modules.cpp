@@ -117,55 +117,69 @@ std::vector<std::string> Module::abilities() { return std::vector<std::string> (
 std::vector<std::string> Module::supports() { return std::vector<std::string> (); }
 
 void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
-	serverData->sendToServer(server, "PRIVMSG " + target + " :" + message);
+	serverData->sendMsg(server, target, message);
 }
 
 void Module::sendNotice(std::string server, std::string target, std::string message) {
-	serverData->sendToServer(server, "NOTICE " + target + " :" + message);
+	serverData->sendNotice(server, target, message);
 }
 
 void Module::sendCTCP(std::string server, std::string target, std::string type, std::string params) {
 	if (params == "")
-		serverData->sendToServer(server, "PRIVMSG " + target + " :" + (char)1 + type + (char)1);
+		serverData->sendMsg(server, target, (char)1 + type + (char)1);
 	else
-		serverData->sendToServer(server, "PRIVMSG " + target + " :" + (char)1 + type + " " + params + (char)1);
+		serverData->sendMsg(server, target, (char)1 + type + " " + params + (char)1);
 }
 
 void Module::sendCTCPReply(std::string server, std::string target, std::string type, std::string data) {
 	if (data == "")
-		serverData->sendToServer(server, "NOTICE " + target + " :" + (char)1 + type + (char)1);
+		serverData->sendNotice(server, target, (char)1 + type + (char)1);
 	else
-		serverData->sendToServer(server, "NOTICE " + target + " :" + (char)1 + type + " " + data + (char)1);
+		serverData->sendNotice(server, target, (char)1 + type + " " + data + (char)1);
 }
 
 void Module::joinChannel(std::string server, std::string channel, std::string key) {
-	serverData->sendToServer(server, "JOIN " + channel + " " + key);
+	serverData->joinChannel(server, channel, key);
 }
 
 void Module::partChannel(std::string server, std::string channel, std::string reason) {
-	serverData->sendToServer(server, "PART " + channel + " :" + reason);
+	serverData->partChannel(server, channel, reason);
 }
 
 void Module::kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason) {
-	serverData->sendToServer(server, "KICK " + channel + " " + nick + " :" + reason);
+	serverData->kickUser(server, channel, nick, reason);
 }
 
-void Module::setMode(std::string server, std::string channel, char mode, bool add, std::string param) {
-	if (param == "") {
-		if (add)
-			serverData->sendToServer(server, "MODE " + channel + " +" + mode);
-		else
-			serverData->sendToServer(server, "MODE " + channel + " -" + mode);
-	} else {
-		if (add)
-			serverData->sendToServer(server, "MODE " + channel + " +" + mode + " " + param);
-		else
-			serverData->sendToServer(server, "MODE " + channel + " -" + mode + " " + param);
-	}
+void Module::setMode(std::string server, std::string channel, std::string mode) {
+	serverData->setMode(server, channel, mode);
+}
+
+void Module::removeMode(std::string server, std::string channel, std::string mode) {
+	serverData->removeMode(server, channel, mode);
+}
+
+void Module::changeNick(std::string server, std::string nick) {
+	serverData->changeNick(server, nick);
+}
+
+void Module::sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData) {
+	serverData->sendNumeric(server, target, numeric, numericData);
+}
+
+void Module::killUser(std::string server, std::string user, std::string reason) {
+	serverData->killUser(server, user, reason);
+}
+
+void Module::setXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason) {
+	serverData->setXLine(server, lineType, hostmask, duration, reason);
+}
+
+void Module::removeXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason) {
+	serverData->removeXLine(server, lineType, hostmask, duration, reason);
 }
 
 void Module::sendOtherCommand(std::string server, std::string command, std::string data) {
-	serverData->sendToServer(server, command + " " + data);
+	serverData->sendOther(server, command + " " + data);
 }
 
 bool Module::connectServer(std::string server) {
@@ -173,7 +187,7 @@ bool Module::connectServer(std::string server) {
 }
 
 void Module::quitServer(std::string server, std::string reason) {
-	serverData->sendToServer(server, "QUIT :" + reason);
+	serverData->quitServer(server, reason);
 }
 
 bool Module::loadModule(std::string modName) {

@@ -80,12 +80,18 @@ class Module {
 		void sendCTCP(std::string server, std::string target, std::string type, std::string params = "");
 		void sendCTCPReply(std::string server, std::string target, std::string type, std::string data = "");
 		void joinChannel(std::string server, std::string channel, std::string key = "");
-		void partChannel(std::string server, std::string channel, std::string reason);
-		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason);
-		void setMode(std::string server, std::string channel, char mode, bool add, std::string param = "");
+		void partChannel(std::string server, std::string channel, std::string reason = "");
+		void kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason = "");
+		void setMode(std::string server, std::string channel, std::string mode);
+		void removeMode(std::string server, std::string channel, std::string mode);
+		void changeNick(std::string server, std::string nick);
+		void sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData);
+		void killUser(std::string server, std::string user, std::string reason);
+		void setXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason);
+		void removeXLine(std::string server, char lineType, std::string hostmask);
 		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
 		bool connectServer(std::string server);
-		void quitServer(std::string server, std::string reason);
+		void quitServer(std::string server, std::string reason = "");
 		bool loadModule(std::string modName);
 		void unloadModule(std::string modName);
 		void rehashBot();

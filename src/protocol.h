@@ -30,8 +30,8 @@ class Protocol {
 		virtual void removeMode(std::string target, std::string mode);
 		virtual void joinChannel(std::string channel, std::string key = "");
 		virtual void partChannel(std::string channel, std::string reason = "");
-		virtual void quitServer(std::string reason);
-		virtual void kickUser(std::string channel, std::string user, std::string reason);
+		virtual void quitServer(std::string reason = "");
+		virtual void kickUser(std::string channel, std::string user, std::string reason = "");
 		virtual void changeNick(std::string newNick);
 		
 		virtual void sendNumeric(std::string numeric, std::string target, std::vector<std::string> numericData);

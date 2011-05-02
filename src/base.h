@@ -9,7 +9,6 @@ typedef void* (*socket_spawn_t)();
 class Base {
 	public:
 		Base(std::string confdir, std::string confname, unsigned short debug);
-		void sendToServer(std::string server, std::string rawLine);
 		std::tr1::unordered_map<std::string, std::string> serverData(std::string server);
 		std::vector<std::vector<char> > serverChanModes(std::string server);
 		std::list<std::pair<char, char> > serverPrefixes(std::string server);
@@ -27,6 +26,20 @@ class Base {
 		void callPreConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
 		void callConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
 		void callQuitModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
+		void sendPrivMsg(std::string server, std::string target, std::string message);
+		void sendNotice(std::string server, std::string target, std::string message);
+		void setMode(std::string server, std::string target, std::string mode);
+		void removeMode(std::string server, std::string target, std::string mode);
+		void joinChannel(std::string server, std::string channel, std::string key = "");
+		void partChannel(std::string server, std::string channel, std::string reason = "");
+		void quitServer(std::string server, std::string reason = "");
+		void kickUser(std::string server, std::string channel, std::string user, std::string reason = "");
+		void changeNick(std::string server, std::string newNick);
+		void sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData);
+		void killUser(std::string server, std::string user, std::string reason);
+		void setXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason);
+		void removeXLine(std::string server, char lineType, std::string hostmask);
+		void sendOther(std::string server, std::string rawLine);
 		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> loadedModules();
 		std::list<std::string> serverList();
