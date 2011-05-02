@@ -100,7 +100,7 @@ class Module {
 		bool serverIsClient(std::string server);
 		std::tr1::unordered_map<std::string, std::string> serverInfo(std::string server);
 		std::vector<std::vector<char> > serverChanModes(std::string server);
-		std::vector<std::pair<char, char> > serverPrefixes(std::string server);
+		std::list<std::pair<char, char> > serverPrefixes(std::string server);
 		std::list<std::string> channels(std::string server);
 		std::string channelTopic(std::string server, std::string channel);
 		std::list<std::string> channelUsers(std::string server, std::string channel);

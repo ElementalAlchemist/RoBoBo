@@ -273,7 +273,7 @@ std::vector<std::vector<char> > Module::serverChanModes(std::string server) {
 	return serverData->serverChanModes(server);
 }
 
-std::vector<std::pair<char, char> > Module::serverPrefixes(std::string server) {
+std::list<std::pair<char, char> > Module::serverPrefixes(std::string server) {
 	return serverData->serverPrefixes(server);
 }
 
