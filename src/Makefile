@@ -2,7 +2,7 @@ CC = g++
 LIBS = -ldl -lpthread
 LDFLAGS=$(LIBS) -rdynamic
 CXXFLAGS=-Wall -pthread $(DEBUG)
-SOURCES=base.cpp channel.cpp config.cpp modules.cpp server.cpp socket.cpp user.cpp
+SOURCES=base.cpp config.cpp modules.cpp protocol.cpp socket.cpp
 
 default: makedepend robobo modules
 
