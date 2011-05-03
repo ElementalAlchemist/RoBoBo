@@ -8,7 +8,7 @@ void Module::reconf(std::tr1::unordered_map<std::string, std::string> modConf) {
 	config = modConf;
 }
 
-Priority Module::receivePriority() { return NORMAL; }
+Priority Module::receivePriority() { return PRI_NORMAL; }
 
 bool Module::onLoadComplete() { return true; }
 
@@ -16,25 +16,25 @@ void Module::onRehash() {}
 
 void Module::onModuleChange() {}
 
-void Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+bool Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-void Module::onUserMsg(std::string server, std::string nick, std::string message) {}
+bool Module::onUserMsg(std::string server, std::string nick, std::string message) { return true; }
 
-void Module::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+bool Module::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-void Module::onUserNotice(std::string server, std::string nick, std::string message) {}
+bool Module::onUserNotice(std::string server, std::string nick, std::string message) { return true; }
 
-void Module::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+bool Module::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-void Module::onUserAction(std::string server, std::string nick, std::string message) {}
+bool Module::onUserAction(std::string server, std::string nick, std::string message) { return true; }
 
-void Module::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+bool Module::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-void Module::onUserCTCP(std::string server, std::string nick, std::string message) {}
+bool Module::onUserCTCP(std::string server, std::string nick, std::string message) { return true; }
 
-void Module::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {}
+bool Module::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-void Module::onUserCTCPReply(std::string server, std::string nick, std::string message) {}
+bool Module::onUserCTCPReply(std::string server, std::string nick, std::string message) { return true; }
 
 void Module::onChannelJoinPre(std::string server, std::string channel, std::string hostmask) {}
 

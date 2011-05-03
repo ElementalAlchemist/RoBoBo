@@ -27,7 +27,7 @@ Before release.  Duh.
 [>] - Change module API to adjust, of course
 [x] - Store bot's user modes and allow modules to check them
 [x] - Prioritize receiving through module-defined receive priority (default normal, others high, low, maybe intermediates for both?)
-[ ] - Allow blocking of receive messages
+[>] - Allow blocking of receive messages
 	[ ] - m_ignore
 [x] - Get rid of PROTOCTL NAMESX and just use CAP multi-prefix from 1.1
 [x] - Use CAP userhost-in-names where possible rather than WHO

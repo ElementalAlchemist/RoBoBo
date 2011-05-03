@@ -5,7 +5,7 @@
 #include <dlfcn.h>
 #include <map>
 
-enum Priority { HIGH, MEDIUM_HIGH, NORMAL, MEDIUM_LOW, LOW };
+enum Priority { PRI_HIGH, PRI_MEDIUM_HIGH, PRI_NORMAL, PRI_MEDIUM_LOW, PRI_LOW };
 
 class Base;
 class Module {
@@ -18,16 +18,16 @@ class Module {
 		virtual bool onLoadComplete();
 		virtual void onRehash();
 		virtual void onModuleChange();
-		virtual void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserMsg(std::string server, std::string nick, std::string message);
-		virtual void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserNotice(std::string server, std::string nick, std::string message);
-		virtual void onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserAction(std::string server, std::string nick, std::string message);
-		virtual void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserCTCP(std::string server, std::string nick, std::string message);
-		virtual void onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
-		virtual void onUserCTCPReply(std::string server, std::string nick, std::string message);
+		virtual bool onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual bool onUserMsg(std::string server, std::string nick, std::string message);
+		virtual bool onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual bool onUserNotice(std::string server, std::string nick, std::string message);
+		virtual bool onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual bool onUserAction(std::string server, std::string nick, std::string message);
+		virtual bool onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual bool onUserCTCP(std::string server, std::string nick, std::string message);
+		virtual bool onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
+		virtual bool onUserCTCPReply(std::string server, std::string nick, std::string message);
 		virtual void onChannelJoinPre(std::string server, std::string channel, std::string hostmask);
 		virtual void onChannelJoinPost(std::string server, std::string channel, std::string hostmask);
 		virtual void onChannelPartPre(std::string server, std::string channel, std::string hostmask, std::string reason);
