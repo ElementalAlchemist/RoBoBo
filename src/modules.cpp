@@ -126,9 +126,9 @@ void Module::sendNotice(std::string server, std::string target, std::string mess
 
 void Module::sendCTCP(std::string server, std::string target, std::string type, std::string params) {
 	if (params == "")
-		serverData->sendMsg(server, target, (char)1 + type + (char)1);
+		serverData->sendPrivMsg(server, target, (char)1 + type + (char)1);
 	else
-		serverData->sendMsg(server, target, (char)1 + type + " " + params + (char)1);
+		serverData->sendPrivMsg(server, target, (char)1 + type + " " + params + (char)1);
 }
 
 void Module::sendCTCPReply(std::string server, std::string target, std::string type, std::string data) {
@@ -174,8 +174,8 @@ void Module::setXLine(std::string server, char lineType, std::string hostmask, s
 	serverData->setXLine(server, lineType, hostmask, duration, reason);
 }
 
-void Module::removeXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason) {
-	serverData->removeXLine(server, lineType, hostmask, duration, reason);
+void Module::removeXLine(std::string server, char lineType, std::string hostmask) {
+	serverData->removeXLine(server, lineType, hostmask);
 }
 
 void Module::sendOtherCommand(std::string server, std::string command, std::string data) {
@@ -303,12 +303,12 @@ std::list<std::string> Module::channelUsers(std::string server, std::string chan
 	return serverData->channelUsers(server, channel);
 }
 
-std::string Module::userIdent(std::string server, std::string channel, std::string user) {
-	return serverData->userIdent(server, channel, user);
+std::string Module::userIdent(std::string server, std::string user) {
+	return serverData->userIdent(server, user);
 }
 
-std::string Module::userHost(std::string server, std::string channel, std::string user) {
-	return serverData->userHost(server, channel, user);
+std::string Module::userHost(std::string server, std::string user) {
+	return serverData->userHost(server, user);
 }
 
 std::pair<char, char> Module::userStatus(std::string server, std::string channel, std::string user) {
