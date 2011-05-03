@@ -53,4 +53,5 @@ class Protocol {
 		Socket* connection;
 		Base* botBase;
 };
+#include "base.h"
 #endif

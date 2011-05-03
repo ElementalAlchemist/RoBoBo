@@ -2,7 +2,6 @@
 #define MODULES_H
 #include "main.h"
 #include "config.h"
-#include "protocol.h"
 #include <dlfcn.h>
 #include <map>
 
@@ -116,5 +115,5 @@ class Module {
 	private:
 		Base* serverData;
 };
-#include "base.h"
+#include "protocol.h"
 #endif

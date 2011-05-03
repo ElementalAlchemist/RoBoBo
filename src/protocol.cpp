@@ -1,7 +1,7 @@
 #include "protocol.h"
 
-Protocol::Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : serverName(serverAddress), serverConf(confVars), botBase(theBase), debugLevel(debug) {
-	connection = theBase->assignSocket(confVars["sockettype"]);
+Protocol::Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : serverName(serverAddress), debugLevel(debug), serverConf(confVars), botBase(theBase) {
+	connection = botBase->assignSocket(confVars["sockettype"]);
 }
 
 Protocol::~Protocol() {}
@@ -26,8 +26,6 @@ std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
 
 std::vector<std::vector<char> > Protocol::channelModes() { return std::vector<std::vector<char> > (); }
 
-std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
-
 std::list<std::string> Protocol::channels() { return std::list<std::string> (); }
 
 std::string Protocol::channelTopic(std::string channel) { return ""; }
@@ -44,8 +42,8 @@ void Protocol::sendMsg(std::string target, std::string message) {}
 void Protocol::sendNotice(std::string target, std::string message) {}
 void Protocol::setMode(std::string target, std::string mode) {}
 void Protocol::removeMode(std::string target, std::string mode) {}
-void Protocol::joinChannel(std::string channel, std::string key = "") {}
-void Protocol::partChannel(std::string channel, std::string reason = "") {}
+void Protocol::joinChannel(std::string channel, std::string key) {}
+void Protocol::partChannel(std::string channel, std::string reason) {}
 void Protocol::quitServer(std::string reason) {}
 void Protocol::kickUser(std::string channel, std::string user, std::string reason) {}
 
@@ -59,4 +57,4 @@ void Protocol::sendOther(std::string rawLine) {}
 void Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {}
 std::list<std::string> Protocol::clients() { return std::list<std::string> (); }
 std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
-std::list<std::string> Protocol::userModes(std::string client) { return std::list<char> (); }
+std::list<std::string> Protocol::userModes(std::string client) { return std::list<std::string> (); }
