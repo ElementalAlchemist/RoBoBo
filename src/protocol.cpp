@@ -20,11 +20,11 @@ bool Protocol::isClient() { return false; } // most protocol modules won't be cl
 
 std::tr1::unordered_map<std::string, std::string> Protocol::info() { return std::tr1::unordered_map<std::string, std::string> (); }
 
-std::list<std::pair<char, char> > Protocol::prefixes() { return std::list<std::pair<char, char> > (); } // for now; to be status class or similar
+std::list<std::pair<std::string, char> > Protocol::prefixes() { return std::list<std::pair<std::string, char> > (); } // for now; to be status class or similar
 
 std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
 
-std::vector<std::vector<char> > Protocol::channelModes() { return std::vector<std::vector<char> > (); }
+std::vector<std::vector<std::string> > Protocol::channelModes() { return std::vector<std::vector<std::string> > (); }
 
 std::list<std::string> Protocol::channels() { return std::list<std::string> (); }
 
@@ -36,7 +36,7 @@ std::string Protocol::userIdent(std::string user) { return ""; }
 
 std::string Protocol::userHost(std::string user) { return ""; }
 
-std::pair<char, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<char, char> ('0', ' '); }
+std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<char, char> ('0', ' '); }
 
 void Protocol::sendMsg(std::string target, std::string message) {}
 void Protocol::sendNotice(std::string target, std::string message) {}

@@ -14,15 +14,15 @@ class Protocol {
 		bool shouldReset();
 		virtual bool isClient();
 		std::tr1::unordered_map<std::string, std::string> info();
-		std::list<std::pair<char, char> > prefixes();
+		std::list<std::pair<std::string, char> > prefixes();
 		std::vector<char> channelTypes();
-		std::vector<std::vector<char> > channelModes();
+		std::vector<std::vector<std::string> > channelModes();
 		std::list<std::string> channels();
 		std::string channelTopic(std::string channel);
 		std::list<std::string> channelUsers(std::string channel);
 		std::string userIdent(std::string user);
 		std::string userHost(std::string user);
-		std::pair<char, char> userStatus(std::string channel, std::string user);
+		std::pair<std::string, char> userStatus(std::string channel, std::string user);
 		
 		virtual void sendMsg(std::string target, std::string message);
 		virtual void sendNotice(std::string target, std::string message);
