@@ -20,6 +20,6 @@ std::string ServicesID::description() {
 	return "Allows identification/authentification to services.";
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
-	return new ServicesID (modConf, modFace, modName, debug);
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
+	return new ServicesID (modConf, modFace, modName, dir, debug);
 }

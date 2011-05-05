@@ -2,7 +2,7 @@
 #define BASE_H
 #include "modules.h"
 
-typedef void* (*module_spawn_t)(std::tr1::unordered_map<std::string, std::string>, Base*, std::string, unsigned short);
+typedef void* (*module_spawn_t)(std::tr1::unordered_map<std::string, std::string>, Base*, std::string, std::string, unsigned short);
 typedef void* (*proto_spawn_t)(std::string, std::tr1::unordered_map<std::string, std::string>, Base*, unsigned short);
 typedef void* (*socket_spawn_t)();
 

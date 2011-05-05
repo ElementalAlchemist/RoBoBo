@@ -989,7 +989,7 @@ bool Base::loadModule(std::string modName, bool startup) {
 		return false;
 	}
 	
-	Module* newModule = (Module*) spawnModule(modConf->second, this, modName, debugLevel);
+	Module* newModule = (Module*) spawnModule(modConf->second, this, modName, directory, debugLevel);
 	if (newModule->botAPIversion() != 2000) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1

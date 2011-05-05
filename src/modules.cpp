@@ -1,6 +1,6 @@
 #include "modules.h"
 
-Module::Module(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) : moduleName(modName), debugLevel(debug), config(modConf), serverData(modFace) {}
+Module::Module(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : moduleName(modName), baseDir(dir), debugLevel(debug), config(modConf), serverData(modFace) {}
 
 Module::~Module() {}
 

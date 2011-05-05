@@ -47,6 +47,6 @@ std::string SetX::description() {
 	return "Allows the automatic setting of usermode x on servers.";
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
-	return new SetX (modConf, modFace, modName, debug);
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
+	return new SetX (modConf, modFace, modName, dir, debug);
 }

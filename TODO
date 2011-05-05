@@ -39,4 +39,4 @@ Before release.  Duh.
 	[ ] - overloaded operators for comparisons
 [x] - Configuration: remove the need for users to type the m_ prefix and the .so extension
 	[x] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
-[ ] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo
+[x] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo

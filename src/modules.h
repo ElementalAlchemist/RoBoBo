@@ -10,7 +10,7 @@ enum Priority { PRI_HIGH, PRI_MEDIUM_HIGH, PRI_NORMAL, PRI_MEDIUM_LOW, PRI_LOW }
 class Base;
 class Module {
 	public:
-		Module(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug);
+		Module(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~Module();
 		virtual int botAPIversion() = 0;
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
@@ -71,7 +71,7 @@ class Module {
 		virtual std::vector<std::string> abilities();
 		virtual std::vector<std::string> supports();
 	protected:
-		std::string moduleName;
+		std::string moduleName, baseDir;
 		unsigned short debugLevel;
 		std::tr1::unordered_map<std::string, std::string> config;
 		void sendPrivMsg(std::string server, std::string target, std::string message);

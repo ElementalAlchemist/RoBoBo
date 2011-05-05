@@ -55,6 +55,6 @@ bool GlobMatcher::match(std::string target, std::string pattern) {
 	return (patternPos == pattern.size());
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
-	return new GlobMatcher (modConf, modFace, modName, debug);
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
+	return new GlobMatcher (modConf, modFace, modName, dir, debug);
 }
