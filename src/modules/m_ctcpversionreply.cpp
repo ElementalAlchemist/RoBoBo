@@ -3,8 +3,8 @@
 class VersionReply : public Module {
 	public:
 		int botAPIversion();
-		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserCTCP(std::string server, std::string nick, std::string message);
+		bool onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string nick, std::string message);
 		std::string description();
 	private:
 		void sendVersionReply(std::string server, std::string target);
@@ -14,14 +14,16 @@ int VersionReply::botAPIversion() {
 	return 2000;
 }
 
-void VersionReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool VersionReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "VERSION")
 		sendVersionReply(server, nick);
+	return true;
 }
 
-void VersionReply::onUserCTCP(std::string server, std::string nick, std::string message) {
+bool VersionReply::onUserCTCP(std::string server, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "VERSION")
 		sendVersionReply(server, nick);
+	return true;
 }
 
 void VersionReply::sendVersionReply(std::string server, std::string target) {
@@ -76,6 +78,6 @@ std::string VersionReply::description() {
 	return "This module sends a reply to CTCP version.";
 }
 
-extern "C" Module* spawn() {
-	return new VersionReply;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new VersionReply (modConf, modFace, modName, debug);
 }

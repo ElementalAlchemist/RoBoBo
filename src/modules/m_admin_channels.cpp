@@ -53,7 +53,7 @@ void AdminChannelControl::onModuleChange() {
 }
 
 std::string AdminChannelControl::description() {
-	return "Allows admins to make the bot join and part channels.";
+	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to make the bot join and part channels.";
 }
 
 std::vector<std::string> AdminChannelControl::supports() {
@@ -113,6 +113,6 @@ void AdminChannelControl::onAdminCommand(std::string server, std::string nick, s
 		partChannel(server, channel, keason);
 }
 
-extern "C" Module* spawn() {
-	return new AdminChannelControl;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new AdminChannelControl (modConf, modFace, modName, debug);
 }

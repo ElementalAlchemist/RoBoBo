@@ -8,16 +8,16 @@ class Admin : public AdminMod {
 		bool onLoadComplete();
 		void onRehash();
 		void onModuleChange();
-		void onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserMsg(std::string server, std::string nick, std::string message);
-		void onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserNotice(std::string server, std::string nick, std::string message);
-		void onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserAction(std::string server, std::string nick, std::string message);
-		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserCTCP(std::string server, std::string nick, std::string message);
-		void onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserCTCPReply(std::string server, std::string nick, std::string message);
+		bool onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
+		bool onUserMsg(std::string server, std::string nick, std::string message);
+		bool onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
+		bool onUserNotice(std::string server, std::string nick, std::string message);
+		bool onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
+		bool onUserAction(std::string server, std::string nick, std::string message);
+		bool onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string nick, std::string message);
+		bool onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCPReply(std::string server, std::string nick, std::string message);
 		void onChannelJoinPost(std::string server, std::string channel, std::string hostmask);
 		void onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason);
 		void onUserQuitPre(std::string server, std::string hostmask, std::string reason);
@@ -150,14 +150,15 @@ void Admin::onModuleChange() {
 	}
 }
 
-void Admin::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Admin::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (target == '0')
 		sendVerbose(2, server + ": " + nick + " -> " + channel + ": " + message);
 	else
 		sendVerbose(2, server + ": " + nick + " -> " + target + channel + ": " + message);
+	return true;
 }
 
-void Admin::onUserMsg(std::string server, std::string nick, std::string message) {
+bool Admin::onUserMsg(std::string server, std::string nick, std::string message) {
 	bool dccMsg = false;
 	if (dccMod == NULL) {
 		for (unsigned int i = 0; i < loggedIn.size(); i++) {
@@ -184,50 +185,59 @@ void Admin::onUserMsg(std::string server, std::string nick, std::string message)
 	if (!dccMsg) {
 		sendVerbose(2, server + ": <" + nick + "> " + message);
 	}
+	return true;
 }
 
-void Admin::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Admin::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (target == '0')
 		sendVerbose(2, server + ": -" + nick + "/" + channel + "- " + message);
 	else
 		sendVerbose(2, server + ": -" + nick + "/" + target + channel + "- " + message);
+	return true;
 }
 
-void Admin::onUserNotice(std::string server, std::string nick, std::string message) {
+bool Admin::onUserNotice(std::string server, std::string nick, std::string message) {
 	sendVerbose(2, server + ": --" + nick + "-- " + message);
+	return true;
 }
 
-void Admin::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Admin::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (target == '0')
 		sendVerbose(2, server + ": (" + channel + ") * " + nick + " " + message);
 	else
 		sendVerbose(2, server + ": (" + target + channel + ") * " + nick + " " + message);
+	return true;
 }
 
-void Admin::onUserAction(std::string server, std::string nick, std::string message) {
+bool Admin::onUserAction(std::string server, std::string nick, std::string message) {
 	sendVerbose(2, server + ": * " + nick + " " + message);
+	return true;
 }
 
-void Admin::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Admin::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (target == '0')
 		sendVerbose(2, server + ": --> [" + nick + "/" + channel + "] " + message);
 	else
 		sendVerbose(2, server + ": --> [" + nick + "/" + target + channel + "] " + message);
+	return true;
 }
 
-void Admin::onUserCTCP(std::string server, std::string nick, std::string message) {
+bool Admin::onUserCTCP(std::string server, std::string nick, std::string message) {
 	sendVerbose(2, server + ": --> [" + nick + "] " + message);
+	return true;
 }
 
-void Admin::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Admin::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {
 	if (target == '0')
 		sendVerbose(2, server + ": <-- [" + nick + "/" + channel + "] " + message);
 	else
 		sendVerbose(2, server + ": <-- [" + nick + "/" + target + channel + "] " + message);
+	return true;
 }
 
-void Admin::onUserCTCPReply(std::string server, std::string nick, std::string message) {
+bool Admin::onUserCTCPReply(std::string server, std::string nick, std::string message) {
 	sendVerbose(2, server + ": <-- [" + nick + "] " + message);
+	return true;
 }
 
 void Admin::onChannelJoinPost(std::string server, std::string channel, std::string hostmask) {
@@ -522,6 +532,6 @@ void Admin::sendVerbose(int verboseLevel, std::string message) {
 	}
 }
 
-extern "C" Module* spawn() {
-	return new Admin;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new Admin (modConf, modFace, modName, debug);
 }

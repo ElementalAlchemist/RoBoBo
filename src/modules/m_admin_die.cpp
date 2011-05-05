@@ -54,7 +54,7 @@ void DieCommand::onModuleChange() {
 }
 
 std::string DieCommand::description() {
-	return "Allows the bot master to shut the bot down from IRC.";
+	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to shut the bot down from IRC.";
 }
 
 std::vector<std::string> DieCommand::supports() {
@@ -97,6 +97,6 @@ void DieCommand::onAdminCommand(std::string server, std::string nick, std::strin
 	std::exit(0);
 }
 
-extern "C" Module* spawn() {
-	return new DieCommand;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new DieCommand (modConf, modFace, modName, debug);
 }

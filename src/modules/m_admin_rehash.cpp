@@ -91,6 +91,6 @@ void RehashCommand::onAdminCommand(std::string server, std::string nick, std::st
 		dccMod->dccSend(server + "/" + nick, "Bot rehashed.");
 }
 
-extern "C" Module* spawn() {
-	return new RehashCommand;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new RehashCommand (modConf, modFace, modName, debug);
 }

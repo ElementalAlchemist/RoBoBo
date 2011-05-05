@@ -5,16 +5,16 @@
 
 class m_dccchat;
 struct dccListenArg {
-	m_dccchat* modPtr;
+	DCCChatModule* modPtr;
 	std::string id;
 	Socket* sockPtr;
 };
 
-class m_dccchat : public dccSender {
+class DCCChatModule : public dccSender {
 	public:
 		int botAPIversion();
 		void onNickChangePre(std::string server, std::string oldNick, std::string newNick);
-		void onUserCTCP(std::string server, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
 		void dccSend(std::string recipient, std::string message);
 		std::vector<std::string> abilities();
@@ -32,11 +32,11 @@ class m_dccchat : public dccSender {
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
 
-int m_dccchat::botAPIversion() {
+int DCCChatModule::botAPIversion() {
 	return 2000;
 }
 
-void m_dccchat::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {
+void DCCChatModule::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(server + "/" + oldNick);
 	if (dccIter != activeConnections.end()) {
 		Socket* thisSocket = dccIter->second;
@@ -45,7 +45,7 @@ void m_dccchat::onNickChangePre(std::string server, std::string oldNick, std::st
 	}
 }
 
-void m_dccchat::onUserCTCP(std::string server, std::string nick, std::string message) {
+void DCCChatModule::onUserCTCP(std::string server, std::string nick, std::string message) {
 	std::vector<std::string> messageParts = splitBySpace(message);
 	if (messageParts[0] == "DCC" && messageParts[1] == "CHAT" && messageParts[2] == "chat") {
 		if (activeConnections.find(server + "/" + nick) == activeConnections.end())
@@ -55,27 +55,27 @@ void m_dccchat::onUserCTCP(std::string server, std::string nick, std::string mes
 	}
 }
 
-std::vector<std::string> m_dccchat::getConnections() {
+std::vector<std::string> DCCChatModule::getConnections() {
 	std::vector<std::string> connections;
 	for (std::tr1::unordered_map<std::string, Socket*>::iterator connIter = activeConnections.begin(); connIter != activeConnections.end(); ++connIter)
 		connections.push_back(connIter->first);
 	return connections;
 }
 
-void m_dccchat::dccSend(std::string recipient, std::string message) {
+void DCCChatModule::dccSend(std::string recipient, std::string message) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccIter = activeConnections.find(recipient);
 	if (dccIter == activeConnections.end())
 		return;
 	dccIter->second->sendData(message);
 }
 
-std::vector<std::string> m_dccchat::abilities() {
+std::vector<std::string> DCCChatModule::abilities() {
 	std::vector<std::string> abilities;
 	abilities.push_back("DCC_CHAT");
 	return abilities;
 }
 
-bool m_dccchat::hookDCCMessage(std::string modName, std::string hookMsg) {
+bool DCCChatModule::hookDCCMessage(std::string modName, std::string hookMsg) {
 	if (moduleTriggers.find(hookMsg) == moduleTriggers.end()) {
 		moduleTriggers.insert(std::pair<std::string, std::string> (hookMsg, modName));
 		return true;
@@ -83,7 +83,7 @@ bool m_dccchat::hookDCCMessage(std::string modName, std::string hookMsg) {
 	return false;
 }
 
-void m_dccchat::unhookDCCSession(std::string modName, std::string dccid) {
+void DCCChatModule::unhookDCCSession(std::string modName, std::string dccid) {
 	std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator reportingModIter = reportingModules.find(dccid);
 	if (reportingModIter == reportingModules.end())
 		return;
@@ -93,11 +93,11 @@ void m_dccchat::unhookDCCSession(std::string modName, std::string dccid) {
 	}
 }
 
-std::string m_dccchat::description() {
+std::string DCCChatModule::description() {
 	return "This module gives the bot DCC CHAT support, allowing users to enter in DCC CHAT communication with the bot.";
 }
 
-void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip, std::string port) {
+void DCCChatModule::dccConnect(std::string server, std::string nick, std::string ip, std::string port) {
 	Socket* dccSocket = new PlainText();
 	std::istringstream portNumber (port);
 	unsigned short dccPort;
@@ -116,13 +116,13 @@ void m_dccchat::dccConnect(std::string server, std::string nick, std::string ip,
 	sleep(1); // make the arguments passed to the thread not die before the thread function can read them.
 }
 
-void* m_dccchat::dccListen_thread(void* args) {
+void* DCCChatModule::dccListen_thread(void* args) {
 	dccListenArg* listenData = (dccListenArg*) args;
 	listenData->modPtr->dccListen(listenData->id, listenData->sockPtr);
 	return NULL;
 }
 
-void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
+void DCCChatModule::dccListen(std::string id, Socket* listenSocket) {
 	std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator ourReportingModules = reportingModules.find(id);
 	while (true) {
 		if (!listenSocket->isConnected())
@@ -176,13 +176,13 @@ void m_dccchat::dccListen(std::string id, Socket* listenSocket) {
 	activeConnections.erase(id);
 }
 
-void m_dccchat::closeDCCConnection(std::string dccid) {
+void DCCChatModule::closeDCCConnection(std::string dccid) {
 	std::tr1::unordered_map<std::string, Socket*>::iterator dccConnection = activeConnections.find(dccid);
 	if (dccConnection == activeConnections.end())
 		return;
 	dccConnection->second->closeConnection();
 }
 
-extern "C" Module* spawn() {
-	return new m_dccchat;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new DCCChatModule (modConf, modFace, modName, debug);
 }

@@ -54,7 +54,7 @@ void ConnectServerCommand::onModuleChange() {
 }
 
 std::string ConnectServerCommand::description() {
-	return "Allows admins to connect to and disconnect from servers.";
+	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to connect the bot to and disconnect the bot from servers.";
 }
 
 std::vector<std::string> ConnectServerCommand::supports() {
@@ -129,6 +129,6 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, 
 	quitServer(quitServerName, quitReason);
 }
 
-extern "C" Module* spawn() {
-	return new ConnectServerCommand;
+extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) {
+	return new ConnectServerCommand (modConf, modFace, modName, debug);
 }
