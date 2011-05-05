@@ -29,7 +29,7 @@ vector -> {
 		"But don't tell anyone! ;)"
 	}
 	vector -> {
-		"anothercommand" // this bot supports two commands
+		"anothercommand" // this mod supports two commands
 		"This command calls the first command."
 		"Syntax: anothercommand"
 		"Blah."
