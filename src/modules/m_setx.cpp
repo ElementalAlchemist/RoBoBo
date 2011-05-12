@@ -37,7 +37,7 @@ void SetX::onNumeric(std::string server, std::string numeric, std::vector<std::s
 		return;
 	for (unsigned int i = 0; i < xServers.size(); i++) {
 		if (xServers[i] == server) {
-			setMode(server, serverData(server)["nick"], 'x', true);
+			setMode(server, serverData(server)["nick"], "cloak", true);
 			return;
 		}
 	}
