@@ -38,7 +38,7 @@ std::string Protocol::userHost(std::string user) { return ""; }
 
 std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<char, char> ('0', ' '); }
 
-char Protocol::compareStatus(std::set<std::string> statuses) { return std::set<std::string>(); }
+std::string Protocol::compareStatus(std::set<std::string> statuses) { return std::set<std::string>(); }
 
 void Protocol::sendMsg(std::string target, std::string message) {}
 void Protocol::sendNotice(std::string target, std::string message) {}
