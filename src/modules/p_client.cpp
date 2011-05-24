@@ -4,7 +4,7 @@
 class Client;
 class User {
 	public:
-		User(std::string ident, std::string host);
+		User(std::string ident, std::string host, Client* serverClass);
 		void ident(std::string ident);
 		std::string ident();
 		void host(std::string host);
@@ -13,18 +13,30 @@ class User {
 		void removeChannel(std::string channel);
 		std::list<std::string> channelList();
 		void status(std::string channel, char status, bool adding);
-		char status(std::string channel);
+		std::string status(std::string channel);
 	private:
 		std::string userIdent, userHost;
 		std::tr1::unordered_map<std::string, std::set<char> > channels;
+		Client* server;
 };
 class Client : public Protocol {
+	friend class User;
 	public:
 		Client(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug);
 		~Client();
 		unsigned int apiVersion();
 		void connectServer();
 		bool isClient();
+		std::list<std::pair<std::string, char> > prefixes();
+		std::set<char> channelTypes();
+		std::vector<std::vector<std::string> > channelModes();
+		std::list<std::string> channels();
+		std::string channelTopic(std::string channel);
+		std::set<std::string> channelUsers(std::string channel);
+		std::string userIdent(std::string user);
+		std::string userHost(std::string user);
+		std::pair<std::string, char> userStatus(std::string channel, std::string user);
+		char compareStatus(std::set<char> statuses);
 		void sendMsg(std::string client, std::string target, std::string message);
 		void sendNotice(std::string client, std::string target, std::string message);
 		void setMode(std::string client, std::string target, std::string mode);
@@ -37,7 +49,7 @@ class Client : public Protocol {
 		void sendOther(std::string client, std::string rawLine);
 		std::list<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
-		std::list<char> userModes(std::string client);
+		std::list<std::string> userModes(std::string client);
 	private:
 		pthread_t receiveThread, sendThread, secondsThread;
 		pthread_attr_t detachedState;
@@ -52,12 +64,12 @@ class Client : public Protocol {
 		volatile unsigned int seconds;
 		bool registered, altChanged, quitHooked, floodControl;
 		std::tr1::unordered_map<std::string, User*> users;
-		std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > channels;
+		std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > inChannels;
 		std::tr1::unordered_map<std::string, bool> readingNames;
 		std::list<std::string> uModes;
-		std::list<std::pair<char, char> > prefixes;
+		std::list<std::pair<char, char> > statusPrefixes;
 		std::vector<std::vector<char> > chanModes;
-		std::list<char> chanTypes;
+		std::set<char> chanTypes;
 		unsigned int maxModes;
 		void setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param = "");
 		void setStatus(bool addMode, std::string channel, std::string status, std::string user);
@@ -70,7 +82,7 @@ class Client : public Protocol {
 		void parseNames(std::string channel, std::string namesList);
 };
 
-User::User(std::string ident, std::string host) : userIdent(ident), userHost(host) {}
+User::User(std::string ident, std::string host, Client* serverClass) : userIdent(ident), userHost(host), server(serverClass) {}
 
 void User::ident(std::string ident) {
 	if (ident != "")
@@ -117,7 +129,11 @@ void User::status(std::string channel, char status, bool adding) {
 char User::status(std::string channel) {
 	if (channels.find(channel) == channels.end())
 		return '0';
-	return channels.find(channel)->second;
+	std::set<char> statusChars = channels.find(channel)->second;
+	std::set<std::string> statuses;
+	for (std::set<char>::iterator statIter = statusChars.begin(); statIter != statusChars.end(); ++statIter)
+		statuses.insert(server->convertChanMode(*statIter));
+	return server->compareStatus(statuses);
 }
 
 Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : Protocol(serverAddress, confVars, theBase, debug), maxModes(1) {
@@ -167,6 +183,84 @@ void Client::connectServer() {
 
 bool Client::isClient() {
 	return true;
+}
+
+std::list<std::pair<std::string, char> > Client::prefixes() {
+	return statusPrefixes;
+}
+
+std::set<char> Client::channelTypes() {
+	return chanTypes;
+}
+
+std::vector<std::vector<std::string> > Client::channelModes() {
+	std::vector<std::vector<std::string> > pubChanModes;
+	for (size_t i = 0; i < chanModes.size(); i++) {
+		std::vector<std::string> theseChanModes;
+		for (size_t j = 0; j < chanModes[i].size(); j++)
+			theseChanModes.push_back(convertChanMode(chanModes[i][j]));
+		pubChanModes.push_back(theseChanModes);
+	}
+	return pubChanModes;
+}
+
+std::list<std::string> Client::channels() {
+	std::list<std::string> retChannels;
+	for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
+		retChannels.push_back(chanIter->first);
+	return retChannels;
+}
+
+std::string Client::channelTopic(std::string channel) {
+	std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return "";
+	return chanIter->second->first;
+}
+
+std::set<std::string> Client::channelUsers(std::string channel) {
+	std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return std::set<std::string>();
+	return chanIter->second.second.second;
+}
+
+std::string Client::userIdent(std::string user) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->ident();
+}
+
+std::string Client::userHost(std::string user) {
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->host();
+}
+
+std::pair<std::string, char> Client::userStatus(std::string channel, std::string user) {
+	if (users.find(user) == users.end())
+		return std::pair<std::string, char> ("", ' ');
+	if (inChannels.find(channel) == inChannels.end())
+		return std::pair<std::string, char> ("", ' ');
+	std::string status = users.find(user)->second->status(channel);
+	if (status == "")
+		return std::pair<std::string, char> ("", ' ');
+	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
+		if (*statIter.first == convertChanMode(status))
+			return *statIter;
+	}
+	return std::pair<std::string, char> ("", ' '); // Um, some bug perhaps?
+}
+
+std::string Client::compareStatus(std::set<std::string> statuses) {
+	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
+		std::string thisStatus = convertChanMode(*statIter->first);
+		if (statuses.find(thisStatus))
+			return thisStatus;
+	}
+	return "";
 }
 
 void Client::sendMsg(std::string client, std::string target, std::string message) {
@@ -241,8 +335,8 @@ void Client::handleData() {
 			serverConf["ident"] = parsedLine[4];
 			serverConf["host"] = parsedLine[5];
 		} else if (parsedLine[1] == "332") { // channel topic
-			std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator it = channels.find(parsedLine[3]);
-			if (it != channels.end())
+			std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator it = inChannels.find(parsedLine[3]);
+			if (it != inChannels.end())
 				it->second.first = parsedLine[4];
 		} else if (parsedLine[1] == "352") { // WHO reply
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[7]);
@@ -292,8 +386,8 @@ void Client::handleData() {
 					else {
 						int category;
 						bool found = false, prefix = false;
-						for (unsigned int j = 0; j < prefixes.size(); j++) {
-							if (prefixes[j].first == parsedLine[3][i]) {
+						for (unsigned int j = 0; j < statusPrefixes.size(); j++) {
+							if (statusPrefixes[j].first == parsedLine[3][i]) {
 								category = 0; // count it as a list mode since it's a list of users who hold a status
 								found = true;
 								prefix = true;
@@ -316,20 +410,20 @@ void Client::handleData() {
 						}
 						
 						if (category == 0) {
-							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = channels.find(parsedLine[2]);
-							if (chanIter != channels.end()) {
+							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
+							if (chanIter != inChannels.end()) {
 								if (prefix)
 									setStatus(addMode, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
 								else
 									setChanMode(addMode, true, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam]);
 							}
 						} else if (category == 1 || (category == 2 && addMode)) {
-							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = channels.find(parsedLine[2]);
-							if (chanIter != channels.end())
+							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
+							if (chanIter != inChannels.end())
 								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
 						} else {
-							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = channels.find(parsedLine[2]);
-							if (chanIter != channels.end())
+							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
+							if (chanIter != inChannels.end())
 								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]));
 						}
 					}
@@ -339,7 +433,7 @@ void Client::handleData() {
 			serverConf["nick"] = parsedLine[2];
 		else if (parsedLine[1] == "NICK") {
 			std::string oldNick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
-			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = channels.begin(); chanIter != channels.end(); ++chanIter) {
+			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
 				if (chanIter->second.second.second.find(oldNick) != chanIter->second.second.second.end()) {
 					chanIter->second.second.second.erase(oldNick);
 					chanIter->second.second.second.insert(parsedLine[2]);
@@ -349,7 +443,7 @@ void Client::handleData() {
 			users.erase(oldNick);
 			users.insert(std::pair<std::string, User*> (parsedLine[2], nickChanger));
 		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) { // bot joined a channel
-			channels.insert(std::pair<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > (parsedLine[2], std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > ()));
+			inChannels.insert(std::pair<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > (parsedLine[2], std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > ()));
 			sendOther("WHO " + parsedLine[2]);
 		} else if (parsedLine[1] == "JOIN") {
 			std::string hostmask = parsedLine[0].substr(1);
@@ -360,18 +454,18 @@ void Client::handleData() {
 				std::string host = hostmask.substr(hostmask.find_first_of('@'));
 				users.insert(std::pair<std::string, std::string> (nick, new User(ident, host)));
 			}
-			channels.find(parsedLine[2])->second.second.second.insert(nick);
+			inChannels.find(parsedLine[2])->second.second.second.insert(nick);
 		} else if (parsedLine[1] == "PART" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1))
-			channels.erase(parsedLine[2]);
+			inChannels.erase(parsedLine[2]);
 		else if (parsedLine[1] == "PART")
-			channels.find(parsedLine[2])->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1));
+			inChannels.find(parsedLine[2])->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1));
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
 			connection.closeConnection();
 			quitHooked = true;
 			keepServer = false;
 			break;
 		} else if (parsedLine[1] == "QUIT") {
-			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = channels.begin(); chanIter != channels.end(); ++chanIter)
+			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 				chanIter->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!')));
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			connection.closeConnection();
@@ -508,8 +602,8 @@ void Client::secondsDecrement() {
 }
 
 void Client::setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param) {
-	std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = channels.find(channel);
-	if (chanIter == channels.end())
+	std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
 		return;
 	if (addMode) {
 		if (list) {
@@ -593,7 +687,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 			for (; parsedLine[i][j] != ')'; j++)
 				prefixModes.push(parsedLine[i][j]);
 			for (j++; !prefixModes.empty(); j++) {
-				prefixes.push_back(std::pair<char, char> (prefixModes.front(), parsedLine[i][j]));
+				statusPrefixes.push_back(std::pair<char, char> (prefixModes.front(), parsedLine[i][j]));
 				prefixModes.pop();
 			}
 		} else if (parsedLine[i].size() > 10 && parsedLine.substr(0, 10) == "CHANMODES=") {
@@ -620,7 +714,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 void Client::parseNames(std::string channel, std::string namesList) {
 	bool firstNames = false;
 	if (!readingNames[channel]) {
-		for (std::list<std::string>::iterator nickIter = channels[channel].second.second.second.begin(); nickIter != channels[channel].second.second.second.end(); ++nickIter) {
+		for (std::list<std::string>::iterator nickIter = inChannels[channel].second.second.second.begin(); nickIter != inChannels[channel].second.second.second.end(); ++nickIter) {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(*nickIter);
 			if (userIter == users.end())
 				continue;
@@ -630,7 +724,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 				users.erase(userIter);
 			}
 		}
-		channels[channel].second.second.second.clear();
+		inChannels[channel].second.second.second.clear();
 		readingNames[channel] = firstNames = true;
 	}
 	std::vector<std::string> names;
@@ -646,7 +740,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		names.push_back(name);
 	for (unsigned int i = 0; i < names.size(); i++) {
 		std::vector<char> rank;
-		for (std::list<std::pair<char, char> >::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter) {
+		for (std::list<std::pair<char, char> >::iterator prefixIter = statusPrefixes.begin(); prefixIter != statusPrefixes.end(); ++prefixIter) {
 			if ((*prefixIter).second == names[i][0]) {
 				rank.push_back((*prefixIter).first);
 				names[i] = names[i].substr(1);
@@ -670,7 +764,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 			joiningUser->second->ident(ident);
 			joiningUser->second->host(host);
 		}
-		channels[channel].second.second.second.insert(nick);
+		inChannels[channel].second.second.second.insert(nick);
 		joiningUser->second->addChannel(channel);
 		for (unsigned int i = 0; i < rank.size(); i++)
 			joiningUser->second->status(channel, rank, true);
