@@ -22,7 +22,7 @@ std::tr1::unordered_map<std::string, std::string> Protocol::info() { return serv
 
 std::list<std::pair<std::string, char> > Protocol::prefixes() { return std::list<std::pair<std::string, char> > (); }
 
-std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
+std::set<char> Protocol::channelTypes() { return std::set<char> (); }
 
 std::vector<std::vector<std::string> > Protocol::channelModes() { return std::vector<std::vector<std::string> > (); }
 

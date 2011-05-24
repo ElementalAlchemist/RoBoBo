@@ -15,7 +15,7 @@ class Protocol {
 		virtual bool isClient();
 		std::tr1::unordered_map<std::string, std::string> info();
 		virtual std::list<std::pair<std::string, char> > prefixes();
-		virtual std::vector<char> channelTypes();
+		virtual std::set<char> channelTypes();
 		virtual std::vector<std::vector<std::string> > channelModes();
 		virtual std::list<std::string> channels();
 		virtual std::string channelTopic(std::string channel);
