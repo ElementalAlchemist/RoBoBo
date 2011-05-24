@@ -668,46 +668,46 @@ void Base::callQuitModulesHook(std::string server, std::tr1::unordered_map<std::
 		modIter->second->onQuit(server);
 }
 
-void Base::sendPrivMsg(std::string server, std::string target, std::string message) {
+void Base::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->sendMsg(target, message);
+	servIter->second->sendMsg(client, target, message);
 }
 
-void Base::sendNotice(std::string server, std::string target, std::string message) {
+void Base::sendNotice(std::string server, std::string client, std::string target, std::string message) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->sendNotice(target, message);
+	servIter->second->sendNotice(client, target, message);
 }
 
-void Base::setMode(std::string server, std::string target, std::string mode) {
+void Base::setMode(std::string server, std::string client, std::string target, std::string mode) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->setMode(target, mode);
+	servIter->second->setMode(client, target, mode);
 }
 
-void Base::removeMode(std::string server, std::string target, std::string mode) {
+void Base::removeMode(std::string server, std::string client, std::string target, std::string mode) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->removeMode(target, mode);
+	servIter->second->removeMode(client, target, mode);
 }
 
-void Base::joinChannel(std::string server, std::string channel, std::string key) {
+void Base::joinChannel(std::string server, std::string client, std::string channel, std::string key) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->joinChannel(channel, key);
+	servIter->second->joinChannel(client, channel, key);
 }
 
-void Base::partChannel(std::string server, std::string channel, std::string reason) {
+void Base::partChannel(std::string server, std::string client, std::string channel, std::string reason) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->partChannel(channel, reason);
+	servIter->second->partChannel(client, channel, reason);
 }
 
 void Base::quitServer(std::string server, std::string reason) {
@@ -717,18 +717,18 @@ void Base::quitServer(std::string server, std::string reason) {
 	servIter->second->quitServer(reason);
 }
 
-void Base::kickUser(std::string server, std::string channel, std::string user, std::string reason) {
+void Base::kickUser(std::string server, std::string client, std::string channel, std::string user, std::string reason) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->kickUser(channel, user, reason);
+	servIter->second->kickUser(client, channel, user, reason);
 }
 
-void Base::changeNick(std::string server, std::string newNick) {
+void Base::changeNick(std::string server, std::string client, std::string newNick) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->changeNick(newNick);
+	servIter->second->changeNick(client, newNick);
 }
 
 void Base::sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData) {
@@ -738,32 +738,44 @@ void Base::sendNumeric(std::string server, std::string target, std::string numer
 	servIter->second->sendNumeric(numeric, target, numericData);
 }
 
-void Base::killUser(std::string server, std::string user, std::string reason) {
+void Base::killUser(std::string server, std::string client, std::string user, std::string reason) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->killUser(user, reason);
+	servIter->second->killUser(client, user, reason);
 }
 
-void Base::setXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason) {
+void Base::setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->setXLine(lineType, hostmask, duration, reason);
+	servIter->second->setXLine(client, lineType, hostmask, duration, reason);
 }
 
-void Base::removeXLine(std::string server, char lineType, std::string hostmask) {
+void Base::removeXLine(std::string server, std::string client, char lineType, std::string hostmask) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->removeXLine(lineType, hostmask);
+	servIter->second->removeXLine(client, lineType, hostmask);
 }
 
-void Base::sendOther(std::string server, std::string rawLine) {
+void Base::sendOther(std::string server, std::string client, std::string rawLine) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->sendOther(rawLine);
+	servIter->second->sendOther(client, rawLine);
+}
+
+void Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	if (servers.find(server) == servers.end())
+		return;
+	servers.find(server)->second->addClient(nick, ident, host, gecos);
+}
+
+void Base::removeClient(std::string server, std::string client) {
+	if (servers.find(server) == servers.end())
+		return;
+	servers.find(server)->second->removeClient(client);
 }
 
 bool Base::isChanType(char chanPrefix, std::string server) {

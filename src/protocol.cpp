@@ -18,9 +18,9 @@ bool Protocol::shouldReset() { return keepServer; }
 
 bool Protocol::isClient() { return false; } // most protocol modules won't be clients
 
-std::tr1::unordered_map<std::string, std::string> Protocol::info() { return std::tr1::unordered_map<std::string, std::string> (); }
+std::tr1::unordered_map<std::string, std::string> Protocol::info() { return serverConf; }
 
-std::list<std::pair<std::string, char> > Protocol::prefixes() { return std::list<std::pair<std::string, char> > (); } // for now; to be status class or similar
+std::list<std::pair<std::string, char> > Protocol::prefixes() { return std::list<std::pair<std::string, char> > (); }
 
 std::vector<char> Protocol::channelTypes() { return std::vector<char> (); }
 
@@ -37,6 +37,8 @@ std::string Protocol::userIdent(std::string user) { return ""; }
 std::string Protocol::userHost(std::string user) { return ""; }
 
 std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<char, char> ('0', ' '); }
+
+char Protocol::compareStatus(std::set<char> statuses) { return ' '; }
 
 void Protocol::sendMsg(std::string target, std::string message) {}
 void Protocol::sendNotice(std::string target, std::string message) {}
@@ -55,6 +57,7 @@ void Protocol::removeXLine(char lineType, std::string hostmask) {}
 void Protocol::sendOther(std::string rawLine) {}
 
 void Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {}
+void Protocol::removeClient(std::string client) {}
 std::list<std::string> Protocol::clients() { return std::list<std::string> (); }
 std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
 std::list<std::string> Protocol::userModes(std::string client) { return std::list<std::string> (); }

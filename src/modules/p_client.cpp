@@ -25,16 +25,16 @@ class Client : public Protocol {
 		unsigned int apiVersion();
 		void connectServer();
 		bool isClient();
-		void sendMsg(std::string target, std::string message);
-		void sendNotice(std::string target, std::string message);
-		void setMode(std::string target, std::string mode);
-		void removeMode(std::string target, std::string mode);
-		void joinChannel(std::string channel, std::string key = "");
-		void partChannel(std::string channel, std::string reason = "");
+		void sendMsg(std::string client, std::string target, std::string message);
+		void sendNotice(std::string client, std::string target, std::string message);
+		void setMode(std::string client, std::string target, std::string mode);
+		void removeMode(std::string client, std::string target, std::string mode);
+		void joinChannel(std::string client, std::string channel, std::string key = "");
+		void partChannel(std::string client, std::string channel, std::string reason = "");
 		void quitServer(std::string reason);
-		void kickUser(std::string channel, std::string user, std::string reason);
-		void changeNick(std::string newNick);
-		void sendOther(std::string rawLine);
+		void kickUser(std::string client, std::string channel, std::string user, std::string reason);
+		void changeNick(std::string client, std::string newNick);
+		void sendOther(std::string client, std::string rawLine);
 		std::list<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		std::list<char> userModes(std::string client);
@@ -169,30 +169,30 @@ bool Client::isClient() {
 	return true;
 }
 
-void Client::sendMsg(std::string target, std::string message) {
+void Client::sendMsg(std::string client, std::string target, std::string message) {
 	dataToSend.push("PRIVMSG " + target + " :" + message);
 }
 
-void Client::sendNotice(std::string target, std::string message) {
+void Client::sendNotice(std::string client, std::string target, std::string message) {
 	dataToSend.push("NOTICE " + target + " :" + message);
 }
 
-void Client::setMode(std::string target, std::string mode) {
+void Client::setMode(std::string client, std::string target, std::string mode) {
 	
 }
 
-void Client::removeMode(std::string target, std::string mode) {
+void Client::removeMode(std::string client, std::string target, std::string mode) {
 	
 }
 
-void Client::joinChannel(std::string channel, std::string key) {
+void Client::joinChannel(std::string client, std::string channel, std::string key) {
 	if (key == "")
 		dataToSend.push("JOIN " + channel);
 	else
 		dataToSend.push("JOIN " + channel + " " + key);
 }
 
-void Client::partChannel(std::string channel, std::string reason) {
+void Client::partChannel(std::string client, std::string channel, std::string reason) {
 	dataToSend.push("PART " + channel + " :" + reason);
 }
 
@@ -200,15 +200,15 @@ void Client::quitServer(std::string reason) {
 	dataToSend.push("QUIT :" + reason);
 }
 
-void Client::kickUser(std::string channel, std::string user, std::string reason) {
+void Client::kickUser(std::string client, std::string channel, std::string user, std::string reason) {
 	dataToSend.push("KICK " + channel + " " + user + " :" + reason);
 }
 
-void Client::changeNick(std::string newNick) {
+void Client::changeNick(std::string client, std::string newNick) {
 	dataToSend.push("NICK " + newNick);
 }
 
-void Client::sendOther(std::string rawLine) {
+void Client::sendOther(std::string client, std::string rawLine) {
 	dataToSend.push(rawLine);
 }
 

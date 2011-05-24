@@ -16,99 +16,99 @@ void Module::onRehash() {}
 
 void Module::onModuleChange() {}
 
-bool Module::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
+bool Module::onChannelMsg(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-bool Module::onUserMsg(std::string server, std::string nick, std::string message) { return true; }
+bool Module::onUserMsg(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-bool Module::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
+bool Module::onChannelNotice(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-bool Module::onUserNotice(std::string server, std::string nick, std::string message) { return true; }
+bool Module::onUserNotice(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-bool Module::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
+bool Module::onChannelAction(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-bool Module::onUserAction(std::string server, std::string nick, std::string message) { return true; }
+bool Module::onUserAction(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-bool Module::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
+bool Module::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-bool Module::onUserCTCP(std::string server, std::string nick, std::string message) { return true; }
+bool Module::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-bool Module::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) { return true; }
+bool Module::onChannelCTCPReply(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
 
-bool Module::onUserCTCPReply(std::string server, std::string nick, std::string message) { return true; }
+bool Module::onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-void Module::onChannelJoinPre(std::string server, std::string channel, std::string hostmask) {}
+void Module::onChannelJoinPre(std::string server, std::string client, std::string channel, std::string hostmask) {}
 
-void Module::onChannelJoinPost(std::string server, std::string channel, std::string hostmask) {}
+void Module::onChannelJoinPost(std::string server, std::string client, std::string channel, std::string hostmask) {}
 
-void Module::onChannelPartPre(std::string server, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelPartPre(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelPartPost(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onUserQuitPre(std::string server, std::string hostmask, std::string reason) {}
+void Module::onUserQuitPre(std::string server, std::string client, std::string hostmask, std::string reason) {}
 
-void Module::onUserQuitPost(std::string server, std::string hostmask, std::string reason) {}
+void Module::onUserQuitPost(std::string server, std::string client, std::string hostmask, std::string reason) {}
 
-void Module::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {}
+void Module::onNickChangePre(std::string server, std::string client, std::string oldNick, std::string newNick) {}
 
-void Module::onNickChangePost(std::string server, std::string oldNick, std::string newNick) {}
+void Module::onNickChangePost(std::string server, std::string client, std::string oldNick, std::string newNick) {}
 
-void Module::onChannelKickPre(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onChannelKickPre(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
-void Module::onChannelKickPost(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onChannelKickPost(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
-void Module::onChannelModePre(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+void Module::onChannelModePre(std::string server, std::string client, std::string channel, std::string setter, char mode, bool add, std::string param) {}
 
-void Module::onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+void Module::onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, char mode, bool add, std::string param) {}
 
-void Module::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {}
+void Module::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {}
 
-void Module::onOtherData(std::string server, std::vector<std::string> parsedLine) {}
+void Module::onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine) {}
 
-void Module::onPreConnect(std::string server) {}
+void Module::onPreConnect(std::string server, std::string client) {}
 
-void Module::onConnect(std::string server) {}
+void Module::onConnect(std::string server, std::string client) {}
 
-void Module::onQuit(std::string server) {}
+void Module::onQuit(std::string server, std::string client) {}
 
-std::string Module::onOutChannelMessage(std::string server, std::string target, char status, std::string message) { return message; }
+std::string Module::onOutChannelMessage(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelMessage(std::string server, std::string target, char status, std::string message) {}
+void Module::onSendChannelMessage(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserMessage(std::string server, std::string target, std::string message) { return message; }
+std::string Module::onOutUserMessage(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserMessage(std::string server, std::string target, std::string message) {}
+void Module::onSendUserMessage(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelNotice(std::string server, std::string target, char status, std::string message) { return message; }
+std::string Module::onOutChannelNotice(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelNotice(std::string server, std::string target, char status, std::string message) {}
+void Module::onSendChannelNotice(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserNotice(std::string server, std::string target, std::string message) { return message; }
+std::string Module::onOutUserNotice(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserNotice(std::string server, std::string target, std::string message) {}
+void Module::onSendUserNotice(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelAction(std::string server, std::string target, char status, std::string message) { return message; }
+std::string Module::onOutChannelAction(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelAction(std::string server, std::string target, char status, std::string message) {}
+void Module::onSendChannelAction(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserAction(std::string server, std::string target, std::string message) { return message; }
+std::string Module::onOutUserAction(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserAction(std::string server, std::string target, std::string message) {}
+void Module::onSendUserAction(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelCTCP(std::string server, std::string target, char status, std::string message) { return message; }
+std::string Module::onOutChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelCTCP(std::string server, std::string target, char status, std::string message) {}
+void Module::onSendChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserCTCP(std::string server, std::string target, std::string message) { return message; }
+std::string Module::onOutUserCTCP(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserCTCP(std::string server, std::string target, std::string message) {}
+void Module::onSendUserCTCP(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelCTCPReply(std::string server, std::string target, char status, std::string message) { return message; }
+std::string Module::onOutChannelCTCPReply(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelCTCPReply(std::string server, std::string target, char status, std::string message) {}
+void Module::onSendChannelCTCPReply(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserCTCPReply(std::string server, std::string target, std::string message) { return message; }
+std::string Module::onOutUserCTCPReply(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserCTCPReply(std::string server, std::string target, std::string message) {}
+void Module::onSendUserCTCPReply(std::string server, std::string client, std::string target, std::string message) {}
 
 std::string Module::description() { return "This module has not been described."; }
 
@@ -116,70 +116,78 @@ std::vector<std::string> Module::abilities() { return std::vector<std::string> (
 
 std::vector<std::string> Module::supports() { return std::vector<std::string> (); }
 
-void Module::sendPrivMsg(std::string server, std::string target, std::string message) {
-	serverData->sendPrivMsg(server, target, message);
+void Module::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
+	serverData->sendPrivMsg(server, client, target, message);
 }
 
-void Module::sendNotice(std::string server, std::string target, std::string message) {
-	serverData->sendNotice(server, target, message);
+void Module::sendNotice(std::string server, std::string client, std::string target, std::string message) {
+	serverData->sendNotice(server, client, target, message);
 }
 
-void Module::sendCTCP(std::string server, std::string target, std::string type, std::string params) {
+void Module::sendCTCP(std::string server, std::string client, std::string target, std::string type, std::string params) {
 	if (params == "")
-		serverData->sendPrivMsg(server, target, (char)1 + type + (char)1);
+		serverData->sendPrivMsg(server, client, target, (char)1 + type + (char)1);
 	else
-		serverData->sendPrivMsg(server, target, (char)1 + type + " " + params + (char)1);
+		serverData->sendPrivMsg(server, client, target, (char)1 + type + " " + params + (char)1);
 }
 
-void Module::sendCTCPReply(std::string server, std::string target, std::string type, std::string data) {
+void Module::sendCTCPReply(std::string server, std::string client, std::string target, std::string type, std::string data) {
 	if (data == "")
-		serverData->sendNotice(server, target, (char)1 + type + (char)1);
+		serverData->sendNotice(server, client, target, (char)1 + type + (char)1);
 	else
-		serverData->sendNotice(server, target, (char)1 + type + " " + data + (char)1);
+		serverData->sendNotice(server, client, target, (char)1 + type + " " + data + (char)1);
 }
 
-void Module::joinChannel(std::string server, std::string channel, std::string key) {
-	serverData->joinChannel(server, channel, key);
+void Module::joinChannel(std::string server, std::string client, std::string channel, std::string key) {
+	serverData->joinChannel(server, client, channel, key);
 }
 
-void Module::partChannel(std::string server, std::string channel, std::string reason) {
-	serverData->partChannel(server, channel, reason);
+void Module::partChannel(std::string server, std::string client, std::string channel, std::string reason) {
+	serverData->partChannel(server, client, channel, reason);
 }
 
-void Module::kickChannelUser(std::string server, std::string channel, std::string nick, std::string reason) {
-	serverData->kickUser(server, channel, nick, reason);
+void Module::kickChannelUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
+	serverData->kickUser(server, client, channel, nick, reason);
 }
 
-void Module::setMode(std::string server, std::string channel, std::string mode) {
-	serverData->setMode(server, channel, mode);
+void Module::setMode(std::string server, std::string client, std::string channel, std::string mode) {
+	serverData->setMode(server, client, channel, mode);
 }
 
-void Module::removeMode(std::string server, std::string channel, std::string mode) {
-	serverData->removeMode(server, channel, mode);
+void Module::removeMode(std::string server, std::string client, std::string channel, std::string mode) {
+	serverData->removeMode(server, client, channel, mode);
 }
 
-void Module::changeNick(std::string server, std::string nick) {
-	serverData->changeNick(server, nick);
+void Module::changeNick(std::string server, std::string client, std::string nick) {
+	serverData->changeNick(server, client, nick);
 }
 
 void Module::sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData) {
 	serverData->sendNumeric(server, target, numeric, numericData);
 }
 
-void Module::killUser(std::string server, std::string user, std::string reason) {
-	serverData->killUser(server, user, reason);
+void Module::killUser(std::string server, std::string client, std::string user, std::string reason) {
+	serverData->killUser(server, client, user, reason);
 }
 
-void Module::setXLine(std::string server, char lineType, std::string hostmask, std::string duration, std::string reason) {
-	serverData->setXLine(server, lineType, hostmask, duration, reason);
+void Module::setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason) {
+	serverData->setXLine(server, client, lineType, hostmask, duration, reason);
 }
 
-void Module::removeXLine(std::string server, char lineType, std::string hostmask) {
-	serverData->removeXLine(server, lineType, hostmask);
+void Module::removeXLine(std::string server, std::string client, char lineType, std::string hostmask) {
+	serverData->removeXLine(server, client, lineType, hostmask);
 }
 
-void Module::sendOtherCommand(std::string server, std::string command, std::string data) {
-	serverData->sendOther(server, command + " " + data);
+void Module::sendOtherCommand(std::string server, std::string client, std::string command, std::string data) {
+	serverData->sendOther(server, client, command + " " + data);
+}
+
+void Module::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	serverData->addClient(server, nick, ident, host, gecos);
+}
+
+void Module::removeClient(std::string server, std::string client) {
+	serverData->removeClient(server, client);
 }
 
 bool Module::connectServer(std::string server) {
