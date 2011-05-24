@@ -19,7 +19,7 @@ class Protocol {
 		virtual std::vector<std::vector<std::string> > channelModes();
 		virtual std::list<std::string> channels();
 		virtual std::string channelTopic(std::string channel);
-		virtual std::list<std::string> channelUsers(std::string channel);
+		virtual std::set<std::string> channelUsers(std::string channel);
 		virtual std::string userIdent(std::string user);
 		virtual std::string userHost(std::string user);
 		virtual std::pair<std::string, char> userStatus(std::string channel, std::string user);

@@ -30,7 +30,7 @@ std::list<std::string> Protocol::channels() { return std::list<std::string> (); 
 
 std::string Protocol::channelTopic(std::string channel) { return ""; }
 
-std::list<std::string> Protocol::channelUsers(std::string channel) { return std::list<std::string> (); }
+std::set<std::string> Protocol::channelUsers(std::string channel) { return std::set<std::string> (); }
 
 std::string Protocol::userIdent(std::string user) { return ""; }
 
