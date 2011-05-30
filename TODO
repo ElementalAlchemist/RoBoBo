@@ -34,7 +34,7 @@ Before release.  Duh.
 	[x] - Include the userhost-in-names CAP capability in m_cap as part of the core (like multi-prefix)
 	[x] - Delegate the call to WHO to the NAMES processor in case the server doesn't support userhost-in-names
 	[ ] - Consider whether to keep the WHOIS command sent on connect to get the bot's ident and host
-[ ] - User status comparison
+[x] - User status comparison
 [x] - Configuration: remove the need for users to type the m_ prefix and the .so extension
 	[x] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
 [x] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo
