@@ -77,7 +77,6 @@ class Client : public Protocol {
 		std::string convertChanMode(char mode);
 		char convertUserMode(std::string mode);
 		std::string convertUserMode(char mode);
-		std::vector<std::string> parseLine(std::string rawLine);
 		void parse005(std::vector<std::string> parsedLine);
 		void parseNames(std::string channel, std::string namesList);
 };
@@ -321,7 +320,7 @@ void Client::handleData() {
 			break; // this case indicates a receive error
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
-		parsedLine = parseLine(receivedLine);
+		parsedLine = botBase->parseLine(receivedLine);
 		botBase->callPreHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendOther("MODE " + serverConf["nick"] + " +B"); // set bot mode
@@ -500,14 +499,14 @@ void Client::sendData() {
 		}
 		sendingMessage = dataToSend.front();
 		dataToSend.pop();
-		parsedLine = parseLine(sendingMessage);
+		parsedLine = botBase->parseLine(sendingMessage);
 		command = parsedLine[0];
 		if (command == "PRIVMSG" || command == "NOTICE") {
 			std::string newMessage = botBase->callHookOut(serverName, parsedLine);
 			if (newMessage == "")
 				continue; // do not send this canceled message
 			sendingMessage = parsedLine[0] + " " + parsedLine[1] + " :" + newMessage;
-			parsedLine = parseLine(sendingMessage);
+			parsedLine = botBase->parseLine(sendingMessage);
 		}
 		if (command == "MODE") {
 			secondsToAdd = 1;
@@ -655,28 +654,6 @@ char Client::convertUserMode(std::string mode) {
 
 std::string Client::convertUserMode(char mode) {
 	
-}
-
-std::vector<std::string> Client::parseLine(std::string rawLine) {
-	std::vector<std::string> parsedLine;
-	std::string linePart = "";
-	for (unsigned int i = 0; i < rawLine.size(); i++) {
-		if (i != 0 && rawLine[i] == ':' && rawLine[i-1] == ' ') {
-			while (i < rawLine.size())
-				linePart += rawLine[i];
-			parsedLine.push_back(linePart);
-			return parsedLine;
-		}
-		if (rawLine[i] == ' ') {
-			parsedLine.push_back(linePart);
-			linePart = "";
-			continue;
-		}
-		linePart += rawLine[i];
-	}
-	if (linePart != "")
-		parsedLine.push_back(linePart);
-	return parsedLine;
 }
 
 void Client::parse005(std::vector<std::string> parsedLine) {
