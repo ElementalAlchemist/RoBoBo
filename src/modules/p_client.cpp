@@ -74,7 +74,8 @@ class Client : public Protocol {
 		void setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param = "");
 		void setStatus(bool addMode, std::string channel, std::string status, std::string user);
 		char convertMode(std::string mode);
-		std::string convertMode(char mode);
+		std::string convertChanMode(char mode);
+		std::string convertUserMode(char mode);
 		void parse005(std::vector<std::string> parsedLine);
 		void parseNames(std::string channel, std::string namesList);
 };
@@ -129,7 +130,7 @@ char User::status(std::string channel) {
 	std::set<char> statusChars = channels.find(channel)->second;
 	std::set<std::string> statuses;
 	for (std::set<char>::iterator statIter = statusChars.begin(); statIter != statusChars.end(); ++statIter)
-		statuses.insert(server->convertMode(*statIter));
+		statuses.insert(server->convertChanMode(*statIter));
 	return server->compareStatus(statuses);
 }
 
@@ -195,7 +196,7 @@ std::vector<std::vector<std::string> > Client::channelModes() {
 	for (size_t i = 0; i < chanModes.size(); i++) {
 		std::vector<std::string> theseChanModes;
 		for (size_t j = 0; j < chanModes[i].size(); j++)
-			theseChanModes.push_back(convertMode(chanModes[i][j]));
+			theseChanModes.push_back(convertChanMode(chanModes[i][j]));
 		pubChanModes.push_back(theseChanModes);
 	}
 	return pubChanModes;
@@ -246,14 +247,14 @@ std::pair<std::string, char> Client::userStatus(std::string channel, std::string
 		return std::pair<std::string, char> ("", ' ');
 	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
 		if (*statIter.first == convertMode(status))
-			return *statIter;
+			return std::pair<std::string, char> (status, (*statIter).second);
 	}
 	return std::pair<std::string, char> ("", ' '); // Um, some bug perhaps?
 }
 
 std::string Client::compareStatus(std::set<std::string> statuses) {
 	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
-		std::string thisStatus = convertMode(statIter->first);
+		std::string thisStatus = convertChanMode(statIter->first);
 		if (statuses.find(thisStatus))
 			return thisStatus;
 	}
@@ -362,10 +363,10 @@ void Client::handleData() {
 						addMode = false;
 					else {
 						if (addMode)
-							uModes.push_back(convertMode(parsedLine[3][i]));
+							uModes.push_back(convertUserMode(parsedLine[3][i]));
 						else {
 							for (std::list<std::string>::iterator uModeIter = uModes.begin(); uModeIter != uModes.end(); ++uModeIter) {
-								if (convertMode(parsedLine[3][i]) == *uModeIter) {
+								if (convertUserMode(parsedLine[3][i]) == *uModeIter) {
 									uModes.erase(uModeIter);
 									break;
 								}
@@ -410,18 +411,18 @@ void Client::handleData() {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end()) {
 								if (prefix)
-									setStatus(addMode, chanIter->first, convertMode(parsedLine[3][i]), parsedLine[currParam++]);
+									setStatus(addMode, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
 								else
-									setChanMode(addMode, true, chanIter->first, convertMode(parsedLine[3][i]), parsedLine[currParam]);
+									setChanMode(addMode, true, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam]);
 							}
 						} else if (category == 1 || (category == 2 && addMode)) {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								setChanMode(addMode, false, chanIter->first, convertMode(parsedLine[3][i]), parsedLine[currParam++]);
+								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
 						} else {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								setChanMode(addMode, false, chanIter->first, convertMode(parsedLine[3][i]));
+								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]));
 						}
 					}
 				}
@@ -661,7 +662,25 @@ char Client::convertMode(std::string mode) {
 	
 }
 
-std::string Client::convertMode(char mode) {
+std::string Client::convertChanMode(char mode) {
+	switch (mode) {
+		case 'a':
+			return "admin";
+		case 'b':
+			return "ban";
+		case 'c':
+			return "blockcolor";
+		case 'd':
+			return "delaymsg";
+		case 'e':
+			return "banexception";
+		case 'f':
+			return "flood";
+		case 'g':
+			
+}
+
+std::string Client::convertUserMode(char mode) {
 	
 }
 
