@@ -48,6 +48,8 @@ void Protocol::joinChannel(std::string channel, std::string key) {}
 void Protocol::partChannel(std::string channel, std::string reason) {}
 void Protocol::quitServer(std::string reason) {}
 void Protocol::kickUser(std::string channel, std::string user, std::string reason) {}
+void Protocol::changeNick(std::string client, std::string newNick) {}
+void Protocol::oper(std::string client, std::string username, std::string password, std::string opertype) {}
 
 void Protocol::sendNumeric(std::string numeric, std::string target, std::vector<std::string> numericData) {}
 void Protocol::killUser(std::string user, std::string reason) {}
@@ -59,5 +61,5 @@ void Protocol::sendOther(std::string rawLine) {}
 void Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {}
 void Protocol::removeClient(std::string client) {}
 std::list<std::string> Protocol::clients() { return std::list<std::string> (); }
-std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
+std::tr1::unordered_map<std::string, std::string> Protocol::clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
 std::list<std::string> Protocol::userModes(std::string client) { return std::list<std::string> (); }

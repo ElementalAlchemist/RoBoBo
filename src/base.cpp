@@ -731,6 +731,13 @@ void Base::changeNick(std::string server, std::string client, std::string newNic
 	servIter->second->changeNick(client, newNick);
 }
 
+void Base::oper(std::string server, std::string client, std::string username, std::string password, std::string opertype) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->oper(client, username, password, opertype);
+}
+
 void Base::sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())

@@ -84,6 +84,7 @@ class Module {
 		void setMode(std::string server, std::string client, std::string channel, std::string mode);
 		void removeMode(std::string server, std::string client, std::string channel, std::string mode);
 		void changeNick(std::string server, std::string client, std::string nick);
+		void oper(std::string server, std::string client, std::string username, std::string password, std::string opertype = "");
 		void sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData);
 		void killUser(std::string server, std::string client, std::string user, std::string reason);
 		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason);

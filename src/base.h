@@ -35,6 +35,7 @@ class Base {
 		void quitServer(std::string server, std::string reason = "");
 		void kickUser(std::string server, std::string client, std::string channel, std::string user, std::string reason = "");
 		void changeNick(std::string server, std::string client, std::string newNick);
+		void oper(std::string server, std::string client, std::string username, std::string password, std::string opertype);
 		void sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData);
 		void killUser(std::string server, std::string client, std::string user, std::string reason);
 		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason);
