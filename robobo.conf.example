@@ -3,6 +3,12 @@
 # etc.
 
 server irc.example.com {
+	# protocol: the protocol to use to connect to the server
+	# Unless you're trying to connect RoBoBo as a server, you'll want "client"
+	protocol = "client";
+	# sockettype: the type of connection to use to connect to the server
+	# Unless you're using SSL or something else, "plaintext" will make a normal connection
+	sockettype = "plaintext";
 	# port: the port that the IRC server uses for client connections
 	# This is usually 6667
 	port = "6667";
