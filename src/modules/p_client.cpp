@@ -1057,6 +1057,6 @@ std::list<std::string> Client::userModes(std::string client) {
 	return uModes;
 }
 
-extern "C" Protocol* spawn() {
-	return new Client;
+extern "C" Protocol* spawn(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debugLevel) {
+	return new Client (serverAddr, config, base, debugLevel);
 }
