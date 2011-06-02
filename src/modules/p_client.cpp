@@ -73,10 +73,8 @@ class Client : public Protocol {
 		unsigned int maxModes;
 		void setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param = "");
 		void setStatus(bool addMode, std::string channel, std::string status, std::string user);
-		char convertChanMode(std::string mode);
-		std::string convertChanMode(char mode);
-		char convertUserMode(std::string mode);
-		std::string convertUserMode(char mode);
+		char convertMode(std::string mode);
+		std::string convertMode(char mode);
 		void parse005(std::vector<std::string> parsedLine);
 		void parseNames(std::string channel, std::string namesList);
 };
@@ -131,7 +129,7 @@ char User::status(std::string channel) {
 	std::set<char> statusChars = channels.find(channel)->second;
 	std::set<std::string> statuses;
 	for (std::set<char>::iterator statIter = statusChars.begin(); statIter != statusChars.end(); ++statIter)
-		statuses.insert(server->convertChanMode(*statIter));
+		statuses.insert(server->convertMode(*statIter));
 	return server->compareStatus(statuses);
 }
 
@@ -197,7 +195,7 @@ std::vector<std::vector<std::string> > Client::channelModes() {
 	for (size_t i = 0; i < chanModes.size(); i++) {
 		std::vector<std::string> theseChanModes;
 		for (size_t j = 0; j < chanModes[i].size(); j++)
-			theseChanModes.push_back(convertChanMode(chanModes[i][j]));
+			theseChanModes.push_back(convertMode(chanModes[i][j]));
 		pubChanModes.push_back(theseChanModes);
 	}
 	return pubChanModes;
@@ -247,7 +245,7 @@ std::pair<std::string, char> Client::userStatus(std::string channel, std::string
 	if (status == "")
 		return std::pair<std::string, char> ("", ' ');
 	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
-		if (*statIter.first == convertChanMode(status))
+		if (*statIter.first == convertMode(status))
 			return *statIter;
 	}
 	return std::pair<std::string, char> ("", ' '); // Um, some bug perhaps?
@@ -255,7 +253,7 @@ std::pair<std::string, char> Client::userStatus(std::string channel, std::string
 
 std::string Client::compareStatus(std::set<std::string> statuses) {
 	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
-		std::string thisStatus = convertChanMode(statIter->first);
+		std::string thisStatus = convertMode(statIter->first);
 		if (statuses.find(thisStatus))
 			return thisStatus;
 	}
@@ -271,11 +269,11 @@ void Client::sendNotice(std::string client, std::string target, std::string mess
 }
 
 void Client::setMode(std::string client, std::string target, std::string mode) {
-	
+	dataToSend.push("MODE " + target + " +" + mode);
 }
 
 void Client::removeMode(std::string client, std::string target, std::string mode) {
-	
+	dataToSend.push("MODE " + target + " -" + mode);
 }
 
 void Client::joinChannel(std::string client, std::string channel, std::string key) {
@@ -364,10 +362,10 @@ void Client::handleData() {
 						addMode = false;
 					else {
 						if (addMode)
-							uModes.push_back(convertUserMode(parsedLine[3][i]));
+							uModes.push_back(convertMode(parsedLine[3][i]));
 						else {
 							for (std::list<std::string>::iterator uModeIter = uModes.begin(); uModeIter != uModes.end(); ++uModeIter) {
-								if (convertUserMode(parsedLine[3][i]) == *uModeIter) {
+								if (convertMode(parsedLine[3][i]) == *uModeIter) {
 									uModes.erase(uModeIter);
 									break;
 								}
@@ -412,18 +410,18 @@ void Client::handleData() {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end()) {
 								if (prefix)
-									setStatus(addMode, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
+									setStatus(addMode, chanIter->first, convertMode(parsedLine[3][i]), parsedLine[currParam++]);
 								else
-									setChanMode(addMode, true, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam]);
+									setChanMode(addMode, true, chanIter->first, convertMode(parsedLine[3][i]), parsedLine[currParam]);
 							}
 						} else if (category == 1 || (category == 2 && addMode)) {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
+								setChanMode(addMode, false, chanIter->first, convertMode(parsedLine[3][i]), parsedLine[currParam++]);
 						} else {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]));
+								setChanMode(addMode, false, chanIter->first, convertMode(parsedLine[3][i]));
 						}
 					}
 				}
@@ -533,6 +531,25 @@ void Client::sendData() {
 				splitLine = keepModes;
 				dataToSend.push(newModeCommand);
 			}
+			std::string newCommand = "MODE " + parsedLine[1] + " ", params = "";
+			bool adding = true;
+			for (size_t i = 0; i < splitLine.size(); i++) {
+				if (splitLine[i][0] == '+') {
+					if (!adding || i == 0) {
+						adding = true;
+						newCommand += '+';
+					}
+				} else if (splitLine[i][0] == '-') {
+					if (adding) {
+						adding = false;
+						newCommand += '-';
+					}
+				}
+				newCommand += convertMode(splitLine[i].substr(1));
+				if (splitLine[i].find_first_of('=') != std::string::npos)
+					params += " " + splitLine[i].substr(splitLine[i].find_first_of('=') + 1);
+			}
+			sendingMessage = newCommand + params;
 			for (unsigned int i = 0; i < splitLine.size(); i++) {
 				if (splitLine[i] == "cloak")
 					secondsToAdd = 6; // because cloaking/setting umode +x is apparently such an expensive operation.
@@ -640,19 +657,11 @@ void Client::setStatus(bool addMode, std::string channel, std::string status, st
 	rankedUser->second->status(channel, status, addMode);
 }
 
-char Client::convertChanMode(std::string mode) {
+char Client::convertMode(std::string mode) {
 	
 }
 
-std::string Client::convertChanMode(char mode) {
-	
-}
-
-char Client::convertUserMode(std::string mode) {
-	
-}
-
-std::string Client::convertUserMode(char mode) {
+std::string Client::convertMode(char mode) {
 	
 }
 
