@@ -4,12 +4,10 @@
 class InspIRCd;
 class User {
 	public:
-		User(std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes);
+		User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime, std::set<std::string> theUModes);
 		std::string nick();
 		std::string ident();
 		std::string host();
-		std::string vhost();
-		std::string ipAddr();
 		std::string gecos();
 		time_t connectionTime();
 		std::string opertype();
@@ -26,7 +24,7 @@ class User {
 		void addStatus(std::string channel, std::string status);
 		void removeStatus(std::string channel, std::string status);
 	private:
-		std::string userNick, userIdent, userHost, vHost, GECOS, ip, oper;
+		std::string userNick, userIdent, userHost, GECOS, oper;
 		time_t connectTime;
 		std::set<std::string> userModes;
 		std::set<char> SNOMasks;
@@ -52,6 +50,8 @@ class Channel {
 class InspIRCd : public Protocol {
 	public:
 		InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug);
+		unsigned int apiVersion() = 0;
+		void connectServer();
 		std::list<std::pair<std::string, char> > prefixes();
 		std::set<char> channelTypes();
 		std::vector<std::vector<std::string> > channelModes();
@@ -76,7 +76,7 @@ class InspIRCd : public Protocol {
 		void killUser(std::string client, std::string user, std::string reason);
 		void setXLine(std::string client, char lineType, std::string hostmask, std::string time, std::string reason);
 		void removeXLine(std::string client, char lineType, std::string hostmask);
-		void sendOther(std::string client, std::string rawLine);
+		void sendOther(std::string rawLine);
 		void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		void removeClient(std::string client);
 		std::list<std::string> clients();
@@ -90,13 +90,12 @@ class InspIRCd : public Protocol {
 		std::list<std::string> clients;
 		std::tr1::unordered_map<std::string, User*> users;
 		std::tr1::unordered_map<std::string, Channel*> channels;
+		std::string uidCount;
+		std::string useUID();
+		std::list<std::pair<std::string, char> > chanRanks;
 };
 
-User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes) : userNick(theNick), userIdent(theIdent), userHost(theHost), vHost(theVHost), GECOS(theGecos), ip(theIP), connectTime(theConnectTime), userModes(theUModes) {}
-
-std::string User::server() {
-	return sid;
-}
+User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime, std::set<std::string> theUModes) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), connectTime(theConnectTime), userModes(theUModes) {}
 
 std::string User::nick() {
 	return userNick;
@@ -108,14 +107,6 @@ std::string User::ident() {
 
 std::string User::host() {
 	return userHost;
-}
-
-std::string User::vhost() {
-	return vHost;
-}
-
-std::string User::ipAddr() {
-	return ip;
 }
 
 std::string User::gecos() {
@@ -219,10 +210,70 @@ void Channel::topic(std::string newTopic) {
 	chanTopic = newTopic;
 }
 
-InspIRCd::InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug) : Protocol(serverAddr, config, base, debug) {}
+InspIRCd::InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug) : Protocol(serverAddr, config, base, debug), uidCount("AAAAAA") {
+	pthread_attr_init(&detachedState);
+	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
+	if (connection == NULL) {
+		std::cout << "p_inspircd21: " << serverName << ": Socket handle could not be obtained." << std::endl;
+		keepServer = false;
+		return;
+	}
+	if (serverConf["bind"] != "") {
+		if (!connection->bindSocket(serverConf["bind"]))
+			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl; // debug level 1
+	}
+}
+
+unsigned int InspIRCd::apiVersion() {
+	return 2000;
+}
+
+void InspIRCd::connectServer() {
+	botBase->callPreConnectHook(serverName);
+	std::istringstream portNumber (serverConf["port"]);
+	unsigned short port;
+	portNumber >> port;
+	connection->connectServer(serverName, port);
+	sleep(1);
+	sendOther("CAPAB START");
+	sendOther("CAPAB CAPABILITIES :PROTOCOL=1203");
+	sendOther("CAPAB END");
+	sendOther("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
+	sendOther(":" + serverConf["sid"] + " BURST");
+	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
+	unsigned int i = 0;
+	std::ostringstream clientNick, clientIdent, clientHost, clientGecos, clientOper, currTimeS;
+	clientNick << i << "/nick";
+	clientIdent << i << "/ident";
+	clientHost << i << "/host";
+	clientGecos << i << "/gecos";
+	clientOper << i << "/oper";
+	time_t currTime = time(NULL);
+	currTimeS << currTime;
+	while (serverConf[clientNick.str()] != "") {
+		std::string uuid = serverConf["sid"] + useUID();
+		sendOther(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
+		users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime, std::set<std::string> ())));
+		if (serverConf[clientOper.str()] != "")
+			sendOther (":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
+		i++;
+		clientNick.str("");
+		clientIdent.str("");
+		clientHost.str("");
+		clientGecos.str("");
+		clientOper.str("");
+		clientNick << i << "/nick";
+		clientIdent << i << "/ident";
+		clientHost << i << "/host";
+		clientGecos << i << "/gecos";
+		clientOper << i << "/oper";
+	}
+	sendOther(":" + serverConf["sid"] + " ENDBURST");
+	pthread_create(&receiveThread, &detachedState, receiveData_thread, this);
+}
 
 std::list<std::pair<std::string, char> > InspIRCd::prefixes() {
-	
+	return chanRanks;
 }
 
 std::set<char> InspIRCd::channelTypes() {
@@ -319,7 +370,7 @@ void InspIRCd::removeXLine(std::string client, char lineType, std::string hostma
 	
 }
 
-void InspIRCd::sendOther(std::string client, std::string rawLine) {
+void InspIRCd::sendOther(std::string rawLine) {
 	
 }
 
@@ -351,6 +402,35 @@ static void* InspIRCd::receiveData_thread(void* ptr) {
 
 void InspIRCd::receiveData() {
 	
+}
+
+std::string InspIRCd::useUID() {
+	std::string uidToUse = uidCount;
+	if (uidCount[5] == 'Z') {
+		uidCount[5] = 'A';
+		if (uidCount[4] == 'Z') {
+			uidCount[4] = 'A';
+			if (uidCount[3] == 'Z') {
+				uidCount[3] = 'A';
+				if (uidCount[2] == 'Z') {
+					uidCount[2] = 'A';
+					if (uidCount[1] == 'Z') {
+						uidCount[1] = 'A';
+						if (uidCount[0] == 'Z')
+							uidCount[0] = 'A';
+						else
+							uidCount[0]++;
+					} else
+						uidCount[1]++;
+				} else
+					uidCount[2]++;
+			} else
+				uidCount[3]++;
+		} else
+			uidCount[4]++;
+	} else
+		uidCount[5]++;
+	return uidToUse;
 }
 
 extern "C" Protocol* spawn(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debugLevel) {
