@@ -12,13 +12,13 @@ Before release.  Duh.
 [>] - Protocol modules!
 	[x] - Move Socket class
 	[x] - Move most of current connection stuff to p_client
-	[ ] - Protocol modules for current versions of popular IRCds
-		[ ] - InspIRCd
+	[>] - Protocol modules for current versions of popular IRCds
+		[>] - InspIRCd
 		[ ] - maybe others?
-	[>] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
-		[ ] - Protocol modules
-			[>] - p_client - defaults with configurable changes
-		[>] - Module API
+	[x] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
+		[x] - Protocol modules
+			[x] - p_client - defaults with configurable changes
+		[x] - Module API
 [x] - Modular sockets: allow protocol modules to pick a socket class to use
 	[ ] - allows more than just plaintext, e.g. SSL without stunnel, etc.
 [x] - Change how users are handled (p_client)

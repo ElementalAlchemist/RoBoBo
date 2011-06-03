@@ -1,10 +1,10 @@
 #include "protoinclude.h"
+#include <ctime>
 
 class InspIRCd;
 class User {
 	public:
-		User(std::string server, std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes);
-		std::string server();
+		User(std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes);
 		std::string nick();
 		std::string ident();
 		std::string host();
@@ -26,7 +26,7 @@ class User {
 		void addStatus(std::string channel, std::string status);
 		void removeStatus(std::string channel, std::string status);
 	private:
-		std::string sid, userNick, userIdent, userHost, vHost, GECOS, ip, oper;
+		std::string userNick, userIdent, userHost, vHost, GECOS, ip, oper;
 		time_t connectTime;
 		std::set<std::string> userModes;
 		std::set<char> SNOMasks;
@@ -87,9 +87,12 @@ class InspIRCd : public Protocol {
 		pthread_attr_t detachedState;
 		static void* receiveData_thread(void* ptr);
 		void receiveData();
+		std::list<std::string> clients;
+		std::tr1::unordered_map<std::string, User*> users;
+		std::tr1::unordered_map<std::string, Channel*> channels;
 };
 
-User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes) : sid(server), userNick(theNick), userIdent(theIdent), userHost(theHost), vHost(theVHost), GECOS(theGecos), ip(theIP), connectTime(theConnectTime), userModes(theUModes) {}
+User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes) : userNick(theNick), userIdent(theIdent), userHost(theHost), vHost(theVHost), GECOS(theGecos), ip(theIP), connectTime(theConnectTime), userModes(theUModes) {}
 
 std::string User::server() {
 	return sid;
@@ -198,7 +201,7 @@ void Channel::joinUser(std::string user) {
 	chanUsers.insert(user);
 }
 
-void channel::partUser(std::string user) {
+void Channel::partUser(std::string user) {
 	std::set<std::string>::iterator userIter = chanUsers.find(user);
 	if (userIter != chanUsers.end())
 		chanUsers.erase(userIter);
@@ -329,7 +332,7 @@ void InspIRCd::removeClient(std::string client) {
 }
 
 std::list<std::string> InspIRCd::clients() {
-	
+	return clients;
 }
 
 std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::string client) {
