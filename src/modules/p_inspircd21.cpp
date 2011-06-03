@@ -85,6 +85,8 @@ class InspIRCd : public Protocol {
 	private:
 		pthread_t receiveThread;
 		pthread_attr_t detachedState;
+		static void* receiveData_thread(void* ptr);
+		void receiveData();
 };
 
 User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theVHost, std::string theGecos, std::string theIP, time_t theConnectTime, std::set<std::string> theUModes) : sid(server), userNick(theNick), userIdent(theIdent), userHost(theHost), vHost(theVHost), GECOS(theGecos), ip(theIP), connectTime(theConnectTime), userModes(theUModes) {}
@@ -335,6 +337,16 @@ std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::stri
 }
 
 std::list<std::string> InspIRCd::userModes(std::string client) {
+	
+}
+
+static void* InspIRCd::receiveData_thread(void* ptr) {
+	InspIRCd* protoClass = (InspIRCd*) ptr;
+	protoClass->receiveData();
+	return NULL;
+}
+
+void InspIRCd::receiveData() {
 	
 }
 
