@@ -41,7 +41,7 @@ class Protocol {
 		virtual void setXLine(std::string client, char lineType, std::string hostmask, std::string time, std::string reason);
 		virtual void removeXLine(std::string client, char lineType, std::string hostmask);
 		
-		virtual void sendOther(std::string client, std::string rawLine);
+		virtual void sendOther(std::string rawLine);
 		
 		virtual void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		virtual void removeClient(std::string client);

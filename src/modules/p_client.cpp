@@ -46,7 +46,7 @@ class Client : public Protocol {
 		void quitServer(std::string reason);
 		void kickUser(std::string client, std::string channel, std::string user, std::string reason);
 		void changeNick(std::string client, std::string newNick);
-		void sendOther(std::string client, std::string rawLine);
+		void sendOther(std::string rawLine);
 		std::list<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		std::list<std::string> userModes(std::string client);
@@ -138,6 +138,11 @@ Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	pthread_mutex_init(&secondsmutex, NULL); // initialize mutex for use in sending threads
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
+	if (connection == NULL) {
+		std::cout << "p_client: " << serverName << ": Socket handle could not be obtained." << std::endl;
+		keepServer = false;
+		return;
+	}
 	if (serverConf["bind"] != "") {
 		if (!connection->bindSocket(serverConf["bind"]))
 			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl; // debug level 1
@@ -159,11 +164,6 @@ unsigned int Client::apiVersion() {
 }
 
 void Client::connectServer() {
-	if (connection == NULL) {
-		std::cout << "p_client: " << serverName << ": Socket handle could not be obtained." << std::endl;
-		keepServer = false;
-		return;
-	}
 	botBase->callPreConnectHook(serverName);
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
@@ -173,7 +173,7 @@ void Client::connectServer() {
 	botBase->callConnectHook(serverName);
 	if (serverConf["password"] != "")
 		sendOther("PASS " + serverConf["password"]);
-	changeNick(serverConf["nick"]);
+	changeNick("", serverConf["nick"]);
 	sendOther("USER " + serverConf["ident"] + " here " + serverName + " :" + serverConf["gecos"]);
 	pthread_create(&receiveThread, &detachedState, handleData_thread, this);
 	pthread_create(&sendThread, &detachedState, sendData_thread, this);
@@ -300,7 +300,7 @@ void Client::changeNick(std::string client, std::string newNick) {
 	dataToSend.push("NICK " + newNick);
 }
 
-void Client::sendOther(std::string client, std::string rawLine) {
+void Client::sendOther(std::string rawLine) {
 	dataToSend.push(rawLine);
 }
 
