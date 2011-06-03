@@ -267,7 +267,7 @@ void InspIRCd::sendMsg(std::string client, std::string target, std::string messa
 	
 }
 
-void InspIRCD::sendNotice(std::string client, std::string target, std::string message) {
+void InspIRCd::sendNotice(std::string client, std::string target, std::string message) {
 	
 }
 
@@ -291,7 +291,7 @@ void InspIRCd::quitServer(std::string client, std::string reason) {
 	
 }
 
-void InspIRCD::kickUser(std::string client, std::string channel, std::string user, std::string reason) {
+void InspIRCd::kickUser(std::string client, std::string channel, std::string user, std::string reason) {
 	
 }
 
