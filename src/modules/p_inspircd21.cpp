@@ -76,7 +76,7 @@ class InspIRCd : public Protocol {
 		void changeNick(std::string client, std::string newNick);
 		void oper(std::string client, std::string username, std::string password, std::string opertype);
 		void killUser(std::string client, std::string user, std::string reason);
-		void setXLine(std::string client, char lineType, std::string hostmask, std::string time, std::string reason);
+		void setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string client, char lineType, std::string hostmask);
 		void sendSNotice(char snomask, std::string text);
 		void sendOther(std::string rawLine);
@@ -474,16 +474,25 @@ void InspIRCd::oper(std::string client, std::string username, std::string passwo
 }
 
 void InspIRCd::killUser(std::string client, std::string user, std::string reason) {
-	if (ourClients.find(client) == ourClients.end())
+	if (ourClients.find(client) == ourClients.end() && client != "")
 		return;
 	if (users.find(user) == users.end() && nicks.find(user) == nicks.end())
 		return;
+	if (client == "")
+		client = serverConf["sid"];
 	if (nicks.find(user) != nicks.end())
 		user = nicks.find(user)->second;
 	connection->sendData(":" + client + " KILL " + user + " :" + reason);
 }
 
-void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask, time_t time, std::string reason) {
+void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {
+	if (ourClients.find(client) == ourClients.end() && client != "")
+		return;
+	if (client == "")
+		client = serverConf["sid"];
+	std::ostringstream currTime, length;
+	currTime << time(NULL);
+	length << duration;
 	
 }
 
