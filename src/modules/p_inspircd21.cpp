@@ -11,6 +11,7 @@ class User {
 		std::string gecos();
 		time_t connectionTime();
 		std::string opertype();
+		void operup(std::string opertype);
 		std::set<std::string> modes();
 		void addMode(std::string mode);
 		void removeMode(std::string mode);
@@ -124,6 +125,10 @@ time_t User::connectionTime() {
 
 std::string User::opertype() {
 	return oper;
+}
+
+void User::operup(std::string opertype) {
+	oper = opertype;
 }
 
 std::set<std::string> User::modes() {
@@ -469,10 +474,16 @@ void InspIRCd::oper(std::string client, std::string username, std::string passwo
 }
 
 void InspIRCd::killUser(std::string client, std::string user, std::string reason) {
-	
+	if (ourClients.find(client) == ourClients.end())
+		return;
+	if (users.find(user) == users.end() && nicks.find(user) == nicks.end())
+		return;
+	if (nicks.find(user) != nicks.end())
+		user = nicks.find(user)->second;
+	connection->sendData(":" + client + " KILL " + user + " :" + reason);
 }
 
-void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask, std::string time, std::string reason) {
+void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask, time_t time, std::string reason) {
 	
 }
 

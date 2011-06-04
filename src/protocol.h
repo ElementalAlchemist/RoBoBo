@@ -37,7 +37,7 @@ class Protocol {
 		virtual void oper(std::string client, std::string username, std::string password, std::string opertype);
 		
 		virtual void killUser(std::string client, std::string user, std::string reason);
-		virtual void setXLine(std::string client, char lineType, std::string hostmask, std::string time, std::string reason);
+		virtual void setXLine(std::string client, char lineType, std::string hostmask, time_t time, std::string reason);
 		virtual void removeXLine(std::string client, char lineType, std::string hostmask);
 		virtual void sendSNotice(char snomask, std::string text);
 		
