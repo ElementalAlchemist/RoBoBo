@@ -166,15 +166,11 @@ void Module::oper(std::string server, std::string client, std::string username, 
 	serverData->oper(server, client, username, password, opertype);
 }
 
-void Module::sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData) {
-	serverData->sendNumeric(server, target, numeric, numericData);
-}
-
 void Module::killUser(std::string server, std::string client, std::string user, std::string reason) {
 	serverData->killUser(server, client, user, reason);
 }
 
-void Module::setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason) {
+void Module::setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {
 	serverData->setXLine(server, client, lineType, hostmask, duration, reason);
 }
 
@@ -182,16 +178,28 @@ void Module::removeXLine(std::string server, std::string client, char lineType, 
 	serverData->removeXLine(server, client, lineType, hostmask);
 }
 
-void Module::sendOtherCommand(std::string server, std::string client, std::string command, std::string data) {
-	serverData->sendOther(server, client, command + " " + data);
+void Module::sendSNotice(std::string server, char snomask, std::string text) {
+	serverData->sendSNotice(server, snomask, text);
+}
+
+void Module::sendOtherCommand(std::string server, std::string command, std::string data) {
+	serverData->sendOther(server, command + " " + data);
+}
+
+std::set<std::string> Module::clients(std::string server) {
+	return serverData->clients(server);
+}
+
+std::tr1::unordered_map<std::string, std::string> Module::clientInfo(std::string server, std::string client) {
+	return serverData->clientInfo(server, client);
 }
 
 void Module::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
 	serverData->addClient(server, nick, ident, host, gecos);
 }
 
-void Module::removeClient(std::string server, std::string client) {
-	serverData->removeClient(server, client);
+void Module::removeClient(std::string server, std::string client, std::string reason) {
+	serverData->removeClient(server, client, reason);
 }
 
 bool Module::connectServer(std::string server) {
@@ -323,6 +331,10 @@ std::string Module::userHost(std::string server, std::string user) {
 	return serverData->userHost(server, user);
 }
 
-std::pair<char, char> Module::userStatus(std::string server, std::string channel, std::string user) {
+std::list<std::string> Module::userModes(std::string server, std::string user) {
+	return serverData->userModes(server, user);
+}
+
+std::pair<std::string, char> Module::userStatus(std::string server, std::string channel, std::string user) {
 	return serverData->userStatus(server, channel, user);
 }

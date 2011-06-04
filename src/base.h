@@ -36,13 +36,13 @@ class Base {
 		void kickUser(std::string server, std::string client, std::string channel, std::string user, std::string reason = "");
 		void changeNick(std::string server, std::string client, std::string newNick);
 		void oper(std::string server, std::string client, std::string username, std::string password, std::string opertype);
-		void sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData);
 		void killUser(std::string server, std::string client, std::string user, std::string reason);
-		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason);
+		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string server, std::string client, char lineType, std::string hostmask);
-		void sendOther(std::string server, std::string client, std::string rawLine);
+		void sendSNotice(std::string server, char snomask, std::string text);
+		void sendOther(std::string server, std::string rawLine);
 		void addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
-		void removeClient(std::string server, std::string client);
+		void removeClient(std::string server, std::string client, std::string reason);
 		bool isChanType(char chanPrefix, std::string server);
 		std::vector<std::string> parseLine(std::string rawLine);
 		std::tr1::unordered_map<std::string, Module*> loadedModules();
@@ -55,7 +55,8 @@ class Base {
 		std::list<std::string> channelUsers(std::string server, std::string channel);
 		std::string userIdent(std::string server, std::string user);
 		std::string userHost(std::string server, std::string user);
-		std::pair<char, char> userStatus(std::string server, std::string channel, std::string user);
+		std::list<std::string> userModes(
+		std::pair<std::string, char> userStatus(std::string server, std::string channel, std::string user);
 		Socket* assignSocket(std::string socketType);
 		void rehash();
 		bool connectServer(std::string serverName);

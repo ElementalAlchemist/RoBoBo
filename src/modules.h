@@ -85,13 +85,13 @@ class Module {
 		void removeMode(std::string server, std::string client, std::string channel, std::string mode);
 		void changeNick(std::string server, std::string client, std::string nick);
 		void oper(std::string server, std::string client, std::string username, std::string password, std::string opertype = "");
-		void sendNumeric(std::string server, std::string target, std::string numeric, std::vector<std::string> numericData);
 		void killUser(std::string server, std::string client, std::string user, std::string reason);
-		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, std::string duration, std::string reason);
+		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string server, std::string client, char lineType, std::string hostmask);
-		void sendOtherCommand(std::string server, std::string client, std::string command, std::string data); // catch-all, just in case
+		void sendSNotice(std::string server, char snomask, std::string text);
+		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
 		void addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
-		void removeClient(std::string server, std::string client);
+		void removeClient(std::string server, std::string client, std::string reason = "");
 		bool connectServer(std::string server);
 		void quitServer(std::string server, std::string reason = "");
 		bool loadModule(std::string modName);
@@ -114,7 +114,8 @@ class Module {
 		std::list<std::string> channelUsers(std::string server, std::string channel);
 		std::string userIdent(std::string server, std::string user);
 		std::string userHost(std::string server, std::string user);
-		std::pair<char, char> userStatus(std::string server, std::string channel, std::string user);
+		std::list<std::string> userModes(std::string server, std::string user);
+		std::pair<std::string, char> userStatus(std::string server, std::string channel, std::string user);
 	private:
 		Base* serverData;
 };
