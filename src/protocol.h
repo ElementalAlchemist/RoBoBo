@@ -31,7 +31,7 @@ class Protocol {
 		virtual void removeMode(std::string client, std::string target, std::string mode);
 		virtual void joinChannel(std::string client, std::string channel, std::string key = "");
 		virtual void partChannel(std::string client, std::string channel, std::string reason = "");
-		virtual void quitServer(std::string client, std::string reason = "");
+		virtual void quitServer(std::string reason = "");
 		virtual void kickUser(std::string client, std::string channel, std::string user, std::string reason = "");
 		virtual void changeNick(std::string client, std::string newNick);
 		virtual void oper(std::string client, std::string username, std::string password, std::string opertype);
@@ -44,7 +44,7 @@ class Protocol {
 		virtual void sendOther(std::string rawLine);
 		
 		virtual void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
-		virtual void removeClient(std::string client);
+		virtual void removeClient(std::string client, std::string reason = "");
 		virtual std::set<std::string> clients();
 		virtual std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		virtual std::list<std::string> userModes(std::string client);

@@ -447,10 +447,9 @@ void InspIRCd::partChannel(std::string client, std::string channel, std::string 
 	connection->sendData(":" + client + " PART " + channel + " :" + reason);
 }
 
-void InspIRCd::quitServer(std::string client, std::string reason) {
-	if (ourClients.find(client) == ourClients.end())
-		return;
-	connection->sendData(":" + client + " QUIT :" + reason);
+void InspIRCd::quitServer(std::string reason) {
+	connection->sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
+	keepServer = false; // if the bot is intentionally quitting, it's not necessary to keep this server anymore
 }
 
 void InspIRCd::kickUser(std::string client, std::string channel, std::string user, std::string reason) {
@@ -493,19 +492,23 @@ void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask,
 	std::ostringstream currTime, length;
 	currTime << time(NULL);
 	length << duration;
-	
+	connection->sendData(":" + client + " ADDLINE " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason);
 }
 
 void InspIRCd::removeXLine(std::string client, char lineType, std::string hostmask) {
-	
+	if (ourClients.find(client) == ourClients.end() && client != "")
+		return;
+	if (client == "")
+		client = serverConf["sid"];
+	connection->sendData(":" + client + " DELLINE " + lineType + " " + hostmask);
 }
 
 void InspIRCd::sendSNotice(char snomask, std::string text) {
-	
+	connection->sendData(":" + serverConf["sid"] + " " + snomask + " :" + text);
 }
 
 void InspIRCd::sendOther(std::string rawLine) {
-	
+	connection->sendData(rawLine);
 }
 
 void InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
