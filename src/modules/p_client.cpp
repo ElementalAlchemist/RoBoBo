@@ -1035,9 +1035,9 @@ void Client::parseNames(std::string channel, std::string namesList) {
 	}
 }
 
-std::list<std::string> Client::clients() {
-	std::list<std::string> ircClients;
-	ircClients.push_back(serverConf["nick"]);
+std::set<std::string> Client::clients() {
+	std::set<std::string> ircClients;
+	ircClients.insert(serverConf["nick"]);
 	return ircClients;
 }
 

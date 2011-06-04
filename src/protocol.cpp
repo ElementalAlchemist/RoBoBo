@@ -51,10 +51,10 @@ void Protocol::kickUser(std::string channel, std::string user, std::string reaso
 void Protocol::changeNick(std::string client, std::string newNick) {}
 void Protocol::oper(std::string client, std::string username, std::string password, std::string opertype) {}
 
-void Protocol::sendNumeric(std::string numeric, std::string target, std::vector<std::string> numericData) {}
 void Protocol::killUser(std::string user, std::string reason) {}
 void Protocol::setXLine(char lineType, std::string hostmask, std::string time, std::string reason) {}
 void Protocol::removeXLine(char lineType, std::string hostmask) {}
+void Protocol::sendSNotice(char snomask, std::string text) {}
 
 void Protocol::sendOther(std::string rawLine) {}
 

@@ -36,16 +36,16 @@ class Protocol {
 		virtual void changeNick(std::string client, std::string newNick);
 		virtual void oper(std::string client, std::string username, std::string password, std::string opertype);
 		
-		virtual void sendNumeric(std::string numeric, std::string target, std::vector<std::string> numericData);
 		virtual void killUser(std::string client, std::string user, std::string reason);
 		virtual void setXLine(std::string client, char lineType, std::string hostmask, std::string time, std::string reason);
 		virtual void removeXLine(std::string client, char lineType, std::string hostmask);
+		virtual void sendSNotice(char snomask, std::string text);
 		
 		virtual void sendOther(std::string rawLine);
 		
 		virtual void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		virtual void removeClient(std::string client);
-		virtual std::list<std::string> clients();
+		virtual std::set<std::string> clients();
 		virtual std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		virtual std::list<std::string> userModes(std::string client);
 	protected:
