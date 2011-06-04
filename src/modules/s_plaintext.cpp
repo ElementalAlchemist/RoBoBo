@@ -78,7 +78,7 @@ std::string PlainText::receive() {
 				usleep(100000);
 			status = recv(socketfd, &inputBuffer, 1, 0);
 			addPause = true;
-		} while ((status < 0 && errno == EWOULDBLOCK) && status != 0);
+		} while (status < 0 && errno == EWOULDBLOCK);
 		addPause = false;
 		if (status <= 0) {
 			perror("An error occurred receiving a message");
