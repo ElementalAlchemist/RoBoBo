@@ -758,6 +758,8 @@ char Client::convertMode(std::string mode) {
 		return 'O';
 	if (mode == "opmoderated")
 		return 'U';
+	if (mode == "operprefix")
+		return 'y';
 	if (mode == "permanent")
 		return 'P';
 	if (mode == "private")
