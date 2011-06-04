@@ -4,7 +4,7 @@
 class InspIRCd;
 class User {
 	public:
-		User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime, std::set<std::string> theUModes);
+		User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime);
 		std::string nick();
 		std::string ident();
 		std::string host();
@@ -81,7 +81,7 @@ class InspIRCd : public Protocol {
 		void sendSNotice(char snomask, std::string text);
 		void sendOther(std::string rawLine);
 		void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
-		void removeClient(std::string client);
+		void removeClient(std::string client, std::string reason);
 		std::list<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		std::list<std::string> userModes(std::string client);
@@ -101,7 +101,7 @@ class InspIRCd : public Protocol {
 		std::string useUID();
 };
 
-User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime, std::set<std::string> theUModes) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), connectTime(theConnectTime), userModes(theUModes) {}
+User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), connectTime(theConnectTime) {}
 
 std::string User::nick() {
 	return userNick;
@@ -265,8 +265,9 @@ void InspIRCd::connectServer() {
 	while (serverConf[clientNick.str()] != "") {
 		std::string uuid = serverConf["sid"] + useUID();
 		sendOther(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
-		users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime, std::set<std::string> ())));
+		users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime)));
 		nicks.insert(std::pair<std::string, std::string> (serverConf[clientNick.str()], uuid));
+		ourClients.insert(uuid);
 		if (serverConf[clientOper.str()] != "")
 			sendOther (":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
 		i++;
@@ -512,11 +513,23 @@ void InspIRCd::sendOther(std::string rawLine) {
 }
 
 void InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
-	
+	std::string uuid = serverConf["sid"] + useUID();
+	users.insert(std::pair<std::string, User*> (uuid, new User (nick, ident, host, gecos, time(NULL))));
+	nicks.insert(std::pair<std::string, std::string> (nick, uuid));
+	ourClients.insert(uuid);
+	std::ostringstream currTime;
+	currTime << time(NULL);
+	connection->sendData(":" + serverConf["sid"] + " UID " + uuid + " " + currTime.str() + " " + nick + " " + host + " " + host + " " + ident + " 127.0.0.1 " + currTime.str() + " + :" + gecos);
 }
 
-void InspIRCd::removeClient(std::string client) {
-	
+void InspIRCd::removeClient(std::string client, std::string reason) {
+	if (ourClients.find(client) == ourClients.end())
+		return;
+	ourClients.erase(ourClients.find(client));
+	std::tr1::unordered_map<std::pair, User*>::iterator userIter = users.find(client);
+	nicks.erase(nicks.find(userIter->second->nick()));
+	users.erase(userIter);
+	connection->sendData(":" + client + " QUIT :" + reason);
 }
 
 std::set<std::string> InspIRCd::clients() {
