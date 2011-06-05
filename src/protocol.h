@@ -1,4 +1,4 @@
-#ifndef PROTOCOL_H
+#ifndef PROTOCOL_H // See the PROTOCOL doc file for more information on utilizing this class.
 #define PROTOCOL_H
 #include "main.h"
 #include "socket.h"

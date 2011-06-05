@@ -1,4 +1,4 @@
-#ifndef MODULES_H
+#ifndef MODULES_H // See the MODULES doc file for more information on utilizing this class.
 #define MODULES_H
 #include "main.h"
 #include "config.h"
