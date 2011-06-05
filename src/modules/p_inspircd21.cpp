@@ -6,9 +6,13 @@ class User {
 	public:
 		User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime);
 		std::string nick();
+		void nick(std::string newNick);
 		std::string ident();
+		void ident(std::string newIdent);
 		std::string host();
+		void host(std::string newHost);
 		std::string gecos();
+		void gecos(std::string newGecos);
 		time_t connectionTime();
 		std::string opertype();
 		void operup(std::string opertype);
@@ -43,11 +47,13 @@ class Channel {
 		void partUser(std::string user);
 		void joinUsers(std::set<std::string> users);
 		std::string topic();
-		void topic(std::string newTopic);
+		void topic(std::string newTopic, time_t tTime);
+		time_t topicSetTime();
+		time_t creationTime();
 	private:
 		std::set<std::string> chanModes, chanUsers;
 		std::string chanTopic;
-		time_t createTime;
+		time_t createTime, topicTime;
 };
 
 class InspIRCd : public Protocol {
@@ -78,6 +84,7 @@ class InspIRCd : public Protocol {
 		void killUser(std::string client, std::string user, std::string reason);
 		void setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string client, char lineType, std::string hostmask);
+		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > listXLines();
 		void sendSNotice(char snomask, std::string text);
 		void sendOther(std::string rawLine);
 		void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
@@ -96,7 +103,10 @@ class InspIRCd : public Protocol {
 		std::tr1::unordered_map<std::string, Channel*> chans;
 		std::list<std::pair<std::string, char> > chanRanks;
 		std::vector<std::vector<std::string> > chanModes;
-		char convertMode(std::string mode);
+		std::tr1::unordered_map<std::string, char> allModes;
+		std::tr1::unordered_map<char, std::string> allChanModes;
+		std::tr1::unordered_map<char, std::string> allUserModes;
+		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > xLines;
 		std::string uidCount;
 		std::string useUID();
 };
@@ -107,16 +117,32 @@ std::string User::nick() {
 	return userNick;
 }
 
+void User::nick(std::string newNick) {
+	userNick = newNick;
+}
+
 std::string User::ident() {
 	return userIdent;
+}
+
+void User::ident(std::string newIdent) {
+	userIdent = newIdent;
 }
 
 std::string User::host() {
 	return userHost;
 }
 
+void User::host(std::string newHost) {
+	userHost = newHost;
+}
+
 std::string User::gecos() {
 	return GECOS;
+}
+
+void User::gecos(std::string newGecos) {
+	GECOS = newGecos;
 }
 
 time_t User::connectionTime() {
@@ -218,8 +244,17 @@ std::string Channel::topic() {
 	return chanTopic;
 }
 
-void Channel::topic(std::string newTopic) {
+void Channel::topic(std::string newTopic, time_t tTime) {
 	chanTopic = newTopic;
+	topicTime = tTime;
+}
+
+time_t Channel::topicSetTime() {
+	return topicTime;
+}
+
+time_t Channel::creationTime() {
+	return createTime;
 }
 
 InspIRCd::InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug) : Protocol(serverAddr, config, base, debug), uidCount("AAAAAA") {
@@ -504,6 +539,10 @@ void InspIRCd::removeXLine(std::string client, char lineType, std::string hostma
 	connection->sendData(":" + client + " DELLINE " + lineType + " " + hostmask);
 }
 
+std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > InspIRCd::listXLines() {
+	return xLines;
+}
+
 void InspIRCd::sendSNotice(char snomask, std::string text) {
 	connection->sendData(":" + serverConf["sid"] + " " + snomask + " :" + text);
 }
@@ -537,11 +576,29 @@ std::set<std::string> InspIRCd::clients() {
 }
 
 std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::string client) {
-	
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
+	if (userIter == users.end())
+		return;
+	std::tr1::unordered_map<std::string, std::string> info;
+	info["nick"] = userIter->second->nick();
+	info["ident"] = userIter->second->ident();
+	info["host"] = userIter->second->host();
+	info["gecos"] = userIter->second->gecos();
+	std::ostringstream connTime;
+	connTime << userIter->second->connectionTime();
+	info["connecttime"] = connTime.str();
+	info["opertype"] = userIter->second->opertype();
 }
 
 std::list<std::string> InspIRCd::userModes(std::string client) {
-	
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
+	if (userIter == users.end())
+		return;
+	std::list<std::string> userModes;
+	std::set<std::string> umodes = userIter->second->modes();
+	for (std::set<std::string>::iterator modeIter = umodes.begin(); modeIter != umodes.end(); ++modeIter)
+		userModes.push_back(*modeIter);
+	return userModes;
 }
 
 static void* InspIRCd::receiveData_thread(void* ptr) {
@@ -551,7 +608,165 @@ static void* InspIRCd::receiveData_thread(void* ptr) {
 }
 
 void InspIRCd::receiveData() {
-	
+	std::string receivedLine = "";
+	std::vector<std::string> parsedLine;
+	while (true) {
+		receivedLine = connection->receive();
+		if (receivedLine == "") // Some failure occured in the receivement of the line.
+			break;
+		parsedLine = botBase->parseLine(receivedLine);
+		if (debugLevel >= 3)
+			std::cout << receivedLine << std::endl;
+		botBase->callPreHook(serverName, parsedLine);
+		if (parsedLine[0] == "CAPAB") {
+			if (parsedLine[1] == "CHANMODES") {
+				std::vector<std::string> splitLine;
+				std::string tempStr = "";
+				for (size_t i = 0; i < parsedLine[2].size(); i++) {
+					if (parsedLine[2][i] == ' ') {
+						splitLine.push_back(tempStr);
+						tempStr = "";
+						continue;
+					}
+					tempStr += parsedLine[2][i];
+				} // line is now split by space
+				if (tempStr != "")
+					splitLine.push_back(tempStr); // get last fragment if line doesn't end in space
+				for (size_t i = 0; i < splitLine.size(); i++) {
+					std::string mode = splitLine[i].substr(0, splitLine[i].find_first_of('=')), postEqual = splitLine[i].substr(splitLine[i].find_first_of('=') + 1);
+					char modeChar = postEqual[0];
+					if (postEqual.size() == 2) // status mode
+						modeChar = postEqual[1];
+					allModes.insert(std::pair<std::string, char> (mode, modeChar));
+					chanModes.insert(std::pair<std::string, char> (modeChar, mode));
+				}
+			} else if (parsedLine[1] == "USERMODES") {
+				std::vector<std::string> splitLine;
+				std::string tempStr = "";
+				for (size_t i = 0; i < parsedLine[2].size(); i++) {
+					if (parsedLine[2][i] == ' ') {
+						splitLine.push_back(tempStr);
+						tempStr = "";
+						continue;
+					}
+					tempStr += parsedLine[2][i];
+				} // line is now split by space
+				if (tempStr != "")
+					splitLine.push_back(tempStr); // get last fragment if line doesn't end in space
+				for (size_t i = 0; i < splitLine.size(); i++) {
+					std::string mode = splitLine[i].substr(0, splitLine[i].find_first_of('=')), postEqual = splitLine[i].substr(splitLine[i].find_first_of('=') + 1);
+					char modeChar = postEqual[0];
+					if (postEqual.size() == 2) // status mode
+						modeChar = postEqual[1];
+					allModes.insert(std::pair<std::string, char> (mode, modeChar));
+					userModes.insert(std::pair<std::string, char> (modeChar, mode));
+				}
+			} else if (parsedLine[1] == "CAPABILITIES") {
+				std::vector<std::string> splitLine;
+				std::string tempStr = "";
+				for (size_t i = 0; i < parsedLine[2].size(); i++) {
+					if (parsedLine[2][i] == ' ') {
+						splitLine.push_back(tempStr);
+						tempStr = "";
+						continue;
+					}
+					tempStr += parsedLine[2][i];
+				} // line is now split by space
+				if (tempStr != "")
+					splitLine.push_back(tempStr); // get last fragment if line doesn't end in space
+				for (size_t i = 0; i < splitLine.size(); i++) {
+					std::string first = splitLine[i].substr(0, splitLine[i].find_first_of('=')), second = splitLine[i].substr(splitLine[i].find_first_of('=') + 1);
+					if (first == "PREFIX") {
+						std::string third = second.substr(second.find_first_of(')') + 1);
+						second = second.substr(1, second.find_first_of(')') - 1);
+						for (size_t i = 0; i < second.size() && i < third.size(); i++)
+							chanRanks.push_back(std::pair<std::string, char> (allChanModes.find(second[i])->second, third[i]));
+					} else if (first == "CHANMODES") {
+						std::vector<std::string> modeList;
+						for (size_t i = 0; i < second.size(); i++) {
+							if (second[i] == ',') {
+								chanModes.push_back(modeList);
+								modeList.clear();
+								continue;
+							}
+							modeList.push_back(second[i]);
+						}
+						chanModes.push_back(modeList); // push back the last set
+					}
+				}
+			} else if (parsedLine[1] == "UID") {
+				nicks.insert(std::pair<std::string, std::string> (parsedLine[4], parsedLine[2]));
+				time_t connectTime;
+				std::istringstream ct (parsedLine[9]);
+				ct >> connectTime;
+				std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime)));
+				for (size_t i = 1; i < parsedLine[10].size(); i++) { // skip the + symbol
+					std::string longmode = allUserModes.find(parsedLine[10][i])->second;
+					newUser.first->second->addMode(longmode);
+					if (longmode == "snomask") {
+						for (size_t j = 1; j < parsedLine[11].size(); j++)
+							newUser.first->second->addSnomask(parsedLine[11][j]);
+					}
+				}
+			} else if (parsedLine[1] == "FJOIN") {
+				std::istringstream cTime (parsedLine[3]);
+				time_t createTime;
+				cTime >> createTime;
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+				if (chanIter = channels.end())
+					chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
+				if (createTime < chanIter->second->creationTime()) {
+					std::string topic = chanIter->second->topic();
+					time_t topicTime = chanIter->second->topicSetTime();
+					std::set<std::string> users = chanIter->second->users();
+					channels.erase(chanIter);
+					chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
+					chanIter->second->joinUsers(users);
+					chanIter->second->topic(topic, topicTime);
+					size_t param = 5; // first param
+					for (size_t i = 1; i < parsedLine[4]; i++) {
+						std::string longmode = allChanModes.find(parsedLine[4][i])->second;
+						bool foundMode = false;
+						for (size_t j = 0; j < chanModes[0].size(); j++) {
+							if (chanModes[0][j] == longmode)
+								foundMode = true;
+						}
+						if (!foundMode) {
+							for (size_t j = 0; j < chanModes[1].size(); j++) {
+								if (chanModes[1][j] == longmode)
+									foundMode = true;
+							}
+						}
+						if (!foundMode) {
+							for (size_t j = 0; j < chanModes[2].size(); j++) {
+								if (chanModes[2][j] == longmode)
+									foundMode = true;
+							}
+						}
+						if (foundMode)
+							longmode += "=" + parsedLine[param++];
+						chanIter->second->addMode(longmode);
+					}
+				}
+			} else if (parsedLine[1] == "FMODE") {
+				
+			} else if (parsedLine[1] == "FTOPIC") {
+				
+			} else if (parsedLine[1] == "FHOST") {
+				
+			} else if (parsedLine[1] == "FNAME") {
+				
+			} else if (parsedLine[1] == "NICK") {
+				std::string uuid = parsedLine[0].substr(1); // strip starting colon
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
+				std::string oldNick = userIter->second->nick();
+				userIter->second->nick(parsedLine[2]);
+				nicks.erase(nicks.find(oldNick));
+				nicks.insert(std::pair<std::string, std::string> (parsedLine[2], uuid));
+			}
+		}
+		botBase->callPostHook(serverName, parsedLine);
+	}
 }
 
 std::string InspIRCd::useUID() {
