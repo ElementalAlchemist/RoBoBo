@@ -39,6 +39,7 @@ class Base {
 		void killUser(std::string server, std::string client, std::string user, std::string reason);
 		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string server, std::string client, char lineType, std::string hostmask);
+		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > listXLines(std::string server);
 		void sendSNotice(std::string server, char snomask, std::string text);
 		void sendOther(std::string server, std::string rawLine);
 		void addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);

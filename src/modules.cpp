@@ -178,6 +178,10 @@ void Module::removeXLine(std::string server, std::string client, char lineType, 
 	serverData->removeXLine(server, client, lineType, hostmask);
 }
 
+std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > Module::listXLines(std::string server) {
+	return serverData->listXLines(server);
+}
+
 void Module::sendSNotice(std::string server, char snomask, std::string text) {
 	serverData->sendSNotice(server, snomask, text);
 }

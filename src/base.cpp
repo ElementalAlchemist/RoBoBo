@@ -759,6 +759,13 @@ void Base::removeXLine(std::string server, std::string client, char lineType, st
 	servIter->second->removeXLine(client, lineType, hostmask);
 }
 
+std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > Base::listXLines(std::string server) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > ();
+	return servIter->second->listXLines();
+}
+
 void Base::sendSNotice(std::string server, char snomask, std::string text) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
