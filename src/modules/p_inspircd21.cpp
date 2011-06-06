@@ -628,7 +628,9 @@ void InspIRCd::receiveData() {
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
 		botBase->callPreHook(serverName, parsedLine);
-		if (parsedLine[0] == "CAPAB") {
+		if (parsedLine[1] == "PING" && parsedLine[3] == serverConf["sid"])
+			connection->sendData(":" + serverConf["sid"] + " PONG " + parsedLine[3] + parsedLine[2]);
+		else if (parsedLine[0] == "CAPAB") {
 			if (parsedLine[1] == "CHANMODES") {
 				std::vector<std::string> splitLine;
 				std::string tempStr = "";
