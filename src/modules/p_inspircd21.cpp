@@ -423,6 +423,11 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 	}
 	if (tempStr != "")
 		modeList.push_back(tempStr);
+	if (ourClients.find(target) != ourClients.end()) {
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(target);
+		for (size_t i = 0; i < modeList.size(); i++)
+			userIter->second->addMode(modeList[i]);
+	} // Don't return because other servers should also know of the change.
 	for (size_t i = 0; i < modeList.size(); i++) {
 		if (modeList[i].find_first_of('=') != std::string::npos) {
 			std::string newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
@@ -430,7 +435,7 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 				newParam = nicks.find(newParam)->second; // Insp requires mode params that act on someone to be UUIDs so let's convert those.
 			params += " " + newParam;
 		}
-		modes += convertMode(modeList[i]);
+		modes += allModes.find(modeList[i])->second;
 	}
 	std::ostringstream currTime;
 	currTime << time(NULL);
@@ -455,6 +460,11 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 	}
 	if (tempStr != "")
 		modeList.push_back(tempStr);
+	if (ourClients.find(target) != ourClients.end()) {
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(target);
+		for (size_t i = 0; i < modeList.size(); i++)
+			userIter->second->removeMode(modeList[i]);
+	} // Don't return because other servers should also know of the change.
 	for (size_t i = 0; i < modeList.size(); i++) {
 		if (modeList[i].find_first_of('=') != std::string::npos) {
 			std::string newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
@@ -462,7 +472,7 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 				newParam = nicks.find(newParam)->second;
 			params += " " + newParam;
 		}
-		modes += convertMode(modeList[i]);
+		modes += allModes.find(modeList[i])->second;
 	}
 	std::ostringstream currTime;
 	currTime << time(NULL);
@@ -749,14 +759,60 @@ void InspIRCd::receiveData() {
 					}
 				}
 			} else if (parsedLine[1] == "FMODE") {
-				
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+				std::istringstream cTime (parsedLine[3]);
+				time_t createTime;
+				cTime >> createTime;
+				if (createTime <= chanIter->second->creationTime()) {
+					bool adding = true;
+					size_t parameter = 5;
+					for (size_t i = 0; i < parsedLine[4].size(); i++) {
+						if (parsedLine[4][i] == '+') {
+							adding = true;
+							continue;
+						}
+						if (parsedLine[4][i] == '-') {
+							adding = false;
+							continue;
+						}
+						std::string longmode = allModes.find(parsedLine[4][i])->second;
+						bool param = false;
+						for (size_t j = 0; j < chanModes[0].size(); j++) {
+							if (chanModes[0][j] == longmode)
+								param = true;
+						}
+						if (!param) {
+							for (size_t j = 0; j < chanModes[1].size(); j++) {
+								if (chanModes[1][j] == longmode)
+									param = true;
+							}
+						}
+						if (!param && adding) {
+							for (size_t j = 0; j < chanModes[2].size(); j++) {
+								if (chanModes[2][j] == longmode)
+									param = true;
+							}
+						}
+						if (param)
+							longmode += "=" + parsedLine[parameter++];
+						if (adding)
+							chanIter->second->addMode(longmode);
+						else
+							chanIter->second->removeMode(longmode);
+					}
+				}
 			} else if (parsedLine[1] == "FTOPIC") {
-				
-			} else if (parsedLine[1] == "FHOST") {
-				
-			} else if (parsedLine[1] == "FNAME") {
-				
-			} else if (parsedLine[1] == "NICK") {
+				std::istringstream cTime (parsedLine[3]);
+				time_t topicTime;
+				cTime >> topicTime;
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+				if (topicTime > chanIter->second->topicSetTime())
+					chanIter->second->topic(parsedLine[4], topicTime);
+			} else if (parsedLine[1] == "FHOST")
+				users.find(parsedLine[0].substr(1))->second->host(parsedLine[2]);
+			else if (parsedLine[1] == "FNAME")
+				users.find(parsedLine[0].substr(1))->second->gecos(parsedLine[2]);
+			else if (parsedLine[1] == "NICK") {
 				std::string uuid = parsedLine[0].substr(1); // strip starting colon
 				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
 				std::string oldNick = userIter->second->nick();
