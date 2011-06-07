@@ -86,7 +86,7 @@ class InspIRCd : public Protocol {
 		void quitServer(std::string client, std::string reason = "");
 		void kickUser(std::string client, std::string channel, std::string user, std::string reason = "");
 		void changeNick(std::string client, std::string newNick);
-		void oper(std::string client, std::string username, std::string password, std::string opertype);
+		void oper(std::string client, std::string username, std::string password);
 		void killUser(std::string client, std::string user, std::string reason);
 		void setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string client, char lineType, std::string hostmask);
@@ -573,10 +573,10 @@ void InspIRCd::changeNick(std::string client, std::string newNick) {
 	connection->sendData(":" + client + " NICK " + newNick + " " + currTime);
 }
 
-void InspIRCd::oper(std::string client, std::string username, std::string password, std::string opertype) {
+void InspIRCd::oper(std::string client, std::string username, std::string password) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
-	connection->sendData(":" + client + " OPERTYPE " + opertype);
+	connection->sendData(":" + client + " OPERTYPE " + username);
 }
 
 void InspIRCd::killUser(std::string client, std::string user, std::string reason) {
