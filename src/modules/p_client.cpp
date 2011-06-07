@@ -46,6 +46,7 @@ class Client : public Protocol {
 		void quitServer(std::string reason);
 		void kickUser(std::string client, std::string channel, std::string user, std::string reason);
 		void changeNick(std::string client, std::string newNick);
+		void oper(std::string client, std::string username, std::string password);
 		void sendOther(std::string rawLine);
 		std::list<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
@@ -366,6 +367,10 @@ void Client::kickUser(std::string client, std::string channel, std::string user,
 
 void Client::changeNick(std::string client, std::string newNick) {
 	dataToSend.push("NICK " + newNick);
+}
+
+void Client::oper(std::string client, std::string username, std::string password) {
+	dataToSend.push("OPER " + username + " " + password);
 }
 
 void Client::sendOther(std::string rawLine) {
