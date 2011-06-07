@@ -293,33 +293,61 @@ void InspIRCd::connectServer() {
 	sendOther(":" + serverConf["sid"] + " BURST");
 	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
 	unsigned int i = 0;
-	std::ostringstream clientNick, clientIdent, clientHost, clientGecos, clientOper, currTimeS;
+	std::ostringstream clientNick, clientIdent, clientHost, clientGecos, clientOper, clientChannels, currTimeS;
 	clientNick << i << "/nick";
 	clientIdent << i << "/ident";
 	clientHost << i << "/host";
 	clientGecos << i << "/gecos";
 	clientOper << i << "/oper";
+	clientChannels << i << "/channels";
 	time_t currTime = time(NULL);
 	currTimeS << currTime;
+	std::tr1::unordered_map<std::string, std::string> joiningChannels;
 	while (serverConf[clientNick.str()] != "") {
 		std::string uuid = serverConf["sid"] + useUID();
 		sendOther(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
-		users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime)));
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime)));
 		nicks.insert(std::pair<std::string, std::string> (serverConf[clientNick.str()], uuid));
 		ourClients.insert(uuid);
 		if (serverConf[clientOper.str()] != "")
-			sendOther (":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
+			sendOther(":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
+		while (serverConf[clientChannels.str()] != "") {
+			std::string channelName = serverConf[clientChannels.str()].substr(0, serverConf[clientChannels.str()].find_first_of(','));
+			if (serverConf[clientChannels.str()].find_first_of(',') == std::string::npos)
+				serverConf[clientChannels.str()] = "";
+			else
+				serverConf[clientChannels.str()] = serverConf[clientChannels.str()].substr(serverConf[clientChannels.str()].find_first_of(',') + 1);
+			if (joiningChannels.find(channelName) == joiningChannels.end()) {
+				joiningChannels.insert(std::pair<std::string, std::string> (channelName, "o," + uuid));
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.insert(std::pair<std::string, Channel*> (channelName, new Channel (currTime))).first;
+				chanIter->second->joinUser(uuid);
+				userIter->second->joinChannel(channelName);
+				userIter->second->addStatus(channelName, "op");
+			} else {
+				channels.find(channelName)->joinUser(uuid);
+				userIter->second->joinChannel(channelName);
+				userIter->second->addStatus(channelName, "op");
+				joiningChannels[channelName] += " o," + uuid;
+			}
+		}
 		i++;
 		clientNick.str("");
 		clientIdent.str("");
 		clientHost.str("");
 		clientGecos.str("");
 		clientOper.str("");
+		clientChannels.str("");
 		clientNick << i << "/nick";
 		clientIdent << i << "/ident";
 		clientHost << i << "/host";
 		clientGecos << i << "/gecos";
 		clientOper << i << "/oper";
+		clientChannels << i << "/channels";
+	}
+	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter) {
+		std::ostringstream currTime; // do it like this in case the second changed in the middle or something so that the correct timestamp is still sent
+		currTime << channels.find(jcIter->first)->second->creationTime();
+		connection->sendData(":" + serverConf["sid"] + " FJOIN " + jcIter->first + " " + currTime.str() + " +nt :" + jcIter->second);
 	}
 	botBase->callConnectHook(serverName);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
@@ -872,6 +900,10 @@ void InspIRCd::receiveData() {
 			userIter->second->nick(parsedLine[2]);
 			nicks.erase(nicks.find(oldNick));
 			nicks.insert(std::pair<std::string, std::string> (parsedLine[2], uuid));
+		} else if (parsedLine[1] == "TIME" && parsedLine[2] == serverConf["sid"] && parsedLine.size() == 4) { // don't reply if for some reason we're getting a TIME reply. That would be stupid, and you would be stupid for doing it.
+			std::ostringstream currTime;
+			currTime << time(NULL);
+			connection->sendData(":" + serverConf["sid"] + " TIME " + parsedLine[0].substr(1) + " " + parsedLine[3] + " " + currTime.str());
 		} else if (parsedLine[1] == "SQUIT" && (parsedLine[2] == serverConf["sid"] || parsedLine[2] == connectedSID)) {
 			keepServer = false;
 			connection->closeConnection();
