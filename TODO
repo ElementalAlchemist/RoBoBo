@@ -17,7 +17,8 @@ Before release.  Duh.
 		[ ] - maybe others?
 	[x] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
 		[x] - Protocol modules
-			[x] - p_client - defaults with configurable changes
+			[x] - p_client
+			[x] - allow configurable changes
 		[x] - Module API
 [x] - Modular sockets: allow protocol modules to pick a socket class to use
 	[ ] - allows more than just plaintext, e.g. SSL without stunnel, etc.

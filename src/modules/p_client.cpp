@@ -71,8 +71,11 @@ class Client : public Protocol {
 		std::vector<std::vector<char> > chanModes;
 		std::set<char> chanTypes;
 		unsigned int maxModes;
+		std::tr1::unordered_map<std::string, char> allModes;
+		std::tr1::unordered_map<char, std::string> allChanModes, allUserModes;
 		void setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param = "");
 		void setStatus(bool addMode, std::string channel, std::string status, std::string user);
+		void saveMode(std::string longmode, char modeChar);
 		char convertMode(std::string mode);
 		std::string convertChanMode(char mode);
 		std::string convertUserMode(char mode);
@@ -151,6 +154,71 @@ Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, s
 		floodControl = false;
 	else
 		floodControl = true;
+	saveMode("admin", 'a', true); // long form, default char, whether it's a channel mode
+	saveMode("allowinvite", 'A', true); // This function allows repeated additions of modes
+	saveMode("auditorium", 'u', true); // to saved mode conversions without too much code
+	saveMode("autoop", 'w', true); // duplication and allowing easy changes to mode
+	saveMode("ban", 'b', true); // customization, if necessary.
+	saveMode("banexception", 'e', true);
+	saveMode("blockcaps", 'B', true);
+	saveMode("blockcolor", 'c', true);
+	saveMode("bot", 'B', false);
+	saveMode("c_registered", 'r', true);
+	saveMode("callerid", 'g', false);
+	saveMode("censor", 'G', true);
+	saveMode("chanacl", 'W', true);
+	saveMode("cloak", 'x', false);
+	saveMode("deaf", 'c', false);
+	saveMode("deaf_commonchan", 'c', false);
+	saveMode("delayjoin", 'D', true);
+	saveMode("delaymsg", 'd', true);
+	saveMode("exemptchanops", 'X', true);
+	saveMode("filter", 'g', true);
+	saveMode("flood", 'f', true);
+	saveMode("founder", 'q', true);
+	saveMode("halfop", 'h', true);
+	saveMode("hidechans", 'I', false);
+	saveMode("hideoper", 'H', false);
+	saveMode("history", 'H', true);
+	saveMode("invex", 'I', true);
+	saveMode("invisible", 'i', false);
+	saveMode("inviteonly", 'i', true);
+	saveMode("joinflood", 'j', true);
+	saveMode("key", 'k', true);
+	saveMode("kicknorejoin", 'J', true);
+	saveMode("limit", 'l', true);
+	saveMode("moderated", 'm', true);
+	saveMode("nickflood", 'F', true);
+	saveMode("noautoop", 'n', false);
+	saveMode("noctcp", 'C', true);
+	saveMode("noextmsg", 'n', true);
+	saveMode("nokick", 'Q', true);
+	saveMode("noknock", 'K', true);
+	saveMode("nonick", 'N', true);
+	saveMode("nonotice", 'T', true);
+	saveMode("official-join", 'Y', true);
+	saveMode("op", 'o', true);
+	saveMode("oper", 'o', false);
+	saveMode("operonly", 'O', true);
+	saveMode("operprefix", 'y', true);
+	saveMode("opmoderated", 'U', true);
+	saveMode("permanent", 'P', true);
+	saveMode("private", 'p', true);
+	saveMode("redirect", 'L', true);
+	saveMode("regdeaf", 'R', false);
+	saveMode("reginvite", 'R', true);
+	saveMode("regmoderated", 'M', true);
+	saveMode("secret", 's', true);
+	saveMode("showwhois", 'W', false);
+	saveMode("snomask", 's', false);
+	saveMode("sslonly", 'z', true);
+	saveMode("stripcolor", 'S', true);
+	saveMode("topiclock", 't', true);
+	saveMode("u_censor", 'G', false);
+	saveMode("u_registered", 'r', false);
+	saveMode("u_stripcolor", 'S', false);
+	saveMode("voice", 'v', true);
+	saveMode("wallops", 'w', false);
 }
 
 Client::~Client() {
@@ -661,284 +729,45 @@ void Client::setStatus(bool addMode, std::string channel, std::string status, st
 	rankedUser->second->status(channel, status, addMode);
 }
 
+void Client::saveMode(std::string longmode, char modeChar, bool chanMode) {
+	if (serverConf[longmode] == "no" || serverConf[longmode] == "disable")
+		return;
+	if (serverConf[longmode] == "") {
+		allModes.insert(std::pair<std::string, char> (longmode, modeChar));
+		if (chanMode)
+			allChanModes.insert(std::pair<char, std::string> (modeChar, longmode));
+		else
+			allUserModes.insert(std::pair<char, std::string> (modeChar, longmode));
+		return;
+	}
+	allModes.insert(std::pair<std::string, char> (longmode, serverConf[longmode][0]));
+	if (chanMode)
+		allChanModes.insert(std::pair<char, std::string> (serverConf[longmode][0], longmode));
+	else
+		allUserModes.insert(std::pair<char, std::string> (serverConf[longmode][0], longmode));
+}
+
 char Client::convertMode(std::string mode) {
 	if (mode.find_first_of('=') != std::string::npos)
 		mode = mode.substr(0, mode.find_first_of('='));
-	if (mode == "admin")
-		return 'a';
-	if (mode == "allowinvite")
-		return 'A';
-	if (mode == "auditorium")
-		return 'u';
-	if (mode == "autoop")
-		return 'w';
-	if (mode == "ban")
-		return 'b';
-	if (mode == "banexception")
-		return 'e';
-	if (mode == "blockcaps")
-		return 'B';
-	if (mode == "blockcolor")
-		return 'c';
-	if (mode == "bot")
-		return 'B';
-	if (mode == "c_registered")
-		return 'r';
-	if (mode == "callerid")
-		return 'g';
-	if (mode == "censor")
-		return 'G';
-	if (mode == "chanacl")
-		return 'W';
-	if (mode == "cloak")
-		return 'x';
-	if (mode == "deaf")
-		return 'd';
-	if (mode == "deaf_commonchan")
-		return 'c';
-	if (mode == "delayjoin")
-		return 'D';
-	if (mode == "delaymsg")
-		return 'd';
-	if (mode == "exemtpchanops")
-		return 'X';
-	if (mode == "filter")
-		return 'g';
-	if (mode == "flood")
-		return 'f';
-	if (mode == "founder")
-		return 'q';
-	if (mode == "halfop")
-		return 'h';
-	if (mode == "hidechans")
-		return 'I';
-	if (mode == "hideoper")
-		return 'H';
-	if (mode == "history")
-		return 'H';
-	if (mode == "invex")
-		return 'I';
-	if (mode == "invisible")
-		return 'i';
-	if (mode == "inviteonly")
-		return 'i';
-	if (mode == "joinflood")
-		return 'j';
-	if (mode == "key")
-		return 'k';
-	if (mode == "kicknorejoin")
-		return 'J';
-	if (mode == "limit")
-		return 'l';
-	if (mode == "moderated")
-		return 'm';
-	if (mode == "nickflood")
-		return 'F';
-	if (mode == "noautoop")
-		return 'n';
-	if (mode == "noctcp")
-		return 'C';
-	if (mode == "noextmsg")
-		return 'n';
-	if (mode == "nokick")
-		return 'Q';
-	if (mode == "noknock")
-		return 'K';
-	if (mode == "nonick")
-		return 'N';
-	if (mode == "nonotice")
-		return 'T';
-	if (mode == "official-join")
-		return 'Y';
-	if (mode == "op")
-		return 'o';
-	if (mode == "oper")
-		return 'o';
-	if (mode == "operonly")
-		return 'O';
-	if (mode == "opmoderated")
-		return 'U';
-	if (mode == "operprefix")
-		return 'y';
-	if (mode == "permanent")
-		return 'P';
-	if (mode == "private")
-		return 'p';
-	if (mode == "redirect")
-		return 'L';
-	if (mode == "regdeaf")
-		return 'R';
-	if (mode == "reginvite")
-		return 'R';
-	if (mode == "regmoderated")
-		return 'M';
-	if (mode == "secret")
-		return 's';
-	if (mode == "showwhois")
-		return 'W';
-	if (mode == "snomask")
-		return 's';
-	if (mode == "sslonly")
-		return 'z';
-	if (mode == "stripcolor")
-		return 'S';
-	if (mode == "topiclock")
-		return 't';
-	if (mode == "u_censor")
-		return 'G';
-	if (mode == "u_registered")
-		return 'r';
-	if (mode == "u_stripcolor")
-		return 'S';
-	if (mode == "voice")
-		return 'v';
-	if (mode == "wallops")
-		return 'w';
-	return ' ';
+	std::tr1::unordered_map<std::string, char>::iterator modeIter = allModes.find(mode);
+	if (modeIter == allModes.end())
+		return ' ';
+	return modeIter->second;
 }
 
 std::string Client::convertChanMode(char mode) {
-	switch (mode) {
-		case 'a':
-			return "admin";
-		case 'b':
-			return "ban";
-		case 'c':
-			return "blockcolor";
-		case 'd':
-			return "delaymsg";
-		case 'e':
-			return "banexception";
-		case 'f':
-			return "flood";
-		case 'g':
-			return "filter";
-		case 'h':
-			return "halfop";
-		case 'i':
-			return "inviteonly";
-		case 'j':
-			return "joinflood";
-		case 'k':
-			return "key";
-		case 'l':
-			return "limit";
-		case 'm':
-			return "moderated";
-		case 'n':
-			return "noextmsg";
-		case 'o':
-			return "op";
-		case 'p':
-			return "private";
-		case 'q':
-			return "founder";
-		case 'r':
-			return "c_registered";
-		case 's':
-			return "secret";
-		case 't':
-			return "topiclock";
-		case 'u':
-			return "auditorium";
-		case 'v':
-			return "voice";
-		case 'w':
-			return "autoop";
-		case 'y':
-			return "operprefix";
-		case 'z':
-			return "sslonly";
-		case 'A':
-			return "allowinvite";
-		case 'B':
-			return "blockcaps";
-		case 'C':
-			return "noctcp";
-		case 'D':
-			return "delayjoin";
-		case 'F':
-			return "nickflood";
-		case 'G':
-			return "censor";
-		case 'H':
-			return "history";
-		case 'I':
-			return "invex";
-		case 'J':
-			return "kicknorejoin";
-		case 'K':
-			return "noknock";
-		case 'L':
-			return "redirect";
-		case 'M':
-			return "regmoderated";
-		case 'N':
-			return "nonick";
-		case 'O':
-			return "operonly";
-		case 'P':
-			return "permanent";
-		case 'Q':
-			return "nokick";
-		case 'R':
-			return "reginvite";
-		case 'S':
-			return "stripcolor";
-		case 'T':
-			return "nonotice";
-		case 'U':
-			return "opmoderated";
-		case 'W':
-			return "chanacl";
-		case 'X':
-			return "exemptchanops";
-		case 'Y':
-			return "official-join";
-		default:
-			return "";
-	}
+	std::tr1::unordered_map<char, std::string>::iterator modeIter = allChanModes.find(mode);
+	if (modeIter == allChanModes.end())
+		return "";
+	return modeIter->second;
 }
 
 std::string Client::convertUserMode(char mode) {
-	switch (mode) {
-		case 'c':
-			return "deaf_commonchan";
-		case 'd':
-			return "deaf";
-		case 'g':
-			return "callerid";
-		case 'i':
-			return "invisible";
-		case 'n':
-			return "noautoop";
-		case 'o':
-			return "oper";
-		case 'r':
-			return "u_registered";
-		case 's':
-			return "snomask";
-		case 'w':
-			return "wallops";
-		case 'x':
-			return "cloak";
-		case 'B':
-			return "bot";
-		case 'G':
-			return "u_censor";
-		case 'H':
-			return "hideoper";
-		case 'I':
-			return "hidechans";
-		case 'R':
-			return "regdeaf";
-		case 'S':
-			return "u_stripcolor";
-		case 'W':
-			return "showwhois";
-		default:
-			return "";
-	}
+	std::tr1::unordered_map<char, std::string>::iterator modeIter = allUserModes.find(mode);
+	if (modeIter == allUserModes.end())
+		return "";
+	return modeIter->second;
 }
 
 void Client::parse005(std::vector<std::string> parsedLine) {
