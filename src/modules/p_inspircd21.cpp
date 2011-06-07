@@ -28,11 +28,14 @@ class User {
 		std::set<std::string> statuses(std::string channel);
 		void addStatus(std::string channel, std::string status);
 		void removeStatus(std::string channel, std::string status);
+		void changeMetadata(std::string key, std::string value);
+		std::string seeMetadata(std::string key);
 	private:
 		std::string userNick, userIdent, userHost, GECOS, oper;
 		time_t connectTime;
 		std::set<std::string> userModes;
 		std::set<char> SNOMasks;
+		std::tr1::unordered_map<std::string, std::string> metadata;
 		std::tr1::unordered_map<std::string, std::set<std::string> > inChannels;
 };
 
@@ -50,10 +53,13 @@ class Channel {
 		void topic(std::string newTopic, time_t tTime);
 		time_t topicSetTime();
 		time_t creationTime();
+		void changeMetadata(std::string key, std::string value);
+		std::string seeMetadata(std::string key);
 	private:
 		std::set<std::string> chanModes, chanUsers;
 		std::string chanTopic;
 		time_t createTime, topicTime;
+		std::tr1::unordered_map<std::string, std::string> metadata;
 };
 
 class InspIRCd : public Protocol {
@@ -210,6 +216,14 @@ std::set<std::string> User::statuses(std::string channel) {
 	return chanIter->second;
 }
 
+void User::changeMetadata(std::string key, std::string value) {
+	metadata[key] = value;
+}
+
+std::string User::seeMetadata(std::string key) {
+	return metadata[key];
+}
+
 Channel::Channel(time_t creation) : createTime(creation) {}
 
 std::set<std::string> Channel::modes() {
@@ -259,6 +273,14 @@ time_t Channel::topicSetTime() {
 
 time_t Channel::creationTime() {
 	return createTime;
+}
+
+void Channel::changeMetadata(std::string key, std::string value) {
+	metadata[key] = value;
+}
+
+std::string Channel::seeMetadata(std::string key) {
+	return metadata[key];
 }
 
 InspIRCd::InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug) : Protocol(serverAddr, config, base, debug), uidCount("AAAAAA") {
@@ -904,6 +926,11 @@ void InspIRCd::receiveData() {
 			std::ostringstream currTime;
 			currTime << time(NULL);
 			connection->sendData(":" + serverConf["sid"] + " TIME " + parsedLine[0].substr(1) + " " + parsedLine[3] + " " + currTime.str());
+		} else if (parsedLine[1] == "METADATA") {
+			if (parsedLine[2][0] == '#')
+				channels.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
+			else
+				users.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
 		} else if (parsedLine[1] == "SQUIT" && (parsedLine[2] == serverConf["sid"] || parsedLine[2] == connectedSID)) {
 			keepServer = false;
 			connection->closeConnection();
