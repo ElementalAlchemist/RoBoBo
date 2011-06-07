@@ -236,7 +236,7 @@ void Client::connectServer() {
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
 	portNumber >> port;
-	connection.connectServer(serverName, port);
+	connection->connectServer(serverName, port);
 	sleep(1); // don't send right away in case of some sort of death or slowness
 	botBase->callConnectHook(serverName);
 	if (serverConf["password"] != "")
@@ -382,7 +382,7 @@ void Client::handleData() {
 	std::string receivedLine = "";
 	std::vector<std::string> parsedLine;
 	while (true) {
-		receivedLine = connection.receive();
+		receivedLine = connection->receive();
 		if (receivedLine == "")
 			break; // this case indicates a receive error
 		if (debugLevel >= 3)
@@ -526,7 +526,7 @@ void Client::handleData() {
 		else if (parsedLine[1] == "PART")
 			inChannels.find(parsedLine[2])->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1));
 		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
-			connection.closeConnection();
+			connection->closeConnection();
 			quitHooked = true;
 			keepServer = false;
 			break;
@@ -534,7 +534,7 @@ void Client::handleData() {
 			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 				chanIter->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!')));
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
-			connection.closeConnection();
+			connection->closeConnection();
 			quitHooked = true;
 			keepServer = false;
 			break;
@@ -558,7 +558,7 @@ void Client::sendData() {
 	std::string command = "";
 	pthread_create(&secondsThread, &detachedState, secondsDecrement_thread, this);
 	while (true) {
-		if (!connection.isConnected())
+		if (!connection->isConnected())
 			break; // Thread must die when server isn't connected.
 		if (dataToSend.empty()) {
 			usleep(100000); // sleep for a short time to avoid processor abuse while being ready for data to arrive
@@ -651,12 +651,12 @@ void Client::sendData() {
 		}
 		while (seconds + secondsToAdd > 10)
 			sleep(1);
-		connection.sendData(sendingMessage);
+		connection->sendData(sendingMessage);
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
 		botBase->callHookSend(serverName, parsedLine);
 		if (command == "QUIT") {
-			connection.closeConnection();
+			connection->closeConnection();
 			keepServer = false;
 			break;
 		}
@@ -674,7 +674,7 @@ void* Client::secondsDecrement_thread(void* ptr) {
 
 void Client::secondsDecrement() {
 	while (true) {
-		if (!connection.isConnected()) {
+		if (!connection->isConnected()) {
 			if (!quitHooked)
 				botBase->callQuitHook(serverName);
 			quitHooked = true;
