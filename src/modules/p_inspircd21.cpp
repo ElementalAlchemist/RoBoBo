@@ -106,6 +106,9 @@ class InspIRCd : public Protocol {
 		std::tr1::unordered_map<std::string, char> allModes;
 		std::tr1::unordered_map<char, std::string> allChanModes;
 		std::tr1::unordered_map<char, std::string> allUserModes;
+		char convertMode(std::string mode);
+		std::string convertChanMode(char mode);
+		std::string convertUserMode(char mode);
 		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > xLines;
 		std::string uidCount;
 		std::string useUID();
@@ -429,13 +432,16 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 			userIter->second->addMode(modeList[i]);
 	} // Don't return because other servers should also know of the change.
 	for (size_t i = 0; i < modeList.size(); i++) {
+		char newMode = convertMode(modeList[i]);
+		if (newMode == ' ')
+			continue;
 		if (modeList[i].find_first_of('=') != std::string::npos) {
 			std::string newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
 			if (nicks.find(newParam) != nicks.end())
 				newParam = nicks.find(newParam)->second; // Insp requires mode params that act on someone to be UUIDs so let's convert those.
 			params += " " + newParam;
 		}
-		modes += allModes.find(modeList[i])->second;
+		modes += newMode;
 	}
 	std::ostringstream currTime;
 	currTime << time(NULL);
@@ -466,13 +472,16 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 			userIter->second->removeMode(modeList[i]);
 	} // Don't return because other servers should also know of the change.
 	for (size_t i = 0; i < modeList.size(); i++) {
+		char remMode = convertMode(modeList[i]);
+		if (remMode == ' ')
+			continue;
 		if (modeList[i].find_first_of('=') != std::string::npos) {
 			std::string newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
 			if (nicks.find(newParam) != nicks.end())
 				newParam = nicks.find(newParam)->second;
 			params += " " + newParam;
 		}
-		modes += allModes.find(modeList[i])->second;
+		modes += remMode;
 	}
 	std::ostringstream currTime;
 	currTime << time(NULL);
@@ -650,7 +659,7 @@ void InspIRCd::receiveData() {
 					if (postEqual.size() == 2) // status mode
 						modeChar = postEqual[1];
 					allModes.insert(std::pair<std::string, char> (mode, modeChar));
-					chanModes.insert(std::pair<std::string, char> (modeChar, mode));
+					allChanModes.insert(std::pair<std::string, char> (modeChar, mode));
 				}
 			} else if (parsedLine[1] == "USERMODES") {
 				std::vector<std::string> splitLine;
@@ -671,7 +680,7 @@ void InspIRCd::receiveData() {
 					if (postEqual.size() == 2) // status mode
 						modeChar = postEqual[1];
 					allModes.insert(std::pair<std::string, char> (mode, modeChar));
-					userModes.insert(std::pair<std::string, char> (modeChar, mode));
+					allUserModes.insert(std::pair<std::string, char> (modeChar, mode));
 				}
 			} else if (parsedLine[1] == "CAPABILITIES") {
 				std::vector<std::string> splitLine;
@@ -692,7 +701,7 @@ void InspIRCd::receiveData() {
 						std::string third = second.substr(second.find_first_of(')') + 1);
 						second = second.substr(1, second.find_first_of(')') - 1);
 						for (size_t i = 0; i < second.size() && i < third.size(); i++)
-							chanRanks.push_back(std::pair<std::string, char> (allChanModes.find(second[i])->second, third[i]));
+							chanRanks.push_back(std::pair<std::string, char> (convertChanMode(second[i]), third[i]));
 					} else if (first == "CHANMODES") {
 						std::vector<std::string> modeList;
 						for (size_t i = 0; i < second.size(); i++) {
@@ -701,7 +710,7 @@ void InspIRCd::receiveData() {
 								modeList.clear();
 								continue;
 							}
-							modeList.push_back(second[i]);
+							modeList.push_back(convertChanMode(second[i]));
 						}
 						chanModes.push_back(modeList); // push back the last set
 					}
@@ -713,7 +722,7 @@ void InspIRCd::receiveData() {
 				ct >> connectTime;
 				std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime)));
 				for (size_t i = 1; i < parsedLine[10].size(); i++) { // skip the + symbol
-					std::string longmode = allUserModes.find(parsedLine[10][i])->second;
+					std::string longmode = convertUserMode(parsedLine[10][i]);
 					newUser.first->second->addMode(longmode);
 					if (longmode == "snomask") {
 						for (size_t j = 1; j < parsedLine[11].size(); j++)
@@ -737,7 +746,7 @@ void InspIRCd::receiveData() {
 					chanIter->second->topic(topic, topicTime);
 					size_t param = 5; // first param
 					for (size_t i = 1; i < parsedLine[4]; i++) {
-						std::string longmode = allChanModes.find(parsedLine[4][i])->second;
+						std::string longmode = convertChanMode(parsedLine[4][i]);
 						bool foundMode = false;
 						for (size_t j = 0; j < chanModes[0].size(); j++) {
 							if (chanModes[0][j] == longmode)
@@ -777,7 +786,7 @@ void InspIRCd::receiveData() {
 							adding = false;
 							continue;
 						}
-						std::string longmode = allModes.find(parsedLine[4][i])->second;
+						std::string longmode = convertChanMode(parsedLine[4][i]);
 						bool param = false;
 						for (size_t j = 0; j < chanModes[0].size(); j++) {
 							if (chanModes[0][j] == longmode)
@@ -825,6 +834,29 @@ void InspIRCd::receiveData() {
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
+}
+
+char InspIRCd::convertMode(std::string mode) {
+	if (mode.find_first_of('=') != std::string::npos)
+		mode = mode.substr(0, mode.find_first_of('='));
+	std::tr1::unordered_map<std::string, char>::iterator modeIter = allModes.find(mode);
+	if (modeIter == allModes.end())
+		return ' ';
+	return modeIter->second;
+}
+
+std::string InspIRCd::convertChanMode(char mode) {
+	std::tr1::unordered_map<char, std::string>::iterator modeIter = allChanModes.find(mode);
+	if (modeIter == allChanModes.end())
+		return "";
+	return modeIter->second;
+}
+
+std::string InspIRCd::convertUserMode(char mode) {
+	std::tr1::unordered_map<char, std::string>::iterator modeIter = allUserModes.find(mode);
+	if (modeIter == allUserModes.end())
+		return "";
+	return modeIter->second;
 }
 
 std::string InspIRCd::useUID() {
