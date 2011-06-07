@@ -812,6 +812,42 @@ void InspIRCd::receiveData() {
 							chanIter->second->removeMode(longmode);
 					}
 				}
+			} else if (parsedLine[1] == "MODE") {
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[0]);
+				bool adding = true;
+				for (size_t i = 0; i < parsedLine[2].size(); i++) {
+					if (parsedLine[2][i] == '+') {
+						adding = true;
+						continue;
+					}
+					if (parsedLine[2][i] == '-') {
+						adding = false;
+						continue;
+					}
+					std::string longmode = convertUserMode(parsedLine[2][i]);
+					if (longmode == "snomask") {
+						bool snoAdding = true;
+						for (size_t j = 0; j < parsedLine[3].size(); j++) {
+							if (parsedLine[3][i] == '+') {
+								snoAdding = true;
+								continue;
+							}
+							if (parsedLine[3][i] == '-') {
+								snoAdding = false;
+								continue;
+							}
+							if (snoAdding)
+								userIter->second->addSnomask(parsedLine[3][i]);
+							else
+								userIter->second->removeSnomask(parsedLine[3][i]);
+						}
+						continue;
+					}
+					if (adding)
+						userIter->second->addMode(longmode);
+					else
+						userIter->second->removeMode(longmode);
+				}
 			} else if (parsedLine[1] == "FTOPIC") {
 				std::istringstream cTime (parsedLine[3]);
 				time_t topicTime;
