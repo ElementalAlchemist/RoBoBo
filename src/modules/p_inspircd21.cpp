@@ -97,6 +97,7 @@ class InspIRCd : public Protocol {
 		pthread_attr_t detachedState;
 		static void* receiveData_thread(void* ptr);
 		void receiveData();
+		std::string connectedSID;
 		std::set<std::string> ourClients;
 		std::tr1::unordered_map<std::string, User*> users;
 		std::tr1::unordered_map<std::string, std::string> nicks;
@@ -504,6 +505,7 @@ void InspIRCd::partChannel(std::string client, std::string channel, std::string 
 
 void InspIRCd::quitServer(std::string reason) {
 	connection->sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
+	connection->closeConnection();
 	keepServer = false; // if the bot is intentionally quitting, it's not necessary to keep this server anymore
 }
 
@@ -715,158 +717,165 @@ void InspIRCd::receiveData() {
 						chanModes.push_back(modeList); // push back the last set
 					}
 				}
-			} else if (parsedLine[1] == "UID") {
-				nicks.insert(std::pair<std::string, std::string> (parsedLine[4], parsedLine[2]));
-				time_t connectTime;
-				std::istringstream ct (parsedLine[9]);
-				ct >> connectTime;
-				std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime)));
-				for (size_t i = 1; i < parsedLine[10].size(); i++) { // skip the + symbol
-					std::string longmode = convertUserMode(parsedLine[10][i]);
-					newUser.first->second->addMode(longmode);
-					if (longmode == "snomask") {
-						for (size_t j = 1; j < parsedLine[11].size(); j++)
-							newUser.first->second->addSnomask(parsedLine[11][j]);
-					}
+			}
+		} else if (parsedLine[0] == "SERVER") {
+			if (parsedLine[3] == "0")
+				connectedSID = parsedLine[4];
+		} else if (parsedLine[1] == "UID") {
+			nicks.insert(std::pair<std::string, std::string> (parsedLine[4], parsedLine[2]));
+			time_t connectTime;
+			std::istringstream ct (parsedLine[9]);
+			ct >> connectTime;
+			std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime)));
+			for (size_t i = 1; i < parsedLine[10].size(); i++) { // skip the + symbol
+				std::string longmode = convertUserMode(parsedLine[10][i]);
+				newUser.first->second->addMode(longmode);
+				if (longmode == "snomask") {
+					for (size_t j = 1; j < parsedLine[11].size(); j++)
+						newUser.first->second->addSnomask(parsedLine[11][j]);
 				}
-			} else if (parsedLine[1] == "FJOIN") {
-				std::istringstream cTime (parsedLine[3]);
-				time_t createTime;
-				cTime >> createTime;
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
-				if (chanIter = channels.end())
-					chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
-				if (createTime < chanIter->second->creationTime()) {
-					std::string topic = chanIter->second->topic();
-					time_t topicTime = chanIter->second->topicSetTime();
-					std::set<std::string> users = chanIter->second->users();
-					channels.erase(chanIter);
-					chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
-					chanIter->second->joinUsers(users);
-					chanIter->second->topic(topic, topicTime);
-					size_t param = 5; // first param
-					for (size_t i = 1; i < parsedLine[4]; i++) {
-						std::string longmode = convertChanMode(parsedLine[4][i]);
-						bool foundMode = false;
-						for (size_t j = 0; j < chanModes[0].size(); j++) {
-							if (chanModes[0][j] == longmode)
+			}
+		} else if (parsedLine[1] == "FJOIN") {
+			std::istringstream cTime (parsedLine[3]);
+			time_t createTime;
+			cTime >> createTime;
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+			if (chanIter = channels.end())
+				chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
+			if (createTime < chanIter->second->creationTime()) {
+				std::string topic = chanIter->second->topic();
+				time_t topicTime = chanIter->second->topicSetTime();
+				std::set<std::string> users = chanIter->second->users();
+				channels.erase(chanIter);
+				chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
+				chanIter->second->joinUsers(users);
+				chanIter->second->topic(topic, topicTime);
+				size_t param = 5; // first param
+				for (size_t i = 1; i < parsedLine[4]; i++) {
+					std::string longmode = convertChanMode(parsedLine[4][i]);
+					bool foundMode = false;
+					for (size_t j = 0; j < chanModes[0].size(); j++) {
+						if (chanModes[0][j] == longmode)
+							foundMode = true;
+					}
+					if (!foundMode) {
+						for (size_t j = 0; j < chanModes[1].size(); j++) {
+							if (chanModes[1][j] == longmode)
 								foundMode = true;
 						}
-						if (!foundMode) {
-							for (size_t j = 0; j < chanModes[1].size(); j++) {
-								if (chanModes[1][j] == longmode)
-									foundMode = true;
-							}
-						}
-						if (!foundMode) {
-							for (size_t j = 0; j < chanModes[2].size(); j++) {
-								if (chanModes[2][j] == longmode)
-									foundMode = true;
-							}
-						}
-						if (foundMode)
-							longmode += "=" + parsedLine[param++];
-						chanIter->second->addMode(longmode);
 					}
-				}
-			} else if (parsedLine[1] == "FMODE") {
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
-				std::istringstream cTime (parsedLine[3]);
-				time_t createTime;
-				cTime >> createTime;
-				if (createTime <= chanIter->second->creationTime()) {
-					bool adding = true;
-					size_t parameter = 5;
-					for (size_t i = 0; i < parsedLine[4].size(); i++) {
-						if (parsedLine[4][i] == '+') {
-							adding = true;
-							continue;
+					if (!foundMode) {
+						for (size_t j = 0; j < chanModes[2].size(); j++) {
+							if (chanModes[2][j] == longmode)
+								foundMode = true;
 						}
-						if (parsedLine[4][i] == '-') {
-							adding = false;
-							continue;
-						}
-						std::string longmode = convertChanMode(parsedLine[4][i]);
-						bool param = false;
-						for (size_t j = 0; j < chanModes[0].size(); j++) {
-							if (chanModes[0][j] == longmode)
-								param = true;
-						}
-						if (!param) {
-							for (size_t j = 0; j < chanModes[1].size(); j++) {
-								if (chanModes[1][j] == longmode)
-									param = true;
-							}
-						}
-						if (!param && adding) {
-							for (size_t j = 0; j < chanModes[2].size(); j++) {
-								if (chanModes[2][j] == longmode)
-									param = true;
-							}
-						}
-						if (param)
-							longmode += "=" + parsedLine[parameter++];
-						if (adding)
-							chanIter->second->addMode(longmode);
-						else
-							chanIter->second->removeMode(longmode);
 					}
+					if (foundMode)
+						longmode += "=" + parsedLine[param++];
+					chanIter->second->addMode(longmode);
 				}
-			} else if (parsedLine[1] == "MODE") {
-				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[0]);
+			}
+		} else if (parsedLine[1] == "FMODE") {
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+			std::istringstream cTime (parsedLine[3]);
+			time_t createTime;
+			cTime >> createTime;
+			if (createTime <= chanIter->second->creationTime()) {
 				bool adding = true;
-				for (size_t i = 0; i < parsedLine[2].size(); i++) {
-					if (parsedLine[2][i] == '+') {
+				size_t parameter = 5;
+				for (size_t i = 0; i < parsedLine[4].size(); i++) {
+					if (parsedLine[4][i] == '+') {
 						adding = true;
 						continue;
 					}
-					if (parsedLine[2][i] == '-') {
+					if (parsedLine[4][i] == '-') {
 						adding = false;
 						continue;
 					}
-					std::string longmode = convertUserMode(parsedLine[2][i]);
-					if (longmode == "snomask") {
-						bool snoAdding = true;
-						for (size_t j = 0; j < parsedLine[3].size(); j++) {
-							if (parsedLine[3][i] == '+') {
-								snoAdding = true;
-								continue;
-							}
-							if (parsedLine[3][i] == '-') {
-								snoAdding = false;
-								continue;
-							}
-							if (snoAdding)
-								userIter->second->addSnomask(parsedLine[3][i]);
-							else
-								userIter->second->removeSnomask(parsedLine[3][i]);
-						}
-						continue;
+					std::string longmode = convertChanMode(parsedLine[4][i]);
+					bool param = false;
+					for (size_t j = 0; j < chanModes[0].size(); j++) {
+						if (chanModes[0][j] == longmode)
+							param = true;
 					}
+					if (!param) {
+						for (size_t j = 0; j < chanModes[1].size(); j++) {
+							if (chanModes[1][j] == longmode)
+								param = true;
+						}
+					}
+					if (!param && adding) {
+						for (size_t j = 0; j < chanModes[2].size(); j++) {
+							if (chanModes[2][j] == longmode)
+								param = true;
+						}
+					}
+					if (param)
+						longmode += "=" + parsedLine[parameter++];
 					if (adding)
-						userIter->second->addMode(longmode);
+						chanIter->second->addMode(longmode);
 					else
-						userIter->second->removeMode(longmode);
+						chanIter->second->removeMode(longmode);
 				}
-			} else if (parsedLine[1] == "FTOPIC") {
-				std::istringstream cTime (parsedLine[3]);
-				time_t topicTime;
-				cTime >> topicTime;
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
-				if (topicTime > chanIter->second->topicSetTime())
-					chanIter->second->topic(parsedLine[4], topicTime);
-			} else if (parsedLine[1] == "FHOST")
-				users.find(parsedLine[0].substr(1))->second->host(parsedLine[2]);
-			else if (parsedLine[1] == "FNAME")
-				users.find(parsedLine[0].substr(1))->second->gecos(parsedLine[2]);
-			else if (parsedLine[1] == "NICK") {
-				std::string uuid = parsedLine[0].substr(1); // strip starting colon
-				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
-				std::string oldNick = userIter->second->nick();
-				userIter->second->nick(parsedLine[2]);
-				nicks.erase(nicks.find(oldNick));
-				nicks.insert(std::pair<std::string, std::string> (parsedLine[2], uuid));
 			}
+		} else if (parsedLine[1] == "MODE") {
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[0]);
+			bool adding = true;
+			for (size_t i = 0; i < parsedLine[2].size(); i++) {
+				if (parsedLine[2][i] == '+') {
+					adding = true;
+					continue;
+				}
+				if (parsedLine[2][i] == '-') {
+					adding = false;
+					continue;
+				}
+				std::string longmode = convertUserMode(parsedLine[2][i]);
+				if (longmode == "snomask") {
+					bool snoAdding = true;
+					for (size_t j = 0; j < parsedLine[3].size(); j++) {
+						if (parsedLine[3][i] == '+') {
+							snoAdding = true;
+							continue;
+						}
+						if (parsedLine[3][i] == '-') {
+							snoAdding = false;
+							continue;
+						}
+						if (snoAdding)
+							userIter->second->addSnomask(parsedLine[3][i]);
+						else
+							userIter->second->removeSnomask(parsedLine[3][i]);
+					}
+					continue;
+				}
+				if (adding)
+					userIter->second->addMode(longmode);
+				else
+					userIter->second->removeMode(longmode);
+			}
+		} else if (parsedLine[1] == "FTOPIC") {
+			std::istringstream cTime (parsedLine[3]);
+			time_t topicTime;
+			cTime >> topicTime;
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+			if (topicTime > chanIter->second->topicSetTime())
+				chanIter->second->topic(parsedLine[4], topicTime);
+		} else if (parsedLine[1] == "FHOST")
+			users.find(parsedLine[0].substr(1))->second->host(parsedLine[2]);
+		else if (parsedLine[1] == "FNAME")
+			users.find(parsedLine[0].substr(1))->second->gecos(parsedLine[2]);
+		else if (parsedLine[1] == "NICK") {
+			std::string uuid = parsedLine[0].substr(1); // strip starting colon
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
+			std::string oldNick = userIter->second->nick();
+			userIter->second->nick(parsedLine[2]);
+			nicks.erase(nicks.find(oldNick));
+			nicks.insert(std::pair<std::string, std::string> (parsedLine[2], uuid));
+		} else if (parsedLine[1] == "SQUIT" && (parsedLine[2] == serverConf["sid"] || parsedLine[2] == connectedSID)) {
+			keepServer = false;
+			connection->closeConnection();
+			break;
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
