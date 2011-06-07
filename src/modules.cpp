@@ -162,8 +162,8 @@ void Module::changeNick(std::string server, std::string client, std::string nick
 	serverData->changeNick(server, client, nick);
 }
 
-void Module::oper(std::string server, std::string client, std::string username, std::string password, std::string opertype) {
-	serverData->oper(server, client, username, password, opertype);
+void Module::oper(std::string server, std::string client, std::string username, std::string password) {
+	serverData->oper(server, client, username, password);
 }
 
 void Module::killUser(std::string server, std::string client, std::string user, std::string reason) {

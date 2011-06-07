@@ -49,7 +49,7 @@ void Protocol::partChannel(std::string channel, std::string reason) {}
 void Protocol::quitServer(std::string reason) {}
 void Protocol::kickUser(std::string channel, std::string user, std::string reason) {}
 void Protocol::changeNick(std::string client, std::string newNick) {}
-void Protocol::oper(std::string client, std::string username, std::string password, std::string opertype) {}
+void Protocol::oper(std::string client, std::string username, std::string password) {}
 
 void Protocol::killUser(std::string user, std::string reason) {}
 void Protocol::setXLine(char lineType, std::string hostmask, time_t duration, std::string reason) {}

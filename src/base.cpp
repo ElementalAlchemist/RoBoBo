@@ -731,7 +731,7 @@ void Base::changeNick(std::string server, std::string client, std::string newNic
 	servIter->second->changeNick(client, newNick);
 }
 
-void Base::oper(std::string server, std::string client, std::string username, std::string password, std::string opertype) {
+void Base::oper(std::string server, std::string client, std::string username, std::string password) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;

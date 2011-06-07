@@ -34,7 +34,7 @@ class Protocol {
 		virtual void quitServer(std::string reason = "");
 		virtual void kickUser(std::string client, std::string channel, std::string user, std::string reason = "");
 		virtual void changeNick(std::string client, std::string newNick);
-		virtual void oper(std::string client, std::string username, std::string password, std::string opertype);
+		virtual void oper(std::string client, std::string username, std::string password);
 		
 		virtual void killUser(std::string client, std::string user, std::string reason);
 		virtual void setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
