@@ -43,7 +43,7 @@ class Channel {
 	public:
 		Channel(time_t creation);
 		std::set<std::string> modes();
-		void addMode(std::string mode);
+		void addMode(std::string mode, bool list);
 		void removeMode(std::string mode);
 		std::set<std::string> users();
 		void joinUser(std::string user);
@@ -57,6 +57,7 @@ class Channel {
 		std::string seeMetadata(std::string key);
 	private:
 		std::set<std::string> chanModes, chanUsers;
+		std::tr1::unordered_map<std::string, std::string> modeParams;
 		std::string chanTopic;
 		time_t createTime, topicTime;
 		std::tr1::unordered_map<std::string, std::string> metadata;
@@ -242,14 +243,22 @@ std::set<std::string> Channel::modes() {
 	return chanModes;
 }
 
-void Channel::addMode(std::string mode) {
-	chanModes.insert(mode);
+void Channel::addMode(std::string mode, bool list) {
+	if (list || mode.find_first_of('=') == std::string::npos) {
+		chanModes.insert(mode);
+		return;
+	}
+	std::string modeonly = mode.substr(0, mode.find_first_of('=')), param = mode.substr(mode.find_first_of('=') + 1);
+	chanModes.insert(modeOnly);
+	modeParams.insert(std::pair<std::string, std::string> (modeOnly, param));
 }
 
 void Channel::removeMode(std::string mode) {
 	std::set<std::string>::iterator modeIter = chanModes.find(mode);
 	if (modeIter != chanModes.end())
 		chanModes.erase(modeIter);
+	if (modeParams.find(mode.substr(0, mode.find_first_of('='))) != modeParams.end())
+		modeParams.erase(modeParams.find(mode.substr(0, mode.find_first_of('='))));
 }
 
 std::set<std::string> Channel::users() {
@@ -821,10 +830,10 @@ void InspIRCd::receiveData() {
 				size_t param = 5; // first param
 				for (size_t i = 1; i < parsedLine[4].size(); i++) {
 					std::string longmode = convertChanMode(parsedLine[4][i]);
-					bool foundMode = false;
+					bool foundMode = false, list = false;
 					for (size_t j = 0; j < chanModes[0].size(); j++) {
 						if (chanModes[0][j] == longmode)
-							foundMode = true;
+							foundMode = list = true;
 					}
 					if (!foundMode) {
 						for (size_t j = 0; j < chanModes[1].size(); j++) {
@@ -840,7 +849,7 @@ void InspIRCd::receiveData() {
 					}
 					if (foundMode)
 						longmode += "=" + parsedLine[param++];
-					chanIter->second->addMode(longmode);
+					chanIter->second->addMode(longmode, list);
 				}
 				std::string joiningUsers = parsedLine[parsedLine.size() - 1];
 				std::vector<std::string> joinUserList;
@@ -886,10 +895,10 @@ void InspIRCd::receiveData() {
 						continue;
 					}
 					std::string longmode = convertChanMode(parsedLine[4][i]);
-					bool param = false;
+					bool param = false, list = false;
 					for (size_t j = 0; j < chanModes[0].size(); j++) {
 						if (chanModes[0][j] == longmode)
-							param = true;
+							param = list = true;
 					}
 					if (!param) {
 						for (size_t j = 0; j < chanModes[1].size(); j++) {
@@ -906,7 +915,7 @@ void InspIRCd::receiveData() {
 					if (param)
 						longmode += "=" + parsedLine[parameter++];
 					if (adding)
-						chanIter->second->addMode(longmode);
+						chanIter->second->addMode(longmode, list);
 					else
 						chanIter->second->removeMode(longmode);
 				}
@@ -984,6 +993,109 @@ void InspIRCd::receiveData() {
 			std::ostringstream createTime;
 			createTime << channels.find(parsedLine[3])->second->creationTime();
 			connection->sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
+		} else if (parsedLine[1] == "SVSMODE") {
+			if (parsedLine[2][0] == '#') {
+				size_t param = 4;
+				bool adding = true;
+				for (size_t i = 0; i < parsedLine[3].size(); i++) {
+					if (parsedLine[3][i] == '+') {
+						adding = true;
+						continue;
+					}
+					if (parsedLine[3][i] == '-') {
+						adding = false;
+						continue;
+					}
+					std::string longmode = convertChanMode(parsedLine[3][i]);
+					bool modeParam = false;
+					for (std::list<std::pair<std::string, char> >::iterator prefixIter = chanRanks.begin(); prefixIter != chanRanks.end(); ++prefixIter) {
+						if (longmode == (*prefixIter)->first) {
+							if (nicks.find(parsedLine[param]) != nicks.end())
+								parsedLine[param] = nicks.find(parsedLine[param])->second;
+							if (adding)
+								users.find(parsedLine[param++])->second->addStatus(longmode);
+							else
+								users.find(parsedLine[param++])->second->removeStatus(longmode);
+							modeParam = true;
+							break;
+						}
+					}
+					if (modeParam)
+						continue;
+					bool list = false;
+					for (size_t i = 0; i < chanModes[0].size(); i++) {
+						if (longmode == chanModes[0][i])
+							modeParam = list = true;
+					}
+					if (!modeParam) {
+						for (size_t i = 0; i < chanModes[1].size(); i++) {
+							if (longmode == chanModes[1][i])
+								modeParam = true;
+						}
+					}
+					if (!modeParam && adding) {
+						for (size_t i = 0; i < chanModes[2].size(); i++) {
+							if (longmode == chanModes[2][i])
+								modeParam = true;
+						}
+					}
+					if (modeParam)
+						longmode += "=" + parsedLine[param++];
+					if (adding)
+						channels.find(parsedLine[2])->addMode(longmode, list);
+					else
+						channels.find(parsedLine[2])->removeMode(longmode, list);
+				}
+				std::ostringstream chanTime;
+				chanTime << channels.find(parsedLine[2])->second->creationTime();
+				std::string fmode = ":" + serverConf["sid"] + " FMODE " + parsedLine[2] + " " + chanTime.str() + " " + parsedLine[3];
+				for (size_t i = 4; i < parsedLine.size(); i++)
+					fmode += " " + parsedLine[i];
+				connection->sendData(fmode);
+			} else {
+				if (nicks.find(parsedLine[2]) != nicks.end())
+					parsedLine[2] = nicks.find(parsedLine[2])->second;
+				std::tr1::unordered_map<std::string, Users*>::iterator userIter = users.find(parsedLine[2]);
+				if (userIter != users.end()) {
+					bool adding = true;
+					for (size_t i = 0; i < parsedLine[3].size(); i++) {
+						if (parsedLine[3][i] == '+') {
+							adding = true;
+							continue;
+						}
+						if (parsedLine[3][i] == '-') {
+							adding = false;
+							continue;
+						}
+						std::string longmode = convertUserMode(parsedLine[3][i]);
+						if (longmode == "")
+							continue;
+						if (adding)
+							userIter->second->addMode(longmode);
+						else
+							userIter->second->removeMode(longmode);
+					}
+					if (parsedLine.size() > 4) {
+						adding = true;
+						for (size_t i = 0; i < parsedLine[4].size(); i++) {
+							if (parsedLine[4][i] == '+') {
+								adding = true;
+								continue;
+							}
+							if (parsedLine[4][i] == '-') {
+								adding = false;
+								continue;
+							}
+							if (adding)
+								userIter->second->addSnomask(parsedLine[4][i]);
+							else
+								userIter->second->removeSnomask(parsedLine[4][i]);
+						}
+						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3] + " " + parsedLine[4]);
+					} else
+						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3]);
+				}
+			}
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
