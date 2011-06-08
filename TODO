@@ -14,7 +14,6 @@ Before release.  Duh.
 	[x] - Move most of current connection stuff to p_client
 	[>] - Protocol modules for current versions of popular IRCds
 		[>] - InspIRCd
-		[ ] - maybe others?
 	[x] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
 		[x] - Protocol modules
 			[x] - p_client
@@ -39,3 +38,15 @@ Before release.  Duh.
 [x] - Configuration: remove the need for users to type the m_ prefix and the .so extension
 	[x] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
 [x] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo
+[ ] - Refactor sending hooks to make non-client protocols compatible with module API (i.e. FMODE, etc. for InspIRCd going to onOther instead of onMode)
+	[ ] - base
+	[ ] - p_client
+	[ ] - p_inspircd21
+[ ] - Make sure all modules follow updated API
+
+2.0 Beta 1
+=======================================
+[ ] - Documentation updates
+	[ ] - PROTOCOL
+	[ ] - MODULES
+	[ ] - README
