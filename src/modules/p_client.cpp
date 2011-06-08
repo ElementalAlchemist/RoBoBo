@@ -561,7 +561,8 @@ void Client::sendData() {
 	std::string sendingMessage = "";
 	std::vector<std::string> parsedLine;
 	std::string command = "";
-	pthread_create(&secondsThread, &detachedState, secondsDecrement_thread, this);
+	if (floodControl)
+		pthread_create(&secondsThread, &detachedState, secondsDecrement_thread, this);
 	while (true) {
 		if (!connection->isConnected())
 			break; // Thread must die when server isn't connected.
@@ -654,7 +655,7 @@ void Client::sendData() {
 			sendingMessage += extraMessage;
 			secondsToAdd *= 2;
 		}
-		while (seconds + secondsToAdd > 10)
+		while (floodControl && seconds + secondsToAdd > 10)
 			sleep(1);
 		connection->sendData(sendingMessage);
 		if (debugLevel >= 3)
@@ -665,9 +666,11 @@ void Client::sendData() {
 			keepServer = false;
 			break;
 		}
-		pthread_mutex_lock(&secondsmutex);
-		seconds += secondsToAdd;
-		pthread_mutex_unlock(&secondsmutex);
+		if (floodControl) {
+			pthread_mutex_lock(&secondsmutex);
+			seconds += secondsToAdd;
+			pthread_mutex_unlock(&secondsmutex);
+		}
 	}
 }
 
