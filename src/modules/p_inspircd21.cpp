@@ -1118,7 +1118,15 @@ void InspIRCd::receiveData() {
 				}
 			}
 		} else if (parsedLine[1] == "SVSNICK" && parsedLine[2].substr(0, 3) == serverConf["sid"] && nicks.find(parsedLine[3]) == nicks.end()) { // ignore it if it's not for us or if the nick is already in use
-			
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
+			nicks.erase(nicks.find(userIter->second->nick()));
+			nicks.insert(std::pair<std::string, std::string> (userIter->first, parsedLine[3]));
+			userIter->second->nick(parsedLine[3]);
+			std::istringstream givenTimestamp (parsedLine[4]);
+			time_t nickTime;
+			givenTimestamp >> nickTime;
+			userIter->second->updateTime(nickTime);
+			connection->sendData(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
