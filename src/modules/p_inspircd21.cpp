@@ -896,6 +896,18 @@ void InspIRCd::receiveData() {
 					}
 					std::string longmode = convertChanMode(parsedLine[4][i]);
 					bool param = false, list = false;
+					for (std::list<std::pair<std::string, char> >::iterator prefixIter = chanRanks.begin(); prefixIter != chanRanks.end(); ++prefixIter) {
+						if (longmode == (*prefixIter).first) {
+							param = true;
+							if (adding)
+								users.find(parsedLine[parameter++])->second->addStatus(parsedLine[2], longmode);
+							else
+								users.find(parsedLine[parameter++])->second->removeStatus(parsedLine[2], longmode);
+							break;
+						}
+					}
+					if (param)
+						continue;
 					for (size_t j = 0; j < chanModes[0].size(); j++) {
 						if (chanModes[0][j] == longmode)
 							param = list = true;
@@ -1009,13 +1021,13 @@ void InspIRCd::receiveData() {
 					std::string longmode = convertChanMode(parsedLine[3][i]);
 					bool modeParam = false;
 					for (std::list<std::pair<std::string, char> >::iterator prefixIter = chanRanks.begin(); prefixIter != chanRanks.end(); ++prefixIter) {
-						if (longmode == (*prefixIter)->first) {
+						if (longmode == (*prefixIter).first) {
 							if (nicks.find(parsedLine[param]) != nicks.end())
 								parsedLine[param] = nicks.find(parsedLine[param])->second;
 							if (adding)
-								users.find(parsedLine[param++])->second->addStatus(longmode);
+								users.find(parsedLine[param++])->second->addStatus(parsedLine[2], longmode);
 							else
-								users.find(parsedLine[param++])->second->removeStatus(longmode);
+								users.find(parsedLine[param++])->second->removeStatus(parsedLine[2], longmode);
 							modeParam = true;
 							break;
 						}
