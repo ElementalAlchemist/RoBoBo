@@ -13,7 +13,8 @@ class User {
 		void host(std::string newHost);
 		std::string gecos();
 		void gecos(std::string newGecos);
-		time_t connectionTime();
+		time_t nickTime();
+		void updateTime(time_t time);
 		std::string opertype();
 		void operup(std::string opertype);
 		std::set<std::string> modes();
@@ -32,7 +33,7 @@ class User {
 		std::string seeMetadata(std::string key);
 	private:
 		std::string userNick, userIdent, userHost, GECOS, oper;
-		time_t connectTime;
+		time_t nickTime;
 		std::set<std::string> userModes;
 		std::set<char> SNOMasks;
 		std::tr1::unordered_map<std::string, std::string> metadata;
@@ -122,7 +123,7 @@ class InspIRCd : public Protocol {
 		std::string useUID();
 };
 
-User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), connectTime(theConnectTime) {}
+User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), nickTime(theConnectTime) {}
 
 std::string User::nick() {
 	return userNick;
@@ -156,8 +157,12 @@ void User::gecos(std::string newGecos) {
 	GECOS = newGecos;
 }
 
-time_t User::connectionTime() {
-	return connectTime;
+time_t User::nickTime() {
+	return nickTime;
+}
+
+void User::updateTime(time_t time) {
+	nickTime = time;
 }
 
 std::string User::opertype() {
@@ -677,7 +682,7 @@ std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::stri
 	info["host"] = userIter->second->host();
 	info["gecos"] = userIter->second->gecos();
 	std::ostringstream connTime;
-	connTime << userIter->second->connectionTime();
+	connTime << userIter->second->nickTime();
 	info["connecttime"] = connTime.str();
 	info["opertype"] = userIter->second->opertype();
 }
@@ -986,6 +991,10 @@ void InspIRCd::receiveData() {
 			userIter->second->nick(parsedLine[2]);
 			nicks.erase(nicks.find(oldNick));
 			nicks.insert(std::pair<std::string, std::string> (parsedLine[2], uuid));
+			std::istringstream givenTimestamp (parsedLine[3]);
+			time_t nickTime;
+			givenTimestamp >> nickTime;
+			userIter->second->updateTime(nickTime);
 		} else if (parsedLine[1] == "TIME" && parsedLine[2] == serverConf["sid"] && parsedLine.size() == 4) { // don't reply if for some reason we're getting a TIME reply. That would be stupid, and you would be stupid for doing it.
 			std::ostringstream currTime;
 			currTime << time(NULL);
