@@ -1127,6 +1127,10 @@ void InspIRCd::receiveData() {
 			givenTimestamp >> nickTime;
 			userIter->second->updateTime(nickTime);
 			connection->sendData(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
+		} else if (parsedLine[1] == "SVSPART" && parsedLine[2].substr(0, 3) == serverConf["sid"]) { // ignore if not for us
+			users.find(parsedLine[2])->second->partChannel(parsedLine[3]);
+			channels.find(parsedLine[3])->second->partUser(parsedLine[2]);
+			connection->sendData(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
