@@ -978,6 +978,12 @@ void InspIRCd::receiveData() {
 			keepServer = false;
 			connection->closeConnection();
 			break;
+		} else if (parsedLine[1] == "SVSJOIN" && ourClients.find(parsedLine[2]) != parsedLine.end()) {
+			users.find(parsedLine[2])->second->joinChannel(parsedLine[3]);
+			channels.find(parsedLine[3])->second->joinUser(parsedLine[2]);
+			std::ostringstream createTime;
+			createTime << channels.find(parsedLine[3])->second->creationTime();
+			connection->sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
