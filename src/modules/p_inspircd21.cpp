@@ -1108,6 +1108,8 @@ void InspIRCd::receiveData() {
 						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3]);
 				}
 			}
+		} else if (parsedLine[1] == "SVSNICK" && parsedLine[2].substr(0, 3) == serverConf["sid"] && nicks.find(parsedLine[3]) == nicks.end()) { // ignore it if it's not for us or if the nick is already in use
+			
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
