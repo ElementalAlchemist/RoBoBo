@@ -216,6 +216,18 @@ std::set<std::string> User::statuses(std::string channel) {
 	return chanIter->second;
 }
 
+void User::addStatus(std::string channel, std::string status) {
+	std::tr1::unordered_map<std::string, std::set<std::string> >::iterator chanIter = inChannels.find(channel);
+	if (chanIter != inChannels.end())
+		chanIter->second.insert(status);
+}
+
+void User::removeStatus(std::string channel, std::string status) {
+	std::tr1::unordered_map<std::string, std::set<std::string> >::iterator chanIter = inChannels.find(channel);
+	if (chanIter != inChannels.end())
+		chanIter->second.erase(chanIter->second.find(status));
+}
+
 void User::changeMetadata(std::string key, std::string value) {
 	metadata[key] = value;
 }
@@ -795,13 +807,19 @@ void InspIRCd::receiveData() {
 			if (createTime < chanIter->second->creationTime()) {
 				std::string topic = chanIter->second->topic();
 				time_t topicTime = chanIter->second->topicSetTime();
-				std::set<std::string> users = chanIter->second->users();
+				std::set<std::string> chanUsers = chanIter->second->users();
 				channels.erase(chanIter);
 				chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
-				chanIter->second->joinUsers(users);
+				chanIter->second->joinUsers(chanUsers);
+				for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
+					User* user = userIter->second;
+					std::set<std::string> statuses = user->statuses();
+					for (std::set<std::string>::iterator prefixIter = statuses.begin(); prefixIter != statuses.end(); ++prefixIter)
+						user->removeStatus(*prefixIter);
+				}
 				chanIter->second->topic(topic, topicTime);
 				size_t param = 5; // first param
-				for (size_t i = 1; i < parsedLine[4]; i++) {
+				for (size_t i = 1; i < parsedLine[4].size(); i++) {
 					std::string longmode = convertChanMode(parsedLine[4][i]);
 					bool foundMode = false;
 					for (size_t j = 0; j < chanModes[0].size(); j++) {
@@ -823,6 +841,31 @@ void InspIRCd::receiveData() {
 					if (foundMode)
 						longmode += "=" + parsedLine[param++];
 					chanIter->second->addMode(longmode);
+				}
+				std::string joiningUsers = parsedLine[parsedLine.size() - 1];
+				std::vector<std::string> joinUserList;
+				std::string tempStr = "";
+				for (size_t i = 0; i < parsedLine[2].size(); i++) {
+					if (parsedLine[2][i] == ' ') {
+						joinUserList.push_back(tempStr);
+						tempStr = "";
+						continue;
+					}
+					tempStr += parsedLine[2][i];
+				} // line is now split by space
+				if (tempStr != "")
+					joinUserList.push_back(tempStr); // get last fragment if line doesn't end in space
+				for (size_t i = 0; i < joinUserList.size(); i++) {
+					std::list<std::string> prefixes;
+					while (joinUserList[i][0] != ',') {
+						prefixes.push_back(convertChanMode(joinUserList[i][0]));
+						joinUserList[i] = joinUserList[i].substr(1);
+					}
+					chanIter->second->joinUser(joinUserList[i]);
+					std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(joinUserList[i]);
+					userIter->second->joinChannel(chanIter->first);
+					for (std::list<std::string>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter)
+						userIter->second->addStatus(*prefixIter);
 				}
 			}
 		} else if (parsedLine[1] == "FMODE") {
