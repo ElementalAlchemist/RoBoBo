@@ -395,7 +395,7 @@ void InspIRCd::connectServer() {
 	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter) {
 		std::ostringstream currTime; // do it like this in case the second changed in the middle or something so that the correct timestamp is still sent
 		currTime << channels.find(jcIter->first)->second->creationTime();
-		connection->sendData(":" + serverConf["sid"] + " FJOIN " + jcIter->first + " " + currTime.str() + " +nt :" + jcIter->second);
+		sendOther(":" + serverConf["sid"] + " FJOIN " + jcIter->first + " " + currTime.str() + " +nt :" + jcIter->second);
 	}
 	botBase->callConnectHook(serverName);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
@@ -641,7 +641,7 @@ std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t
 }
 
 void InspIRCd::sendSNotice(char snomask, std::string text) {
-	connection->sendData(":" + serverConf["sid"] + " " + snomask + " :" + text);
+	connection->sendData(":" + serverConf["sid"] + " SNONOTICE " + snomask + " :" + text);
 }
 
 void InspIRCd::sendOther(std::string rawLine) {
@@ -716,7 +716,7 @@ void InspIRCd::receiveData() {
 			std::cout << receivedLine << std::endl;
 		botBase->callPreHook(serverName, parsedLine);
 		if (parsedLine[1] == "PING" && parsedLine[3] == serverConf["sid"])
-			connection->sendData(":" + serverConf["sid"] + " PONG " + parsedLine[3] + parsedLine[2]);
+			sendOther(":" + serverConf["sid"] + " PONG " + parsedLine[3] + parsedLine[2]);
 		else if (parsedLine[0] == "CAPAB") {
 			if (parsedLine[1] == "CHANMODES") {
 				std::vector<std::string> splitLine;
@@ -1002,7 +1002,7 @@ void InspIRCd::receiveData() {
 		} else if (parsedLine[1] == "TIME" && parsedLine[2] == serverConf["sid"] && parsedLine.size() == 4) { // don't reply if for some reason we're getting a TIME reply. That would be stupid, and you would be stupid for doing it.
 			std::ostringstream currTime;
 			currTime << time(NULL);
-			connection->sendData(":" + serverConf["sid"] + " TIME " + parsedLine[0].substr(1) + " " + parsedLine[3] + " " + currTime.str());
+			sendOther(":" + serverConf["sid"] + " TIME " + parsedLine[0].substr(1) + " " + parsedLine[3] + " " + currTime.str());
 		} else if (parsedLine[1] == "METADATA") {
 			if (parsedLine[2][0] == '#')
 				channels.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
@@ -1017,7 +1017,7 @@ void InspIRCd::receiveData() {
 			channels.find(parsedLine[3])->second->joinUser(parsedLine[2]);
 			std::ostringstream createTime;
 			createTime << channels.find(parsedLine[3])->second->creationTime();
-			connection->sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
+			sendOther(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
 		} else if (parsedLine[1] == "SVSMODE") {
 			if (parsedLine[2][0] == '#') {
 				size_t param = 4;
@@ -1076,7 +1076,7 @@ void InspIRCd::receiveData() {
 				std::string fmode = ":" + serverConf["sid"] + " FMODE " + parsedLine[2] + " " + chanTime.str() + " " + parsedLine[3];
 				for (size_t i = 4; i < parsedLine.size(); i++)
 					fmode += " " + parsedLine[i];
-				connection->sendData(fmode);
+				sendOther(fmode);
 			} else {
 				if (nicks.find(parsedLine[2]) != nicks.end())
 					parsedLine[2] = nicks.find(parsedLine[2])->second;
@@ -1116,9 +1116,9 @@ void InspIRCd::receiveData() {
 							else
 								userIter->second->removeSnomask(parsedLine[4][i]);
 						}
-						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3] + " " + parsedLine[4]);
+						sendOther(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3] + " " + parsedLine[4]);
 					} else
-						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3]);
+						sendOther(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3]);
 				}
 			}
 		} else if (parsedLine[1] == "SVSNICK" && parsedLine[2].substr(0, 3) == serverConf["sid"] && nicks.find(parsedLine[3]) == nicks.end()) { // ignore it if it's not for us or if the nick is already in use
@@ -1130,11 +1130,15 @@ void InspIRCd::receiveData() {
 			time_t nickTime;
 			givenTimestamp >> nickTime;
 			userIter->second->updateTime(nickTime);
-			connection->sendData(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
+			sendOther(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
 		} else if (parsedLine[1] == "SVSPART" && parsedLine[2].substr(0, 3) == serverConf["sid"]) { // ignore if not for us
 			users.find(parsedLine[2])->second->partChannel(parsedLine[3]);
 			channels.find(parsedLine[3])->second->partUser(parsedLine[2]);
-			connection->sendData(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
+			sendOther(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
+		} else if (parsedLine[1] == "ENCAP" && (parsedLine[2] == "*" || parsedLine[2] == serverConf["sid"])) {
+			// ALLTIME CHGHOST CHGIDENT CHGNAME FPART REMOVE SAJOIN SANICK SAPART SAQUIT
+			if (parsedLine[3] == "ALLTIME")
+				
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
