@@ -12,11 +12,11 @@ class User {
 		void addChannel(std::string channel);
 		void removeChannel(std::string channel);
 		std::list<std::string> channelList();
-		void status(std::string channel, char status, bool adding);
+		void status(std::string channel, std::string status, bool adding);
 		std::string status(std::string channel);
 	private:
 		std::string userIdent, userHost;
-		std::tr1::unordered_map<std::string, std::set<char> > channels;
+		std::tr1::unordered_map<std::string, std::set<std::string> > channels;
 		Client* server;
 };
 class Client : public Protocol {
@@ -119,7 +119,7 @@ std::list<std::string> User::channelList() {
 	return listOfChannels;
 }
 
-void User::status(std::string channel, char status, bool adding) {
+void User::status(std::string channel, std::string status, bool adding) {
 	if (channels.find(channel) == channels.end())
 		return;
 	if (adding)
@@ -838,10 +838,10 @@ void Client::parseNames(std::string channel, std::string namesList) {
 	if (name != "")
 		names.push_back(name);
 	for (unsigned int i = 0; i < names.size(); i++) {
-		std::vector<char> rank;
+		std::vector<std::string> rank;
 		for (std::list<std::pair<char, char> >::iterator prefixIter = statusPrefixes.begin(); prefixIter != statusPrefixes.end(); ++prefixIter) {
 			if ((*prefixIter).second == names[i][0]) {
-				rank.push_back((*prefixIter).first);
+				rank.push_back(convertChanMode((*prefixIter).first));
 				names[i] = names[i].substr(1);
 			}
 		}
@@ -865,7 +865,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		}
 		inChannels[channel].second.second.second.insert(nick);
 		joiningUser->second->addChannel(channel);
-		for (unsigned int i = 0; i < rank.size(); i++)
+		for (size_t i = 0; i < rank.size(); i++) {
 			joiningUser->second->status(channel, rank, true);
 	}
 	if (firstNames) {
