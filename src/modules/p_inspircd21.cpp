@@ -1133,7 +1133,13 @@ void InspIRCd::receiveData() {
 			sendOther(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
 		} else if (parsedLine[1] == "SVSPART" && parsedLine[2].substr(0, 3) == serverConf["sid"]) { // ignore if not for us
 			users.find(parsedLine[2])->second->partChannel(parsedLine[3]);
-			channels.find(parsedLine[3])->second->partUser(parsedLine[2]);
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[3]);
+			chanIter->second->partUser(parsedLine[2]);
+			std::set<std::string> modes = chanIter->second->modes();
+			if (chanIter->second->users.empty() && modes.find("permanent") == modes.end()) {
+				delete chanIter->second;
+				channels.erase(chanIter);
+			}
 			sendOther(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
 		} else if (parsedLine[1] == "ENCAP" && (parsedLine[2] == "*" || parsedLine[2] == serverConf["sid"])) {
 			if (parsedLine[3] == "ALLTIME") {
@@ -1151,14 +1157,26 @@ void InspIRCd::receiveData() {
 				sendOther(":" + parsedLine[4] + " FNAME :" + parsedLine[5]);
 			} else if (parsedLine[3] == "FPART") {
 				users.find(parsedLine[5])->second->partChannel(parsedLine[4]);
-				channels.find(parsedLine[4])->second->partUser(parsedLine[5]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[4]);
+				chanIter->second->partUser(parsedLine[5]);
+				std::set<std::string> modes = chanIter->second->modes();
+				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
+					delete chanIter->second;
+					channels.erase(chanIter);
+				}
 				if (parsedLine.size() == 6)
 					sendOther(":" + parsedLine[5] + " PART " + parsedLine[4] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": No reason given");
 				else
 					sendOther(":" + parsedLine[5] + " PART " + parsedLine[4] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": " + parsedLine[6]);
 			} else if (parsedLine[3] == "REMOVE") {
 				users.find(parsedLine[4])->second->partChannel(parsedLine[5]);
-				channels.find(parsedLine[5])->second->partUser(parsedLine[4]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[5]);
+				chanIter->second->partUser(parsedLine[4]);
+				std::set<std::string> modes = chanIter->second->modes();
+				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
+					delete chanIter->second;
+					channels.erase(chanIter);
+				}
 				if (parsedLine.size() == 6)
 					sendOther(":" + parsedLine[4] + " PART " + parsedLine[5] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": No reason given");
 				else
@@ -1181,7 +1199,13 @@ void InspIRCd::receiveData() {
 				} else
 					sendOther(":" + serverConf["sid"] + " FJOIN " + parsedLine[5] + " " + chanTime.str() + " + ," + parsedLine[4]);
 			} else if (parsedLine[3] == "SAKICK") {
-				channels.find(parsedLine[4])->second->partUser(parsedLine[5]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[4]);
+				chanIter->second->partUser(parsedLine[5]);
+				std::set<std::string> modes = chanIter->second->modes();
+				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
+					delete chanIter->second;
+					channels.erase(chanIter);
+				}
 				users.find(parsedLine[5])->second->partChannel(parsedLine[4]);
 				if (parsedLine.size() == 6)
 					sendOther(":" + serverConf["sid"] + " KICK " + parsedLine[4] + " " + parsedLine[5]);
@@ -1196,7 +1220,13 @@ void InspIRCd::receiveData() {
 				currTime << time(NULL);
 				sendOther(":" + userIter->first + " NICK " + parsedLine[5] + " " + currTime.str());
 			} else if (parsedLine[3] == "SAPART") {
-				channels.find(parsedLine[5])->second->partUser(parsedLine[4]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[5]);
+				chanIter->second->partUser(parsedLine[4]);
+				std::set<std::string> modes = chanIter->second->modes();
+				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
+					delete chanIter->second;
+					channels.erase(chanIter);
+				}
 				users.find(parsedLine[4])->second->partChannel(parsedLine[5]);
 				if (parsedLine.size() == 6)
 					sendOther(":" + parsedLine[4] + " PART " + parsedLine[5]);
