@@ -1135,6 +1135,79 @@ void InspIRCd::receiveData() {
 			users.find(parsedLine[2])->second->partChannel(parsedLine[3]);
 			channels.find(parsedLine[3])->second->partUser(parsedLine[2]);
 			sendOther(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
+		} else if (parsedLine[1] == "ENCAP" && (parsedLine[2] == "*" || parsedLine[2] == serverConf["sid"])) {
+			if (parsedLine[3] == "ALLTIME") {
+				std::ostringstream currTime;
+				currTime << time(NULL);
+				sendOther(":" + serverConf["sid"] + " PUSH " + parsedLine[0].substr(1) + "::" + serverConf["servername"] + " NOTICE " + users.find(parsedLine[0].substr(1))->second->nick() + " :robobo.alchemyirc.net " + currTime.str());
+			} else if (parsedLine[3] == "CHGHOST") {
+				users.find(parsedLine[4])->second->host(parsedLine[5]);
+				sendOther(":" + parsedLine[4] + " FHOST " + parsedLine[5]);
+			} else if (parsedLine[3] == "CHGIDENT") {
+				users.find(parsedLine[4])->second->ident(parsedLine[5]);
+				sendOther(":" + parsedLine[4] + " FIDENT " + parsedLine[5]);
+			} else if (parsedLine[3] == "CHGNAME") {
+				users.find(parsedLine[4])->second->gecos(parsedLine[5]);
+				sendOther(":" + parsedLine[4] + " FNAME :" + parsedLine[5]);
+			} else if (parsedLine[3] == "FPART") {
+				users.find(parsedLine[5])->second->partChannel(parsedLine[4]);
+				channels.find(parsedLine[4])->second->partUser(parsedLine[5]);
+				if (parsedLine.size() == 6)
+					sendOther(":" + parsedLine[5] + " PART " + parsedLine[4] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": No reason given");
+				else
+					sendOther(":" + parsedLine[5] + " PART " + parsedLine[4] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": " + parsedLine[6]);
+			} else if (parsedLine[3] == "REMOVE") {
+				users.find(parsedLine[4])->second->partChannel(parsedLine[5]);
+				channels.find(parsedLine[5])->second->partUser(parsedLine[4]);
+				if (parsedLine.size() == 6)
+					sendOther(":" + parsedLine[4] + " PART " + parsedLine[5] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": No reason given");
+				else
+					sendOther(":" + parsedLine[4] + " PART " + parsedLine[5] + " :Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": " + parsedLine[6]);
+			} else if (parsedLine[3] == "SAJOIN") {
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[5]);
+				bool chanCreated = false;
+				if (chanIter == channels.end()) {
+					chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[5], new Channel (time(NULL)))).first;
+					chanCreated = true;
+				}
+				std::ostringstream chanTime;
+				chanTime << chanIter->second->creationTime();
+				chanIter->second->joinUser(parsedLine[4]);
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[4]);
+				userIter->second->joinChannel(parsedLine[5]);
+				if (chanCreated) {
+					userIter->second->addStatus(parsedLine[5], "op");
+					sendOther(":" + serverConf["sid"] + " FJOIN " + parsedLine[5] + " " + chanTime.str() + " + o," + parsedLine[4]);
+				} else
+					sendOther(":" + serverConf["sid"] + " FJOIN " + parsedLine[5] + " " + chanTime.str() + " + ," + parsedLine[4]);
+			} else if (parsedLine[3] == "SAKICK") {
+				channels.find(parsedLine[4])->second->partUser(parsedLine[5]);
+				users.find(parsedLine[5])->second->partChannel(parsedLine[4]);
+				if (parsedLine.size() == 6)
+					sendOther(":" + serverConf["sid"] + " KICK " + parsedLine[4] + " " + parsedLine[5]);
+				else
+					sendOther(":" + serverConf["sid"] + " KICK " + parsedLine[4] + " " + parsedLine[5] + " :" + parsedLine[6]);
+			} else if (parsedLine[3] == "SANICK") {
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[4]);
+				nicks.erase(nicks.find(userIter->second->nick()));
+				nicks.insert(std::pair<std::string, std::string> (parsedLine[5], parsedLine[4]));
+				userIter->second->nick(parsedLine[5]);
+				std::ostringstream currTime;
+				currTime << time(NULL);
+				sendOther(":" + userIter->first + " NICK " + parsedLine[5] + " " + currTime.str());
+			} else if (parsedLine[3] == "SAPART") {
+				channels.find(parsedLine[5])->second->partUser(parsedLine[4]);
+				users.find(parsedLine[4])->second->partChannel(parsedLine[5]);
+				if (parsedLine.size() == 6)
+					sendOther(":" + parsedLine[4] + " PART " + parsedLine[5]);
+				else
+					sendOther(":" + parsedLine[4] + " PART " + parsedLine[5] + " :" + parsedLine[6]);
+			} else if (parsedLine[3] == "SAQUIT") {
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[4]);
+				delete userIter->second;
+				users.erase(userIter);
+				sendOther(":" + parsedLine[4] + " QUIT :" + parsedLine[5]);
+			}
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
