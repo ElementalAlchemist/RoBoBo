@@ -980,7 +980,9 @@ void InspIRCd::receiveData() {
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
 			if (topicTime > chanIter->second->topicSetTime())
 				chanIter->second->topic(parsedLine[4], topicTime);
-		} else if (parsedLine[1] == "FHOST")
+		} else if (parsedLine[1] == "FIDENT")
+			users.find(parsedLine[0].substr(1))->second->ident(parsedLine[2]);
+		else if (parsedLine[1] == "FHOST")
 			users.find(parsedLine[0].substr(1))->second->host(parsedLine[2]);
 		else if (parsedLine[1] == "FNAME")
 			users.find(parsedLine[0].substr(1))->second->gecos(parsedLine[2]);
