@@ -1135,10 +1135,6 @@ void InspIRCd::receiveData() {
 			users.find(parsedLine[2])->second->partChannel(parsedLine[3]);
 			channels.find(parsedLine[3])->second->partUser(parsedLine[2]);
 			sendOther(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
-		} else if (parsedLine[1] == "ENCAP" && (parsedLine[2] == "*" || parsedLine[2] == serverConf["sid"])) {
-			// ALLTIME CHGHOST CHGIDENT CHGNAME FPART REMOVE SAJOIN SANICK SAPART SAQUIT
-			if (parsedLine[3] == "ALLTIME")
-				
 		}
 		botBase->callPostHook(serverName, parsedLine);
 	}
