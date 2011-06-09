@@ -90,9 +90,9 @@ class InspIRCd : public Protocol {
 		void changeNick(std::string client, std::string newNick);
 		void oper(std::string client, std::string username, std::string password);
 		void killUser(std::string client, std::string user, std::string reason);
-		void setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
-		void removeXLine(std::string client, char lineType, std::string hostmask);
-		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > listXLines();
+		void setXLine(std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason);
+		void removeXLine(std::string client, std::string lineType, std::string hostmask);
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > listXLines();
 		void sendSNotice(char snomask, std::string text);
 		void sendOther(std::string rawLine);
 		void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
@@ -118,7 +118,7 @@ class InspIRCd : public Protocol {
 		char convertMode(std::string mode);
 		std::string convertChanMode(char mode);
 		std::string convertUserMode(char mode);
-		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > xLines;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > xLines;
 		std::string uidCount;
 		std::string useUID();
 };
@@ -617,7 +617,7 @@ void InspIRCd::killUser(std::string client, std::string user, std::string reason
 	connection->sendData(":" + client + " KILL " + user + " :" + reason);
 }
 
-void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {
+void InspIRCd::setXLine(std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason) {
 	if (ourClients.find(client) == ourClients.end() && client != "")
 		return;
 	if (client == "")
@@ -628,7 +628,7 @@ void InspIRCd::setXLine(std::string client, char lineType, std::string hostmask,
 	connection->sendData(":" + client + " ADDLINE " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason);
 }
 
-void InspIRCd::removeXLine(std::string client, char lineType, std::string hostmask) {
+void InspIRCd::removeXLine(std::string client, std::string lineType, std::string hostmask) {
 	if (ourClients.find(client) == ourClients.end() && client != "")
 		return;
 	if (client == "")
@@ -636,7 +636,7 @@ void InspIRCd::removeXLine(std::string client, char lineType, std::string hostma
 	connection->sendData(":" + client + " DELLINE " + lineType + " " + hostmask);
 }
 
-std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > InspIRCd::listXLines() {
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > InspIRCd::listXLines() {
 	return xLines;
 }
 
@@ -811,7 +811,9 @@ void InspIRCd::receiveData() {
 						newUser.first->second->addSnomask(parsedLine[11][j]);
 				}
 			}
-		} else if (parsedLine[1] == "FJOIN") {
+		} else if (parsedLine[1] == "OPERTYPE")
+			users.find(parsedLine[0].substr(1))->second->addMode("oper");
+		else if (parsedLine[1] == "FJOIN") {
 			std::istringstream cTime (parsedLine[3]);
 			time_t createTime;
 			cTime >> createTime;
