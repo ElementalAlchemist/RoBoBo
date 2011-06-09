@@ -105,7 +105,7 @@ std::string User::host() {
 }
 
 void User::addChannel(std::string channel) {
-	channels.insert(std::pair<std::string, std::set<char> > (channel, std::set<char> ());
+	channels.insert(std::pair<std::string, std::set<char> > (channel, std::set<char> ()));
 }
 
 void User::removeChannel(std::string channel) {
@@ -526,18 +526,27 @@ void Client::handleData() {
 				users.insert(std::pair<std::string, std::string> (nick, new User(ident, host)));
 			}
 			inChannels.find(parsedLine[2])->second.second.second.insert(nick);
+			users.find(nick)->second->addChannel(parsedLine[2]);
 		} else if (parsedLine[1] == "PART" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1))
 			inChannels.erase(parsedLine[2]);
-		else if (parsedLine[1] == "PART")
-			inChannels.find(parsedLine[2])->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1));
-		else if (parsedLine[1] == "QUIT" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
+		else if (parsedLine[1] == "PART") {
+			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
+			inChannels.find(parsedLine[2])->second.second.second.erase(nick);
+			users.find(nick)->second->removeChannel(parsedLine[2]);
+			if (inChannels.find(parsedLine[2])->second.second.second.empty())
+				inChannels.erase(inChannels.find(parsedLine[2]));
+		} else if (parsedLine[1] == "QUIT" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
 			connection->closeConnection();
 			quitHooked = true;
 			keepServer = false;
 			break;
 		} else if (parsedLine[1] == "QUIT") {
+			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!'));
 			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
-				chanIter->second.second.second.erase(parsedLine[0].substr(1, parsedLine[0].find_first_of('!')));
+				chanIter->second.second.second.erase(nick);
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(nick);
+			delete userIter->second;
+			users.erase(userIter);
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			connection->closeConnection();
 			quitHooked = true;
@@ -813,7 +822,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 void Client::parseNames(std::string channel, std::string namesList) {
 	bool firstNames = false;
 	if (!readingNames[channel]) {
-		for (std::list<std::string>::iterator nickIter = inChannels[channel].second.second.second.begin(); nickIter != inChannels[channel].second.second.second.end(); ++nickIter) {
+		for (std::set<std::string>::iterator nickIter = inChannels[channel].second.second.second.begin(); nickIter != inChannels[channel].second.second.second.end(); ++nickIter) {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(*nickIter);
 			if (userIter == users.end())
 				continue;
@@ -865,7 +874,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		}
 		inChannels[channel].second.second.second.insert(nick);
 		joiningUser->second->addChannel(channel);
-		for (size_t i = 0; i < rank.size(); i++) {
+		for (size_t i = 0; i < rank.size(); i++)
 			joiningUser->second->status(channel, rank, true);
 	}
 	if (firstNames) {
