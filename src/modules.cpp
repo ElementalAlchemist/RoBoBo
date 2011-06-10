@@ -66,37 +66,37 @@ void Module::onConnect(std::string server, std::string client) {}
 
 void Module::onQuit(std::string server, std::string client) {}
 
-std::string Module::onOutChannelMessage(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
+std::string Module::onChannelMessageOut(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelMessage(std::string server, std::string client, std::string target, char status, std::string message) {}
+void Module::onChannelMessageSend(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserMessage(std::string server, std::string client, std::string target, std::string message) { return message; }
+std::string Module::onUserMessageOut(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserMessage(std::string server, std::string client, std::string target, std::string message) {}
+void Module::onUserMessageSend(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelNotice(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
+std::string Module::onChannelNoticeOut(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelNotice(std::string server, std::string client, std::string target, char status, std::string message) {}
+void Module::onChannelNoticeSend(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserNotice(std::string server, std::string client, std::string target, std::string message) { return message; }
+std::string Module::onUserNoticeOut(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserNotice(std::string server, std::string client, std::string target, std::string message) {}
+void Module::onUserNoticeSend(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
+std::string Module::onChannelCTCPOut(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message) {}
+void Module::onChannelCTCPSend(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserCTCP(std::string server, std::string client, std::string target, std::string message) { return message; }
+std::string Module::onUserCTCPOut(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserCTCP(std::string server, std::string client, std::string target, std::string message) {}
+void Module::onUserCTCPSend(std::string server, std::string client, std::string target, std::string message) {}
 
-std::string Module::onOutChannelCTCPReply(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
+std::string Module::onChannelCTCPReplyOut(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 
-void Module::onSendChannelCTCPReply(std::string server, std::string client, std::string target, char status, std::string message) {}
+void Module::onChannelCTCPReplySend(std::string server, std::string client, std::string target, char status, std::string message) {}
 
-std::string Module::onOutUserCTCPReply(std::string server, std::string client, std::string target, std::string message) { return message; }
+std::string Module::onUserCTCPReplyOut(std::string server, std::string client, std::string target, std::string message) { return message; }
 
-void Module::onSendUserCTCPReply(std::string server, std::string client, std::string target, std::string message) {}
+void Module::onUserCTCPReplySend(std::string server, std::string client, std::string target, std::string message) {}
 
 std::string Module::description() { return "This module has not been described."; }
 

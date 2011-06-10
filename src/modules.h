@@ -44,22 +44,22 @@ class Module {
 		virtual void onConnect(std::string server, std::string client);
 		virtual void onQuit(std::string server, std::string client);
 		
-		virtual std::string onOutChannelMessage(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual void onSendChannelMessage(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual std::string onOutUserMessage(std::string server, std::string client, std::string target, std::string message);
-		virtual void onSendUserMessage(std::string server, std::string client, std::string target, std::string message);
-		virtual std::string onOutChannelNotice(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual void onSendChannelNotice(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual std::string onOutUserNotice(std::string server, std::string client, std::string target, std::string message);
-		virtual void onSendUserNotice(std::string server, std::string client, std::string target, std::string message);
-		virtual std::string onOutChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual void onSendChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual std::string onOutUserCTCP(std::string server, std::string client, std::string target, std::string message);
-		virtual void onSendUserCTCP(std::string server, std::string client, std::string target, std::string message);
-		virtual std::string onOutChannelCTCPReply(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual void onSendChannelCTCPReply(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual std::string onOutUserCTCPReply(std::string server, std::string client, std::string target, std::string message);
-		virtual void onSendUserCTCPReply(std::string server, std::string client, std::string target, std::string message);
+		virtual std::string onChannelMessageOut(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual void onChannelMessageSend(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual std::string onUserMessageOut(std::string server, std::string client, std::string target, std::string message);
+		virtual void onUserMessageSend(std::string server, std::string client, std::string target, std::string message);
+		virtual std::string onChannelNoticeOut(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual void onChannelNoticeSend(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual std::string onUserNoticeOut(std::string server, std::string client, std::string target, std::string message);
+		virtual void onUserNoticeSend(std::string server, std::string client, std::string target, std::string message);
+		virtual std::string onChannelCTCPOut(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual void onChannelCTCPSend(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual std::string onUserCTCPOut(std::string server, std::string client, std::string target, std::string message);
+		virtual void onUserCTCPSend(std::string server, std::string client, std::string target, std::string message);
+		virtual std::string onChannelCTCPReplyOut(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual void onChannelCTCPReplySend(std::string server, std::string client, std::string target, char status, std::string message);
+		virtual std::string onUserCTCPReplyOut(std::string server, std::string client, std::string target, std::string message);
+		virtual void onUserCTCPReplySend(std::string server, std::string client, std::string target, std::string message);
 		
 		virtual std::string description();
 		virtual std::vector<std::string> abilities();
