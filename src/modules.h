@@ -90,6 +90,7 @@ class Module {
 		bool connectServer(std::string server);
 		void quitServer(std::string server, std::string reason = "");
 		bool loadModule(std::string modName);
+		void unloadModule();
 		void unloadModule(std::string modName);
 		void rehashBot();
 		unsigned int botVersion();

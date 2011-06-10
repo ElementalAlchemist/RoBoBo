@@ -206,6 +206,10 @@ bool Module::loadModule(std::string modName) {
 	return serverData->loadModule(modName, false);
 }
 
+void Module::unloadModule() {
+	serverData->unloadModule(moduleName);
+}
+
 void Module::unloadModule(std::string modName) {
 	serverData->unloadModule(modName);
 }
