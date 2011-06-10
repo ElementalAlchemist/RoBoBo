@@ -55,6 +55,51 @@ class Protocol {
 		unsigned short debugLevel;
 		std::tr1::unordered_map<std::string, std::string> serverConf;
 		Socket* connection;
+		std::vector<std::string> parseLine(std::string rawLine);
+		
+		bool callChanMsgHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserMsgHook(std::string client, std::string nick, std::string message);
+		bool callChanNoticeHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserNoticeHook(std::string client, std::string nick, std::string message);
+		bool callChannelCTCPHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserCTCPHook(std::string client, std::string nick, std::string message);
+		bool callChannelCTCPReplyHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserCTCPReplyHook(std::string client, std::string nick, std::string message);
+		void callChannelJoinPreHook(std::string client, std::string channel, std::string hostmask);
+		void callChannelJoinPostHook(std::string client, std::string channel, std::string hostmask);
+		void callChannelPartPreHook(std::string client, std::string channel, std::string hostmask, std::string reason);
+		void callChannelPartPostHook(std::string client, std::string channel, std::string hostmask, std::string reason);
+		void callUserQuitPreHook(std::string client, std::string hostmask, std::string reason);
+		void callUserQuitPostHook(std::string client, std::string hostmask, std::string reason);
+		void callNickChangePreHook(std::string client, std::string oldNick, std::string newNick);
+		void callNickChangePostHook(std::string client, std::string oldNick, std::string newNick);
+		void callChannelKickPreHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelKickPostHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelModePreHook(std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callChannelModePostHook(std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callNumericHook(std::string client, std::string numeric, std::vector<std::string> parsedLine);
+		void callOtherDataHook(std::string client, std::vector<std::string> parsedLine);
+		void callPreConnectHook(std::string client);
+		void callConnectHook(std::string client);
+		void callQuitHook(std::string client);
+		
+		std::string callChannelMessageOutHook(std::string client, std::string target, char status, std::string message);
+		void callChannelMessageSendHook(std::string client, std::string target, char status, stdd::string message);
+		std::string callUserMessageOutHook(std::string client, std::string target, std::string message);
+		void callUserMessageSendHook(std::string client, std::string target, std::string message);
+		std::string callChannelNoticeOutHook(std::string client, std::string target, char status, std::string message);
+		void callChannelNoticeSendHook(std::string client, std::string target, char status, std::string message);
+		std::string callUserNoticeOutHook(std::string client, std::string target, std::string message);
+		void callUserNoticeSendHook(std::string client, std::string target, std::string message);
+		std::string callChannelCTCPOutHook(std::string client, std::string target, char status, std::string message);
+		void callChannelCTCPSendHook(std::string client, std::string target, char status, std::string message);
+		std::string callUserCTCPOutHook(std::string client, std::string target, std::string message);
+		void callUserCTCPSendHook(std::string client, std::string target, std::string message);
+		std::string callChannelCTCPReplyOutHook(std::string client, std::string target, char status, std::string message);
+		void callChannelCTCPReplySendHook(std::string client, std::string target, char status, std::string message);
+		std::string callUserCTCPReplyOutHook(std::string client, std::string target, std::string message);
+		void callUserCTCPReplySendHook(std::string client, std::string target, std::string message);
+	private:
 		Base* botBase;
 };
 #include "base.h"
