@@ -336,6 +336,32 @@ void Base::callChannelModePostHook(std::string server, std::string client, std::
 		modIter->second->onChannelModePost(server, client, channel, setter, mode, add, param);
 }
 
+void Base::callUserModePreHook(std::string server, std::string client, std::string mode, bool add) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserModePre(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserModePre(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserModePre(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserModePre(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserModePre(server, client, mode, add);
+}
+
+void Base::callUserModePostHook(std::string server, std::string client, std::string mode, bool add) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserModePost(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserModePost(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserModePost(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserModePost(server, client, mode, add);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserModePost(server, client, mode, add);
+}
+
 void Base::callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
 		modIter->second->onNumeric(server, client, numeric, parsedLine);

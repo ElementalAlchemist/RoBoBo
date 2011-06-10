@@ -41,8 +41,8 @@ Before release.  Duh.
 [>] - Refactor sending hooks to make non-client protocols compatible with module API (i.e. FMODE, etc. for InspIRCd going to onOther instead of onMode)
 	[x] - Hide base from direct protocol module access
 	[x] - protocol
-	[>] - base
-	[ ] - p_client
+	[x] - base
+	[>] - p_client
 	[ ] - p_inspircd21
 [ ] - Make sure all modules follow updated API
 

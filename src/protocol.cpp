@@ -171,6 +171,14 @@ void Protocol::callChannelModePostHook(std::string client, std::string channel, 
 	botBase->callChannelModePostHook(serverName, client, channel, setter, mode, add, param);
 }
 
+void Protocol::callUserModePreHook(std::string client, std::string mode, bool add) {
+	botBase->callUserModePreHook(serverName, client, mode, add);
+}
+
+void Protocol::callUserModePostHook(std::string client, std::string mode, bool add) {
+	botBase->callUserModePostHook(serverName, client, mode, add);
+}
+
 void Protocol::callNumericHook(std::string client, std::string numeric, std::vector<std::string> parsedLine) {
 	botBase->callNumericHook(serverName, client, numeric, parsedLine);
 }

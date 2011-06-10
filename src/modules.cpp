@@ -56,6 +56,10 @@ void Module::onChannelModePre(std::string server, std::string client, std::strin
 
 void Module::onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
 
+void Module::callUserModePreHook(std::string server, std::string client, std::string mode, bool add) {}
+
+void Module::callUserModePostHook(std::string server, std::string client, std::string mode, bool add) {}
+
 void Module::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {}
 
 void Module::onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine) {}

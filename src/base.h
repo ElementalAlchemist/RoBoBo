@@ -32,6 +32,8 @@ class Base {
 		void callChannelKickPostHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		void callChannelModePreHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
 		void callChannelModePostHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callUserModePreHook(std::string server, std::string client, std::string mode, bool add);
+		void callUserModePostHook(std::string server, std::string client, std::string mode, bool add);
 		void callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
 		void callOtherDataHook(std::string server, std::string client, std::vector<std::string> parsedLine);
 		void callPreConnectHook(std::string server, std::string client);

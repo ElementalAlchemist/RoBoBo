@@ -77,6 +77,8 @@ class Protocol {
 		void callChannelKickPostHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		void callChannelModePreHook(std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
 		void callChannelModePostHook(std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callUserModePreHook(std::string client, std::string mode, bool add);
+		void callUserModePostHook(std::string client, std::string mode, bool add);
 		void callNumericHook(std::string client, std::string numeric, std::vector<std::string> parsedLine);
 		void callOtherDataHook(std::string client, std::vector<std::string> parsedLine);
 		void callPreConnectHook(std::string client);
