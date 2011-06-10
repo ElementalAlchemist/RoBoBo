@@ -729,10 +729,10 @@ void Base::sendOther(std::string server, std::string rawLine) {
 	servIter->second->sendOther(rawLine);
 }
 
-void Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
 	if (servers.find(server) == servers.end())
 		return;
-	servers.find(server)->second->addClient(nick, ident, host, gecos);
+	return servers.find(server)->second->addClient(nick, ident, host, gecos);
 }
 
 void Base::removeClient(std::string server, std::string client, std::string reason) {

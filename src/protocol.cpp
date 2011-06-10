@@ -63,7 +63,7 @@ void Protocol::sendSNotice(char snomask, std::string text) {}
 
 void Protocol::sendOther(std::string rawLine) {}
 
-void Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {}
+std::string Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) { return ""; }
 void Protocol::removeClient(std::string client, std::string reason) {}
 std::list<std::string> Protocol::clients() { return std::list<std::string> (); }
 std::tr1::unordered_map<std::string, std::string> Protocol::clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }

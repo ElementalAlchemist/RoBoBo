@@ -186,8 +186,8 @@ std::tr1::unordered_map<std::string, std::string> Module::clientInfo(std::string
 	return serverData->clientInfo(server, client);
 }
 
-void Module::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
-	serverData->addClient(server, nick, ident, host, gecos);
+std::string Module::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	return serverData->addClient(server, nick, ident, host, gecos);
 }
 
 void Module::removeClient(std::string server, std::string client, std::string reason) {

@@ -85,7 +85,7 @@ class Module {
 		std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > listXLines(std::string server);
 		void sendSNotice(std::string server, char snomask, std::string text);
 		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case
-		void addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
+		std::string addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
 		void removeClient(std::string server, std::string client, std::string reason = "");
 		bool connectServer(std::string server);
 		void quitServer(std::string server, std::string reason = "");

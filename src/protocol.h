@@ -44,7 +44,7 @@ class Protocol {
 		
 		virtual void sendOther(std::string rawLine);
 		
-		virtual void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
+		virtual std::string addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		virtual void removeClient(std::string client, std::string reason = "");
 		virtual std::set<std::string> clients();
 		virtual std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);

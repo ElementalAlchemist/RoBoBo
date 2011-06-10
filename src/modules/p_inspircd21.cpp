@@ -95,7 +95,7 @@ class InspIRCd : public Protocol {
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > listXLines();
 		void sendSNotice(char snomask, std::string text);
 		void sendOther(std::string rawLine);
-		void addClient(std::string nick, std::string ident, std::string host, std::string gecos);
+		std::string addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		void removeClient(std::string client, std::string reason);
 		std::list<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
@@ -648,7 +648,7 @@ void InspIRCd::sendOther(std::string rawLine) {
 	connection->sendData(rawLine);
 }
 
-void InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
+std::string InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
 	std::string uuid = serverConf["sid"] + useUID();
 	users.insert(std::pair<std::string, User*> (uuid, new User (nick, ident, host, gecos, time(NULL))));
 	nicks.insert(std::pair<std::string, std::string> (nick, uuid));
@@ -656,6 +656,7 @@ void InspIRCd::addClient(std::string nick, std::string ident, std::string host, 
 	std::ostringstream currTime;
 	currTime << time(NULL);
 	connection->sendData(":" + serverConf["sid"] + " UID " + uuid + " " + currTime.str() + " " + nick + " " + host + " " + host + " " + ident + " 127.0.0.1 " + currTime.str() + " + :" + gecos);
+	return uuid;
 }
 
 void InspIRCd::removeClient(std::string client, std::string reason) {
