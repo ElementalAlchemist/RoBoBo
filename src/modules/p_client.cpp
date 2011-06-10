@@ -233,13 +233,13 @@ unsigned int Client::apiVersion() {
 }
 
 void Client::connectServer() {
-	botBase->callPreConnectHook(serverName);
+	callPreConnectHook(serverName);
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
 	portNumber >> port;
 	connection->connectServer(serverName, port);
 	sleep(1); // don't send right away in case of some sort of death or slowness
-	botBase->callConnectHook(serverName);
+	callConnectHook(serverName);
 	if (serverConf["password"] != "")
 		sendOther("PASS " + serverConf["password"]);
 	changeNick("", serverConf["nick"]);
@@ -392,7 +392,7 @@ void Client::handleData() {
 			break; // this case indicates a receive error
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
-		parsedLine = botBase->parseLine(receivedLine);
+		parsedLine = parseLine(receivedLine);
 		botBase->callPreHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendOther("MODE " + serverConf["nick"] + " +B"); // set bot mode
@@ -581,14 +581,14 @@ void Client::sendData() {
 		}
 		sendingMessage = dataToSend.front();
 		dataToSend.pop();
-		parsedLine = botBase->parseLine(sendingMessage);
+		parsedLine = parseLine(sendingMessage);
 		command = parsedLine[0];
 		if (command == "PRIVMSG" || command == "NOTICE") {
 			std::string newMessage = botBase->callHookOut(serverName, parsedLine);
 			if (newMessage == "")
 				continue; // do not send this canceled message
 			sendingMessage = parsedLine[0] + " " + parsedLine[1] + " :" + newMessage;
-			parsedLine = botBase->parseLine(sendingMessage);
+			parsedLine = parseLine(sendingMessage);
 		}
 		if (command == "MODE") {
 			secondsToAdd = 1;
@@ -693,7 +693,7 @@ void Client::secondsDecrement() {
 	while (true) {
 		if (!connection->isConnected()) {
 			if (!quitHooked)
-				botBase->callQuitHook(serverName);
+				callQuitHook(serverName);
 			quitHooked = true;
 			break; // thread must die when server isn't connected anymore
 		}
