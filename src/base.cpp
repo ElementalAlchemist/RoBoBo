@@ -805,28 +805,6 @@ bool Base::isChanType(char chanPrefix, std::string server) {
 	return false;
 }
 
-std::vector<std::string> Base::parseLine(std::string rawLine) {
-	std::vector<std::string> parsedLine;
-	std::string linePart = "";
-	for (unsigned int i = 0; i < rawLine.size(); i++) {
-		if (i != 0 && rawLine[i] == ':' && rawLine[i-1] == ' ') {
-			while (i < rawLine.size())
-				linePart += rawLine[i];
-			parsedLine.push_back(linePart);
-			return parsedLine;
-		}
-		if (rawLine[i] == ' ') {
-			parsedLine.push_back(linePart);
-			linePart = "";
-			continue;
-		}
-		linePart += rawLine[i];
-	}
-	if (linePart != "")
-		parsedLine.push_back(linePart);
-	return parsedLine;
-}
-
 std::list<std::string> Base::serverList() {
 	std::list<std::string> listOfServers;
 	for (std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)

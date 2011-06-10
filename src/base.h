@@ -89,7 +89,6 @@ class Base {
 		void addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
 		void removeClient(std::string server, std::string client, std::string reason);
 		bool isChanType(char chanPrefix, std::string server);
-		std::vector<std::string> parseLine(std::string rawLine);
 		std::tr1::unordered_map<std::string, Module*> loadedModules();
 		std::list<std::string> serverList();
 		std::multimap<std::string, std::string> moduleAbilities();
