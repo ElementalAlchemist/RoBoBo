@@ -33,12 +33,13 @@ Before release.  Duh.
 [x] - Use CAP userhost-in-names where possible rather than WHO
 	[x] - Include the userhost-in-names CAP capability in m_cap as part of the core (like multi-prefix)
 	[x] - Delegate the call to WHO to the NAMES processor in case the server doesn't support userhost-in-names
-	[ ] - Consider whether to keep the WHOIS command sent on connect to get the bot's ident and host
+	[x] - Consider whether to keep the WHOIS command sent on connect to get the bot's ident and host
 [x] - User status comparison
 [x] - Configuration: remove the need for users to type the m_ prefix and the .so extension
 	[x] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
 [x] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo
-[ ] - Refactor sending hooks to make non-client protocols compatible with module API (i.e. FMODE, etc. for InspIRCd going to onOther instead of onMode)
+[>] - Refactor sending hooks to make non-client protocols compatible with module API (i.e. FMODE, etc. for InspIRCd going to onOther instead of onMode)
+	[ ] - Hide base from direct protocol module access
 	[ ] - base
 	[ ] - p_client
 	[ ] - p_inspircd21

@@ -24,10 +24,6 @@ bool Module::onChannelNotice(std::string server, std::string client, std::string
 
 bool Module::onUserNotice(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-bool Module::onChannelAction(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
-
-bool Module::onUserAction(std::string server, std::string client, std::string nick, std::string message) { return true; }
-
 bool Module::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) { return true; }
 
 bool Module::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) { return true; }
@@ -56,9 +52,9 @@ void Module::onChannelKickPre(std::string server, std::string client, std::strin
 
 void Module::onChannelKickPost(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
-void Module::onChannelModePre(std::string server, std::string client, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+void Module::onChannelModePre(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
 
-void Module::onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, char mode, bool add, std::string param) {}
+void Module::onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
 
 void Module::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {}
 
@@ -85,14 +81,6 @@ void Module::onSendChannelNotice(std::string server, std::string client, std::st
 std::string Module::onOutUserNotice(std::string server, std::string client, std::string target, std::string message) { return message; }
 
 void Module::onSendUserNotice(std::string server, std::string client, std::string target, std::string message) {}
-
-std::string Module::onOutChannelAction(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
-
-void Module::onSendChannelAction(std::string server, std::string client, std::string target, char status, std::string message) {}
-
-std::string Module::onOutUserAction(std::string server, std::string client, std::string target, std::string message) { return message; }
-
-void Module::onSendUserAction(std::string server, std::string client, std::string target, std::string message) {}
 
 std::string Module::onOutChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message) { return message; }
 

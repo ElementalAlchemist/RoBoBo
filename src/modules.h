@@ -22,8 +22,6 @@ class Module {
 		virtual bool onUserMsg(std::string server, std::string client, std::string nick, std::string message);
 		virtual bool onChannelNotice(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
 		virtual bool onUserNotice(std::string server, std::string client, std::string nick, std::string message);
-		virtual bool onChannelAction(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
-		virtual bool onUserAction(std::string server, std::string client, std::string nick, std::string message);
 		virtual bool onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
 		virtual bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
 		virtual bool onChannelCTCPReply(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
@@ -38,8 +36,8 @@ class Module {
 		virtual void onNickChangePost(std::string server, std::string client, std::string oldNick, std::string newNick);
 		virtual void onChannelKickPre(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		virtual void onChannelKickPost(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
-		virtual void onChannelModePre(std::string server, std::string client, std::string channel, std::string setter, char mode, bool add, std::string param);
-		virtual void onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, char mode, bool add, std::string param);
+		virtual void onChannelModePre(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		virtual void onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
 		virtual void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
 		virtual void onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine);
 		virtual void onPreConnect(std::string server, std::string client);
@@ -54,10 +52,6 @@ class Module {
 		virtual void onSendChannelNotice(std::string server, std::string client, std::string target, char status, std::string message);
 		virtual std::string onOutUserNotice(std::string server, std::string client, std::string target, std::string message);
 		virtual void onSendUserNotice(std::string server, std::string client, std::string target, std::string message);
-		virtual std::string onOutChannelAction(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual void onSendChannelAction(std::string server, std::string client, std::string target, char status, std::string message);
-		virtual std::string onOutUserAction(std::string server, std::string client, std::string target, std::string message);
-		virtual void onSendUserAction(std::string server, std::string client, std::string target, std::string message);
 		virtual std::string onOutChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message);
 		virtual void onSendChannelCTCP(std::string server, std::string client, std::string target, char status, std::string message);
 		virtual std::string onOutUserCTCP(std::string server, std::string client, std::string target, std::string message);
