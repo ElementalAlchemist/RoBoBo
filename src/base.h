@@ -54,22 +54,7 @@ class Base {
 		void callChannelCTCPReplySendHook(std::string server, std::string client, std::string target, char status, std::string message);
 		std::string callUserCTCPReplyOutHook(std::string server, std::string client, std::string target, std::string message);
 		void callUserCTCPReplySendHook(std::string server, std::string client, std::string target, std::string message);
-		/*
-		void callPreHook(std::string server, std::vector<std::string> parsedLine);
-		void callPostHook(std::string server, std::vector<std::string> parsedLine);
-		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
-		void callHookSend(std::string server, std::vector<std::string> parsedLine);
-		void callPreConnectHook(std::string server);
-		void callConnectHook(std::string server);
-		void callQuitHook(std::string server);
-		void callPreModulesHook(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
-		bool callPostModulesHook(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
-		std::string callModulesHookOut(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
-		void callModulesHookSend(std::string server, std::vector<std::string> parsedLine, std::tr1::unordered_map<std::string, Module*>* modules);
-		void callPreConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
-		void callConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
-		void callQuitModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
-		*/
+		
 		void sendPrivMsg(std::string server, std::string client, std::string target, std::string message);
 		void sendNotice(std::string server, std::string client, std::string target, std::string message);
 		void setMode(std::string server, std::string client, std::string target, std::string mode);
