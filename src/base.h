@@ -12,6 +12,49 @@ class Base {
 		std::tr1::unordered_map<std::string, std::string> serverData(std::string server);
 		std::vector<std::vector<char> > serverChanModes(std::string server);
 		std::list<std::pair<char, char> > serverPrefixes(std::string server);
+		bool callChanMsgHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserMsgHook(std::string server, std::string client, std::string nick, std::string message);
+		bool callChanNoticeHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserNoticeHook(std::string server, std::string client, std::string nick, std::string message);
+		bool callChannelCTCPHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserCTCPHook(std::string server, std::string client, std::string nick, std::string message);
+		bool callChannelCTCPReplyHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserCTCPReplyHook(std::string server, std::string client, std::string nick, std::string message);
+		void callChannelJoinPreHook(std::string server, std::string client, std::string channel, std::string hostmask);
+		void callChannelJoinPostHook(std::string server, std::string client, std::string channel, std::string hostmask);
+		void callChannelPartPreHook(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason);
+		void callChannelPartPostHook(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason);
+		void callUserQuitPreHook(std::string server, std::string client, std::string hostmask, std::string reason);
+		void callUserQuitPostHook(std::string server, std::string client, std::string hostmask, std::string reason);
+		void callNickChangePreHook(std::string server, std::string client, std::string oldNick, std::string newNick);
+		void callNickChangePostHook(std::string server, std::string client, std::string oldNick, std::string newNick);
+		void callChannelKickPreHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelKickPostHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelModePreHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callChannelModePostHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
+		void callOtherDataHook(std::string server, std::string client, std::vector<std::string> parsedLine);
+		void callPreConnectHook(std::string server, std::string client);
+		void callConnectHook(std::string server, std::string client);
+		void callQuitHook(std::string server, std::string client);
+		
+		std::string callChannelMessageOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelMessageSendHook(std::string server, std::string client, std::string target, char status, stdd::string message);
+		std::string callUserMessageOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserMessageSendHook(std::string server, std::string client, std::string target, std::string message);
+		std::string callChannelNoticeOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelNoticeSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserNoticeOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserNoticeSendHook(std::string server, std::string client, std::string target, std::string message);
+		std::string callChannelCTCPOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelCTCPSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserCTCPOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserCTCPSendHook(std::string server, std::string client, std::string target, std::string message);
+		std::string callChannelCTCPReplyOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelCTCPReplySendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserCTCPReplyOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserCTCPReplySendHook(std::string server, std::string client, std::string target, std::string message);
+		/*
 		void callPreHook(std::string server, std::vector<std::string> parsedLine);
 		void callPostHook(std::string server, std::vector<std::string> parsedLine);
 		std::string callHookOut(std::string server, std::vector<std::string> parsedLine);
@@ -26,6 +69,7 @@ class Base {
 		void callPreConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
 		void callConnectModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
 		void callQuitModulesHook(std::string server, std::tr1::unordered_map<std::string, Module*>* modules);
+		*/
 		void sendPrivMsg(std::string server, std::string client, std::string target, std::string message);
 		void sendNotice(std::string server, std::string client, std::string target, std::string message);
 		void setMode(std::string server, std::string client, std::string target, std::string mode);

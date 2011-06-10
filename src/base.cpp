@@ -60,6 +60,7 @@ std::list<std::pair<char, char> > Base::serverPrefixes(std::string server) {
 	return serverIter->second->prefixes();
 }
 
+/*
 void Base::callPreHook(std::string server, std::vector<std::string> parsedLine) {
 	callPreModulesHook(server, parsedLine, &highModules);
 	callPreModulesHook(server, parsedLine, &mediumHighModules);
@@ -667,6 +668,7 @@ void Base::callQuitModulesHook(std::string server, std::tr1::unordered_map<std::
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->begin(); modIter != modules->end(); ++modIter)
 		modIter->second->onQuit(server);
 }
+*/
 
 void Base::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
