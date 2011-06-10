@@ -39,8 +39,9 @@ Before release.  Duh.
 	[x] - detects whether it's a normal module (for module blocks) or a protocol module (var in server blocks) by the prefix (m_ vs. p_)
 [x] - Give modules a way to the robobo dir so that incorrect assumptions aren't made regarding people using dir/robobo instead of cd dir; ./robobo
 [>] - Refactor sending hooks to make non-client protocols compatible with module API (i.e. FMODE, etc. for InspIRCd going to onOther instead of onMode)
-	[ ] - Hide base from direct protocol module access
-	[ ] - base
+	[x] - Hide base from direct protocol module access
+	[x] - protocol
+	[>] - base
 	[ ] - p_client
 	[ ] - p_inspircd21
 [ ] - Make sure all modules follow updated API

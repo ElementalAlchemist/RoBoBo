@@ -60,6 +60,233 @@ std::list<std::pair<char, char> > Base::serverPrefixes(std::string server) {
 	return serverIter->second->prefixes();
 }
 
+bool Base::callChanMsgHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelMsg(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelMsg(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelMsg(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelMsg(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelMsg(server, client, channel, target, nick, message);
+	return keepGoing;
+}
+
+bool Base::callUserMsgHook(std::string server, std::string client, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserMsg(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserMsg(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserMsg(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserMsg(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserMsg(server, client, nick, message);
+	return keepGoing;
+}
+
+bool Base::callChanNoticeHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelNotice(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelNotice(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelNotice(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelNotice(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelNotice(server, client, channel, target, nick, message);
+	return keepGoing;
+}
+
+bool Base::callUserNoticeHook(std::string server, std::string client, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserNotice(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserNotice(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserNotice(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserNotice(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserNotice(server, client, nick, message);
+	return keepGoing;
+}
+
+bool Base::callChannelCTCPHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCP(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCP(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCP(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCP(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCP(server, client, channel, target, nick, message);
+	return keepGoing;
+}
+
+bool Base::callUserCTCPHook(std::string server, std::string client, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCP(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCP(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCP(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCP(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCP(server, client, nick, message);
+	return keepGoing;
+}
+
+bool Base::callChannelCTCPReplyHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCPReply(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCPReply(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCPReply(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCPReply(server, client, channel, target, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onChannelCTCPReply(server, client, channel, target, nick, message);
+	return keepGoing;
+}
+
+bool Base::callUserCTCPReplyHook(std::string server, std::string client, std::string nick, std::string message) {
+	bool keepGoing = true;
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCPReply(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCPReply(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCPReply(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCPReply(server, client, nick, message);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end() && keepGoing; ++modIter)
+		keepGoing = modIter->second->onUserCTCPReply(server, client, nick, message);
+	return keepGoing;
+}
+
+void Base::callChannelJoinPreHook(std::string server, std::string client, std::string channel, std::string hostmask) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+}
+
+void Base::callChannelJoinPostHook(std::string server, std::string client, std::string channel, std::string hostmask) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+}
+
+void Base::callChannelPartPreHook(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.begin(); ++modIter)
+		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+}
+
+void Base::callChannelPartPostHook(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+}
+
+void Base::callUserQuitPreHook(std::string server, std::string client, std::string hostmask, std::string reason) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+}
+
+void Base::callUserQuitPostHook(std::string server, std::string client, std::string hostmask, std::string reason) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+}
+
+void callNickChangePreHook(std::string server, std::string client, std::string oldNick, std::string newNick);
+void callNickChangePostHook(std::string server, std::string client, std::string oldNick, std::string newNick);
+void callChannelKickPreHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+void callChannelKickPostHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+void callChannelModePreHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+void callChannelModePostHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+void callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
+void callOtherDataHook(std::string server, std::string client, std::vector<std::string> parsedLine);
+void callPreConnectHook(std::string server, std::string client);
+void callConnectHook(std::string server, std::string client);
+void callQuitHook(std::string server, std::string client);
+
+std::string callChannelMessageOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+void callChannelMessageSendHook(std::string server, std::string client, std::string target, char status, stdd::string message);
+std::string callUserMessageOutHook(std::string server, std::string client, std::string target, std::string message);
+void callUserMessageSendHook(std::string server, std::string client, std::string target, std::string message);
+std::string callChannelNoticeOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+void callChannelNoticeSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+std::string callUserNoticeOutHook(std::string server, std::string client, std::string target, std::string message);
+void callUserNoticeSendHook(std::string server, std::string client, std::string target, std::string message);
+std::string callChannelCTCPOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+void callChannelCTCPSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+std::string callUserCTCPOutHook(std::string server, std::string client, std::string target, std::string message);
+void callUserCTCPSendHook(std::string server, std::string client, std::string target, std::string message);
+std::string callChannelCTCPReplyOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+void callChannelCTCPReplySendHook(std::string server, std::string client, std::string target, char status, std::string message);
+std::string callUserCTCPReplyOutHook(std::string server, std::string client, std::string target, std::string message);
+void callUserCTCPReplySendHook(std::string server, std::string client, std::string target, std::string message);
+
 void Base::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
