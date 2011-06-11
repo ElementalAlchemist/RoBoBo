@@ -82,6 +82,7 @@ class Client : public Protocol {
 		std::string convertUserMode(char mode);
 		void parse005(std::vector<std::string> parsedLine);
 		void parseNames(std::string channel, std::string namesList);
+		bool isNumeric(std::string command);
 };
 
 User::User(std::string ident, std::string host, Client* serverClass) : userIdent(ident), userHost(host), server(serverClass) {}
@@ -393,40 +394,49 @@ void Client::handleData() {
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
-		botBase->callPreHook(serverName, parsedLine); // call module hooks for the received message
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendOther("MODE " + serverConf["nick"] + " +B"); // set bot mode
 			if (serverConf["channels"] != "")
 				joinChannel(serverConf["channels"]);
 			registered = true;
 			sendOther("WHOIS " + serverConf["nick"]);
-		} else if (parsedLine[1] == "005") // server features
+			callNumericHook(serverConf["nick"], "001", parsedLine);
+		} else if (parsedLine[1] == "005") { // server features
 			parse005(parsedLine);
-		else if (parsedLine[1] == "311" && parsedLine[3] == serverConf["nick"]) {
+			callNumericHook(serverConf["nick"], "005", parsedLine);
+		} else if (parsedLine[1] == "311" && parsedLine[3] == serverConf["nick"]) {
 			serverConf["ident"] = parsedLine[4];
 			serverConf["host"] = parsedLine[5];
+			callNumericHook(serverConf["nick"], "311", parsedLine);
 		} else if (parsedLine[1] == "332") { // channel topic
 			std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator it = inChannels.find(parsedLine[3]);
 			if (it != inChannels.end())
 				it->second.first = parsedLine[4];
+			callNumericHook(serverConf["nick"], "332", parsedLine);
 		} else if (parsedLine[1] == "352") { // WHO reply
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[7]);
 			if (userIter != users.end()) {
 				userIter->second->ident(parsedLine[4]);
 				userIter->second->host(parsedLine[5]);
 			}
-		} else if (parsedLine[1] == "353") // NAMES reply
+			callNumericHook(serverConf["nick"], "352", parsedLine);
+		} else if (parsedLine[1] == "353") { // NAMES reply
 			parseNames(parsedLine[4], parsedLine[5]);
-		else if (parsedLine[1] == "366") // end of NAMES reply
+			callNumericHook(serverConf["nick"], "353", parsedLine);
+		} else if (parsedLine[1] == "366") { // end of NAMES reply
 			readingNames[parsedLine[3]] = false;
-		else if (parsedLine[1] == "433" && !registered) { // nickname already in use
+			callNumericHook(serverConf["nick"], "366", parsedLine);
+		} else if (parsedLine[1] == "433" && !registered) { // nickname already in use
 			if (!altChanged) {
 				changeNick(serverConf["altnick"]);
 				serverConf["nick"] = serverConf["altnick"];
 				altChanged = true;
 			} else
 				quitServer("");
-		} else if (parsedLine[1] == "MODE") {
+			callNumericHook(serverConf["nick"], "433", parsedLine);
+		} else if (isNumeric(parsedLine[1]))
+			callNumericHook(serverConf["nick"], parsedLine[1], parsedLine);
+		else if (parsedLine[1] == "MODE") {
 			bool addMode = true;
 			if (parsedLine[2] == serverConf["nick"]) { // if it's a user mode
 				for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
@@ -435,6 +445,8 @@ void Client::handleData() {
 					else if (parsedLine[3][i] == '-')
 						addMode = false;
 					else {
+						std::string longmode = convertUserMode(parsedLine[3][i]);
+						callUserModePreHook(serverConf["nick"], longmode, addMode);
 						if (addMode)
 							uModes.push_back(convertUserMode(parsedLine[3][i]));
 						else {
@@ -445,11 +457,12 @@ void Client::handleData() {
 								}
 							}
 						}
+						callUserModePostHook(serverConf["nick"], longmode, addMode);
 					}
 				}
 			} else { // it's a channel mode
-				int currParam = 4; // MODE parameters start at the fourth IRC parameter
-				for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
+				size_t currParam = 4; // MODE parameters start at the fourth IRC parameter
+				for (size_t i = 0; i < parsedLine[3].size(); i++) {
 					if (parsedLine[3][i] == '+')
 						addMode = true;
 					else if (parsedLine[3][i] == '-')
@@ -479,31 +492,44 @@ void Client::handleData() {
 							if (!found)
 								category = 4;
 						}
-						
+						std::string setterNick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
+						std::string longmode = convertChanMode(parsedLine[3][i]);
+						if (category == 0 || category == 1 || (category == 2 && addMode))
+							callChannelModePreHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam]);
+						else
+							callChannelModePreHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode);
 						if (category == 0) {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end()) {
 								if (prefix)
-									setStatus(addMode, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
+									setStatus(addMode, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam]);
 								else
 									setChanMode(addMode, true, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam]);
 							}
 						} else if (category == 1 || (category == 2 && addMode)) {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
-								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam++]);
+								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]), parsedLine[currParam]);
 						} else {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end())
 								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]));
 						}
+						if (category == 0 || category == 1 || (category == 2 && addMode))
+							callChannelModePostHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam++]); // increase parameter now that we're done with the current one
+						else
+							callChannelModePostHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode);
 					}
 				}
 			}
-		} else if (parsedLine[1] == "NICK" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) // bot's nick changed
+		} else if (parsedLine[1] == "NICK" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) { // bot's nick changed
+			callNickChangePreHook(serverConf["nick"], serverConf["nick"], parsedLine[2]);
+			std::string oldNick = serverConf["nick"];
 			serverConf["nick"] = parsedLine[2];
-		else if (parsedLine[1] == "NICK") {
+			callNickChangePostHook(serverConf["nick"], oldNick, parsedLine[2]);
+		} else if (parsedLine[1] == "NICK") {
 			std::string oldNick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
+			callNickChangePreHook(serverConf["nick"], oldNick, parsedLine[2]);
 			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
 				if (chanIter->second.second.second.find(oldNick) != chanIter->second.second.second.end()) {
 					chanIter->second.second.second.erase(oldNick);
@@ -513,11 +539,14 @@ void Client::handleData() {
 			User* nickChanger = users.find(oldNick)->second;
 			users.erase(oldNick);
 			users.insert(std::pair<std::string, User*> (parsedLine[2], nickChanger));
+			callNickChangePostHook(serverConf["nick"], oldNick, parsedLine[2]);
 		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) { // bot joined a channel
+			callChannelJoinPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
 			inChannels.insert(std::pair<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > (parsedLine[2], std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > ()));
-			sendOther("WHO " + parsedLine[2]);
+			callChannelJoinPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
 		} else if (parsedLine[1] == "JOIN") {
 			std::string hostmask = parsedLine[0].substr(1);
+			callChannelJoinPreHook(serverConf["nick"], parsedLine[2], hostmask);
 			std::string nick = hostmask.substr(0, hostmask.find_first_of('!'));
 			if (users.find(nick) == users.end()) {
 				size_t exclaim = hostmask.find_first_of('!');
@@ -527,34 +556,57 @@ void Client::handleData() {
 			}
 			inChannels.find(parsedLine[2])->second.second.second.insert(nick);
 			users.find(nick)->second->addChannel(parsedLine[2]);
-		} else if (parsedLine[1] == "PART" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1))
+			callChannelJoinPostHook(serverConf["nick"], parsedLine[2], hostmask);
+		} else if (parsedLine[1] == "PART" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
+			if (parsedLine.size() == 3)
+				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+			else
+				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 			inChannels.erase(parsedLine[2]);
-		else if (parsedLine[1] == "PART") {
+			if (parsedLine.size() == 3)
+				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+			else
+				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
+		} else if (parsedLine[1] == "PART") {
+			if (parsedLine.size() == 3)
+				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+			else
+				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 			inChannels.find(parsedLine[2])->second.second.second.erase(nick);
 			users.find(nick)->second->removeChannel(parsedLine[2]);
 			if (inChannels.find(parsedLine[2])->second.second.second.empty())
 				inChannels.erase(inChannels.find(parsedLine[2]));
+			if (parsedLine.size() == 3)
+				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+			else
+				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 		} else if (parsedLine[1] == "QUIT" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
+			callQuitHook(serverConf["nick"]);
 			connection->closeConnection();
 			quitHooked = true;
 			keepServer = false;
 			break;
 		} else if (parsedLine[1] == "QUIT") {
-			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!'));
+			callUserQuitPreHook(serverConf["nick"], parsedLine[0].substr(1), parsedLine[2]);
+			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 				chanIter->second.second.second.erase(nick);
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(nick);
 			delete userIter->second;
 			users.erase(userIter);
+			callUserQuitPostHook(serverConf["nick"], parsedLine[0].substr(1), parsedLine[2]);
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
+			callQuitHook(serverConf["nick"]);
 			connection->closeConnection();
 			quitHooked = true;
 			keepServer = false;
 			break;
-		} else if (parsedLine[0] == "PING") // server ping
+		} else if (parsedLine[0] == "PING") { // server ping
 			sendOther("PONG " + parsedLine[1]);
-		botBase->callPostHook(serverName, parsedLine);
+			callOtherDataHook(serverConf["nick"], parsedLine);
+		} else
+			callOtherDataHook(serverConf["nick"], parsedLine);
 	}
 }
 
@@ -903,6 +955,14 @@ std::tr1::unordered_map<std::string, std::string> Client::clientInfo(std::string
 
 std::list<std::string> Client::userModes(std::string client) {
 	return uModes;
+}
+
+bool Client::isNumeric(std::string command) {
+	if (command.size() != 3)
+		return false;
+	if (command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9')
+		return true;
+	return false;
 }
 
 extern "C" Protocol* spawn(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debugLevel) {
