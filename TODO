@@ -5,7 +5,7 @@ Current TODO List
 [>] - in progress
 [x] - complete
 
-Before release.  Duh.
+2.0 Alpha 1
 =======================================
 [x] - Rename ModuleInterface to Base or something
 [x] - Destroy the word "get"
@@ -45,6 +45,7 @@ Before release.  Duh.
 	[x] - p_client
 	[>] - p_inspircd21
 [ ] - Make sure all modules follow updated API
+[ ] - Update example conf
 
 2.0 Beta 1
 =======================================

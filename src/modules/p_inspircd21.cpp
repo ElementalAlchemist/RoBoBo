@@ -328,18 +328,13 @@ unsigned int InspIRCd::apiVersion() {
 }
 
 void InspIRCd::connectServer() {
-	botBase->callPreConnectHook(serverName);
-	std::istringstream portNumber (serverConf["port"]);
-	unsigned short port;
-	portNumber >> port;
-	connection->connectServer(serverName, port);
-	sleep(1);
-	sendOther("CAPAB START");
-	sendOther("CAPAB CAPABILITIES :PROTOCOL=1203");
-	sendOther("CAPAB END");
-	sendOther("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
-	sendOther(":" + serverConf["sid"] + " BURST");
-	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
+	std::vector<std::string> preConnectLines;
+	preConnectLines.push_back("CAPAB START");
+	preConnectLines.push_back("CAPAB CAPABILITIES :PROTOCOL=1203");
+	preConnectLines.push_back("CAPAB END");
+	preConnectLines.push_back("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
+	preConnectLines.push_back(":" + serverConf["sid"] + " BURST");
+	preConnectLines.push_back(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
 	unsigned int i = 0;
 	std::ostringstream clientNick, clientIdent, clientHost, clientGecos, clientOper, clientChannels, currTimeS;
 	clientNick << i << "/nick";
@@ -353,12 +348,13 @@ void InspIRCd::connectServer() {
 	std::tr1::unordered_map<std::string, std::string> joiningChannels;
 	while (serverConf[clientNick.str()] != "") {
 		std::string uuid = serverConf["sid"] + useUID();
-		sendOther(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
+		callPreConnectHook(uuid);
+		preConnectLines.push_back(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
 		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime)));
 		nicks.insert(std::pair<std::string, std::string> (serverConf[clientNick.str()], uuid));
 		ourClients.insert(uuid);
 		if (serverConf[clientOper.str()] != "")
-			sendOther(":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
+			preConnectLines.push_back(":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
 		while (serverConf[clientChannels.str()] != "") {
 			std::string channelName = serverConf[clientChannels.str()].substr(0, serverConf[clientChannels.str()].find_first_of(','));
 			if (serverConf[clientChannels.str()].find_first_of(',') == std::string::npos)
@@ -392,10 +388,17 @@ void InspIRCd::connectServer() {
 		clientOper << i << "/oper";
 		clientChannels << i << "/channels";
 	}
+	std::istringstream portNumber (serverConf["port"]);
+	unsigned short port;
+	portNumber >> port;
+	connection->connectServer(serverName, port);
+	sleep(1);
+	for (size_t i = 0; i < preConnectLines.size(); i++)
+		sendOther(preConnectLines[i]);
 	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter) {
 		std::ostringstream currTime; // do it like this in case the second changed in the middle or something so that the correct timestamp is still sent
 		currTime << channels.find(jcIter->first)->second->creationTime();
-		sendOther(":" + serverConf["sid"] + " FJOIN " + jcIter->first + " " + currTime.str() + " +nt :" + jcIter->second);
+		preConnectLines.push_back(":" + serverConf["sid"] + " FJOIN " + jcIter->first + " " + currTime.str() + " +nt :" + jcIter->second);
 	}
 	botBase->callConnectHook(serverName);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
