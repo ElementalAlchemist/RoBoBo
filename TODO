@@ -42,8 +42,8 @@ Before release.  Duh.
 	[x] - Hide base from direct protocol module access
 	[x] - protocol
 	[x] - base
-	[>] - p_client
-	[ ] - p_inspircd21
+	[x] - p_client
+	[>] - p_inspircd21
 [ ] - Make sure all modules follow updated API
 
 2.0 Beta 1

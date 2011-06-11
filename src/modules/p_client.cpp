@@ -635,12 +635,85 @@ void Client::sendData() {
 		dataToSend.pop();
 		parsedLine = parseLine(sendingMessage);
 		command = parsedLine[0];
-		if (command == "PRIVMSG" || command == "NOTICE") {
-			std::string newMessage = botBase->callHookOut(serverName, parsedLine);
-			if (newMessage == "")
-				continue; // do not send this canceled message
-			sendingMessage = parsedLine[0] + " " + parsedLine[1] + " :" + newMessage;
+		if (command == "PRIVMSG") {
+			std::string message;
+			bool channel = false, ctcp = false;
+			char status = ' ';
+			std::string targetName = parsedLine[1];
+			if (chanTypes.find(targetName[0]) == chanTypes.end() && chanTypes.find(targetName[1]) == chanTypes.end()) { // User message!
+				if (parsedLine[2][0] == (char)1) {
+					ctcp = true;
+					message = parsedLine[2].substr(1);
+					if (message[message.size() - 1] == (char)1)
+						message = message.substr(0, message.size() - 1);
+					message = (char)1 + callUserCTCPOutHook(serverConf["nick"], targetName, message) + (char)1;
+				} else
+					message = callUserMessageOutHook(serverConf["nick"], targetName, message);
+			} else { // Channel message!
+				channel = true;
+				if (chanTypes.find(targetName[0]) == chanTypes.end()) {
+					status = targetName[0];
+					targetName = targetName.substr(1);
+				}
+				if (parsedLine[2][0] == (char)1) {
+					ctcp = true;
+					message = parsedLine[2].substr(1);
+					if (message[message.size() - 1] == (char)1)
+						message = message.substr(0, message.size() - 1);
+					message = (char)1 + callChannelCTCPOutHook(serverConf["nick"], targetName, status, message) + (char)1;
+				} else
+					message = callChannelMessageOutHook(serverConf["nick"], targetName, status, message);
+			}
+			if (message == "")
+				continue; // This message clearly cannot be sent.
+			sendingMessage = "PRIVMSG " + parsedLine[1] + " :" + message;
 			parsedLine = parseLine(sendingMessage);
+			if (ctcp && channel)
+				callChannelCTCPSendHook(serverConf["nick"], targetName, status, message);
+			else if (ctcp)
+				callUserCTCPSendHook(serverConf["nick"], targetName, message);
+			else if (channel)
+				callChannelMessageSendHook(serverConf["nick"], targetName, status, message);
+			else
+				callUserMessageSendHook(serverConf["nick"], targetName, message);
+		} else if (command == "NOTICE") {
+			std::string message;
+			bool channel = false, ctcp = false;
+			char status = ' ';
+			std::string targetName = parsedLine[1];
+			if (chanTypes.find(targetName[0]) == chanTypes.end() && chanTypes.find(targetName[1]) == chanTypes.end()) { // User message!
+				if (parsedLine[2][0] == (char)1) {
+					message = parsedLine[2].substr(1);
+					if (message[message.size() - 1] == (char)1)
+						message = message.substr(0, message.size() - 1);
+					message = (char)1 + callUserCTCPReplyOutHook(serverConf["nick"], targetName, message) + (char)1;
+				} else
+					message = callUserNoticeOutHook(serverConf["nick"], targetName, message);
+			} else { // Channel message!
+				if (chanTypes.find(targetName[0]) == chanTypes.end()) {
+					status = targetName[0];
+					targetName = targetName.substr(1);
+				}
+				if (parsedLine[2][0] == (char)1) {
+					message = parsedLine[2].substr(1);
+					if (message[message.size() - 1] == (char)1)
+						message = message.substr(0, message.size() - 1);
+					message = (char)1 + callChannelCTCPReplyOutHook(serverConf["nick"], targetName, status, message);
+				} else
+					message = callChannelNoticeOutHook(serverConf["nick"], targetName, status, message);
+			}
+			if (message == "")
+				continue; // This message clearly cannot be sent.  So it won't.  Next line, please!
+			sendingMessage = "NOTICE " + parsedLine[1] + " :" + parsedLine[2];
+			parsedLine = parseLine(sendingMessage);
+			if (channel && ctcp)
+				callChannelCTCPReplySendHook(serverConf["nick"], targetName, status, message);
+			else if (ctcp)
+				callUserCTCPReplySendHook(serverConf["nick"], targetName, message);
+			else if (channel)
+				callChannelNoticeSendHook(serverConf["nick"], targetName, message);
+			else
+				callUserNoticeSendHook(serverConf["nick"], targetName, message);
 		}
 		if (command == "MODE") {
 			secondsToAdd = 1;
@@ -721,7 +794,6 @@ void Client::sendData() {
 		connection->sendData(sendingMessage);
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
-		botBase->callHookSend(serverName, parsedLine);
 		if (command == "QUIT") {
 			connection->closeConnection();
 			keepServer = false;
