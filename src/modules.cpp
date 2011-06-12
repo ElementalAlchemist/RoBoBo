@@ -40,6 +40,10 @@ void Module::onChannelPartPre(std::string server, std::string client, std::strin
 
 void Module::onChannelPartPost(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {}
 
+void Module::onUserConnectPre(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {}
+
+void Module::onUserConnectPost(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {}
+
 void Module::onUserQuitPre(std::string server, std::string client, std::string hostmask, std::string reason) {}
 
 void Module::onUserQuitPost(std::string server, std::string client, std::string hostmask, std::string reason) {}

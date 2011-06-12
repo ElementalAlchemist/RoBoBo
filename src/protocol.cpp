@@ -139,6 +139,14 @@ void Protocol::callChannelPartPostHook(std::string client, std::string channel, 
 	botBase->callChannelPartPostHook(serverName, client, channel, hostmask, reason);
 }
 
+void Protocol::callUserConnectPreHook(std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
+	botBase->callUserConnectPreHook(serverName, client, nick, ident, host, gecos);
+}
+
+void Protocol::callUserConnectPostHook(std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
+	botBase->callUserConnectPostHook(serverName, client, nick, ident, host, gecos);
+}
+
 void Protocol::callUserQuitPreHook(std::string client, std::string hostmask, std::string reason) {
 	botBase->callUserQuitPreHook(serverName, client, hostmask, reason);
 }

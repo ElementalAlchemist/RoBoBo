@@ -232,6 +232,32 @@ void Base::callChannelPartPostHook(std::string server, std::string client, std::
 		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
 }
 
+void Base::callUserConnectPreHook(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+}
+
+void Base::callUserConnectPostHook(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+}
+
 void Base::callUserQuitPreHook(std::string server, std::string client, std::string hostmask, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
 		modIter->second->onUserQuitPre(server, client, hostmask, reason);

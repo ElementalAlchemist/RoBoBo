@@ -30,6 +30,8 @@ class Module {
 		virtual void onChannelJoinPost(std::string server, std::string client, std::string channel, std::string hostmask);
 		virtual void onChannelPartPre(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason);
 		virtual void onChannelPartPost(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason);
+		virtual void onUserConnectPre(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos);
+		virtual void onUserConnectPost(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos);
 		virtual void onUserQuitPre(std::string server, std::string client, std::string hostmask, std::string reason);
 		virtual void onUserQuitPost(std::string server, std::string client, std::string hostmask, std::string reason);
 		virtual void onNickChangePre(std::string server, std::string client, std::string oldNick, std::string newNick);

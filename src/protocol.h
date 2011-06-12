@@ -69,6 +69,8 @@ class Protocol {
 		void callChannelJoinPostHook(std::string client, std::string channel, std::string hostmask);
 		void callChannelPartPreHook(std::string client, std::string channel, std::string hostmask, std::string reason);
 		void callChannelPartPostHook(std::string client, std::string channel, std::string hostmask, std::string reason);
+		void callUserConnectPreHook(std::string client, std::string nick, std::string ident, std::string host, std::string gecos);
+		void callUserConnectPostHook(std::string client, std::string nick, std::string ident, std::string host, std::string gecos);
 		void callUserQuitPreHook(std::string client, std::string hostmask, std::string reason);
 		void callUserQuitPostHook(std::string client, std::string hostmask, std::string reason);
 		void callNickChangePreHook(std::string client, std::string oldNick, std::string newNick);
