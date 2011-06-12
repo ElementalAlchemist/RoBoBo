@@ -351,7 +351,7 @@ void InspIRCd::connectServer() {
 		std::string uuid = serverConf["sid"] + useUID();
 		callPreConnectHook(uuid);
 		preConnectLines.push_back(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
-		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime)));
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime))).first;
 		nicks.insert(std::pair<std::string, std::string> (serverConf[clientNick.str()], uuid));
 		ourClients.insert(uuid);
 		if (serverConf[clientOper.str()] != "")
@@ -402,8 +402,8 @@ void InspIRCd::connectServer() {
 		currTime << channels.find(jcIter->first)->second->creationTime();
 		joinUsers(jcIter->first, jcIter->second);
 	}
-	for (std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin(); userIter != users.end(); ++userIter)
-		callConnectHook(userIter->first);
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callConnectHook(*userIter);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
 	pthread_create(&receiveThread, &detachedState, receiveData_thread, this);
 }
@@ -810,7 +810,7 @@ void InspIRCd::receiveData() {
 			time_t connectTime;
 			std::istringstream ct (parsedLine[9]);
 			ct >> connectTime;
-			std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime)));
+			std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime))).first;
 			for (size_t i = 1; i < parsedLine[10].size(); i++) { // skip the + symbol
 				std::string longmode = convertUserMode(parsedLine[10][i]);
 				newUser.first->second->addMode(longmode);
