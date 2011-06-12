@@ -719,7 +719,7 @@ void InspIRCd::receiveData() {
 		receivedLine = connection->receive();
 		if (receivedLine == "") // Some failure occured in the receivement of the line.
 			break;
-		parsedLine = botBase->parseLine(receivedLine);
+		parsedLine = parseLine(receivedLine);
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
 		botBase->callPreHook(serverName, parsedLine);
