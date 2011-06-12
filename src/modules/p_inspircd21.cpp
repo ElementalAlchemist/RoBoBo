@@ -118,6 +118,7 @@ class InspIRCd : public Protocol {
 		char convertMode(std::string mode);
 		std::string convertChanMode(char mode);
 		std::string convertUserMode(char mode);
+		void joinUsers(std::string channel, std::vector< std::string > userList);
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > xLines;
 		std::string uidCount;
 		std::string useUID();
@@ -345,7 +346,7 @@ void InspIRCd::connectServer() {
 	clientChannels << i << "/channels";
 	time_t currTime = time(NULL);
 	currTimeS << currTime;
-	std::tr1::unordered_map<std::string, std::string> joiningChannels;
+	std::tr1::unordered_map<std::string, std::vector<std::string> > joiningChannels;
 	while (serverConf[clientNick.str()] != "") {
 		std::string uuid = serverConf["sid"] + useUID();
 		callPreConnectHook(uuid);
@@ -362,7 +363,8 @@ void InspIRCd::connectServer() {
 			else
 				serverConf[clientChannels.str()] = serverConf[clientChannels.str()].substr(serverConf[clientChannels.str()].find_first_of(',') + 1);
 			if (joiningChannels.find(channelName) == joiningChannels.end()) {
-				joiningChannels.insert(std::pair<std::string, std::string> (channelName, "o," + uuid));
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator joinIter = joiningChannels.insert(std::pair<std::string, std::vector<std::string> > (channelName, std::vector<std::string> ())).first;
+				joinIter->second.push_back("o," + uuid);
 				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.insert(std::pair<std::string, Channel*> (channelName, new Channel (currTime))).first;
 				chanIter->second->joinUser(uuid);
 				userIter->second->joinChannel(channelName);
@@ -371,7 +373,7 @@ void InspIRCd::connectServer() {
 				channels.find(channelName)->joinUser(uuid);
 				userIter->second->joinChannel(channelName);
 				userIter->second->addStatus(channelName, "op");
-				joiningChannels[channelName] += " o," + uuid;
+				joiningChannels[channelName].push_back(" o," + uuid);
 			}
 		}
 		i++;
@@ -398,9 +400,10 @@ void InspIRCd::connectServer() {
 	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter) {
 		std::ostringstream currTime; // do it like this in case the second changed in the middle or something so that the correct timestamp is still sent
 		currTime << channels.find(jcIter->first)->second->creationTime();
-		preConnectLines.push_back(":" + serverConf["sid"] + " FJOIN " + jcIter->first + " " + currTime.str() + " +nt :" + jcIter->second);
+		joinUsers(jcIter->first, jcIter->second);
 	}
-	botBase->callConnectHook(serverName);
+	for (std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin(); userIter != users.end(); ++userIter)
+		callConnectHook(userIter->first);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
 	pthread_create(&receiveThread, &detachedState, receiveData_thread, this);
 }
@@ -571,9 +574,10 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 void InspIRCd::joinChannel(std::string client, std::string channel, std::string key) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
-	std::ostringstream currTime;
-	currTime << time(NULL);
-	connection->sendData(":" + serverConf["sid"] + " FJOIN " + channel + " " + currTime.str() + " + :," + client);
+	if (channels.find(channel) == channels.end())
+		joinUsers(channel, "o," + client);
+	else
+		joinUsers(channel, "," + client);
 }
 
 void InspIRCd::partChannel(std::string client, std::string channel, std::string reason) {
@@ -1268,6 +1272,23 @@ std::string InspIRCd::convertUserMode(char mode) {
 	if (modeIter == allUserModes.end())
 		return "";
 	return modeIter->second;
+}
+
+void InspIRCd::joinUsers(std::string channel, std::vector<std::string> userList) {
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::string modes = "+";
+	if (chanIter = channels.end()) {
+		chanIter = channels.insert(std::pair<std::string, Channel*> (channel, new Channel (time(NULL)))).first;
+		modes += "nt";
+	}
+	time_t chanTime = chanIter->second->creationTime();
+	std::ostringstream chanTimeS;
+	chanTimeS << chanTime;
+	std::string joiningUsers;
+	for (size_t i = 0; i < userList.size(); i++)
+		joiningUsers += " " + userList[i];
+	joiningUsers = joiningUsers.substr(1); // remove opening space
+	connection->sendData(":" + serverConf["sid"] + " FJOIN " + channel + " " + chanTimeS.str() + " " + modes + " :" + joiningUsers);
 }
 
 std::string InspIRCd::useUID() {
