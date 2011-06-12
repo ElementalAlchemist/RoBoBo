@@ -187,6 +187,14 @@ void Protocol::callUserModePostHook(std::string client, std::string mode, bool a
 	botBase->callUserModePostHook(serverName, client, mode, add);
 }
 
+void Protocol::callUserOperPreHook(std::string client, std::string user, std::string opertype) {
+	botBase->callUserOperPreHook(serverName, client, user, opertype);
+}
+
+void Protocol::callUserOperPostHook(std::string client, std::string user, std::string opertype) {
+	botBase->callUserOperPostHook(serverName, client, user, opertype);
+}
+
 void Protocol::callNumericHook(std::string client, std::string numeric, std::vector<std::string> parsedLine) {
 	botBase->callNumericHook(serverName, client, numeric, parsedLine);
 }

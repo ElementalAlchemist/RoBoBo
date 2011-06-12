@@ -388,6 +388,32 @@ void Base::callUserModePostHook(std::string server, std::string client, std::str
 		modIter->second->onUserModePost(server, client, mode, add);
 }
 
+void Base::callUserOperPreHook(std::string server, std::string client, std::string user, std::string opertype) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserOperPre(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserOperPre(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserOperPre(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserOperPre(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserOperPre(server, client, user, opertype);
+}
+
+void Base::callUserOperPostHook(std::string server, std::string client, std::string user, std::string opertype) {
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
+		modIter->second->onUserOperPost(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
+		modIter->second->onUserOperPost(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
+		modIter->second->onUserOperPost(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
+		modIter->second->onUserOperPost(server, client, user, opertype);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
+		modIter->second->onUserOperPost(server, client, user, opertype);
+}
+
 void Base::callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
 		modIter->second->onNumeric(server, client, numeric, parsedLine);
