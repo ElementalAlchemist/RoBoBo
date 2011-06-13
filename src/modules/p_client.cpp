@@ -234,13 +234,13 @@ unsigned int Client::apiVersion() {
 }
 
 void Client::connectServer() {
-	callPreConnectHook(serverName);
+	callPreConnectHook();
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
 	portNumber >> port;
 	connection->connectServer(serverName, port);
 	sleep(1); // don't send right away in case of some sort of death or slowness
-	callConnectHook(serverName);
+	callConnectHook(serverConf["nick"]);
 	if (serverConf["password"] != "")
 		sendOther("PASS " + serverConf["password"]);
 	changeNick("", serverConf["nick"]);
@@ -495,9 +495,9 @@ void Client::handleData() {
 						std::string setterNick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 						std::string longmode = convertChanMode(parsedLine[3][i]);
 						if (category == 0 || category == 1 || (category == 2 && addMode))
-							callChannelModePreHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam]);
+							callChannelModePreHook(parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam]);
 						else
-							callChannelModePreHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode);
+							callChannelModePreHook(parsedLine[2], setterNick, longmode, addMode);
 						if (category == 0) {
 							std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(parsedLine[2]);
 							if (chanIter != inChannels.end()) {
@@ -516,20 +516,20 @@ void Client::handleData() {
 								setChanMode(addMode, false, chanIter->first, convertChanMode(parsedLine[3][i]));
 						}
 						if (category == 0 || category == 1 || (category == 2 && addMode))
-							callChannelModePostHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam++]); // increase parameter now that we're done with the current one
+							callChannelModePostHook(parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam++]); // increase parameter now that we're done with the current one
 						else
-							callChannelModePostHook(serverConf["nick"], parsedLine[2], setterNick, longmode, addMode);
+							callChannelModePostHook(parsedLine[2], setterNick, longmode, addMode);
 					}
 				}
 			}
 		} else if (parsedLine[1] == "NICK" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) { // bot's nick changed
-			callNickChangePreHook(serverConf["nick"], serverConf["nick"], parsedLine[2]);
+			callNickChangePreHook(serverConf["nick"], parsedLine[2]);
 			std::string oldNick = serverConf["nick"];
 			serverConf["nick"] = parsedLine[2];
-			callNickChangePostHook(serverConf["nick"], oldNick, parsedLine[2]);
+			callNickChangePostHook(oldNick, parsedLine[2]);
 		} else if (parsedLine[1] == "NICK") {
 			std::string oldNick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
-			callNickChangePreHook(serverConf["nick"], oldNick, parsedLine[2]);
+			callNickChangePreHook(oldNick, parsedLine[2]);
 			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter) {
 				if (chanIter->second.second.second.find(oldNick) != chanIter->second.second.second.end()) {
 					chanIter->second.second.second.erase(oldNick);
@@ -539,14 +539,14 @@ void Client::handleData() {
 			User* nickChanger = users.find(oldNick)->second;
 			users.erase(oldNick);
 			users.insert(std::pair<std::string, User*> (parsedLine[2], nickChanger));
-			callNickChangePostHook(serverConf["nick"], oldNick, parsedLine[2]);
+			callNickChangePostHook(oldNick, parsedLine[2]);
 		} else if (parsedLine[1] == "JOIN" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) { // bot joined a channel
-			callChannelJoinPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+			callChannelJoinPreHook(parsedLine[2], parsedLine[0].substr(1));
 			inChannels.insert(std::pair<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > > (parsedLine[2], std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > ()));
-			callChannelJoinPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+			callChannelJoinPostHook(parsedLine[2], parsedLine[0].substr(1));
 		} else if (parsedLine[1] == "JOIN") {
 			std::string hostmask = parsedLine[0].substr(1);
-			callChannelJoinPreHook(serverConf["nick"], parsedLine[2], hostmask);
+			callChannelJoinPreHook(parsedLine[2], hostmask);
 			std::string nick = hostmask.substr(0, hostmask.find_first_of('!'));
 			if (users.find(nick) == users.end()) {
 				size_t exclaim = hostmask.find_first_of('!');
@@ -556,31 +556,31 @@ void Client::handleData() {
 			}
 			inChannels.find(parsedLine[2])->second.second.second.insert(nick);
 			users.find(nick)->second->addChannel(parsedLine[2]);
-			callChannelJoinPostHook(serverConf["nick"], parsedLine[2], hostmask);
+			callChannelJoinPostHook(parsedLine[2], hostmask);
 		} else if (parsedLine[1] == "PART" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
 			if (parsedLine.size() == 3)
-				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+				callChannelPartPreHook(parsedLine[2], parsedLine[0].substr(1));
 			else
-				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
+				callChannelPartPreHook(parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 			inChannels.erase(parsedLine[2]);
 			if (parsedLine.size() == 3)
-				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+				callChannelPartPostHook(parsedLine[2], parsedLine[0].substr(1));
 			else
-				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
+				callChannelPartPostHook(parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 		} else if (parsedLine[1] == "PART") {
 			if (parsedLine.size() == 3)
-				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+				callChannelPartPreHook(parsedLine[2], parsedLine[0].substr(1));
 			else
-				callChannelPartPreHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
+				callChannelPartPreHook(parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 			inChannels.find(parsedLine[2])->second.second.second.erase(nick);
 			users.find(nick)->second->removeChannel(parsedLine[2]);
 			if (inChannels.find(parsedLine[2])->second.second.second.empty())
 				inChannels.erase(inChannels.find(parsedLine[2]));
 			if (parsedLine.size() == 3)
-				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1));
+				callChannelPartPostHook(parsedLine[2], parsedLine[0].substr(1));
 			else
-				callChannelPartPostHook(serverConf["nick"], parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
+				callChannelPartPostHook(parsedLine[2], parsedLine[0].substr(1), parsedLine[3]);
 		} else if (parsedLine[1] == "QUIT" && serverConf["nick"] == parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1)) {
 			callQuitHook(serverConf["nick"]);
 			connection->closeConnection();
@@ -588,14 +588,14 @@ void Client::handleData() {
 			keepServer = false;
 			break;
 		} else if (parsedLine[1] == "QUIT") {
-			callUserQuitPreHook(serverConf["nick"], parsedLine[0].substr(1), parsedLine[2]);
+			callUserQuitPreHook(parsedLine[0].substr(1), parsedLine[2]);
 			std::string nick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 			for (std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
 				chanIter->second.second.second.erase(nick);
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(nick);
 			delete userIter->second;
 			users.erase(userIter);
-			callUserQuitPostHook(serverConf["nick"], parsedLine[0].substr(1), parsedLine[2]);
+			callUserQuitPostHook(parsedLine[0].substr(1), parsedLine[2]);
 		} else if (parsedLine[1] == "KILL" && serverConf["nick"] == parsedLine[2]) {
 			callQuitHook(serverConf["nick"]);
 			connection->closeConnection();
