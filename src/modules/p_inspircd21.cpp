@@ -67,6 +67,7 @@ class Channel {
 class InspIRCd : public Protocol {
 	public:
 		InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug);
+		~InspIRCd();
 		unsigned int apiVersion() = 0;
 		void connectServer();
 		std::list<std::pair<std::string, char> > prefixes();
@@ -322,6 +323,10 @@ InspIRCd::InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, 
 		if (!connection->bindSocket(serverConf["bind"]))
 			std::cout << "Could not bind to " << serverConf["bind"] << "; trying without binding.  Abort RoBoBo and adjust configuration settings to try again with binding." << std::endl; // debug level 1
 	}
+}
+
+InspIRCd::~InspIRCd() {
+	pthread_cancel(receiveThread);
 }
 
 unsigned int InspIRCd::apiVersion() {
