@@ -180,186 +180,186 @@ bool Base::callUserCTCPReplyHook(std::string server, std::string client, std::st
 	return keepGoing;
 }
 
-void Base::callChannelJoinPreHook(std::string server, std::string client, std::string channel, std::string hostmask) {
+void Base::callChannelJoinPreHook(std::string server, std::string channel, std::string hostmask) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPre(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPre(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPre(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPre(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelJoinPre(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPre(server, channel, hostmask);
 }
 
-void Base::callChannelJoinPostHook(std::string server, std::string client, std::string channel, std::string hostmask) {
+void Base::callChannelJoinPostHook(std::string server, std::string channel, std::string hostmask) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPost(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPost(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPost(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPost(server, channel, hostmask);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelJoinPost(server, client, channel, hostmask);
+		modIter->second->onChannelJoinPost(server, channel, hostmask);
 }
 
-void Base::callChannelPartPreHook(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {
+void Base::callChannelPartPreHook(std::string server, std::string channel, std::string hostmask, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPre(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPre(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPre(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.begin(); ++modIter)
-		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPre(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelPartPre(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPre(server, channel, hostmask, reason);
 }
 
-void Base::callChannelPartPostHook(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {
+void Base::callChannelPartPostHook(std::string server, std::string channel, std::string hostmask, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPost(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPost(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPost(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPost(server, channel, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelPartPost(server, client, channel, hostmask, reason);
+		modIter->second->onChannelPartPost(server, channel, hostmask, reason);
 }
 
-void Base::callUserConnectPreHook(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
+void Base::callUserConnectPreHook(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPre(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPre(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPre(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPre(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onUserConnectPre(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPre(server, nick, ident, host, gecos);
 }
 
-void Base::callUserConnectPostHook(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
+void Base::callUserConnectPostHook(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPost(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPost(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPost(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPost(server, nick, ident, host, gecos);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onUserConnectPost(server, client, nick, ident, host, gecos);
+		modIter->second->onUserConnectPost(server, nick, ident, host, gecos);
 }
 
-void Base::callUserQuitPreHook(std::string server, std::string client, std::string hostmask, std::string reason) {
+void Base::callUserQuitPreHook(std::string server, std::string hostmask, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+		modIter->second->onUserQuitPre(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+		modIter->second->onUserQuitPre(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+		modIter->second->onUserQuitPre(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+		modIter->second->onUserQuitPre(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onUserQuitPre(server, client, hostmask, reason);
+		modIter->second->onUserQuitPre(server, hostmask, reason);
 }
 
-void Base::callUserQuitPostHook(std::string server, std::string client, std::string hostmask, std::string reason) {
+void Base::callUserQuitPostHook(std::string server, std::string hostmask, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+		modIter->second->onUserQuitPost(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+		modIter->second->onUserQuitPost(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+		modIter->second->onUserQuitPost(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+		modIter->second->onUserQuitPost(server, hostmask, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onUserQuitPost(server, client, hostmask, reason);
+		modIter->second->onUserQuitPost(server, hostmask, reason);
 }
 
-void Base::callNickChangePreHook(std::string server, std::string client, std::string oldNick, std::string newNick) {
+void Base::callNickChangePreHook(std::string server, std::string oldNick, std::string newNick) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onNickChangePre(server, client, oldNick, newNick);
+		modIter->second->onNickChangePre(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onNickChangePre(server, client, oldNick, newNick);
+		modIter->second->onNickChangePre(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onNickChangePre(server, client, oldNick, newNick);
+		modIter->second->onNickChangePre(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onNickChangePre(server, client, oldNick, newNick);
+		modIter->second->onNickChangePre(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onNickChangePre(server, client, oldNick, newNick);
+		modIter->second->onNickChangePre(server, oldNick, newNick);
 }
 
-void Base::callNickChangePostHook(std::string server, std::string client, std::string oldNick, std::string newNick) {
+void Base::callNickChangePostHook(std::string server, std::string oldNick, std::string newNick) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onNickChangePost(server, client, oldNick, newNick);
+		modIter->second->onNickChangePost(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onNickChangePost(server, client, oldNick, newNick);
+		modIter->second->onNickChangePost(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onNickChangePost(server, client, oldNick, newNick);
+		modIter->second->onNickChangePost(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onNickChangePost(server, client, oldNick, newNick);
+		modIter->second->onNickChangePost(server, oldNick, newNick);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onNickChangePost(server, client, oldNick, newNick);
+		modIter->second->onNickChangePost(server, oldNick, newNick);
 }
 
-void Base::callChannelKickPreHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+void Base::callChannelKickPreHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelKickPre(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPre(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelKickPre(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPre(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelKickPre(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPre(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelKickPre(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPre(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelKickPre(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPre(server, channel, kicker, kickee, reason);
 }
 
-void Base::callChannelKickPostHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+void Base::callChannelKickPostHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelKickPost(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPost(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelKickPost(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPost(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelKickPost(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPost(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelKickPost(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPost(server, channel, kicker, kickee, reason);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelKickPost(server, client, channel, kicker, kickee, reason);
+		modIter->second->onChannelKickPost(server, channel, kicker, kickee, reason);
 }
 
-void Base::callChannelModePreHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
+void Base::callChannelModePreHook(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelModePre(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePre(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelModePre(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePre(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelModePre(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePre(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelModePre(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePre(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelModePre(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePre(server, channel, setter, mode, add, param);
 }
 
-void Base::callChannelModePostHook(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
+void Base::callChannelModePostHook(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onChannelModePost(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePost(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onChannelModePost(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePost(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onChannelModePost(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePost(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onChannelModePost(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePost(server, channel, setter, mode, add, param);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onChannelModePost(server, client, channel, setter, mode, add, param);
+		modIter->second->onChannelModePost(server, channel, setter, mode, add, param);
 }
 
 void Base::callUserModePreHook(std::string server, std::string client, std::string mode, bool add) {
@@ -388,30 +388,30 @@ void Base::callUserModePostHook(std::string server, std::string client, std::str
 		modIter->second->onUserModePost(server, client, mode, add);
 }
 
-void Base::callUserOperPreHook(std::string server, std::string client, std::string user, std::string opertype) {
+void Base::callUserOperPreHook(std::string server, std::string user, std::string opertype) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onUserOperPre(server, client, user, opertype);
+		modIter->second->onUserOperPre(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onUserOperPre(server, client, user, opertype);
+		modIter->second->onUserOperPre(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onUserOperPre(server, client, user, opertype);
+		modIter->second->onUserOperPre(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onUserOperPre(server, client, user, opertype);
+		modIter->second->onUserOperPre(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onUserOperPre(server, client, user, opertype);
+		modIter->second->onUserOperPre(server, user, opertype);
 }
 
-void Base::callUserOperPostHook(std::string server, std::string client, std::string user, std::string opertype) {
+void Base::callUserOperPostHook(std::string server, std::string user, std::string opertype) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onUserOperPost(server, client, user, opertype);
+		modIter->second->onUserOperPost(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onUserOperPost(server, client, user, opertype);
+		modIter->second->onUserOperPost(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onUserOperPost(server, client, user, opertype);
+		modIter->second->onUserOperPost(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onUserOperPost(server, client, user, opertype);
+		modIter->second->onUserOperPost(server, user, opertype);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onUserOperPost(server, client, user, opertype);
+		modIter->second->onUserOperPost(server, user, opertype);
 }
 
 void Base::callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
@@ -440,17 +440,17 @@ void Base::callOtherDataHook(std::string server, std::string client, std::vector
 		modIter->second->onOtherData(server, client, parsedLine);
 }
 
-void Base::callPreConnectHook(std::string server, std::string client) {
+void Base::callPreConnectHook(std::string server) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
-		modIter->second->onPreConnect(server, client);
+		modIter->second->onPreConnect(server);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
-		modIter->second->onPreConnect(server, client);
+		modIter->second->onPreConnect(server);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = normalModules.begin(); modIter != normalModules.end(); ++modIter)
-		modIter->second->onPreConnect(server, client);
+		modIter->second->onPreConnect(server);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumLowModules.begin(); modIter != mediumLowModules.end(); ++modIter)
-		modIter->second->onPreConnect(server, client);
+		modIter->second->onPreConnect(server);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = lowModules.begin(); modIter != lowModules.end(); ++modIter)
-		modIter->second->onPreConnect(server, client);
+		modIter->second->onPreConnect(server);
 }
 
 void Base::callConnectHook(std::string server, std::string client) {

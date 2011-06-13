@@ -34,45 +34,45 @@ bool Module::onUserCTCPReply(std::string server, std::string client, std::string
 
 void Module::onChannelJoinPre(std::string server, std::string client, std::string channel, std::string hostmask) {}
 
-void Module::onChannelJoinPost(std::string server, std::string client, std::string channel, std::string hostmask) {}
+void Module::onChannelJoinPost(std::string server, std::string channel, std::string hostmask) {}
 
-void Module::onChannelPartPre(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelPartPre(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onChannelPartPost(std::string server, std::string client, std::string channel, std::string hostmask, std::string reason) {}
+void Module::onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason) {}
 
-void Module::onUserConnectPre(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {}
+void Module::onUserConnectPre(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {}
 
-void Module::onUserConnectPost(std::string server, std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {}
+void Module::onUserConnectPost(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {}
 
-void Module::onUserQuitPre(std::string server, std::string client, std::string hostmask, std::string reason) {}
+void Module::onUserQuitPre(std::string server, std::string hostmask, std::string reason) {}
 
-void Module::onUserQuitPost(std::string server, std::string client, std::string hostmask, std::string reason) {}
+void Module::onUserQuitPost(std::string server, std::string hostmask, std::string reason) {}
 
-void Module::onNickChangePre(std::string server, std::string client, std::string oldNick, std::string newNick) {}
+void Module::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {}
 
-void Module::onNickChangePost(std::string server, std::string client, std::string oldNick, std::string newNick) {}
+void Module::onNickChangePost(std::string server, std::string oldNick, std::string newNick) {}
 
-void Module::onChannelKickPre(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onChannelKickPre(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
-void Module::onChannelKickPost(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onChannelKickPost(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
-void Module::onChannelModePre(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
+void Module::onChannelModePre(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
 
-void Module::onChannelModePost(std::string server, std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
+void Module::onChannelModePost(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param) {}
 
 void Module::onUserModePre(std::string server, std::string client, std::string mode, bool add) {}
 
 void Module::onUserModePost(std::string server, std::string client, std::string mode, bool add) {}
 
-void Module::onUserOperPre(std::string server, std::string client, std::string user, std::string opertype) {}
+void Module::onUserOperPre(std::string server, std::string user, std::string opertype) {}
 
-void Module::onUserOperPost(std::string server, std::string client, std::string user, std::string opertype) {}
+void Module::onUserOperPost(std::string server, std::string user, std::string opertype) {}
 
 void Module::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {}
 
 void Module::onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine) {}
 
-void Module::onPreConnect(std::string server, std::string client) {}
+void Module::onPreConnect(std::string server) {}
 
 void Module::onConnect(std::string server, std::string client) {}
 

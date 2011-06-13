@@ -124,59 +124,59 @@ bool Protocol::callUserCTCPReplyHook(std::string client, std::string nick, std::
 }
 
 void Protocol::callChannelJoinPreHook(std::string client, std::string channel, std::string hostmask) {
-	botBase->callChannelJoinPreHook(serverName, client, channel, hostmask);
+	botBase->callChannelJoinPreHook(serverName, channel, hostmask);
 }
 
-void Protocol::callChannelJoinPostHook(std::string client, std::string channel, std::string hostmask) {
-	botBase->callChannelJoinPostHook(serverName, client, channel, hostmask);
+void Protocol::callChannelJoinPostHook(std::string channel, std::string hostmask) {
+	botBase->callChannelJoinPostHook(serverName, channel, hostmask);
 }
 
-void Protocol::callChannelPartPreHook(std::string client, std::string channel, std::string hostmask, std::string reason) {
-	botBase->callChannelPartPreHook(serverName, client, channel, hostmask, reason);
+void Protocol::callChannelPartPreHook(std::string channel, std::string hostmask, std::string reason) {
+	botBase->callChannelPartPreHook(serverName, channel, hostmask, reason);
 }
 
-void Protocol::callChannelPartPostHook(std::string client, std::string channel, std::string hostmask, std::string reason) {
-	botBase->callChannelPartPostHook(serverName, client, channel, hostmask, reason);
+void Protocol::callChannelPartPostHook(std::string channel, std::string hostmask, std::string reason) {
+	botBase->callChannelPartPostHook(serverName, channel, hostmask, reason);
 }
 
-void Protocol::callUserConnectPreHook(std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
-	botBase->callUserConnectPreHook(serverName, client, nick, ident, host, gecos);
+void Protocol::callUserConnectPreHook(std::string nick, std::string ident, std::string host, std::string gecos) {
+	botBase->callUserConnectPreHook(serverName, nick, ident, host, gecos);
 }
 
-void Protocol::callUserConnectPostHook(std::string client, std::string nick, std::string ident, std::string host, std::string gecos) {
-	botBase->callUserConnectPostHook(serverName, client, nick, ident, host, gecos);
+void Protocol::callUserConnectPostHook(std::string nick, std::string ident, std::string host, std::string gecos) {
+	botBase->callUserConnectPostHook(serverName, nick, ident, host, gecos);
 }
 
-void Protocol::callUserQuitPreHook(std::string client, std::string hostmask, std::string reason) {
-	botBase->callUserQuitPreHook(serverName, client, hostmask, reason);
+void Protocol::callUserQuitPreHook(std::string hostmask, std::string reason) {
+	botBase->callUserQuitPreHook(serverName, hostmask, reason);
 }
 
-void Protocol::callUserQuitPostHook(std::string client, std::string hostmask, std::string reason) {
-	botBase->callUserQuitPostHook(serverName, client, hostmask, reason);
+void Protocol::callUserQuitPostHook(std::string hostmask, std::string reason) {
+	botBase->callUserQuitPostHook(serverName, hostmask, reason);
 }
 
-void Protocol::callNickChangePreHook(std::string client, std::string oldNick, std::string newNick) {
-	botBase->callNickChangePreHook(serverName, client, oldNick, newNick);
+void Protocol::callNickChangePreHook(std::string oldNick, std::string newNick) {
+	botBase->callNickChangePreHook(serverName, oldNick, newNick);
 }
 
-void Protocol::callNickChangePostHook(std::string client, std::string oldNick, std::string newNick) {
-	botBase->callNickChangePostHook(serverName, client, oldNick, newNick);
+void Protocol::callNickChangePostHook(std::string oldNick, std::string newNick) {
+	botBase->callNickChangePostHook(serverName, oldNick, newNick);
 }
 
-void Protocol::callChannelKickPreHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	botBase->callChannelKickPreHook(serverName, client, channel, kicker, kickee, reason);
+void Protocol::callChannelKickPreHook(std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	botBase->callChannelKickPreHook(serverName, channel, kicker, kickee, reason);
 }
 
-void Protocol::callChannelKickPostHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	botBase->callChannelKickPostHook(serverName, client, channel, kicker, kickee, reason);
+void Protocol::callChannelKickPostHook(std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	botBase->callChannelKickPostHook(serverName, channel, kicker, kickee, reason);
 }
 
-void Protocol::callChannelModePreHook(std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
-	botBase->callChannelModePreHook(serverName, client, channel, setter, mode, add, param);
+void Protocol::callChannelModePreHook(std::string channel, std::string setter, std::string mode, bool add, std::string param) {
+	botBase->callChannelModePreHook(serverName, channel, setter, mode, add, param);
 }
 
-void Protocol::callChannelModePostHook(std::string client, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
-	botBase->callChannelModePostHook(serverName, client, channel, setter, mode, add, param);
+void Protocol::callChannelModePostHook(std::string channel, std::string setter, std::string mode, bool add, std::string param) {
+	botBase->callChannelModePostHook(serverName, channel, setter, mode, add, param);
 }
 
 void Protocol::callUserModePreHook(std::string client, std::string mode, bool add) {
@@ -187,12 +187,12 @@ void Protocol::callUserModePostHook(std::string client, std::string mode, bool a
 	botBase->callUserModePostHook(serverName, client, mode, add);
 }
 
-void Protocol::callUserOperPreHook(std::string client, std::string user, std::string opertype) {
+void Protocol::callUserOperPreHook(std::string user, std::string opertype) {
 	botBase->callUserOperPreHook(serverName, client, user, opertype);
 }
 
-void Protocol::callUserOperPostHook(std::string client, std::string user, std::string opertype) {
-	botBase->callUserOperPostHook(serverName, client, user, opertype);
+void Protocol::callUserOperPostHook(std::string user, std::string opertype) {
+	botBase->callUserOperPostHook(serverName, user, opertype);
 }
 
 void Protocol::callNumericHook(std::string client, std::string numeric, std::vector<std::string> parsedLine) {
@@ -203,8 +203,8 @@ void Protocol::callOtherDataHook(std::string client, std::vector<std::string> pa
 	botBase->callOtherDataHook(serverName, client, parsedLine);
 }
 
-void Protocol::callPreConnectHook(std::string client) {
-	botBase->callPreConnectHook(serverName, client);
+void Protocol::callPreConnectHook() {
+	botBase->callPreConnectHook(serverName);
 }
 
 void Protocol::callConnectHook(std::string client) {
