@@ -701,10 +701,12 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 void InspIRCd::joinChannel(std::string client, std::string channel, std::string key) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
+	std::vector<std::string> joining;
 	if (chans.find(channel) == chans.end())
-		joinUsers(channel, "o," + client);
+		joining.push_back("o," + client);
 	else
-		joinUsers(channel, "," + client);
+		joining.push_back("," + client);
+	joinUsers(channel, joining);
 }
 
 void InspIRCd::partChannel(std::string client, std::string channel, std::string reason) {
