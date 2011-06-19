@@ -471,13 +471,111 @@ std::string InspIRCd::compareStatus(std::set<std::string> statuses) {
 void InspIRCd::sendMsg(std::string client, std::string target, std::string message) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
-	connection->sendData(":" + client + " PRIVMSG " + target + " :" + message);
+	bool channel = false, ctcp = false;
+	char status = ' ';
+	if (target[0] == '#' || target[1] == '#') {
+		if (target[0] != '#') {
+			status = target[0];
+			target = target.substr(1);
+		}
+		channel = true;
+		if (message[0] == (char)1) {
+			ctcp = true;
+			message.substr(1);
+			if (message[message.size() - 1] == (char)1)
+				message = message.substr(0, message.size() - 1);
+			message = callChannelCTCPOutHook(client, target, status, message);
+			if (message == "")
+				return;
+			message = (char)1 + message + (char)1;
+		} else {
+			message = callChannelMessageOutHook(client, target, status, message);
+			if (message == "")
+				return;
+		}
+	} else {
+		if (message[0] == (char)1) {
+			ctcp = true;
+			message.substr(1);
+			if (message[message.size() - 1] == (char)1)
+				message = message.substr(0, message.size() - 1);
+			message = callUserCTCPOutHook(client, target, message);
+			if (message == "")
+				return;
+			message = (char)1 + message + (char)1;
+		} else {
+			message = callUserMessageOutHook(client, target, message);
+			if (message == "")
+				return;
+		}
+	}
+	if (status == ' ')
+		connection->sendData(":" + client + " PRIVMSG " + target + " :" + message);
+	else
+		connection->sendData(":" + client + " PRIVMSG " + status + target + " :" + message);
+	if (channel && ctcp)
+		callChannelCTCPSendHook(client, target, status, message);
+	else if (channel)
+		callChannelMessageSendHook(client, target, status, message);
+	else if (ctcp)
+		callUserCTCPSendHook(client, target, message);
+	else
+		callUserMessageSendHook(client, target, message);
 }
 
 void InspIRCd::sendNotice(std::string client, std::string target, std::string message) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
-	connection->sendData(":" + client + " NOTICE " + target + " :" + message);
+	bool channel = false, ctcp = false;
+	char status = ' ';
+	if (target[0] == '#' || target[1] == '#') {
+		channel = true;
+		if (target[0] != '#') {
+			status = target[0];
+			target = target.substr(1);
+		}
+		if (message[0] == (char)1) {
+			ctcp = true;
+			message = message.substr(1);
+			if (message[message.size() - 1] == (char)1)
+				message = message.substr(0, message.size() - 1);
+			message = callChannelCTCPReplyOutHook(client, target, status, message);
+			if (message == "")
+				return;
+			message = (char)1 + message + (char)1;
+		} else {
+			message = callChannelNoticeOutHook(client, target, status, message);
+			if (message == "")
+				return;
+		}
+	} else {
+		if (message[0] == (char)1) {
+			ctcp = true;
+			message = message.substr(1);
+			if (message[message.size() - 1] == (char)1)
+				message = message.substr(0, message.size() - 1);
+			message = callUserCTCPReplyOutHook(client, target, message);
+			if (message == "")
+				return;
+			message = (char)1 + message + (char)1;
+		} else {
+			message = callUserNoticeOutHook(client, target, message);
+			if (message == "")
+				return;
+		}
+	}
+	if (status == ' ')
+		connection->sendData(":" + client + " NOTICE " + target + " :" + message);
+	else
+		connection->sendData(":" + client + " NOTICE " + status + target + " :" + message);
+	if (channel && ctcp)
+		callChannelCTCPReplySendHook(client, target, status, message);
+	else if (channel)
+		callChannelNoticeSendHook(client, target, status, message);
+	else if (ctcp)
+		callUserCTCPReplySendHook(client, target, message);
+	else
+		callUserNoticeSendHook(client, target, message);
 }
 
 void InspIRCd::setMode(std::string client, std::string target, std::string mode) {
