@@ -367,7 +367,7 @@ void InspIRCd::connectServer() {
 				serverConf[clientChannels.str()] = "";
 			else
 				serverConf[clientChannels.str()] = serverConf[clientChannels.str()].substr(serverConf[clientChannels.str()].find_first_of(',') + 1);
-			if (channels.find(channelName) == channels.end()) {
+			if (chans.find(channelName) == chans.end()) {
 				userIter->second->addStatus(channelName, "op");
 				joiningChannels[channelName].push_back("o," + uuid);
 			} else
@@ -389,7 +389,7 @@ void InspIRCd::connectServer() {
 	}
 	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter) {
 		std::ostringstream currTime; // do it like this in case the second changed in the middle or something so that the correct timestamp is still sent
-		currTime << channels.find(jcIter->first)->second->creationTime();
+		currTime << chans.find(jcIter->first)->second->creationTime();
 		joinUsers(jcIter->first, jcIter->second);
 	}
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
@@ -563,7 +563,7 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 void InspIRCd::joinChannel(std::string client, std::string channel, std::string key) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
-	if (channels.find(channel) == channels.end())
+	if (chans.find(channel) == chans.end())
 		joinUsers(channel, "o," + client);
 	else
 		joinUsers(channel, "," + client);
@@ -846,15 +846,15 @@ void InspIRCd::receiveData() {
 			std::istringstream cTime (parsedLine[3]);
 			time_t createTime;
 			cTime >> createTime;
-			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
-			if (chanIter = channels.end())
-				chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
+			if (chanIter = chans.end())
+				chanIter = chans.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
 			if (createTime < chanIter->second->creationTime()) {
 				std::string topic = chanIter->second->topic();
 				time_t topicTime = chanIter->second->topicSetTime();
 				std::set<std::string> chanUsers = chanIter->second->users();
-				channels.erase(chanIter);
-				chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
+				chans.erase(chanIter);
+				chanIter = chans.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
 				chanIter->second->joinUsers(chanUsers);
 				for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
 					User* user = userIter->second;
@@ -902,7 +902,7 @@ void InspIRCd::receiveData() {
 				}
 			}
 		} else if (parsedLine[1] == "FMODE") {
-			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
 			std::istringstream cTime (parsedLine[3]);
 			time_t createTime;
 			cTime >> createTime;
@@ -1010,12 +1010,12 @@ void InspIRCd::receiveData() {
 			std::istringstream cTime (parsedLine[3]);
 			time_t topicTime;
 			cTime >> topicTime;
-			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[2]);
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
 			if (topicTime > chanIter->second->topicSetTime())
 				chanIter->second->topic(parsedLine[4], topicTime);
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter) {
 				std::set<std::string> channelsList = users.find(*userIter)->second->channels();
-				if (channelsList.find(parsedLine[2]) != channels.end())
+				if (channelsList.find(parsedLine[2]) != chans.end())
 					callOtherDataHook(*userIter, parsedLine);
 			}
 		} else if (parsedLine[1] == "FIDENT") {
@@ -1051,7 +1051,7 @@ void InspIRCd::receiveData() {
 			sendOther(":" + serverConf["sid"] + " TIME " + parsedLine[0].substr(1) + " " + parsedLine[3] + " " + currTime.str());
 		} else if (parsedLine[1] == "METADATA") {
 			if (parsedLine[2][0] == '#')
-				channels.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
+				chans.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
 			else
 				users.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
@@ -1066,9 +1066,9 @@ void InspIRCd::receiveData() {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
 			callChannelJoinPreHook(parsedLine[3], userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host());
 			userIter->second->joinChannel(parsedLine[3]);
-			channels.find(parsedLine[3])->second->joinUser(parsedLine[2]);
+			chans.find(parsedLine[3])->second->joinUser(parsedLine[2]);
 			std::ostringstream createTime;
-			createTime << channels.find(parsedLine[3])->second->creationTime();
+			createTime << chans.find(parsedLine[3])->second->creationTime();
 			connection->sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
 			callChannelJoinPostHook(parsedLine[3], userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host());
 		} else if (parsedLine[1] == "SVSMODE") {
@@ -1125,16 +1125,16 @@ void InspIRCd::receiveData() {
 					} else
 						callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
 					if (adding)
-						channels.find(parsedLine[2])->addMode(longmode, list);
+						chans.find(parsedLine[2])->addMode(longmode, list);
 					else
-						channels.find(parsedLine[2])->removeMode(longmode, list);
+						chans.find(parsedLine[2])->removeMode(longmode, list);
 					if (modeParam)
 						callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[param++]);
 					else
 						callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
 				}
 				std::ostringstream chanTime;
-				chanTime << channels.find(parsedLine[2])->second->creationTime();
+				chanTime << chans.find(parsedLine[2])->second->creationTime();
 				std::string fmode = ":" + serverConf["sid"] + " FMODE " + parsedLine[2] + " " + chanTime.str() + " " + parsedLine[3];
 				for (size_t i = 4; i < parsedLine.size(); i++)
 					fmode += " " + parsedLine[i];
@@ -1205,12 +1205,12 @@ void InspIRCd::receiveData() {
 			std::string hostmask = userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host();
 			callChannelPartPreHook(parsedLine[3], hostmask, "SVSPART received");
 			userIter->second->partChannel(parsedLine[3]);
-			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[3]);
+			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[3]);
 			chanIter->second->partUser(parsedLine[2]);
 			std::set<std::string> modes = chanIter->second->modes();
 			if (chanIter->second->users.empty() && modes.find("permanent") == modes.end()) {
 				delete chanIter->second;
-				channels.erase(chanIter);
+				chans.erase(chanIter);
 			}
 			connection->sendData(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
 			callChannelPartPostHook(parsedLine[3], hostmask, "SVSPART received");
@@ -1230,12 +1230,12 @@ void InspIRCd::receiveData() {
 				sendOther(":" + parsedLine[4] + " FNAME :" + parsedLine[5]);
 			} else if (parsedLine[3] == "FPART") {
 				users.find(parsedLine[5])->second->partChannel(parsedLine[4]);
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[4]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[4]);
 				chanIter->second->partUser(parsedLine[5]);
 				std::set<std::string> modes = chanIter->second->modes();
 				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
 					delete chanIter->second;
-					channels.erase(chanIter);
+					chans.erase(chanIter);
 				}
 				if (parsedLine.size() == 6)
 					partChannel(parsedLine[5], parsedLine[4], "Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": No reason given");
@@ -1243,22 +1243,22 @@ void InspIRCd::receiveData() {
 					partChannel(parsedLine[5], parsedLine[4], "Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": " + parsedLine[6]);
 			} else if (parsedLine[3] == "REMOVE") {
 				users.find(parsedLine[4])->second->partChannel(parsedLine[5]);
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[5]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[5]);
 				chanIter->second->partUser(parsedLine[4]);
 				std::set<std::string> modes = chanIter->second->modes();
 				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
 					delete chanIter->second;
-					channels.erase(chanIter);
+					chans.erase(chanIter);
 				}
 				if (parsedLine.size() == 6)
 					partChannel(parsedLine[4], parsedLine[5], "Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": No reason given");
 				else
 					partChannel(parsedLine[4], parsedLine[5], "Removed by " + users.find(parsedLine[0].substr(1))->second->nick() + ": " + parsedLine[6]);
 			} else if (parsedLine[3] == "SAJOIN") {
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[5]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[5]);
 				bool chanCreated = false;
-				if (chanIter == channels.end()) {
-					chanIter = channels.insert(std::pair<std::string, Channel*> (parsedLine[5], new Channel (time(NULL)))).first;
+				if (chanIter == chans.end()) {
+					chanIter = chans.insert(std::pair<std::string, Channel*> (parsedLine[5], new Channel (time(NULL)))).first;
 					chanCreated = true;
 				}
 				chanIter->second->joinUser(parsedLine[4]);
@@ -1272,12 +1272,12 @@ void InspIRCd::receiveData() {
 					user.push_back("," + parsedLine[4]);
 				joinUsers(parsedLine[5], user);
 			} else if (parsedLine[3] == "SAKICK") {
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[4]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[4]);
 				chanIter->second->partUser(parsedLine[5]);
 				std::set<std::string> modes = chanIter->second->modes();
 				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
 					delete chanIter->second;
-					channels.erase(chanIter);
+					chans.erase(chanIter);
 				}
 				users.find(parsedLine[5])->second->partChannel(parsedLine[4]);
 				if (parsedLine.size() == 6)
@@ -1293,12 +1293,12 @@ void InspIRCd::receiveData() {
 				currTime << time(NULL);
 				changeNick(userIter->first, parsedLine[5]);
 			} else if (parsedLine[3] == "SAPART") {
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(parsedLine[5]);
+				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[5]);
 				chanIter->second->partUser(parsedLine[4]);
 				std::set<std::string> modes = chanIter->second->modes();
 				if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
 					delete chanIter->second;
-					channels.erase(chanIter);
+					chans.erase(chanIter);
 				}
 				users.find(parsedLine[4])->second->partChannel(parsedLine[5]);
 				if (parsedLine.size() == 6)
@@ -1342,10 +1342,10 @@ std::string InspIRCd::convertUserMode(char mode) {
 }
 
 void InspIRCd::joinUsers(std::string channel, std::vector<std::string> userList) {
-	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(channel);
 	std::string modes = "+";
-	if (chanIter = channels.end()) {
-		chanIter = channels.insert(std::pair<std::string, Channel*> (channel, new Channel (time(NULL)))).first;
+	if (chanIter = chans.end()) {
+		chanIter = chans.insert(std::pair<std::string, Channel*> (channel, new Channel (time(NULL)))).first;
 		modes += "nt";
 	}
 	time_t chanTime = chanIter->second->creationTime();
