@@ -605,17 +605,37 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 		char newMode = convertMode(modeList[i]);
 		if (newMode == ' ')
 			continue;
+		std::string newParam = "";
 		if (modeList[i].find_first_of('=') != std::string::npos) {
-			std::string newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
+			newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
 			if (nicks.find(newParam) != nicks.end())
 				newParam = nicks.find(newParam)->second; // Insp requires mode params that act on someone to be UUIDs so let's convert those.
 			params += " " + newParam;
 		}
 		modes += newMode;
+		if (target[0] == '#') {
+			callChannelModePreHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), true, newParam);
+			bool listmode = false;
+			for (size_t j = 0; j < chanModes[0].size(); j++) {
+				if (modeList[i] == chanModes[0][j]) {
+					listmode = true;
+					break;
+				}
+			}
+			chans.find(target)->second->addMode(modeList[i], listmode);
+			std::ostringstream currTime;
+			currTime << time(NULL);
+			connection->sendData(":" + client + " FMODE " + target + " " + currTime + " " + modes + params);
+			callChannelModePostHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), true, newParam);
+		} else {
+			if (nicks.find(target) != nicks.end())
+				target = nicks.find(target)->second; // Convert the target nick to a UUID since that's kinda important and stuff.
+			callUserModePreHook(target, modeList[i], true);
+			users.find(target)->second->addMode(modeList[i]);
+			connection->sendData(":" + client + " MODE " + target + " " + modeList[i]);
+			callUserModePostHook(target, modeList[i], true);
+		}
 	}
-	std::ostringstream currTime;
-	currTime << time(NULL);
-	connection->sendData(":" + client + " FMODE " + target + " " + currTime + " " + modes + params);
 }
 
 void InspIRCd::removeMode(std::string client, std::string target, std::string mode) {
@@ -645,17 +665,37 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 		char remMode = convertMode(modeList[i]);
 		if (remMode == ' ')
 			continue;
+		std::string newParam = "";
 		if (modeList[i].find_first_of('=') != std::string::npos) {
-			std::string newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
+			newParam = modeList[i].substr(modeList[i].find_first_of('=') + 1);
 			if (nicks.find(newParam) != nicks.end())
 				newParam = nicks.find(newParam)->second;
 			params += " " + newParam;
 		}
 		modes += remMode;
+		if (target[0] == '#') {
+			callChannelModePreHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), false, newParam);
+			bool listmode = false;
+			for (size_t j = 0; j < chanModes[0].size(); j++) {
+				if (modeList[i] == chanModes[0][j]) {
+					listmode = true;
+					break;
+				}
+			}
+			chans.find(target)->second->addMode(modeList[i], listmode);
+			std::ostringstream currTime;
+			currTime << time(NULL);
+			connection->sendData(":" + client + " FMODE " + target + " " + currTime + " " + modes + params);
+			callChannelModePostHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), false, newParam);
+		} else {
+			if (nicks.find(target) != nicks.end())
+				target = nicks.find(target)->second; // Convert the target nick to a UUID since that's kinda important and stuff.
+			callUserModePreHook(target, modeList[i], false);
+			users.find(target)->second->addMode(modeList[i]);
+			connection->sendData(":" + client + " MODE " + target + " " + modeList[i]);
+			callUserModePostHook(target, modeList[i], false);
+		}
 	}
-	std::ostringstream currTime;
-	currTime << time(NULL);
-	connection->sendData(":" + client + " FMODE " + target + " " + currTime + " " + modes + params);
 }
 
 void InspIRCd::joinChannel(std::string client, std::string channel, std::string key) {
