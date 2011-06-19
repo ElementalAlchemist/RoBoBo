@@ -13,6 +13,7 @@ class User {
 		void host(std::string newHost);
 		std::string gecos();
 		void gecos(std::string newGecos);
+		std::string hostmask();
 		time_t nickTime();
 		void updateTime(time_t time);
 		std::string opertype();
@@ -157,6 +158,10 @@ std::string User::gecos() {
 
 void User::gecos(std::string newGecos) {
 	GECOS = newGecos;
+}
+
+std::string User::hostmask() {
+	return userNick + "!" + userIdent + "@" + userHost;
 }
 
 time_t User::nickTime() {
@@ -979,10 +984,8 @@ void InspIRCd::receiveData() {
 			} // line is now split by space
 			if (tempStr != "")
 				joinUserList.push_back(tempStr); // get last fragment if line doesn't end in space
-			for (size_t i = 0; i < joinUserList.size(); i++) {
-				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(joinUserList[i].substr(joinUserList[i].find_first_of(',') + 1));
-				callChannelJoinPreHook(parsedLine[2], userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host());
-			}
+			for (size_t i = 0; i < joinUserList.size(); i++)
+				callChannelJoinPreHook(parsedLine[2], users.find(joinUserList[i].substr(joinUserList[i].find_first_of(',') + 1))->second->hostmask());
 			std::istringstream cTime (parsedLine[3]);
 			time_t createTime;
 			cTime >> createTime;
@@ -1038,7 +1041,7 @@ void InspIRCd::receiveData() {
 					userIter->second->joinChannel(chanIter->first);
 					for (std::list<std::string>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter)
 						userIter->second->addStatus(*prefixIter);
-					callChannelJoinPostHook(chanIter->first, userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host());
+					callChannelJoinPostHook(chanIter->first, userIter->second->hostmask());
 				}
 			}
 		} else if (parsedLine[1] == "FMODE") {
@@ -1204,13 +1207,13 @@ void InspIRCd::receiveData() {
 			break;
 		} else if (parsedLine[1] == "SVSJOIN" && ourClients.find(parsedLine[2]) != parsedLine.end()) {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
-			callChannelJoinPreHook(parsedLine[3], userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host());
+			callChannelJoinPreHook(parsedLine[3], userIter->second->hostmask());
 			userIter->second->joinChannel(parsedLine[3]);
 			chans.find(parsedLine[3])->second->joinUser(parsedLine[2]);
 			std::ostringstream createTime;
 			createTime << chans.find(parsedLine[3])->second->creationTime();
 			connection->sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
-			callChannelJoinPostHook(parsedLine[3], userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host());
+			callChannelJoinPostHook(parsedLine[3], userIter->second->hostmask());
 		} else if (parsedLine[1] == "SVSMODE") {
 			if (parsedLine[2][0] == '#') {
 				size_t param = 4;
@@ -1342,7 +1345,7 @@ void InspIRCd::receiveData() {
 			callNickChangePostHook(oldnick, parsedLine[3]);
 		} else if (parsedLine[1] == "SVSPART" && parsedLine[2].substr(0, 3) == serverConf["sid"]) { // ignore if not for us
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
-			std::string hostmask = userIter->second->nick() + "!" + userIter->second->ident() + "@" + userIter->second->host();
+			std::string hostmask = userIter->second->hostmask();
 			callChannelPartPreHook(parsedLine[3], hostmask, "SVSPART received");
 			userIter->second->partChannel(parsedLine[3]);
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[3]);
@@ -1484,21 +1487,29 @@ std::string InspIRCd::convertUserMode(char mode) {
 void InspIRCd::joinUsers(std::string channel, std::vector<std::string> userList) {
 	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(channel);
 	std::string modes = "+";
-	if (chanIter = chans.end()) {
+	std::set<std::string> chanUsers;
+	std::string joiningUsers;
+	for (size_t i = 0; i < userList.size(); i++) {
+		joiningUsers += " " + userList[i];
+		std::string uuid = userList[i].substr(userList[i].find_first_of(',') + 1);
+		std::string hostmask = users.find(uuid)->second->hostmask();
+		callChannelJoinPreHook(channel, hostmask);
+		chanUsers.insert(uuid);
+		users.find(uuid)->second->joinChannel(channel);
+	}
+	if (chanIter == chans.end()) {
 		chanIter = chans.insert(std::pair<std::string, Channel*> (channel, new Channel (time(NULL)))).first;
 		modes += "nt";
 	}
 	time_t chanTime = chanIter->second->creationTime();
 	std::ostringstream chanTimeS;
 	chanTimeS << chanTime;
-	std::set<std::string> chanUsers;
-	std::string joiningUsers;
-	for (size_t i = 0; i < userList.size(); i++) {
-		joiningUsers += " " + userList[i];
-		chanUsers.insert(userList[i]);
-		users.find(userList[i])->second->joinChannel(channel);
-	}
 	chanIter->second->joinUsers(chanUsers);
+	for (size_t i = 0; i < userList.size(); i++) {
+		std::string uuid = userList[i].substr(userList[i].find_first_of(',') + 1);
+		std::string hostmask = users.find(uuid)->second->hostmask();
+		callChannelJoinPostHook(channel, hostmask);
+	}
 	joiningUsers = joiningUsers.substr(1); // remove opening space
 	connection->sendData(":" + serverConf["sid"] + " FJOIN " + channel + " " + chanTimeS.str() + " " + modes + " :" + joiningUsers);
 }
