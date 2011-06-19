@@ -1263,9 +1263,9 @@ void InspIRCd::receiveData() {
 					} else
 						callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
 					if (adding)
-						chans.find(parsedLine[2])->addMode(longmode, list);
+						chans.find(parsedLine[2])->second->addMode(longmode, list);
 					else
-						chans.find(parsedLine[2])->removeMode(longmode, list);
+						chans.find(parsedLine[2])->second->removeMode(longmode, list);
 					if (modeParam)
 						callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[param++]);
 					else
