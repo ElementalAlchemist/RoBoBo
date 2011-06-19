@@ -717,10 +717,17 @@ void InspIRCd::joinChannel(std::string client, std::string channel, std::string 
 void InspIRCd::partChannel(std::string client, std::string channel, std::string reason) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
+	callChannelPartPreHook(channel, userIter->second->hostmask(), reason);
+	userIter->second->partChannel(channel);
+	chans.find(channel)->second->partUser(client);
 	connection->sendData(":" + client + " PART " + channel + " :" + reason);
+	callChannelPartPostHook(channel, userIter->second->hostmask(), reason);
 }
 
 void InspIRCd::quitServer(std::string reason) {
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callQuitHook(*userIter);
 	connection->sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
 	connection->closeConnection();
 	keepServer = false; // if the bot is intentionally quitting, it's not necessary to keep this server anymore
