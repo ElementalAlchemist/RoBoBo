@@ -89,7 +89,7 @@ class InspIRCd : public Protocol {
 		void quitServer(std::string client, std::string reason = "");
 		void kickUser(std::string client, std::string channel, std::string user, std::string reason = "");
 		void changeNick(std::string client, std::string newNick);
-		void oper(std::string client, std::string username, std::string password);
+		void oper(std::string client, std::string username, std::string password = "");
 		void killUser(std::string client, std::string user, std::string reason);
 		void setXLine(std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason);
 		void removeXLine(std::string client, std::string lineType, std::string hostmask);
@@ -340,10 +340,11 @@ void InspIRCd::connectServer() {
 	portNumber >> port;
 	connection->connectServer(serverName, port);
 	sleep(1);
-	sendOther("CAPAB START");
-	sendOther("CAPAB CAPABILITIES :PROTOCOL=1203");
-	sendOther("CAPAB END");
-	sendOther("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
+	pthread_create(&receiveThread, &detachedState, receiveData_thread, this);
+	connection->sendData("CAPAB START");
+	connection->sendData("CAPAB CAPABILITIES :PROTOCOL=1203");
+	connection->sendData("CAPAB END");
+	connection->sendData("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
 	sendOther(":" + serverConf["sid"] + " BURST");
 	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
 	unsigned int i = 0;
@@ -354,36 +355,23 @@ void InspIRCd::connectServer() {
 	clientGecos << i << "/gecos";
 	clientOper << i << "/oper";
 	clientChannels << i << "/channels";
-	time_t currTime = time(NULL);
-	currTimeS << currTime;
 	std::tr1::unordered_map<std::string, std::vector<std::string> > joiningChannels;
 	while (serverConf[clientNick.str()] != "") {
-		std::string uuid = serverConf["sid"] + useUID();
-		sendOther(":" + serverConf["sid"] + " UID " + uuid + " " + currTimeS.str() + " " + serverConf[clientNick.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientHost.str()] + " " + serverConf[clientIdent.str()] + " 127.0.0.1 " + currTimeS.str() + " + :" + serverConf[clientGecos.str()]);
-		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.insert(std::pair<std::string, User*> (uuid, new User (serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()], currTime))).first;
-		nicks.insert(std::pair<std::string, std::string> (serverConf[clientNick.str()], uuid));
-		ourClients.insert(uuid);
+		std::string uuid = addClient(serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()]);
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
 		if (serverConf[clientOper.str()] != "")
-			sendOther(":" + uuid + " OPERTYPE " + serverConf[clientOper.str()]);
+			oper(uuid, serverConf[clientOper.str()]);
 		while (serverConf[clientChannels.str()] != "") {
 			std::string channelName = serverConf[clientChannels.str()].substr(0, serverConf[clientChannels.str()].find_first_of(','));
 			if (serverConf[clientChannels.str()].find_first_of(',') == std::string::npos)
 				serverConf[clientChannels.str()] = "";
 			else
 				serverConf[clientChannels.str()] = serverConf[clientChannels.str()].substr(serverConf[clientChannels.str()].find_first_of(',') + 1);
-			if (joiningChannels.find(channelName) == joiningChannels.end()) {
-				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator joinIter = joiningChannels.insert(std::pair<std::string, std::vector<std::string> > (channelName, std::vector<std::string> ())).first;
-				joinIter->second.push_back("o," + uuid);
-				std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = channels.insert(std::pair<std::string, Channel*> (channelName, new Channel (currTime))).first;
-				chanIter->second->joinUser(uuid);
-				userIter->second->joinChannel(channelName);
+			if (channels.find(channelName) == channels.end()) {
 				userIter->second->addStatus(channelName, "op");
-			} else {
-				channels.find(channelName)->joinUser(uuid);
-				userIter->second->joinChannel(channelName);
-				userIter->second->addStatus(channelName, "op");
-				joiningChannels[channelName].push_back(" o," + uuid);
-			}
+				joiningChannels[channelName].push_back("o," + uuid);
+			} else
+				joiningChannels[channelName].push_back("," + uuid);
 		}
 		i++;
 		clientNick.str("");
@@ -407,7 +395,6 @@ void InspIRCd::connectServer() {
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callConnectHook(*userIter);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
-	pthread_create(&receiveThread, &detachedState, receiveData_thread, this);
 }
 
 std::list<std::pair<std::string, char> > InspIRCd::prefixes() {
@@ -612,6 +599,7 @@ void InspIRCd::oper(std::string client, std::string username, std::string passwo
 	if (ourClients.find(client) == ourClients.end())
 		return;
 	connection->sendData(":" + client + " OPERTYPE " + username);
+	users.find(client)->second->operup(username);
 }
 
 void InspIRCd::killUser(std::string client, std::string user, std::string reason) {
@@ -1322,6 +1310,9 @@ void InspIRCd::receiveData() {
 				delete userIter->second;
 				users.erase(userIter);
 				removeClient(parsedLine[4], parsedLine[5]);
+			} else {
+				for (std::set<std::string>::iterator userIter = users.begin(); userIter != users.end(); ++userIter)
+					callOtherDataHook(*userIter, parsedLine);
 			}
 		}
 	}
@@ -1360,9 +1351,14 @@ void InspIRCd::joinUsers(std::string channel, std::vector<std::string> userList)
 	time_t chanTime = chanIter->second->creationTime();
 	std::ostringstream chanTimeS;
 	chanTimeS << chanTime;
+	std::set<std::string> chanUsers;
 	std::string joiningUsers;
-	for (size_t i = 0; i < userList.size(); i++)
+	for (size_t i = 0; i < userList.size(); i++) {
 		joiningUsers += " " + userList[i];
+		chanUsers.insert(userList[i]);
+		users.find(userList[i])->second->joinChannel(channel);
+	}
+	chanIter->second->joinUsers(chanUsers);
 	joiningUsers = joiningUsers.substr(1); // remove opening space
 	connection->sendData(":" + serverConf["sid"] + " FJOIN " + channel + " " + chanTimeS.str() + " " + modes + " :" + joiningUsers);
 }
