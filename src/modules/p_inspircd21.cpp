@@ -775,13 +775,34 @@ void InspIRCd::oper(std::string client, std::string username, std::string passwo
 void InspIRCd::killUser(std::string client, std::string user, std::string reason) {
 	if (ourClients.find(client) == ourClients.end() && client != "")
 		return;
-	if (users.find(user) == users.end() && nicks.find(user) == nicks.end())
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
+	if (userIter == users.end() && nicks.find(user) == nicks.end())
 		return;
 	if (client == "")
 		client = serverConf["sid"];
-	if (nicks.find(user) != nicks.end())
+	if (nicks.find(user) != nicks.end()) {
 		user = nicks.find(user)->second;
+		userIter = users.find(user);
+	}
+	bool ourClient = false;
+	if (user.substr(0, 3) == serverConf["sid"])
+		ourClient = true;
+	std::string clientNick = users.find(client)->second->nick();
+	if (ourClient)
+		callQuitHook(user);
+	else
+		callUserQuitPreHook(userIter->second->hostmask(), "Killed by " + clientNick + " (" + reason + ")");
 	connection->sendData(":" + client + " KILL " + user + " :" + reason);
+	std::set<std::string> userChannels = userIter->second->channels();
+	for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
+		chans.find(*chanIter)->second->partUser(user);
+	nicks.erase(nicks.find(userIter->second->nick()));
+	delete userIter->second;
+	users.erase(userIter);
+	if (ourClient)
+		ourClients.erase(user);
+	else
+		callUserQuitPostHook(userIter->second->hostmask(), "Killed by " + clientNick + " (" + reason + ")");
 }
 
 void InspIRCd::setXLine(std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason) {
