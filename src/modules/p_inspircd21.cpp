@@ -731,12 +731,20 @@ void InspIRCd::quitServer(std::string reason) {
 	connection->sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
 	connection->closeConnection();
 	keepServer = false; // if the bot is intentionally quitting, it's not necessary to keep this server anymore
+	// The bot automatically detects where the keepServer variable is when the server check comes around and uses it to decide whether to restart the server.
 }
 
 void InspIRCd::kickUser(std::string client, std::string channel, std::string user, std::string reason) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
+	if (nicks.find(user) == nicks.end())
+		return;
+	std::string target = nicks.find(user)->second;
+	callChannelKickPreHook(channel, users.find(client)->second->nick(), user, reason);
+	chans.find(channel)->second->partUser(target);
+	users.find(target)->second->partChannel(channel);
 	connection->sendData(":" + client + " KICK " + channel + " " + user + " :" + reason);
+	callChannelKickPostHook(channel, users.find(client)->second->nick(), user, reason);
 }
 
 void InspIRCd::changeNick(std::string client, std::string newNick) {
