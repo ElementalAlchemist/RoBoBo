@@ -1538,12 +1538,9 @@ void InspIRCd::receiveData() {
 					partChannel(parsedLine[4], parsedLine[5]);
 				else
 					partChannel(parsedLine[4], parsedLine[5], parsedLine[6]);
-			} else if (parsedLine[3] == "SAQUIT") {
-				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[4]);
-				delete userIter->second;
-				users.erase(userIter);
+			} else if (parsedLine[3] == "SAQUIT")
 				removeClient(parsedLine[4], parsedLine[5]);
-			} else {
+			else {
 				for (std::set<std::string>::iterator userIter = users.begin(); userIter != users.end(); ++userIter)
 					callOtherDataHook(*userIter, parsedLine);
 			}
