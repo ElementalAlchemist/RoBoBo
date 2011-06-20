@@ -837,11 +837,18 @@ std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t
 }
 
 void InspIRCd::sendSNotice(char snomask, std::string text) {
-	connection->sendData(":" + serverConf["sid"] + " SNONOTICE " + snomask + " :" + text);
+	std::string sendLine = ":" + serverConf["sid"] + " SNONOTICE " + snomask + " :" + text;
+	connection->sendData(sendLine);
+	std::vector<std::string> parsedLine = parseLine(sendLine);
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callOtherDataHook(*userIter, parsedLine);
 }
 
 void InspIRCd::sendOther(std::string rawLine) {
 	connection->sendData(rawLine);
+	std::vector<std::string> parsedLine = parseLine(rawLine);
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callOtherDataHook(*userIter, parsedLine);
 }
 
 std::string InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
