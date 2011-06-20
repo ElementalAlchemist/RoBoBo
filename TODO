@@ -12,8 +12,8 @@ Current TODO List
 [>] - Protocol modules!
 	[x] - Move Socket class
 	[x] - Move most of current connection stuff to p_client
-	[>] - Protocol modules for current versions of popular IRCds
-		[>] - InspIRCd
+	[x] - Protocol modules for current versions of popular IRCds
+		[x] - InspIRCd
 	[x] - Use long-name modes with mode function; protocol modules translate long modes into letters if necessary
 		[x] - Protocol modules
 			[x] - p_client
