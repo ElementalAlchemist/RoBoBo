@@ -750,9 +750,16 @@ void InspIRCd::kickUser(std::string client, std::string channel, std::string use
 void InspIRCd::changeNick(std::string client, std::string newNick) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
+	std::string oldNick = userIter->second->nick();
+	callNickChangePreHook(oldNick, newNick);
+	time_t nickTime = time(NULL);
 	std::ostringstream currTime;
-	currTime << time(NULL);
+	currTime << nickTime;
 	connection->sendData(":" + client + " NICK " + newNick + " " + currTime);
+	userIter->second->nick(newNick);
+	userIter->second->updateTime(nickTime);
+	callNickChangePostHook(oldNick, newNick);
 }
 
 void InspIRCd::oper(std::string client, std::string username, std::string password) {
