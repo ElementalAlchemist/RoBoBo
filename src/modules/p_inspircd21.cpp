@@ -765,8 +765,11 @@ void InspIRCd::changeNick(std::string client, std::string newNick) {
 void InspIRCd::oper(std::string client, std::string username, std::string password) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
-	connection->sendData(":" + client + " OPERTYPE " + username);
+	std::string nick = users.find(client)->second->nick();
+	callUserOperPreHook(nick, username);
+	connection->sendData(":" + client + " OPERTYPE :" + username);
 	users.find(client)->second->operup(username);
+	callUserOperPostHook(nick, username);
 }
 
 void InspIRCd::killUser(std::string client, std::string user, std::string reason) {
