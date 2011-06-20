@@ -813,7 +813,11 @@ void InspIRCd::setXLine(std::string client, std::string lineType, std::string ho
 	std::ostringstream currTime, length;
 	currTime << time(NULL);
 	length << duration;
-	connection->sendData(":" + client + " ADDLINE " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason);
+	std::string sendLine = ":" + client + " ADDLINE " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason;
+	connection->sendData(sendLine);
+	std::vector<std::string> parsedLine = parseLine(sendLine);
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callOtherDataHook(*userIter, parsedLine);
 }
 
 void InspIRCd::removeXLine(std::string client, std::string lineType, std::string hostmask) {
@@ -821,7 +825,11 @@ void InspIRCd::removeXLine(std::string client, std::string lineType, std::string
 		return;
 	if (client == "")
 		client = serverConf["sid"];
-	connection->sendData(":" + client + " DELLINE " + lineType + " " + hostmask);
+	std::string sendLine = ":" + client + " DELLINE " + lineType + " " + hostmask;
+	connection->sendData(sendLine);
+	std::vector<std::string> parsedLine = parseLine(sendLine);
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callOtherDataHook(*userIter, parsedLine);
 }
 
 std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > InspIRCd::listXLines() {
