@@ -1256,6 +1256,26 @@ void InspIRCd::receiveData() {
 			givenTimestamp >> nickTime;
 			userIter->second->updateTime(nickTime);
 			callNickChangePostHook(oldNick, parsedLine[2]);
+		} else if (parsedLine[1] == "PART") {
+			std::string uuid = parsedLine[0].substr(1); // strip starting colon
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
+			std::string hostmask = userIter->second->hostmask();
+			callChannelPartPreHook(parsedLine[2], hostmask, parsedLine[3]);
+			chans.find(parsedLine[2])->second->partUser(uuid);
+			userIter->second->partChannel(parsedLine[2]);
+			callChannelPartPostHook(parsedLine[2], hostmask, parsedLine[3]);
+		} else if (parsedLine[1] == "QUIT") { // QUIT not valid from remote servers for local clients, so no need to check for that.
+			std::string uuid = parsedLine[0].substr(1); // strip starting colon
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
+			std::string hostmask = userIter->second->hostmask();
+			callUserQuitPreHook(hostmask, parsedLine[2]);
+			std::set<std::string> userChannels = userIter->second->channels();
+			for (std::set<std::string> chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
+				channels.find(*chanIter)->second->partUser(uuid);
+			nicks.erase(nicks.find(userIter->second->nick()));
+			delete userIter->second;
+			users.erase(userIter);
+			callUserQuitPostHook(hostmask, parsedLine[2]);
 		} else if (parsedLine[1] == "TIME" && parsedLine[2] == serverConf["sid"] && parsedLine.size() == 4) { // don't reply if for some reason we're getting a TIME reply. That would be stupid, and you would be stupid for doing it.
 			std::ostringstream currTime;
 			currTime << time(NULL);
