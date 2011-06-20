@@ -29,19 +29,20 @@ vector -> {
 		"But don't tell anyone! ;)"
 	}
 	vector -> {
-		"anothercommand" // this mod supports two commands
-		"This command calls the first command."
-		"Syntax: anothercommand"
+		"anothercommand" // this mod supports two commands.  Right here is the second one,
+		"This command calls the first command." // the second one's description
+		"Syntax: anothercommand" // and the rest is, as above, some help text for it.
 		"Blah."
 	}
 }
-Using push_back, the strings should be added to the inner vector in that order.  Vectors added to the outer vector can
+The strings should appear in the inner vector in that order.  Vectors added to the outer vector can
 be added in any order.
 */
 
 void AdminHook::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {}
 /* onAdminCommand(std::string, std::string, std::string, std::string, dccSender*, bool)
-This function is called by the admin module whenever a command that you told the admin module in adminCommands().
+This function is called by the admin module whenever a command that you told the admin module in adminCommands() to activate on is given
+by a bot admin.
 The parameters are provided as follows:
 - server: the server (as known by the bot) to which the user sending the command is connected
 - nick: the nick the user sending the command is using
