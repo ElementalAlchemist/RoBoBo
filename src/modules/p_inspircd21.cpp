@@ -858,7 +858,11 @@ std::string InspIRCd::addClient(std::string nick, std::string ident, std::string
 	ourClients.insert(uuid);
 	std::ostringstream currTime;
 	currTime << time(NULL);
-	connection->sendData(":" + serverConf["sid"] + " UID " + uuid + " " + currTime.str() + " " + nick + " " + host + " " + host + " " + ident + " 127.0.0.1 " + currTime.str() + " + :" + gecos);
+	std::string sendLine = ":" + serverConf["sid"] + " UID " + uuid + " " + currTime.str() + " " + nick + " " + host + " " + host + " " + ident + " 127.0.0.1 " + currTime.str() + " + :" + gecos;
+	connection->sendData(sendLine);
+	std::vector<std::string> parsedLine = parseLine(sendLine);
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+		callOtherDataHook(*userIter, parsedLine);
 	return uuid;
 }
 
