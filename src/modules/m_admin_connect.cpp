@@ -10,7 +10,7 @@ class ConnectServerCommand : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int ConnectServerCommand::botAPIversion() {
@@ -21,7 +21,7 @@ bool ConnectServerCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -49,7 +49,7 @@ void ConnectServerCommand::onModuleChange() {
 	std::multimap<std::string, std::string>::iterator botAdminAbility = moduleAbilities.find("BOT_ADMIN");
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
-		unloadModule(moduleName);
+		unloadModule();
 	}
 }
 
@@ -91,10 +91,10 @@ std::vector<std::vector<std::string> > ConnectServerCommand::adminCommands() {
 	return theCommands;
 }
 
-void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void ConnectServerCommand::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "This command is available only to the bot master.");
+			sendPrivMsg(server, client, nick, "This command is available only to the bot master.");
 		else
 			dccMod->dccSend(server + "/" + nick, "This command is available only to the bot master.");
 		return;
@@ -102,19 +102,19 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, 
 	if (command == "connect") {
 		if (message.substr(0, message.find_first_of(' ')) != message) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Too many parameters for connect.");
+				sendPrivMsg(server, client, nick, "Too many parameters for connect.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Too many parameters for connect.");
 			return;
 		}
 		if (connectServer(message)) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Connecting to " + message + ".");
+				sendPrivMsg(server, client, nick, "Connecting to " + message + ".");
 			else
 				dccMod->dccSend(server + "/" + nick, "Connecting to " + message + ".");
 		} else {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Cannot connect to " + message + ".  Please put a server block for " + message + " in the configuration file and try again.");
+				sendPrivMsg(server, client, nick, "Cannot connect to " + message + ".  Please put a server block for " + message + " in the configuration file and try again.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Cannot connect to " + message + ".  Please put a server block for " + message  + " in the configuration file and try again.");
 		}
@@ -123,7 +123,7 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, 
 	std::string quitServerName = message.substr(0, message.find_first_of(' '));
 	std::string quitReason = message.substr(message.find_first_of(' ') + 1);
 	if (dccMod == NULL)
-		sendPrivMsg(server, nick, "Quitting server " + quitServerName + " with reason " + quitReason);
+		sendPrivMsg(server, client, nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	else
 		dccMod->dccSend(server + "/" + nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	quitServer(quitServerName, quitReason);

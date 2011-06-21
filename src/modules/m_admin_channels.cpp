@@ -10,7 +10,7 @@ class AdminChannelControl : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int AdminChannelControl::botAPIversion() {
@@ -21,7 +21,7 @@ bool AdminChannelControl::onLoadComplete() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but it is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -48,7 +48,7 @@ void AdminChannelControl::onModuleChange() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but it is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
-		unloadModule(moduleName);
+		unloadModule();
 	}
 }
 
@@ -90,10 +90,10 @@ std::vector<std::vector<std::string> > AdminChannelControl::adminCommands() {
 	return theCommands;
 }
 
-void AdminChannelControl::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void AdminChannelControl::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "This command is only available to bot masters.");
+			sendPrivMsg(server, client, nick, "This command is only available to bot masters.");
 		else
 			dccMod->dccSend(server + "/" + nick, "This command is available only to bot masters.");
 		return;

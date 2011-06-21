@@ -10,7 +10,7 @@ class RehashCommand : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int RehashCommand::botAPIversion() {
@@ -21,7 +21,7 @@ bool RehashCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -48,7 +48,7 @@ void RehashCommand::onModuleChange() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
-		unloadModule(moduleName);
+		unloadModule();
 	}
 }
 
@@ -76,17 +76,17 @@ std::vector<std::vector<std::string> > RehashCommand::adminCommands() {
 	return theCommands;
 }
 
-void RehashCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void RehashCommand::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "This command is available only to the bot master.");
+			sendPrivMsg(server, client, nick, "This command is available only to the bot master.");
 		else
 			dccMod->dccSend(server + "/" + nick, "This command is available only to the bot master.");
 		return;
 	}
 	rehashBot();
 	if (dccMod == NULL)
-		sendPrivMsg(server, nick, "Bot rehashed.");
+		sendPrivMsg(server, client, nick, "Bot rehashed.");
 	else
 		dccMod->dccSend(server + "/" + nick, "Bot rehashed.");
 }

@@ -10,7 +10,7 @@ class LoadModCommand : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 int LoadModCommand::botAPIversion() {
@@ -21,7 +21,7 @@ bool LoadModCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -49,7 +49,7 @@ void LoadModCommand::onModuleChange() {
 	std::multimap<std::string, std::string>::iterator botAdminAbility = moduleAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 	}
 }
 
@@ -86,44 +86,44 @@ std::vector<std::vector<std::string> > LoadModCommand::adminCommands() {
 	return theCommands;
 }
 
-void LoadModCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void LoadModCommand::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (command == "loadmod") {
 		if (config["masteronly"] == "yes" && !master) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "You must be the bot master to use this command.");
+				sendPrivMsg(server, client, nick, "You must be the bot master to use this command.");
 			else
 				dccMod->dccSend(server + "/" + nick, "You must be the bot master to use this command.");
 			return;
 		}
 		if (message == "") {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Usage: loadmod <modulename>");
+				sendPrivMsg(server, client, nick, "Usage: loadmod <modulename>");
 			else
 				dccMod->dccSend(server + "/" + nick, "Usage: loadmod <modulename>");
 			return;
 		}
 		if (loadModule(message)) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Module " + message + " loaded successfully.");
+				sendPrivMsg(server, client, nick, "Module " + message + " loaded successfully.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Module " + message + " loaded successfully.");
 		} else {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Module " + message + " failed to load.");
+				sendPrivMsg(server, client, nick, "Module " + message + " failed to load.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Module " + message + " failed to load.");
 		}
 	} else { // command == "unloadmod"
 		if (config["masteronly"] == "yes" && !master) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "This module is available only to the bot master.");
+				sendPrivMsg(server, client, nick, "This module is available only to the bot master.");
 			else
-				sendPrivMsg(server, nick, "This module is available only to the bot master.");
+				dccMod->dccSend(server + "/" + nick, "This module is available only to the bot master.");
 			return;
 		}
 		if (message == "") {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Usage: unloadmod <module>");
+				sendPrivMsg(server, client, nick, "Usage: unloadmod <module>");
 			else
 				dccMod->dccSend(server + "/" + nick, "Usage: unloadmod <module>");
 			return;
@@ -132,14 +132,14 @@ void LoadModCommand::onAdminCommand(std::string server, std::string nick, std::s
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.find(message);
 		if (modIter == loadedModules.end()) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Could not unload module " + message + ": does not exist.");
+				sendPrivMsg(server, client, nick, "Could not unload module " + message + ": does not exist.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Could not unload module " + message + ": does not exist.");
 			return;
 		}
 		unloadModule(message);
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "Unloading module " + message);
+			sendPrivMsg(server, client, nick, "Unloading module " + message);
 		else
 			dccMod->dccSend(server + "/" + nick, "Unloading module " + message);
 	}
