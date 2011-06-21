@@ -78,7 +78,7 @@ bool Admin::onLoadComplete() {
 			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
 			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl; // debug level 1
-			unloadModule(moduleName);
+			unloadModule();
 			return false;
 		}
 		admins.push_back(adminPrivs);
@@ -123,7 +123,8 @@ void Admin::onRehash() {
 			adminPrivs.insert(std::pair<std::string, std::string> ("verbose", config[adminIndex.str()+"/verbose"]));
 		else {
 			std::cout << "Unloading m_admin: invalid configuration.  Check your verbose levels." << std::endl; // debug level 1
-			unloadModule(moduleName);
+			unloadModule();
+			break;
 		}
 		admins.push_back(adminPrivs);
 		verbosity.push_back(0); // verbosity should only be >0 with an open DCC chat session
