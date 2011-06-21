@@ -397,8 +397,6 @@ void InspIRCd::connectServer() {
 		currTime << chans.find(jcIter->first)->second->creationTime();
 		joinUsers(jcIter->first, jcIter->second);
 	}
-	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
-		callConnectHook(*userIter);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
 }
 
@@ -867,8 +865,7 @@ std::string InspIRCd::addClient(std::string nick, std::string ident, std::string
 	std::string sendLine = ":" + serverConf["sid"] + " UID " + uuid + " " + currTime.str() + " " + nick + " " + host + " " + host + " " + ident + " 127.0.0.1 " + currTime.str() + " + :" + gecos;
 	connection->sendData(sendLine);
 	std::vector<std::string> parsedLine = parseLine(sendLine);
-	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
-		callOtherDataHook(*userIter, parsedLine);
+	callConnectHook(uuid);
 	return uuid;
 }
 
