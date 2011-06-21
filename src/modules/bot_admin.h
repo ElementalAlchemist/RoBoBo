@@ -4,7 +4,7 @@ class AdminHook : public dccChat {
 	public:
 		virtual ~AdminHook();
 		virtual std::vector<std::vector<std::string> > adminCommands();
-		virtual void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		virtual void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 class AdminMod : public dccChat {

@@ -8,25 +8,26 @@ class Admin : public AdminMod {
 		bool onLoadComplete();
 		void onRehash();
 		void onModuleChange();
-		bool onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserMsg(std::string server, std::string nick, std::string message);
-		bool onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserNotice(std::string server, std::string nick, std::string message);
-		bool onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserAction(std::string server, std::string nick, std::string message);
-		bool onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserCTCP(std::string server, std::string nick, std::string message);
-		bool onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserCTCPReply(std::string server, std::string nick, std::string message);
+		bool onChannelMsg(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserMsg(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelNotice(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserNotice(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelCTCPReply(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message);
 		void onChannelJoinPost(std::string server, std::string channel, std::string hostmask);
 		void onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason);
+		void onUserConnectPost(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
 		void onUserQuitPre(std::string server, std::string hostmask, std::string reason);
 		void onNickChangePost(std::string server, std::string oldNick, std::string newNick);
 		void onChannelKickPost(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
-		void onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param);
-		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
-		void onOtherData(std::string server, std::vector<std::string> parsedLine);
+		void onChannelModePost(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
+		void onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine);
 		void onPreConnect(std::string server);
+		void onConnect(std::string server, std::string client);
+		void onQuit(std::string server, std::string client);
 		void onDCCReceive(std::string dccid, std::string message);
 		void onDCCEnd(std::string dccid);
 		std::string description();
@@ -40,12 +41,12 @@ class Admin : public AdminMod {
 		std::vector<bool> loggedIn;
 		dccSender* dccMod;
 		bool isValidVerboseLevel(std::string verboseLevel);
-		void handleDCCMessage(std::string server, std::string nick, std::string message);
+		void handleDCCMessage(std::string server, std::string client, std::string nick, std::string message);
 		std::tr1::unordered_map<std::string, std::vector<std::string> > botAdminCommands;
 };
 
 int Admin::botAPIversion() {
-	return 1100;
+	return 2000;
 }
 
 bool Admin::onLoadComplete() {
@@ -57,9 +58,8 @@ bool Admin::onLoadComplete() {
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules().find(serviceIter->second);
 		dccMod = (dccSender*) modIter->second;
 		if (!dccMod->hookDCCMessage(moduleName, "login")) { // hook DCC message
-			if (!dccMod->hookDCCMessage(moduleName, "admin")) { // backup
+			if (!dccMod->hookDCCMessage(moduleName, "admin")) // backup
 				dccMod = NULL; // couldn't hook messages, so no DCC
-			}
 		}
 	}
 	int i = 0;
@@ -150,32 +150,32 @@ void Admin::onModuleChange() {
 	}
 }
 
-bool Admin::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	if (target == '0')
-		sendVerbose(2, server + ": " + nick + " -> " + channel + ": " + message);
+bool Admin::onChannelMsg(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	if (target == ' ')
+		sendVerbose(2, server + "/" + client + ": " + nick + " -> " + channel + ": " + message);
 	else
-		sendVerbose(2, server + ": " + nick + " -> " + target + channel + ": " + message);
+		sendVerbose(2, server + "/" + client + ": " + nick + " -> " + target + channel + ": " + message);
 	return true;
 }
 
-bool Admin::onUserMsg(std::string server, std::string nick, std::string message) {
+bool Admin::onUserMsg(std::string server, std::string client, std::string nick, std::string message) {
 	bool dccMsg = false;
 	if (dccMod == NULL) {
 		for (unsigned int i = 0; i < loggedIn.size(); i++) {
 			if ((loggedIn[i] && admins[i]["server"] == server && admins[i]["nick"] == nick)) {
-				handleDCCMessage(server, nick, message);
+				handleDCCMessage(server, client, nick, message);
 				dccMsg = true;
 				break;
 			}
 			if (admins[i]["server"] == server && admins[i]["nick"] == nick && splitBySpace(message)[0] == "login") {
 				if (message.size() <= 6)
-					sendPrivMsg(server, nick, "Usage: login <password>");
+					sendPrivMsg(server, client, nick, "Usage: login <password>");
 				else {
 					if (admins[i]["password"] == splitBySpace(message)[1]) {
 						loggedIn[i] = true;
-						sendPrivMsg(server, nick, "You are now identified.");
+						sendPrivMsg(server, client, nick, "You are now identified.");
 					} else
-						sendPrivMsg(server, nick, "You are not an admin of this bot.  Go away. :(");
+						sendPrivMsg(server, client, nick, "You are not an admin of this bot.  Go away. :(");
 				}
 				dccMsg = true; // the message was handled.
 				break;
@@ -183,60 +183,57 @@ bool Admin::onUserMsg(std::string server, std::string nick, std::string message)
 		}
 	}
 	if (!dccMsg) {
-		sendVerbose(2, server + ": <" + nick + "> " + message);
+		sendVerbose(2, server + "/" + client + ": <" + nick + "> " + message);
 	}
 	return true;
 }
 
-bool Admin::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	if (target == '0')
-		sendVerbose(2, server + ": -" + nick + "/" + channel + "- " + message);
+bool Admin::onChannelNotice(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	if (target == ' ')
+		sendVerbose(2, server + "/" + client + ": -" + nick + "/" + channel + "- " + message);
 	else
-		sendVerbose(2, server + ": -" + nick + "/" + target + channel + "- " + message);
+		sendVerbose(2, server + "/" + client + ": -" + nick + "/" + target + channel + "- " + message);
 	return true;
 }
 
-bool Admin::onUserNotice(std::string server, std::string nick, std::string message) {
-	sendVerbose(2, server + ": --" + nick + "-- " + message);
+bool Admin::onUserNotice(std::string server, std::string client, std::string nick, std::string message) {
+	sendVerbose(2, server + "/" + client + ": --" + nick + "-- " + message);
 	return true;
 }
 
-bool Admin::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	if (target == '0')
-		sendVerbose(2, server + ": (" + channel + ") * " + nick + " " + message);
+bool Admin::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	if (message.substr(0, message.find_first_of(' ')) == "ACTION") {
+		if (target == ' ')
+			sendVerbose(2, server + "/" + client + ": (" + channel + ") * " + nick + " " + message);
+		else
+			sendVerbose(2, server + "/" + client + ": (" + target + channel + ") * " + nick + " " + message);
+		return true;
+	}
+	if (target == ' ')
+		sendVerbose(2, server + "/" + client + ": --> [" + nick + "/" + channel + "] " + message);
 	else
-		sendVerbose(2, server + ": (" + target + channel + ") * " + nick + " " + message);
+		sendVerbose(2, server + "/" + client + ": --> [" + nick + "/" + target + channel + "] " + message);
 	return true;
 }
 
-bool Admin::onUserAction(std::string server, std::string nick, std::string message) {
-	sendVerbose(2, server + ": * " + nick + " " + message);
-	return true;
-}
-
-bool Admin::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	if (target == '0')
-		sendVerbose(2, server + ": --> [" + nick + "/" + channel + "] " + message);
+bool Admin::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
+	if (message.substr(0, message.find_first_of(' ')) == "ACTION")
+		sendVerbose(2, server + "/" + client + ": *" + nick + " " + message);
 	else
-		sendVerbose(2, server + ": --> [" + nick + "/" + target + channel + "] " + message);
+		sendVerbose(2, server + "/" + client + ": --> [" + nick + "] " + message);
 	return true;
 }
 
-bool Admin::onUserCTCP(std::string server, std::string nick, std::string message) {
-	sendVerbose(2, server + ": --> [" + nick + "] " + message);
-	return true;
-}
-
-bool Admin::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {
-	if (target == '0')
-		sendVerbose(2, server + ": <-- [" + nick + "/" + channel + "] " + message);
+bool Admin::onChannelCTCPReply(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	if (target == ' ')
+		sendVerbose(2, server + "/" + client + ": <-- [" + nick + "/" + channel + "] " + message);
 	else
-		sendVerbose(2, server + ": <-- [" + nick + "/" + target + channel + "] " + message);
+		sendVerbose(2, server + "/" + client + ": <-- [" + nick + "/" + target + channel + "] " + message);
 	return true;
 }
 
-bool Admin::onUserCTCPReply(std::string server, std::string nick, std::string message) {
-	sendVerbose(2, server + ": <-- [" + nick + "] " + message);
+bool Admin::onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message) {
+	sendVerbose(2, server + "/" + client + ": <-- [" + nick + "] " + message);
 	return true;
 }
 
@@ -246,6 +243,10 @@ void Admin::onChannelJoinPost(std::string server, std::string channel, std::stri
 
 void Admin::onChannelPartPost(std::string server, std::string channel, std::string hostmask, std::string reason) {
 	sendVerbose(2, server + ": " + hostmask + " PART " + channel + " (" + reason + ")");
+}
+
+void Admin::onUserConnectPost(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	sendVerbose(2, server + ": User connected to network: " + nick + "!" + ident + "@" + host + " : " + gecos);
 }
 
 void Admin::onUserQuitPre(std::string server, std::string hostmask, std::string reason) {
@@ -276,15 +277,15 @@ void Admin::onChannelModePost(std::string server, std::string channel, std::stri
 	sendVerbose(2, server + ": (" + channel + ") " + setter + " set MODE " + (add ? "+" : "-") + mode + " " + param);
 }
 
-void Admin::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {
-	sendVerbose(2, " -> " + server + " " + numeric + " " + parsedLine[3]);
+void Admin::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
+	sendVerbose(2, " -> " + server + "/" + client + " " + numeric + " " + parsedLine[3]);
 }
 
-void Admin::onOtherData(std::string server, std::vector<std::string> parsedLine) {
+void Admin::onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine) {
 	std::string message = "";
-	for (unsigned int i = 0; i < parsedLine.size(); i++) {
+	for (unsigned int i = 0; i < parsedLine.size() - 1; i++)
 		message += " " + parsedLine[i];
-	}
+	message += " :" + parsedLine[parsedLine.size() - 1];
 	sendVerbose(2, message.substr(1));
 }
 
@@ -294,10 +295,18 @@ void Admin::onPreConnect(std::string server) {
 		dccMod->dccSend(admins[0]["server"] + "/" + admins[0]["nick"], "I am now connecting to " + server + ".  It may be necessary to rehash for admins on that server to be able to log in.");
 }
 
+void Admin::onConnect(std::string server, std::string client) {
+	sendVerbose(1, "Local client " + client + " now connected to " + server);
+}
+
+void Admin::onQuit(std::string server, std::string client) {
+	sendVerbose(1, "Local client " + client + " has been removed from connection to " + server);
+}
+
 void Admin::onDCCReceive(std::string dccid, std::string message) { // dccid = server/nick
 	std::string server = dccid.substr(0, dccid.find_first_of('/'));
 	std::string nick = dccid.substr(dccid.find_first_of('/')+1);
-	handleDCCMessage(server, nick, message);
+	handleDCCMessage(server, *(clients(server).begin()), nick, message);
 }
 
 void Admin::onDCCEnd(std::string dccid) {
@@ -310,7 +319,7 @@ void Admin::onDCCEnd(std::string dccid) {
 }
 
 std::string Admin::description() {
-	return "This module provides administration features for the bot.";
+	return "This module provides an administration system for the bot.";
 }
 
 std::vector<std::string> Admin::abilities() {
@@ -336,7 +345,7 @@ bool Admin::isValidVerboseLevel(std::string verboseLevel) {
 	return false;
 }
 
-void Admin::handleDCCMessage(std::string server, std::string nick, std::string message) {
+void Admin::handleDCCMessage(std::string server, std::string client, std::string nick, std::string message) {
 	std::vector<std::string> splitMsg = splitBySpace(message);
 	std::transform(splitMsg[0].begin(), splitMsg[0].end(), splitMsg[0].begin(), ::tolower);
 	if (splitMsg[0] == "login" || splitMsg[0] == "admin") {
@@ -381,31 +390,31 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		verbosity[adminNum] = verbose;
 	} else if (splitMsg[0] == "modules") {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "Loaded modules:");
+			sendPrivMsg(server, client, nick, "Loaded modules:");
 		else
 			dccMod->dccSend(server + "/" + nick, "Loaded modules:");
 		std::tr1::unordered_map<std::string, Module*> loadedModules = modules();
 		for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.begin(); modIter != loadedModules.end(); ++modIter) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, modIter->first + ": " + modIter->second->description());
+				sendPrivMsg(server, client, nick, modIter->first + ": " + modIter->second->description());
 			else
 				dccMod->dccSend(server + "/" + nick, modIter->first + ": " + modIter->second->description());
 		}
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "End of module list.");
+			sendPrivMsg(server, client, nick, "End of module list.");
 		else
 			dccMod->dccSend(server + "/" + nick, "End of module list.");
 	} else if (splitMsg[0] == "help") {
 		if (splitMsg.size() == 1) {
 			if (dccMod == NULL) {
-				sendPrivMsg(server, nick, "RoBoBo Admin Help");
-				sendPrivMsg(server, nick, "help -> Gives help on using commands.");
-				sendPrivMsg(server, nick, "modules -> Lists loaded modules.");
-				sendPrivMsg(server, nick, "servers -> Lists connected servers.");
-				sendPrivMsg(server, nick, "admins -> Lists logged-in bot administrators.");
+				sendPrivMsg(server, client, nick, "RoBoBo Admin Help");
+				sendPrivMsg(server, client, nick, "help -> Gives help on using commands.");
+				sendPrivMsg(server, client, nick, "modules -> Lists loaded modules.");
+				sendPrivMsg(server, client, nick, "servers -> Lists connected servers.");
+				sendPrivMsg(server, client, nick, "admins -> Lists logged-in bot administrators.");
 				for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator comIter = botAdminCommands.begin(); comIter != botAdminCommands.end(); ++comIter)
-					sendPrivMsg(server, nick, comIter->first + " -> " + comIter->second[1]);
-				sendPrivMsg(server, nick, "End of command list!");
+					sendPrivMsg(server, client, nick, comIter->first + " -> " + comIter->second[1]);
+				sendPrivMsg(server, client, nick, "End of command list!");
 			} else {
 				dccMod->dccSend(server + "/" + nick, "RoBoBo Admin Help");
 				dccMod->dccSend(server + "/" + nick, "help -> Gives help on using commands.");
@@ -420,10 +429,10 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			std::transform(splitMsg[1].begin(), splitMsg[1].end(), splitMsg[1].begin(), ::tolower);
 			if (splitMsg[1] == "modules") {
 				if (dccMod == NULL) {
-					sendPrivMsg(server, nick, "modules implemented by module " + moduleName);
-					sendPrivMsg(server, nick, "Lists loaded modules.");
-					sendPrivMsg(server, nick, "This command lists all loaded modules and their descriptions.  This command takes no arguments.");
-					sendPrivMsg(server, nick, "End of help for modules");
+					sendPrivMsg(server, client, nick, "modules implemented by module " + moduleName);
+					sendPrivMsg(server, client, nick, "Lists loaded modules.");
+					sendPrivMsg(server, client, nick, "This command lists all loaded modules and their descriptions.  This command takes no arguments.");
+					sendPrivMsg(server, client, nick, "End of help for modules");
 				} else {
 					dccMod->dccSend(server + "/" + nick, "modules implemented by module " + moduleName);
 					dccMod->dccSend(server + "/" + nick, "Lists loaded modules.");
@@ -434,17 +443,17 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			}
 			if (splitMsg[1] == "help") {
 				if (dccMod == NULL)
-					sendPrivMsg(server, nick, "Silly you!  You're using that!");
+					sendPrivMsg(server, client, nick, "Silly you!  You're using that!");
 				else
 					dccMod->dccSend(server + "/" + nick, "Silly you!  You're using that!");
 				return;
 			}
 			if (splitMsg[1] == "admins") {
 				if (dccMod == NULL) {
-					sendPrivMsg(server, nick, "admins implemented by module " + moduleName);
-					sendPrivMsg(server, nick, "Lists logged-in bot administrators.");
-					sendPrivMsg(server, nick, "This command lists the nicks and servers of all online administrators.  This command takes no arguments.");
-					sendPrivMsg(server, nick, "End of help for admins");
+					sendPrivMsg(server, client, nick, "admins implemented by module " + moduleName);
+					sendPrivMsg(server, client, nick, "Lists logged-in bot administrators.");
+					sendPrivMsg(server, client, nick, "This command lists the nicks and servers of all online administrators.  This command takes no arguments.");
+					sendPrivMsg(server, client, nick, "End of help for admins");
 				} else {
 					dccMod->dccSend(server + "/" + nick, "admins implemented by module " + moduleName);
 					dccMod->dccSend(server + "/" + nick, "Lists logged-in bot administrators.");
@@ -455,10 +464,10 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			}
 			if (splitMsg[1] == "servers") {
 				if (dccMod == NULL) {
-					sendPrivMsg(server, nick, "servers implemented by module " + moduleName);
-					sendPrivMsg(server, nick, "Lists servers to which bot is connected.");
-					sendPrivMsg(server, nick, "This command lists all of the IRC servers to which this bot is connected.  This command takes no arguments.");
-					sendPrivMsg(server, nick, "End of help for servers");
+					sendPrivMsg(server, client, nick, "servers implemented by module " + moduleName);
+					sendPrivMsg(server, client, nick, "Lists servers to which bot is connected.");
+					sendPrivMsg(server, client, nick, "This command lists all of the IRC servers to which this bot is connected.  This command takes no arguments.");
+					sendPrivMsg(server, client, nick, "End of help for servers");
 				} else {
 					dccMod->dccSend(server + "/" + nick, "servers implemented by module " + moduleName);
 					dccMod->dccSend(server + "/" + nick, "Lists servers to which bot is connected.");
@@ -471,11 +480,11 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			if (comIter == botAdminCommands.end())
 				return;
 			if (dccMod == NULL) {
-				sendPrivMsg(server, nick, comIter->first + " implemented by module " + comIter->second[0]);
-				sendPrivMsg(server, nick, comIter->second[1]);
+				sendPrivMsg(server, client, nick, comIter->first + " implemented by module " + comIter->second[0]);
+				sendPrivMsg(server, client, nick, comIter->second[1]);
 				for (unsigned int i = 2; i < comIter->second.size(); i++)
-					sendPrivMsg(server, nick, comIter->second[i]);
-				sendPrivMsg(server, nick, "End of help for " + comIter->first);
+					sendPrivMsg(server, client, nick, comIter->second[i]);
+				sendPrivMsg(server, client, nick, "End of help for " + comIter->first);
 			} else {
 				dccMod->dccSend(server + "/" + nick, comIter->first + " implemented by module " + comIter->second[0]);
 				dccMod->dccSend(server + "/" + nick, comIter->second[1]);
@@ -486,12 +495,12 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 		}
 	} else if (splitMsg[0] == "admins") {
 		if (dccMod == NULL) {
-			sendPrivMsg(server, nick, "Online Bot Administrators");
+			sendPrivMsg(server, client, nick, "Online Bot Administrators");
 			for (unsigned int i = 0; i < admins.size(); i++) {
 				if (loggedIn[i])
-					sendPrivMsg(server, nick, admins[i]["nick"] + ", using server " + admins[i]["server"]);
+					sendPrivMsg(server, client, nick, admins[i]["nick"] + ", using server " + admins[i]["server"]);
 			}
-			sendPrivMsg(server, nick, "End of online admin list.");
+			sendPrivMsg(server, client, nick, "End of online admin list.");
 		} else {
 			dccMod->dccSend(server + "/" + nick, "Online Bot Administrators");
 			for (unsigned int i = 0; i < admins.size(); i++) {
@@ -503,10 +512,10 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 	} else if (splitMsg[0] == "servers") {
 		std::list<std::string> serverList = servers();
 		if (dccMod == NULL) {
-			sendPrivMsg(server, nick, "Connected Servers");
+			sendPrivMsg(server, client, nick, "Connected Servers");
 			for (std::list<std::string>::iterator servIter = serverList.begin(); servIter != serverList.end(); ++servIter)
-				sendPrivMsg(server, nick, *servIter);
-			sendPrivMsg(server, nick, "End of server list.");
+				sendPrivMsg(server, client, nick, *servIter);
+			sendPrivMsg(server, client, nick, "End of server list.");
 		} else {
 			dccMod->dccSend(server + "/" + nick, "Connected Servers");
 			for (std::list<std::string>::iterator servIter = serverList.begin(); servIter != serverList.end(); ++servIter)
@@ -519,7 +528,7 @@ void Admin::handleDCCMessage(std::string server, std::string nick, std::string m
 			return;
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules().find(comIter->second[0]);
 		AdminHook* adminCommandModule = (AdminHook*) modIter->second;
-		adminCommandModule->onAdminCommand(server, nick, splitMsg[0], (message.size() > splitMsg[0].size()) ? message.substr(splitMsg[0].size() + 1) : "", dccMod, (server == admins[0]["server"] && nick == admins[0]["nick"]));
+		adminCommandModule->onAdminCommand(server, client, nick, splitMsg[0], (message.size() > splitMsg[0].size()) ? message.substr(splitMsg[0].size() + 1) : "", dccMod, (server == admins[0]["server"] && nick == admins[0]["nick"]));
 	}
 }
 
