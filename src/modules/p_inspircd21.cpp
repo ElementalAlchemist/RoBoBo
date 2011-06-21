@@ -392,11 +392,8 @@ void InspIRCd::connectServer() {
 		clientOper << i << "/oper";
 		clientChannels << i << "/channels";
 	}
-	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter) {
-		std::ostringstream currTime; // do it like this in case the second changed in the middle or something so that the correct timestamp is still sent
-		currTime << chans.find(jcIter->first)->second->creationTime();
+	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter)
 		joinUsers(jcIter->first, jcIter->second);
-	}
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
 }
 
