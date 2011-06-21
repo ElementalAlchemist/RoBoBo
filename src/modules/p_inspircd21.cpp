@@ -870,6 +870,7 @@ void InspIRCd::removeClient(std::string client, std::string reason) {
 	if (ourClients.find(client) == ourClients.end())
 		return;
 	ourClients.erase(ourClients.find(client));
+	callQuitHook(client);
 	std::tr1::unordered_map<std::pair, User*>::iterator userIter = users.find(client);
 	std::set<std::string> userChannels = userIter->second->channels();
 	for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
@@ -878,7 +879,6 @@ void InspIRCd::removeClient(std::string client, std::string reason) {
 	delete userIter->second;
 	users.erase(userIter);
 	connection->sendData(":" + client + " QUIT :" + reason);
-	callQuitHook(client, reason);
 }
 
 std::set<std::string> InspIRCd::clients() {
