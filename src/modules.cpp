@@ -206,6 +206,18 @@ void Module::removeClient(std::string server, std::string client, std::string re
 	serverData->removeClient(server, client, reason);
 }
 
+std::set<std::string> Module::clients(std::string server) {
+	return serverData->clients(server);
+}
+
+std::tr1::unordered_map<std::string, std::string> Module::clientInfo(std::string server, std::string client) {
+	return serverData->clientInfo(server, client);
+}
+
+std::list<std::string> Module::userModes(std::string server, std::string client) {
+	return serverData->userModes(server, client);
+}
+
 bool Module::connectServer(std::string server) {
 	return serverData->connectServer(server);
 }

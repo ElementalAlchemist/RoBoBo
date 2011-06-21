@@ -79,6 +79,9 @@ class Base {
 		void sendOther(std::string server, std::string rawLine);
 		std::string addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
 		void removeClient(std::string server, std::string client, std::string reason);
+		std::set<std::string> clients(std::string server);
+		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string server, std::string client);
+		std::list<std::string> userModes(std::string server, std::string client);
 		bool isChanType(char chanPrefix, std::string server);
 		std::tr1::unordered_map<std::string, Module*> loadedModules();
 		std::list<std::string> serverList();

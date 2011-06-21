@@ -808,15 +808,38 @@ void Base::sendOther(std::string server, std::string rawLine) {
 }
 
 std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
-	if (servers.find(server) == servers.end())
-		return;
-	return servers.find(server)->second->addClient(nick, ident, host, gecos);
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->addClient(nick, ident, host, gecos);
 }
 
 void Base::removeClient(std::string server, std::string client, std::string reason) {
-	if (servers.find(server) == servers.end())
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
 		return;
-	servers.find(server)->second->removeClient(client, reason);
+	servIter->second->removeClient(client, reason);
+}
+
+std::set<std::string> Base::clients(std::string server) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::set<std::string> ();
+	return servIter->second->clients();
+}
+
+std::tr1::unordered_map<std::string, std::string> Base::clientInfo(std::string server, std::string client) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::tr1::unordered_map<std::string, std::string> ();
+	return servIter->second->clientInfo(client);
+}
+
+std::list<std::string> Base::userModes(std::string server, std::string client) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->userModes(client);
 }
 
 bool Base::isChanType(char chanPrefix, std::string server) {
