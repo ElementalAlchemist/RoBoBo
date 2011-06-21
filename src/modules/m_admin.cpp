@@ -5,6 +5,7 @@
 class Admin : public AdminMod {
 	public:
 		int botAPIversion();
+		Priority receivePriority();
 		bool onLoadComplete();
 		void onRehash();
 		void onModuleChange();
@@ -47,6 +48,10 @@ class Admin : public AdminMod {
 
 int Admin::botAPIversion() {
 	return 2000;
+}
+
+Priority Admin::receivePriority() {
+	return PRI_HIGH; // Ensure that admin module gets messages as necessary; e.g. prevent bot admins ignoring themselves from being able to do anything.
 }
 
 bool Admin::onLoadComplete() {
