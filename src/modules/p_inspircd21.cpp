@@ -499,6 +499,9 @@ void InspIRCd::sendMsg(std::string client, std::string target, std::string messa
 				return;
 		}
 	} else {
+		if (nicks.find(target) == nicks.end())
+			return;
+		target = nicks.find(target)->second;
 		if (message[0] == (char)1) {
 			ctcp = true;
 			message.substr(1);
@@ -554,6 +557,9 @@ void InspIRCd::sendNotice(std::string client, std::string target, std::string me
 				return;
 		}
 	} else {
+		if (nicks.find(target) == nicks.end())
+			return;
+		target = nicks.find(target)->second;
 		if (message[0] == (char)1) {
 			ctcp = true;
 			message = message.substr(1);
