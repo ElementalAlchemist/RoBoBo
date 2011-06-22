@@ -18,3 +18,5 @@ bool Socket::isConnected() { return connected; }
 bool Socket::sendData(std::string message) { return false; }
 
 std::string Socket::receive() { return ""; }
+
+void Socket::connectServer(std::string address, unsigned short port) {}
