@@ -209,15 +209,18 @@ void User::removeSnomask(char snomask) {
 }
 
 std::set<std::string> User::channels() {
-	return inChannels;
+	std::set<std::string> chanList;
+	for (std::tr1::unordered_map<std::string, std::set<std::string> >::iterator chanIter = inChannels.begin(); chanIter != inChannels.end(); ++chanIter)
+		chanList.insert(chanIter->first);
+	return chanList;
 }
 
 void User::joinChannel(std::string channel) {
-	inChannels.insert(std::pair<std::string, std::set<std::string> (channel, std::set<std::string> ()));
+	inChannels.insert(std::pair<std::string, std::set<std::string> > (channel, std::set<std::string> ()));
 }
 
 void User::partChannel(std::string channel) {
-	std::set<std::string>::iterator chanIter = inChannels.find(channel);
+	std::tr1::unordered_map<std::string, std::set<std::string> >::iterator chanIter = inChannels.find(channel);
 	if (chanIter != inChannels.end())
 		inChannels.erase(chanIter);
 }
