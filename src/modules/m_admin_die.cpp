@@ -57,9 +57,6 @@ void DieCommand::onModuleChange() {
 }
 
 std::string DieCommand::description() {
-	std::string desc = "Allows ";
-	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
-	desc += " to shut the bot down from IRC.";
 	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to shut the bot down from IRC.";
 }
 
