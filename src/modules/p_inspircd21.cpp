@@ -1169,7 +1169,7 @@ void InspIRCd::receiveData() {
 						callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[parameter]);
 						longmode += "=" + parsedLine[parameter];
 					} else
-						callChannelJoinPreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
+						callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
 					if (adding)
 						chanIter->second->addMode(longmode, list);
 					else
@@ -1245,6 +1245,70 @@ void InspIRCd::receiveData() {
 			users.find(parsedLine[0].substr(1))->second->gecos(parsedLine[2]);
 			if (ourClients.find(parsedLine[0].substr(1)) != ourClients.end())
 				callOtherDataHook(parsedLine[0].substr(1), parsedLine);
+		} else if (parsedLine[1] == "PRIVMSG") {
+			std::string nickFrom = users.find(parsedLine[0].substr(1))->second->nick();
+			if (parsedLine[2][0] == '#' || parsedLine[2][1] == '#') {
+				char status = ' ';
+				if (parsedLine[2][0] != '#') {
+					status = parsedLine[2][0];
+					parsedLine[2] = parsedLine[2].substr(1);
+				}
+				std::set<std::string> chanUsers = chans.find(parsedLine[2])->second->users();
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
+						if (ourClients.find(*userIter) != ourClients.end())
+							callChannelCTCPHook(*userIter, parsedLine[2], status, nickFrom, parsedLine[3]);
+					}
+				} else {
+					for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
+						if (ourClients.find(*userIter) != ourClients.end())
+							callChanMsgHook(*userIter, parsedLine[2], status, nickFrom, parsedLine[3]);
+					}
+				}
+			} else {
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					callUserCTCPHook(parsedLine[2], nickFrom, parsedLine[3]);
+				} else
+					callUserMsgHook(parsedLine[2], nickFrom, parsedLine[3]);
+			}
+		} else if (parsedLine[1] == "NOTICE") {
+			std::string nickFrom = users.find(parsedLine[0].substr(1))->second->nick();
+			if (parsedLine[2][0] == '#' || parsedLine[2][1] == '#') {
+				char status = ' ';
+				if (parsedLine[2][0] != '#') {
+					status = parsedLine[2][0];
+					parsedLine[2] = parsedLine[2].substr(1);
+				}
+				std::set<std::string> chanUsers = chans.find(parsedLine[2])->second->users();
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
+						if (ourClients.find(*userIter) != ourClients.end())
+							callChannelCTCPReplyHook(*userIter, parsedLine[2], status, nickFrom, parsedLine[3]);
+					}
+				} else {
+					for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
+						if (ourClients.find(*userIter) != ourClients.end())
+							callChanNoticeHook(*userIter, parsedLine[2], status, nickFrom, parsedLine[3]);
+					}
+				}
+			} else {
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					callUserCTCPReplyHook(parsedLine[2], nickFrom, parsedLine[3]);
+				} else
+					callUserNoticeHook(parsedLine[2], nickFrom, parsedLine[3]);
+			}
 		} else if (parsedLine[1] == "NICK") {
 			std::string uuid = parsedLine[0].substr(1); // strip starting colon
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
@@ -1266,18 +1330,36 @@ void InspIRCd::receiveData() {
 			chans.find(parsedLine[2])->second->partUser(uuid);
 			userIter->second->partChannel(parsedLine[2]);
 			callChannelPartPostHook(parsedLine[2], hostmask, parsedLine[3]);
+		} else if (parsedLine[1] == "KICK") {
+			std::string kicker = parsedLine[0].substr(1);
+			std::string kickeeNick = users.find(parsedLine[3])->second->nick();
+			callChannelKickPreHook(parsedLine[2], kicker, kickeeNick, parsedLine[4]);
+			chans.find(parsedLine[2])->second->partUser(parsedLine[3]);
+			users.find(parsedLine[3])->second->partChannel(parsedLine[2]);
+			callChannelKickPostHook(parsedLine[2], kicker, kickeeNick, parsedLine[4]);
 		} else if (parsedLine[1] == "QUIT") { // QUIT not valid from remote servers for local clients, so no need to check for that.
 			std::string uuid = parsedLine[0].substr(1); // strip starting colon
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
 			std::string hostmask = userIter->second->hostmask();
 			callUserQuitPreHook(hostmask, parsedLine[2]);
 			std::set<std::string> userChannels = userIter->second->channels();
-			for (std::set<std::string> chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
+			for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
 				channels.find(*chanIter)->second->partUser(uuid);
 			nicks.erase(nicks.find(userIter->second->nick()));
 			delete userIter->second;
 			users.erase(userIter);
 			callUserQuitPostHook(hostmask, parsedLine[2]);
+		} else if (parsedLine[1] == "KILL" && ourClients.find(parsedLine[2]) != ourClients.end()) {
+			std::string uuid = parsedLine[2];
+			callQuitHook(uuid);
+			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
+			std::set<std::string> userChannels = userIter->second->channels();
+			for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
+				channels.find(*chanIter)->second->partUser(uuid);
+			nicks.erase(nicks.find(userIter->second->nick()));
+			delete userIter->second;
+			users.erase(userIter);
+			ourClients.erase(uuid);
 		} else if (parsedLine[1] == "TIME" && parsedLine[2] == serverConf["sid"] && parsedLine.size() == 4) { // don't reply if for some reason we're getting a TIME reply. That would be stupid, and you would be stupid for doing it.
 			std::ostringstream currTime;
 			currTime << time(NULL);
