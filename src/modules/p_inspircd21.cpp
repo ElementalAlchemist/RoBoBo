@@ -34,7 +34,7 @@ class User {
 		std::string seeMetadata(std::string key);
 	private:
 		std::string userNick, userIdent, userHost, GECOS, oper;
-		time_t nickTime;
+		time_t nickChgTime;
 		std::set<std::string> userModes;
 		std::set<char> SNOMasks;
 		std::tr1::unordered_map<std::string, std::string> metadata;
@@ -126,7 +126,7 @@ class InspIRCd : public Protocol {
 		std::string useUID();
 };
 
-User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), nickTime(theConnectTime) {}
+User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), nickChgTime(theConnectTime) {}
 
 std::string User::nick() {
 	return userNick;
@@ -165,11 +165,11 @@ std::string User::hostmask() {
 }
 
 time_t User::nickTime() {
-	return nickTime;
+	return nickChgTime;
 }
 
 void User::updateTime(time_t time) {
-	nickTime = time;
+	nickChgTime = time;
 }
 
 std::string User::opertype() {
