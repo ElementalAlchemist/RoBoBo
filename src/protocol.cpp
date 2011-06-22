@@ -46,7 +46,7 @@ void Protocol::setMode(std::string client, std::string target, std::string mode)
 void Protocol::removeMode(std::string client, std::string target, std::string mode) {}
 void Protocol::joinChannel(std::string client, std::string channel, std::string key) {}
 void Protocol::partChannel(std::string client, std::string channel, std::string reason) {}
-void Protocol::quitServer(std::string client, std::string reason) {}
+void Protocol::quitServer(std::string reason) {}
 void Protocol::kickUser(std::string client, std::string channel, std::string user, std::string reason) {}
 void Protocol::changeNick(std::string client, std::string newNick) {}
 void Protocol::oper(std::string client, std::string username, std::string password) {}
