@@ -854,6 +854,8 @@ void InspIRCd::sendOther(std::string rawLine) {
 
 std::string InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
 	std::string uuid = serverConf["sid"] + useUID();
+	if (nicks.find(nick) != nicks.end())
+		nick = uuid; // Properly implement uuid as an alt nick.
 	users.insert(std::pair<std::string, User*> (uuid, new User (nick, ident, host, gecos, time(NULL))));
 	nicks.insert(std::pair<std::string, std::string> (nick, uuid));
 	ourClients.insert(uuid);
