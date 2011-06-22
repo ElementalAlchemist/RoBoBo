@@ -69,7 +69,7 @@ class InspIRCd : public Protocol {
 	public:
 		InspIRCd(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debug);
 		~InspIRCd();
-		unsigned int apiVersion() = 0;
+		unsigned int apiVersion();
 		void connectServer();
 		std::list<std::pair<std::string, char> > prefixes();
 		std::set<char> channelTypes();
