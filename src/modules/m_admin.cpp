@@ -47,7 +47,7 @@ class Admin : public AdminMod {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > botAdminCommands;
 };
 
-Admin::Admin(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
+Admin::Admin(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : AdminMod(modConf, modFace, modName, dir, debug) {}
 
 int Admin::botAPIversion() {
 	return 2000;

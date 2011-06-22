@@ -2,6 +2,7 @@
 
 class AdminHook : public dccChat {
 	public:
+		AdminHook(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~AdminHook();
 		virtual std::vector<std::vector<std::string> > adminCommands();
 		virtual void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
@@ -9,9 +10,12 @@ class AdminHook : public dccChat {
 
 class AdminMod : public dccChat {
 	public:
+		AdminMod(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~AdminMod();
 		virtual void sendVerbose(int verboseLevel, std::string message);
 };
+
+AdminHook::AdminHook(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : dccChat(modConf, modFace, modName, dir, debug) {}
 
 AdminHook::~AdminHook() {}
 
@@ -55,6 +59,8 @@ The parameters are provided as follows:
 	If the command is not given to the admin via DCC, the dccMod pointer will be NULL.
 - master: Whether a bot master sent the command.  If true, the bot master sent the command.  If false, an admin who is not the bot master sent it.
 */
+
+AdminMod::AdminMod(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : dccChat(modConf, modFace, modName, dir, debug) {}
 
 AdminMod::~AdminMod() {}
 

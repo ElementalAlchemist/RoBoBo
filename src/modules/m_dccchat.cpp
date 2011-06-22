@@ -33,7 +33,7 @@ class DCCChatModule : public dccSender {
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
 
-DCCChatModule::DCCChatModule(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
+DCCChatModule::DCCChatModule(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : dccSender(modConf, modFace, modName, dir, debug) {}
 
 int DCCChatModule::botAPIversion() {
 	return 2000;

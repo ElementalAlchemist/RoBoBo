@@ -14,7 +14,7 @@ class ConnectServerCommand : public AdminHook {
 		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
-ConnectServerCommand::ConnectServerCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, short unsigned int debug): Module(modConf, modFace, modName, dir, debug) {}
+ConnectServerCommand::ConnectServerCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, short unsigned int debug): AdminHook(modConf, modFace, modName, dir, debug) {}
 
 int ConnectServerCommand::botAPIversion() {
 	return 2000;

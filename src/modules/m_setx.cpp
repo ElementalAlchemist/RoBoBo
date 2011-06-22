@@ -12,7 +12,7 @@ class SetX : public Module {
 		std::vector<std::string> xServers;
 };
 
-SetX::SetX(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug);
+SetX::SetX(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int SetX::botAPIversion() {
 	return 2000;

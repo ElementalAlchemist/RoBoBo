@@ -3,14 +3,14 @@
 
 class GlobMatcher : public PatternMatcher {
 	public:
-		GlobPatternMatcher(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug);
+		GlobMatcher(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug);
 		int botAPIversion();
 		std::string description();
 		std::vector<std::string> abilities();
 		bool match(std::string target, std::string pattern);
 };
 
-GlobMatcher::GlobPatternMatcher(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) : Module(modConf, modFace, modName, debug) {}
+GlobMatcher::GlobMatcher(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, unsigned short debug) : PatternMatcher(modConf, modFace, modName, debug) {}
 
 int GlobMatcher::botAPIversion() {
 	return 2000;
