@@ -32,7 +32,7 @@ bool Module::onChannelCTCPReply(std::string server, std::string client, std::str
 
 bool Module::onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message) { return true; }
 
-void Module::onChannelJoinPre(std::string server, std::string client, std::string channel, std::string hostmask) {}
+void Module::onChannelJoinPre(std::string server, std::string channel, std::string hostmask) {}
 
 void Module::onChannelJoinPost(std::string server, std::string channel, std::string hostmask) {}
 
