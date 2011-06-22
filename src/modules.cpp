@@ -214,10 +214,6 @@ std::tr1::unordered_map<std::string, std::string> Module::clientInfo(std::string
 	return serverData->clientInfo(server, client);
 }
 
-std::list<std::string> Module::userModes(std::string server, std::string client) {
-	return serverData->userModes(server, client);
-}
-
 bool Module::connectServer(std::string server) {
 	return serverData->connectServer(server);
 }

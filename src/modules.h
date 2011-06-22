@@ -95,7 +95,6 @@ class Module {
 		void removeClient(std::string server, std::string client, std::string reason = "");
 		std::set<std::string> clients(std::string server);
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string server, std::string client);
-		std::list<std::string> userModes(std::string server, std::string client);
 		bool connectServer(std::string server);
 		void quitServer(std::string server, std::string reason = "");
 		bool loadModule(std::string modName);
