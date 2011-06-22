@@ -65,7 +65,7 @@ void Protocol::sendOther(std::string rawLine) {}
 
 std::string Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) { return ""; }
 void Protocol::removeClient(std::string client, std::string reason) {}
-std::set<std::string> Protocol::clients() { return std::list<std::string> (); }
+std::set<std::string> Protocol::clients() { return std::set<std::string> (); }
 std::tr1::unordered_map<std::string, std::string> Protocol::clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
 std::list<std::string> Protocol::userModes(std::string client) { return std::list<std::string> (); }
 
