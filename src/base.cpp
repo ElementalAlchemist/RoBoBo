@@ -46,14 +46,14 @@ std::tr1::unordered_map<std::string, std::string> Base::serverData(std::string s
 	return serverIter->second->info();
 }
 
-std::vector<std::vector<char> > Base::serverChanModes(std::string server) {
+std::vector<std::vector<std::string> > Base::serverChanModes(std::string server) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::vector<std::vector<char> > (); // Empty structure for whoever can't check the server list for real servers
 	return serverIter->second->channelModes();
 }
 
-std::list<std::pair<char, char> > Base::serverPrefixes(std::string server) {
+std::list<std::pair<std::string, char> > Base::serverPrefixes(std::string server) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
 		return std::list<std::pair<char, char> > ();
@@ -493,7 +493,7 @@ std::string Base::callChannelMessageOutHook(std::string server, std::string clie
 	return message;
 }
 
-void Base::callChannelMessageSendHook(std::string server, std::string client, std::string target, char status, stdd::string message) {
+void Base::callChannelMessageSendHook(std::string server, std::string client, std::string target, char status, std::string message) {
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
 		modIter->second->onChannelMessageSend(server, client, target, status, message);
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = mediumHighModules.begin(); modIter != mediumHighModules.end(); ++modIter)
@@ -762,7 +762,7 @@ void Base::oper(std::string server, std::string client, std::string username, st
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->oper(client, username, password, opertype);
+	servIter->second->oper(client, username, password);
 }
 
 void Base::killUser(std::string server, std::string client, std::string user, std::string reason) {
@@ -835,22 +835,11 @@ std::tr1::unordered_map<std::string, std::string> Base::clientInfo(std::string s
 	return servIter->second->clientInfo(client);
 }
 
-std::list<std::string> Base::userModes(std::string server, std::string client) {
-	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return std::list<std::string> ();
-	return servIter->second->userModes(client);
-}
-
 bool Base::isChanType(char chanPrefix, std::string server) {
 	if (servers.find(server) == servers.end())
 		return false;
-	std::vector<char> prefixes = servers.find(server)->second->channelTypes();
-	for (unsigned int i = 0; i < prefixes.size(); i++) {
-		if (chanPrefix == prefixes[i])
-			return true;
-	}
-	return false;
+	std::set<char> prefixes = servers.find(server)->second->channelTypes();
+	return prefixes.find(chanPrefix) != prefixes.end();
 }
 
 std::list<std::string> Base::serverList() {
@@ -923,6 +912,13 @@ std::string Base::userHost(std::string server, std::string user) {
 	if (servIter == servers.end())
 		return "";
 	return servIter->second->userHost(user);
+}
+
+std::list<std::string> Base::userModes(std::string server, std::string user) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->userModes(user);
 }
 
 std::pair<std::string, char> Base::userStatus(std::string server, std::string channel, std::string user) {

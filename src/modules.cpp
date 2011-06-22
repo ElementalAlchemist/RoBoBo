@@ -319,11 +319,11 @@ std::tr1::unordered_map<std::string, std::string> Module::serverInfo(std::string
 	return serverData->serverData(server);
 }
 
-std::vector<std::vector<char> > Module::serverChanModes(std::string server) {
+std::vector<std::vector<std::string> > Module::serverChanModes(std::string server) {
 	return serverData->serverChanModes(server);
 }
 
-std::list<std::pair<char, char> > Module::serverPrefixes(std::string server) {
+std::list<std::pair<std::string, char> > Module::serverPrefixes(std::string server) {
 	return serverData->serverPrefixes(server);
 }
 
