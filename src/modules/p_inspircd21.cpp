@@ -99,7 +99,7 @@ class InspIRCd : public Protocol {
 		void sendOther(std::string rawLine);
 		std::string addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		void removeClient(std::string client, std::string reason);
-		std::list<std::string> clients();
+		std::set<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		std::list<std::string> userModes(std::string client);
 	private:
