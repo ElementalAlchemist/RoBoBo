@@ -55,8 +55,8 @@ void Protocol::killUser(std::string client, std::string user, std::string reason
 void Protocol::setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {}
 void Protocol::removeXLine(std::string client, char lineType, std::string hostmask) {}
 
-std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > Protocol::listXLines() {
-	return std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > ();
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > Protocol::listXLines() {
+	return std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > ();
 }
 
 void Protocol::sendSNotice(char snomask, std::string text) {}

@@ -39,7 +39,7 @@ class Protocol {
 		virtual void killUser(std::string client, std::string user, std::string reason);
 		virtual void setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
 		virtual void removeXLine(std::string client, char lineType, std::string hostmask);
-		virtual std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > listXLines(); // unordered_map { line type => unordered_map { hostmask => time to expiry } }
+		virtual std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > listXLines(); // unordered_map { line type => unordered_map { hostmask => time to expiry } }
 		virtual void sendSNotice(char snomask, std::string text);
 		
 		virtual void sendOther(std::string rawLine);

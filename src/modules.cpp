@@ -178,7 +178,7 @@ void Module::removeXLine(std::string server, std::string client, char lineType, 
 	serverData->removeXLine(server, client, lineType, hostmask);
 }
 
-std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > Module::listXLines(std::string server) {
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > Module::listXLines(std::string server) {
 	return serverData->listXLines(server);
 }
 
