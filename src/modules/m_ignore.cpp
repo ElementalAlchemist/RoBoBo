@@ -4,6 +4,7 @@
 
 class Ignore : public AdminHook {
 	public:
+		Ignore(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		Priority receivePriority();
 		bool onLoadComplete();
@@ -28,6 +29,8 @@ class Ignore : public AdminHook {
 		PatternMatcher* globMatcher;
 		bool ignoreUser();
 };
+
+Ignore::Ignore(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int Ignore::botAPIversion() {
 	return 2000;
