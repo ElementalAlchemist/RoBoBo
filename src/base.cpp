@@ -49,14 +49,14 @@ std::tr1::unordered_map<std::string, std::string> Base::serverData(std::string s
 std::vector<std::vector<std::string> > Base::serverChanModes(std::string server) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
-		return std::vector<std::vector<char> > (); // Empty structure for whoever can't check the server list for real servers
+		return std::vector<std::vector<std::string> > (); // Empty structure for whoever can't check the server list for real servers
 	return serverIter->second->channelModes();
 }
 
 std::list<std::pair<std::string, char> > Base::serverPrefixes(std::string server) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
 	if (serverIter == servers.end())
-		return std::list<std::pair<char, char> > ();
+		return std::list<std::pair<std::string, char> > ();
 	return serverIter->second->prefixes();
 }
 
@@ -924,7 +924,7 @@ std::list<std::string> Base::userModes(std::string server, std::string user) {
 std::pair<std::string, char> Base::userStatus(std::string server, std::string channel, std::string user) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::pair<char, char> ("", ' '); // pair for normal user
+		return std::pair<std::string, char> ("", ' '); // pair for normal user
 	return servIter->second->userStatus(channel, user);
 }
 
