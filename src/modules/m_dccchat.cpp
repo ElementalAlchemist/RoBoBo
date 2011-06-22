@@ -14,7 +14,7 @@ class DCCChatModule : public dccSender {
 	public:
 		int botAPIversion();
 		void onNickChangePre(std::string server, std::string oldNick, std::string newNick);
-		bool onUserCTCP(std::string server, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
 		std::vector<std::string> getConnections();
 		void dccSend(std::string recipient, std::string message);
 		std::vector<std::string> abilities();
@@ -45,13 +45,13 @@ void DCCChatModule::onNickChangePre(std::string server, std::string oldNick, std
 	}
 }
 
-void DCCChatModule::onUserCTCP(std::string server, std::string nick, std::string message) {
+void DCCChatModule::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
 	std::vector<std::string> messageParts = splitBySpace(message);
 	if (messageParts[0] == "DCC" && messageParts[1] == "CHAT" && messageParts[2] == "chat") {
 		if (activeConnections.find(server + "/" + nick) == activeConnections.end())
 			dccConnect(server, nick, messageParts[3], messageParts[4]);
 		else
-			sendNotice(server, nick, "You already have an active DCC chat session!");
+			sendNotice(server, client, nick, "You already have an active DCC chat session!");
 	}
 }
 

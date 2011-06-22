@@ -39,12 +39,14 @@ The strings should appear in the inner vector in that order.  Vectors added to t
 be added in any order.
 */
 
-void AdminHook::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {}
-/* onAdminCommand(std::string, std::string, std::string, std::string, dccSender*, bool)
+void AdminHook::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {}
+/* onAdminCommand(std::string, std::string, std::string, std::string, std::string, dccSender*, bool)
 This function is called by the admin module whenever a command that you told the admin module in adminCommands() to activate on is given
 by a bot admin.
 The parameters are provided as follows:
 - server: the server (as known by the bot) to which the user sending the command is connected
+- client: the client to which the admin command was sent.  This is only relevant if DCC is disabled as the DCC chat module doesn't care about
+	specific local clients to a server.
 - nick: the nick the user sending the command is using
 - command: the command given (you won't need to check this if you only gave one command in adminCommands())
 - message: All of the parameters given to the command (i.e. the entire message starting immediately after the space after the command)

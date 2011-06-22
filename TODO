@@ -44,7 +44,7 @@ Current TODO List
 	[x] - base
 	[x] - p_client
 	[>] - p_inspircd21
-[ ] - Make sure all modules follow updated API
+[x] - Make sure all modules follow updated API
 [ ] - Update example conf
 
 2.0 Beta 1

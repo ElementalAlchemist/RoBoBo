@@ -9,16 +9,16 @@ class Ignore : public AdminHook {
 		bool onLoadComplete();
 		void onRehash();
 		void onModuleChange();
-		bool onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserMsg(std::string server, std::string nick, std::string message);
-		bool onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserNotice(std::string server, std::string nick, std::string message);
-		bool onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserAction(std::string server, std::string nick, std::string message);
-		bool onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserCTCP(std::string server, std::string nick, std::string message);
-		bool onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message);
-		bool onUserCTCPReply(std::string server, std::string nick, std::string message);
+		bool onChannelMsg(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserMsg(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelNotice(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserNotice(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelAction(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserAction(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
+		bool onChannelCTCPReply(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message);
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands;
@@ -41,6 +41,7 @@ bool Ignore::onLoadComplete() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("PATTERN_GLOB") == moduleAbilities.end()) {
 		std::cout << "The ignore module requires a glob pattern matching module to be loaded.  Unloading " << moduleName << "..." << std::endl;
+		unloadModule();
 		return false;
 	}
 	globMatcher = modules().find(moduleAbilities.find("PATTERN_GLOB")->second)->second;
@@ -72,13 +73,13 @@ void Ignore::onRehash() {
 void Ignore::onModuleChange() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("PATTERN_GLOB") == moduleAbilities.end()) {
-		unloadModule(moduleName);
+		unloadModule();
 		return;
 	}
 	globMatcher = modules().find(moduleAbilities.find("PATTERN_GLOB")->second)->second;
 }
 
-bool Ignore::onChannelMsg(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Ignore::onChannelMsg(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -87,7 +88,7 @@ bool Ignore::onChannelMsg(std::string server, std::string channel, char target, 
 	return true;
 }
 
-bool Ignore::onUserMsg(std::string server, std::string nick, std::string message) {
+bool Ignore::onUserMsg(std::string server, std::string client, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -96,7 +97,7 @@ bool Ignore::onUserMsg(std::string server, std::string nick, std::string message
 	return true;
 }
 
-bool Ignore::onChannelNotice(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Ignore::onChannelNotice(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -105,7 +106,7 @@ bool Ignore::onChannelNotice(std::string server, std::string channel, char targe
 	return true;
 }
 
-bool Ignore::onUserNotice(std::string server, std::string nick, std::string message) {
+bool Ignore::onUserNotice(std::string server, std::string client, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -114,7 +115,7 @@ bool Ignore::onUserNotice(std::string server, std::string nick, std::string mess
 	return true;
 }
 
-bool Ignore::onChannelAction(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Ignore::onChannelAction(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -123,7 +124,7 @@ bool Ignore::onChannelAction(std::string server, std::string channel, char targe
 	return true;
 }
 
-bool Ignore::onUserAction(std::string server, std::string nick, std::string message) {
+bool Ignore::onUserAction(std::string server, std::string client, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -132,7 +133,7 @@ bool Ignore::onUserAction(std::string server, std::string nick, std::string mess
 	return true;
 }
 
-bool Ignore::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Ignore::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -141,7 +142,7 @@ bool Ignore::onChannelCTCP(std::string server, std::string channel, char target,
 	return true;
 }
 
-bool Ignore::onUserCTCP(std::string server, std::string nick, std::string message) {
+bool Ignore::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -150,7 +151,7 @@ bool Ignore::onUserCTCP(std::string server, std::string nick, std::string messag
 	return true;
 }
 
-bool Ignore::onChannelCTCPReply(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool Ignore::onChannelCTCPReply(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -159,7 +160,7 @@ bool Ignore::onChannelCTCPReply(std::string server, std::string channel, char ta
 	return true;
 }
 
-bool Ignore::onUserCTCPReply(std::string server, std::string nick, std::string message) {
+bool Ignore::onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message) {
 	std::string hostmask = nick + "!" + userIdent(server, nick) + "@" + userHost(server, nick);
 	for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter) {
 		if (globMatcher->match(hostmask, *blockIter))
@@ -203,11 +204,11 @@ std::vector<std::vector<std::string> > Ignore::adminCommands() {
 	return theCommands;
 }
 
-void Ignore::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void Ignore::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (command == "ignore") {
 		if (message == "") {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "You didn't enter a hostmask to ignore.");
+				sendPrivMsg(server, client, nick, "You didn't enter a hostmask to ignore.");
 			else
 				dccMod->dccSend(server + "/" + nick, "You didn't enter a hostmask to ignore.");
 			return;
@@ -216,7 +217,7 @@ void Ignore::onAdminCommand(std::string server, std::string nick, std::string co
 			message = message.substr(0, message.find_first_of(' '));
 		blockedHostmasks.push_back(message);
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "Added hostmask " + message + " to ignore list.");
+			sendPrivMsg(server, client, nick, "Added hostmask " + message + " to ignore list.");
 		else
 			dccMod->dccSend(server + "/" + nick, "Added hostmask " + message + " to ignore list.");
 		return;
@@ -224,7 +225,7 @@ void Ignore::onAdminCommand(std::string server, std::string nick, std::string co
 	if (command == "unignore") {
 		if (message == "") {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "You didn't enter a hostmask to unignore.");
+				sendPrivMsg(server, client, nick, "You didn't enter a hostmask to unignore.");
 			else
 				dccMod->dccSend(server + "/" + nick, "You didn't enter a hostmask to unignore.");
 			return;
@@ -235,23 +236,23 @@ void Ignore::onAdminCommand(std::string server, std::string nick, std::string co
 			if (*blockIter == message) {
 				blockedHostmasks.erase(blockIter);
 				if (dccMod == NULL)
-					sendPrivMsg(server, nick, "Hostmask " + message + " is no longer ignored.");
+					sendPrivMsg(server, client, nick, "Hostmask " + message + " is no longer ignored.");
 				else
 					dccMod->dccSend(server + "/" + nick, "Hostmask " + message + " is no longer ignored.");
 				return;
 			}
 		}
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "Hostmask " + message + " was not ignored.");
+			sendPrivMsg(server, client, nick, "Hostmask " + message + " was not ignored.");
 		else
 			dccMod->dccSend(server + "/" + nick, "Hostmask " + message + " was not ignored.");
 		return;
 	} // command == "ignorelist"
 	if (dccMod == NULL) {
-		sendPrivMsg(server, nick, "Ignore list:");
+		sendPrivMsg(server, client, nick, "Ignore list:");
 		for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter)
-			sendPrivMsg(server, nick, *blockIter);
-		sendPrivMsg(server, nick, "End of ignore list.");
+			sendPrivMsg(server, client, nick, *blockIter);
+		sendPrivMsg(server, client, nick, "End of ignore list.");
 	} else {
 		dccMod->dccSend(server + "/" + nick, "Ignore list:");
 		for (std::list<std::string>::iterator blockIter = blockedHostmasks.begin(); blockIter != blockedHostmasks.end(); ++blockIter)

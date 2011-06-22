@@ -5,7 +5,7 @@ class SetX : public Module {
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
-		void onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine);
+		void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
 		std::string description();
 	private:
 		std::vector<std::string> xServers;
@@ -32,7 +32,7 @@ void SetX::onRehash() {
 	onLoadComplete();
 }
 
-void SetX::onNumeric(std::string server, std::string numeric, std::vector<std::string> parsedLine) {
+void SetX::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
 	if (numeric != "001")
 		return;
 	for (unsigned int i = 0; i < xServers.size(); i++) {
