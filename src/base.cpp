@@ -893,10 +893,10 @@ std::string Base::channelTopic(std::string server, std::string channel) {
 	return servIter->second->channelTopic(channel);
 }
 
-std::list<std::string> Base::channelUsers(std::string server, std::string channel) {
+std::set<std::string> Base::channelUsers(std::string server, std::string channel) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::list<std::string> (); // return empty list to those who cannot provide a valid server name
+		return std::set<std::string> (); // return empty set to those who cannot provide a valid server name
 	return servIter->second->channelUsers(channel);
 }
 
@@ -1068,19 +1068,19 @@ bool Base::loadModule(std::string modName, bool startup) {
 		return false;
 	}
 	switch (newModule->receivePriority()) {
-		case HIGH:
+		case PRI_HIGH:
 			highModules.insert(std::pair<std::string, Module*> (modName, newModule));
 			break;
-		case MEDIUM_HIGH:
+		case PRI_MEDIUM_HIGH:
 			mediumHighModules.insert(std::pair<std::string, Module*> (modName, newModule));
 			break;
-		case NORMAL:
+		case PRI_NORMAL:
 			normalModules.insert(std::pair<std::string, Module*> (modName, newModule));
 			break;
-		case MEDIUM_LOW:
+		case PRI_MEDIUM_LOW:
 			mediumLowModules.insert(std::pair<std::string, Module*> (modName, newModule));
 			break;
-		case LOW:
+		case PRI_LOW:
 			lowModules.insert(std::pair<std::string, Module*> (modName, newModule));
 	}
 	moduleFiles.insert(std::pair<std::string, void*> (modName, openModule));

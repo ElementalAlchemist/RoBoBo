@@ -335,7 +335,7 @@ std::string Module::channelTopic(std::string server, std::string channel) {
 	return serverData->channelTopic(server, channel);
 }
 
-std::list<std::string> Module::channelUsers(std::string server, std::string channel) {
+std::set<std::string> Module::channelUsers(std::string server, std::string channel) {
 	return serverData->channelUsers(server, channel);
 }
 
