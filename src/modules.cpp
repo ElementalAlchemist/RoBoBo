@@ -190,14 +190,6 @@ void Module::sendOtherCommand(std::string server, std::string command, std::stri
 	serverData->sendOther(server, command + " " + data);
 }
 
-std::set<std::string> Module::clients(std::string server) {
-	return serverData->clients(server);
-}
-
-std::tr1::unordered_map<std::string, std::string> Module::clientInfo(std::string server, std::string client) {
-	return serverData->clientInfo(server, client);
-}
-
 std::string Module::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
 	return serverData->addClient(server, nick, ident, host, gecos);
 }
