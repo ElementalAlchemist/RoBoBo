@@ -3,9 +3,9 @@ variation of the traditional "./configure; make; make install" installation
 process.
 
 1. make: This builds the configure script.  You only need to do this once ever,
-unless you delete the entire project.  If you accidentally delete the configure
-binary file later but need it again, you can rebuild it from the robobo main
-directory:
+unless you delete the entire project or you upgrade to a new version with
+configure fixes.  If you accidentally delete the configure binary file later
+but need it again, you can rebuild it from the robobo main directory:
 g++ src/configure -o configure
 
 2. ./configure: This finds the module source files and puts the correct
