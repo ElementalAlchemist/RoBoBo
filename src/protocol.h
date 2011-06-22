@@ -90,7 +90,7 @@ class Protocol {
 		void callQuitHook(std::string client);
 		
 		std::string callChannelMessageOutHook(std::string client, std::string target, char status, std::string message);
-		void callChannelMessageSendHook(std::string client, std::string target, char status, stdd::string message);
+		void callChannelMessageSendHook(std::string client, std::string target, char status, std::string message);
 		std::string callUserMessageOutHook(std::string client, std::string target, std::string message);
 		void callUserMessageSendHook(std::string client, std::string target, std::string message);
 		std::string callChannelNoticeOutHook(std::string client, std::string target, char status, std::string message);
