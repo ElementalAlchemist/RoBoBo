@@ -44,7 +44,7 @@ bool Ignore::onLoadComplete() {
 		unloadModule();
 		return false;
 	}
-	globMatcher = modules().find(moduleAbilities.find("PATTERN_GLOB")->second)->second;
+	globMatcher = (PatternMatcher*) modules().find(moduleAbilities.find("PATTERN_GLOB")->second)->second;
 	unsigned int i = 0;
 	std::ostringstream hostKey;
 	hostKey << "hostmask/0";
@@ -76,7 +76,7 @@ void Ignore::onModuleChange() {
 		unloadModule();
 		return;
 	}
-	globMatcher = modules().find(moduleAbilities.find("PATTERN_GLOB")->second)->second;
+	globMatcher = (PatternMatcher*) modules().find(moduleAbilities.find("PATTERN_GLOB")->second)->second;
 }
 
 bool Ignore::onChannelMsg(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
