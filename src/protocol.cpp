@@ -36,24 +36,24 @@ std::string Protocol::userIdent(std::string user) { return ""; }
 
 std::string Protocol::userHost(std::string user) { return ""; }
 
-std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<char, char> ('0', ' '); }
+std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<std::string, char> ("", ' '); }
 
-std::string Protocol::compareStatus(std::set<std::string> statuses) { return std::set<std::string>(); }
+std::string Protocol::compareStatus(std::set<std::string> statuses) { return *(statuses.begin()); } // It may or may not be correct for the server, but it's a valid answer.
 
-void Protocol::sendMsg(std::string target, std::string message) {}
-void Protocol::sendNotice(std::string target, std::string message) {}
-void Protocol::setMode(std::string target, std::string mode) {}
-void Protocol::removeMode(std::string target, std::string mode) {}
-void Protocol::joinChannel(std::string channel, std::string key) {}
-void Protocol::partChannel(std::string channel, std::string reason) {}
-void Protocol::quitServer(std::string reason) {}
-void Protocol::kickUser(std::string channel, std::string user, std::string reason) {}
+void Protocol::sendMsg(std::string client, std::string target, std::string message) {}
+void Protocol::sendNotice(std::string client, std::string target, std::string message) {}
+void Protocol::setMode(std::string client, std::string target, std::string mode) {}
+void Protocol::removeMode(std::string client, std::string target, std::string mode) {}
+void Protocol::joinChannel(std::string client, std::string channel, std::string key) {}
+void Protocol::partChannel(std::string client, std::string channel, std::string reason) {}
+void Protocol::quitServer(std::string client, std::string reason) {}
+void Protocol::kickUser(std::string client, std::string channel, std::string user, std::string reason) {}
 void Protocol::changeNick(std::string client, std::string newNick) {}
 void Protocol::oper(std::string client, std::string username, std::string password) {}
 
-void Protocol::killUser(std::string user, std::string reason) {}
-void Protocol::setXLine(char lineType, std::string hostmask, time_t duration, std::string reason) {}
-void Protocol::removeXLine(char lineType, std::string hostmask) {}
+void Protocol::killUser(std::string client, std::string user, std::string reason) {}
+void Protocol::setXLine(std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {}
+void Protocol::removeXLine(std::string client, char lineType, std::string hostmask) {}
 
 std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > Protocol::listXLines() {
 	return std::tr1::unordered_map<char, std::tr1::unordered_map<std::string, time_t> > ();
@@ -65,7 +65,7 @@ void Protocol::sendOther(std::string rawLine) {}
 
 std::string Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) { return ""; }
 void Protocol::removeClient(std::string client, std::string reason) {}
-std::list<std::string> Protocol::clients() { return std::list<std::string> (); }
+std::set<std::string> Protocol::clients() { return std::list<std::string> (); }
 std::tr1::unordered_map<std::string, std::string> Protocol::clientInfo(std::string client) { return std::tr1::unordered_map<std::string, std::string> (); }
 std::list<std::string> Protocol::userModes(std::string client) { return std::list<std::string> (); }
 
@@ -123,7 +123,7 @@ bool Protocol::callUserCTCPReplyHook(std::string client, std::string nick, std::
 	return botBase->callUserCTCPReplyHook(serverName, client, nick, message);
 }
 
-void Protocol::callChannelJoinPreHook(std::string client, std::string channel, std::string hostmask) {
+void Protocol::callChannelJoinPreHook(std::string channel, std::string hostmask) {
 	botBase->callChannelJoinPreHook(serverName, channel, hostmask);
 }
 
@@ -188,7 +188,7 @@ void Protocol::callUserModePostHook(std::string client, std::string mode, bool a
 }
 
 void Protocol::callUserOperPreHook(std::string user, std::string opertype) {
-	botBase->callUserOperPreHook(serverName, client, user, opertype);
+	botBase->callUserOperPreHook(serverName, user, opertype);
 }
 
 void Protocol::callUserOperPostHook(std::string user, std::string opertype) {
@@ -219,7 +219,7 @@ std::string Protocol::callChannelMessageOutHook(std::string client, std::string 
 	return botBase->callChannelMessageOutHook(serverName, client, target, status, message);
 }
 
-void Protocol::callChannelMessageSendHook(std::string client, std::string target, char status, stdd::string message) {
+void Protocol::callChannelMessageSendHook(std::string client, std::string target, char status, std::string message) {
 	botBase->callChannelMessageSendHook(serverName, client, target, status, message);
 }
 
