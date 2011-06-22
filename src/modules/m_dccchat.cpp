@@ -12,6 +12,7 @@ struct dccListenArg {
 
 class DCCChatModule : public dccSender {
 	public:
+		DCCChatModule(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		void onNickChangePre(std::string server, std::string oldNick, std::string newNick);
 		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
@@ -31,6 +32,8 @@ class DCCChatModule : public dccSender {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > reportingModules;
 		std::tr1::unordered_map<std::string, std::string> moduleTriggers;
 };
+
+DCCChatModule::DCCChatModule(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int DCCChatModule::botAPIversion() {
 	return 2000;

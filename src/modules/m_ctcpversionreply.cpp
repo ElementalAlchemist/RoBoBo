@@ -2,6 +2,7 @@
 
 class VersionReply : public Module {
 	public:
+		VersionReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
 		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
@@ -9,6 +10,8 @@ class VersionReply : public Module {
 	private:
 		void sendVersionReply(std::string server, std::string client, std::string target);
 };
+
+VersionReply::VersionReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int VersionReply::botAPIversion() {
 	return 2000;

@@ -3,7 +3,7 @@
 
 class Cap : public CapModule {
 	public:
-		Cap();
+		Cap(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		void onModuleChange();
 		void onOtherData(std::string server, std::vector<std::string> parsedLine);
@@ -17,7 +17,7 @@ class Cap : public CapModule {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > blockingModules;
 };
 
-Cap::Cap() {
+Cap::Cap(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {
 	std::vector<std::string> theCore;
 	theCore.push_back("");
 	capCommands.insert(std::pair<std::string, std::vector<std::string> > ("multi-prefix", theCore));

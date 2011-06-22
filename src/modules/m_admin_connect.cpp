@@ -3,6 +3,7 @@
 
 class ConnectServerCommand : public AdminHook {
 	public:
+		ConnectServerCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
@@ -12,6 +13,8 @@ class ConnectServerCommand : public AdminHook {
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
+
+ConnectServerCommand::ConnectServerCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, short unsigned int debug): Module(modConf, modFace, modName, dir, debug) {}
 
 int ConnectServerCommand::botAPIversion() {
 	return 2000;

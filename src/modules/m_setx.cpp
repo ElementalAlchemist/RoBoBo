@@ -2,6 +2,7 @@
 
 class SetX : public Module {
 	public:
+		SetX(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
@@ -10,6 +11,8 @@ class SetX : public Module {
 	private:
 		std::vector<std::string> xServers;
 };
+
+SetX::SetX(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug);
 
 int SetX::botAPIversion() {
 	return 2000;

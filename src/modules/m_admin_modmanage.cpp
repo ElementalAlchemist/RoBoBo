@@ -3,6 +3,7 @@
 
 class LoadModCommand : public AdminHook {
 	public:
+		LoadModCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
@@ -12,6 +13,8 @@ class LoadModCommand : public AdminHook {
 		std::vector<std::vector<std::string> > adminCommands();
 		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
+
+LoadModCommand::LoadModCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int LoadModCommand::botAPIversion() {
 	return 2000;

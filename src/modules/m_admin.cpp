@@ -4,6 +4,7 @@
 
 class Admin : public AdminMod {
 	public:
+		Admin(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		Priority receivePriority();
 		bool onLoadComplete();
@@ -45,6 +46,8 @@ class Admin : public AdminMod {
 		void handleDCCMessage(std::string server, std::string client, std::string nick, std::string message);
 		std::tr1::unordered_map<std::string, std::vector<std::string> > botAdminCommands;
 };
+
+Admin::Admin(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int Admin::botAPIversion() {
 	return 2000;
