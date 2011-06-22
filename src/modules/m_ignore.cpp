@@ -21,8 +21,8 @@ class Ignore : public AdminHook {
 		bool onUserCTCPReply(std::string server, std::string client, std::string nick, std::string message);
 		std::string description();
 		std::vector<std::string> supports();
-		std::vector<std::vector<std::string> > adminCommands;
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		std::vector<std::vector<std::string> > adminCommands();
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 	private:
 		std::list<std::string> blockedHostmasks;
 		PatternMatcher* globMatcher;
