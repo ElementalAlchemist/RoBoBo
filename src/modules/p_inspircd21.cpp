@@ -1028,13 +1028,13 @@ void InspIRCd::receiveData() {
 			time_t connectTime;
 			std::istringstream ct (parsedLine[9]);
 			ct >> connectTime;
-			std::pair<std::tr1::unordered_map<std::string, User*>::iterator, bool> newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime))).first;
+			std::tr1::unordered_map<std::string, User*>::iterator newUser = users.insert(std::pair<std::string, User*> (parsedLine[2], new User (parsedLine[4], parsedLine[7], parsedLine[6], parsedLine[parsedLine.size() - 1], connectTime))).first;
 			for (size_t i = 1; i < parsedLine[10].size(); i++) { // skip the + symbol
 				std::string longmode = convertUserMode(parsedLine[10][i]);
-				newUser.first->second->addMode(longmode);
+				newUser->second->addMode(longmode);
 				if (longmode == "snomask") {
 					for (size_t j = 1; j < parsedLine[11].size(); j++)
-						newUser.first->second->addSnomask(parsedLine[11][j]);
+						newUser->second->addSnomask(parsedLine[11][j]);
 				}
 			}
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
