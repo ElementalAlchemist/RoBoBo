@@ -83,13 +83,9 @@ module admin {
 	0/verbose = "1"; # be verbose about what's happening with the bot with this admin?  DCC only.
 }
 
-module admin_loadmod {
+module admin_modmanage {
 	#masteronly = "yes"; # whether or not this command is to be available only to the bot master. Uncomment and change to change.
 } # The admin module masteronly settings default to the settings shown.  "yes" and "no" are the accepted values.
-
-module admin_unloadmod {
-	#masteronly = "yes";
-}
 
 module admin_rehash {
 	#masteronly = "yes";
