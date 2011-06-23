@@ -1638,7 +1638,7 @@ void InspIRCd::receiveData() {
 			} else if (parsedLine[3] == "SAQUIT")
 				removeClient(parsedLine[4], parsedLine[5]);
 			else {
-				for (std::set<std::string>::iterator userIter = users.begin(); userIter != users.end(); ++userIter)
+				for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 					callOtherDataHook(*userIter, parsedLine);
 			}
 		}
