@@ -1035,8 +1035,7 @@ bool Base::connectServer(std::string serverName) {
 		return false;
 	}
 	protocolFiles.insert(std::pair<std::string, void*> (servConfIter->second["protocol"], protoFile));
-	servers.insert(std::pair<std::string, Protocol*> (serverName, newProto));
-	servers.find(serverName)->second->connectServer();
+	servers.insert(std::pair<std::string, Protocol*> (serverName, newProto)).first->second->connectServer();
 	return true;
 }
 
