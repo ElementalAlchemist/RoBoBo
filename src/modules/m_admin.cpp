@@ -95,9 +95,9 @@ bool Admin::onLoadComplete() {
 		i++;
 	}
 	std::tr1::unordered_map<std::string, Module*> loadedModules = modules();
-	std::tr1::unordered_map<std::string, std::vector<std::string> > modSupports = modSupports();
-	if (modSupports.find("BOT_ADMIN") != modSupports.end()) {
-		std::vector<std::string> adminModules = modSupports.find("BOT_ADMIN")->second;
+	std::tr1::unordered_map<std::string, std::vector<std::string> > moduleSupports = modSupports();
+	if (moduleSupports.find("BOT_ADMIN") != moduleSupports.end()) {
+		std::vector<std::string> adminModules = moduleSupports.find("BOT_ADMIN")->second;
 		for (unsigned int i = 0; i < adminModules.size(); i++) {
 			AdminHook* adminCommandMod = (AdminHook*) modules().find(adminModules[i])->second;
 			std::vector<std::vector<std::string> > adminSupport = adminCommandMod->adminCommands();
