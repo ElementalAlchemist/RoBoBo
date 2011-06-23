@@ -1472,7 +1472,7 @@ void InspIRCd::receiveData() {
 			} else {
 				if (nicks.find(parsedLine[2]) != nicks.end())
 					parsedLine[2] = nicks.find(parsedLine[2])->second;
-				std::tr1::unordered_map<std::string, Users*>::iterator userIter = users.find(parsedLine[2]);
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
 				if (userIter != users.end()) {
 					bool adding = true;
 					for (size_t i = 0; i < parsedLine[3].size(); i++) {
