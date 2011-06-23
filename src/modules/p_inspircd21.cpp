@@ -457,7 +457,7 @@ std::pair<std::string, char> InspIRCd::userStatus(std::string channel, std::stri
 	if (statuses.empty())
 		return std::pair<std::string, char> ("", ' ');
 	for (std::list<std::pair<std::string, char> >::iterator statIter = chanRanks.begin(); statIter != chanRanks.end(); ++statIter) {
-		if (statuses.find((*statIter).first))
+		if (statuses.find((*statIter).first) != statuses.end())
 			return std::pair<std::string, char> ((*statIter).first, (*statIter).second);
 	}
 	return std::pair<std::string, char> ("", ' '); // oh noez! a bug!
@@ -465,7 +465,7 @@ std::pair<std::string, char> InspIRCd::userStatus(std::string channel, std::stri
 
 std::string InspIRCd::compareStatus(std::set<std::string> statuses) {
 	for (std::list<std::pair<std::string, char> >::iterator statIter = chanRanks.begin(); statIter != chanRanks.end(); ++statIter) {
-		if (statuses.find((*statIter).first))
+		if (statuses.find((*statIter).first) != statuses.end())
 			return std::pair<std::string, char> ((*statIter).first, (*statIter).second);
 	}
 	return std::pair<std::string, char> ("", ' '); // oh noez! someone sent us a set of non-statuses!
