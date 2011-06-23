@@ -48,7 +48,7 @@ void DCCChatModule::onNickChangePre(std::string server, std::string oldNick, std
 	}
 }
 
-void DCCChatModule::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
+bool DCCChatModule::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
 	std::vector<std::string> messageParts = splitBySpace(message);
 	if (messageParts[0] == "DCC" && messageParts[1] == "CHAT" && messageParts[2] == "chat") {
 		if (activeConnections.find(server + "/" + nick) == activeConnections.end())
@@ -56,6 +56,7 @@ void DCCChatModule::onUserCTCP(std::string server, std::string client, std::stri
 		else
 			sendNotice(server, client, nick, "You already have an active DCC chat session!");
 	}
+	return true;
 }
 
 std::vector<std::string> DCCChatModule::getConnections() {
