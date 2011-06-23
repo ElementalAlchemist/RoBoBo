@@ -363,7 +363,6 @@ void InspIRCd::connectServer() {
 	sendData("CAPAB CAPABILITIES :PROTOCOL=1203");
 	sendData("CAPAB END");
 	sendData("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
-	sleep(1);
 	sendOther(":" + serverConf["sid"] + " BURST");
 	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
 	sleep(1);
