@@ -67,12 +67,12 @@ class Protocol {
 		bool callUserCTCPReplyHook(std::string client, std::string nick, std::string message);
 		void callChannelJoinPreHook(std::string channel, std::string hostmask);
 		void callChannelJoinPostHook(std::string channel, std::string hostmask);
-		void callChannelPartPreHook(std::string channel, std::string hostmask, std::string reason);
-		void callChannelPartPostHook(std::string channel, std::string hostmask, std::string reason);
+		void callChannelPartPreHook(std::string channel, std::string hostmask, std::string reason = "");
+		void callChannelPartPostHook(std::string channel, std::string hostmask, std::string reason = "");
 		void callUserConnectPreHook(std::string nick, std::string ident, std::string host, std::string gecos);
 		void callUserConnectPostHook(std::string nick, std::string ident, std::string host, std::string gecos);
-		void callUserQuitPreHook(std::string hostmask, std::string reason);
-		void callUserQuitPostHook(std::string hostmask, std::string reason);
+		void callUserQuitPreHook(std::string hostmask, std::string reason = "");
+		void callUserQuitPostHook(std::string hostmask, std::string reason = "");
 		void callNickChangePreHook(std::string oldNick, std::string newNick);
 		void callNickChangePostHook(std::string oldNick, std::string newNick);
 		void callChannelKickPreHook(std::string channel, std::string kicker, std::string kickee, std::string reason);
