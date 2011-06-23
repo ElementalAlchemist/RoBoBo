@@ -879,7 +879,7 @@ void InspIRCd::removeClient(std::string client, std::string reason) {
 	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
 	std::set<std::string> userChannels = userIter->second->channels();
 	for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
-		chans.find(chanIter)->second->partUser(client);
+		chans.find(*chanIter)->second->partUser(client);
 	nicks.erase(nicks.find(userIter->second->nick()));
 	delete userIter->second;
 	users.erase(userIter);
