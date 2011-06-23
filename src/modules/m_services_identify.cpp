@@ -16,7 +16,7 @@ int ServicesID::botAPIversion() {
 
 void ServicesID::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
 	if (numeric == "001" && config[server+"/password"] != "")
-		sendPrivMsg(server, config[server+"/service"], config[server+"/command"] + " " + (config[server+"/nickname"] != "" ? config[server+"/nickname"] + " " : "") + config[server+"/password"]);
+		sendPrivMsg(server, client, config[server+"/service"], config[server+"/command"] + " " + (config[server+"/nickname"] != "" ? config[server+"/nickname"] + " " : "") + config[server+"/password"]);
 }
 
 std::string ServicesID::description() {
