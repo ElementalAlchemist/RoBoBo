@@ -1538,7 +1538,7 @@ void InspIRCd::receiveData() {
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[3]);
 			chanIter->second->partUser(parsedLine[2]);
 			std::set<std::string> modes = chanIter->second->modes();
-			if (chanIter->second->users.empty() && modes.find("permanent") == modes.end()) {
+			if (chanIter->second->users().empty() && modes.find("permanent") == modes.end()) {
 				delete chanIter->second;
 				chans.erase(chanIter);
 			}
