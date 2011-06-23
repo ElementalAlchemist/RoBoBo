@@ -38,6 +38,7 @@ serverconf irc.server.net { # This server will not be connected on startup, but 
 	servername = "robobo.server.net"; # Name this server!  Mostly because you have to.
 	sid = "00A"; # The server ID is required for InspIRCd server connections.
 	password = "password"; # A password for connecting is also required.
+	description = "Server description!"; # Also provide a server description.
 	port = "6667";
 	0/nick = "RoBoBo"; # Adding clients is optional.  If not specified, no clients will be created on connect.
 	0/ident = nick;
