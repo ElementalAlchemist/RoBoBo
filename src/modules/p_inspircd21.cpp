@@ -940,8 +940,6 @@ void InspIRCd::receiveData() {
 		receivedLine = connection->receive();
 		if (receivedLine == "") // Some failure occured in the receivement of the line.
 			break;
-		if (debugLevel >= 3)
-			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
 		if (debugLevel >= 3)
 			std::cout << receivedLine << std::endl;
