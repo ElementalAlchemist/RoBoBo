@@ -917,7 +917,7 @@ std::list<std::string> InspIRCd::userModes(std::string client) {
 	return userModes;
 }
 
-static void* InspIRCd::receiveData_thread(void* ptr) {
+void* InspIRCd::receiveData_thread(void* ptr) {
 	InspIRCd* protoClass = (InspIRCd*) ptr;
 	protoClass->receiveData();
 	return NULL;
