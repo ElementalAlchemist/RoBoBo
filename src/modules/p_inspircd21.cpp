@@ -1079,7 +1079,7 @@ void InspIRCd::receiveData() {
 					User* user = users.find(userIter)->second;
 					std::set<std::string> statuses = user->statuses();
 					for (std::set<std::string>::iterator prefixIter = statuses.begin(); prefixIter != statuses.end(); ++prefixIter)
-						user->removeStatus(*prefixIter);
+						user->removeStatus(chanIter->first, *prefixIter);
 				}
 				chanIter->second->topic(topic, topicTime);
 				size_t param = 5; // first param
@@ -1116,7 +1116,7 @@ void InspIRCd::receiveData() {
 					std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(joinUserList[i]);
 					userIter->second->joinChannel(chanIter->first);
 					for (std::list<std::string>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter)
-						userIter->second->addStatus(*prefixIter);
+						userIter->second->addStatus(chanIter->first, *prefixIter);
 					callChannelJoinPostHook(chanIter->first, userIter->second->hostmask());
 				}
 			}
