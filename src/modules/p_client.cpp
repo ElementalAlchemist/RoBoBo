@@ -317,7 +317,7 @@ std::pair<std::string, char> Client::userStatus(std::string channel, std::string
 	if (status == "")
 		return std::pair<std::string, char> ("", ' ');
 	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
-		if (*statIter.first == convertMode(status))
+		if ((*statIter).first == convertMode(status))
 			return std::pair<std::string, char> (status, (*statIter).second);
 	}
 	return std::pair<std::string, char> ("", ' '); // Um, some bug perhaps?
