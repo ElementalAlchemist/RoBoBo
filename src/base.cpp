@@ -1011,7 +1011,7 @@ bool Base::connectServer(std::string serverName) {
 		return false;
 	void* protoFile;
 	if (protocolFiles.find(servConfIter->second["protocol"]) == protocolFiles.end()) {
-		std::string fileLoc = "/modules/p_" + servConfIter->second["protocol"] + ".so";
+		std::string fileLoc = directory + "/modules/p_" + servConfIter->second["protocol"] + ".so";
 		protoFile = dlopen(fileLoc.c_str(), RTLD_NOW);
 		if (protoFile == NULL) {
 			std::string error = "Could not open protocol " + servConfIter->second["protocol"] + ": " + dlerror();
