@@ -598,7 +598,7 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 	for (size_t i = 0; i < mode.size(); i++) {
 		if (mode[i] == ' ') {
 			modeList.push_back(tempStr);
-			tempStr++;
+			tempStr = "";
 			continue;
 		}
 		tempStr += mode[i];
