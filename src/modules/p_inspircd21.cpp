@@ -417,7 +417,7 @@ std::vector<std::vector<std::string> > InspIRCd::channelModes() {
 std::list<std::string> InspIRCd::channels() {
 	std::list<std::string> chanList;
 	for (std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.begin(); chanIter != chans.end(); ++chanIter)
-		chanList.insert(chanIter->first);
+		chanList.push_back(chanIter->first);
 	return chanList;
 }
 
