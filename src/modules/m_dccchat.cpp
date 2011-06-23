@@ -3,7 +3,7 @@
 #include "s_plaintext.cpp" // steal use of existing socket system
 #include <pthread.h>
 
-class m_dccchat;
+class DCCChatModule;
 struct dccListenArg {
 	DCCChatModule* modPtr;
 	std::string id;
