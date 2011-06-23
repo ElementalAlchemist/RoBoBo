@@ -87,7 +87,7 @@ class InspIRCd : public Protocol {
 		void removeMode(std::string client, std::string target, std::string mode);
 		void joinChannel(std::string client, std::string channel, std::string key = "");
 		void partChannel(std::string client, std::string channel, std::string reason = "");
-		void quitServer(std::string client, std::string reason = "");
+		void quitServer(std::string reason = "");
 		void kickUser(std::string client, std::string channel, std::string user, std::string reason = "");
 		void changeNick(std::string client, std::string newNick);
 		void oper(std::string client, std::string username, std::string password = "");
