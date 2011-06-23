@@ -1383,7 +1383,7 @@ void InspIRCd::receiveData() {
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 				callQuitHook(*userIter);
 			break;
-		} else if (parsedLine[1] == "SVSJOIN" && ourClients.find(parsedLine[2]) != parsedLine.end()) {
+		} else if (parsedLine[1] == "SVSJOIN" && ourClients.find(parsedLine[2]) != ourClients.end()) {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
 			callChannelJoinPreHook(parsedLine[3], userIter->second->hostmask());
 			userIter->second->joinChannel(parsedLine[3]);
