@@ -991,7 +991,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		}
 		std::tr1::unordered_map<std::string, User*>::iterator joiningUser = users.find(nick);
 		if (joiningUser == users.end()) {
-			users.insert(std::pair<std::string, User*> (nick, new User(ident, host)));
+			users.insert(std::pair<std::string, User*> (nick, new User(ident, host, this)));
 			joiningUser = users.find(nick);
 		} else {
 			joiningUser->second->ident(ident);
