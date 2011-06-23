@@ -959,7 +959,7 @@ void InspIRCd::receiveData() {
 					if (postEqual.size() == 2) // status mode
 						modeChar = postEqual[1];
 					allModes.insert(std::pair<std::string, char> (mode, modeChar));
-					allChanModes.insert(std::pair<std::string, char> (modeChar, mode));
+					allChanModes.insert(std::pair<char, std::string> (modeChar, mode));
 				}
 			} else if (parsedLine[1] == "USERMODES") {
 				std::vector<std::string> splitLine;
@@ -980,7 +980,7 @@ void InspIRCd::receiveData() {
 					if (postEqual.size() == 2) // status mode
 						modeChar = postEqual[1];
 					allModes.insert(std::pair<std::string, char> (mode, modeChar));
-					allUserModes.insert(std::pair<std::string, char> (modeChar, mode));
+					allUserModes.insert(std::pair<char, std::string> (modeChar, mode));
 				}
 			} else if (parsedLine[1] == "CAPABILITIES") {
 				std::vector<std::string> splitLine;
