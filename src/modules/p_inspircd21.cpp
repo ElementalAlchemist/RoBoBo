@@ -1045,7 +1045,7 @@ void InspIRCd::receiveData() {
 			userIter->second->addMode("oper");
 			userIter->second->operup(parsedLine[2]);
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
-				callUserOperPostHook(userIter->second->nick(), parsedLine[2]);
+				callUserOperPostHook(users.find(*userIter)->second->nick(), parsedLine[2]);
 		} else if (parsedLine[1] == "FJOIN") {
 			std::string joiningUsers = parsedLine[parsedLine.size() - 1];
 			std::vector<std::string> joinUserList;
