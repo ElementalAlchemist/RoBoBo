@@ -909,7 +909,7 @@ std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::stri
 std::list<std::string> InspIRCd::userModes(std::string client) {
 	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
 	if (userIter == users.end())
-		return;
+		return std::list<std::string> ();
 	std::list<std::string> userModes;
 	std::set<std::string> umodes = userIter->second->modes();
 	for (std::set<std::string>::iterator modeIter = umodes.begin(); modeIter != umodes.end(); ++modeIter)
