@@ -1348,7 +1348,7 @@ void InspIRCd::receiveData() {
 			callUserQuitPreHook(hostmask, parsedLine[2]);
 			std::set<std::string> userChannels = userIter->second->channels();
 			for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
-				channels.find(*chanIter)->second->partUser(uuid);
+				chans.find(*chanIter)->second->partUser(uuid);
 			nicks.erase(nicks.find(userIter->second->nick()));
 			delete userIter->second;
 			users.erase(userIter);
@@ -1359,7 +1359,7 @@ void InspIRCd::receiveData() {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
 			std::set<std::string> userChannels = userIter->second->channels();
 			for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
-				channels.find(*chanIter)->second->partUser(uuid);
+				chans.find(*chanIter)->second->partUser(uuid);
 			nicks.erase(nicks.find(userIter->second->nick()));
 			delete userIter->second;
 			users.erase(userIter);
