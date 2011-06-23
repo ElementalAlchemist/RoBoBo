@@ -37,7 +37,7 @@ class Client : public Protocol {
 		std::string userIdent(std::string user);
 		std::string userHost(std::string user);
 		std::pair<std::string, char> userStatus(std::string channel, std::string user);
-		char compareStatus(std::set<char> statuses);
+		std::string compareStatus(std::set<std::string> statuses);
 		void sendMsg(std::string client, std::string target, std::string message);
 		void sendNotice(std::string client, std::string target, std::string message);
 		void setMode(std::string client, std::string target, std::string mode);
@@ -130,12 +130,12 @@ void User::status(std::string channel, std::string status, bool adding) {
 		channels.find(channel)->second.erase(channels.find(channel)->second.find(status));
 }
 
-char User::status(std::string channel) {
+std::string User::status(std::string channel) {
 	if (channels.find(channel) == channels.end())
 		return '0';
-	std::set<char> statusChars = channels.find(channel)->second;
+	std::set<std::string> statusChars = channels.find(channel)->second;
 	std::set<std::string> statuses;
-	for (std::set<char>::iterator statIter = statusChars.begin(); statIter != statusChars.end(); ++statIter)
+	for (std::set<std::string>::iterator statIter = statusChars.begin(); statIter != statusChars.end(); ++statIter)
 		statuses.insert(server->convertChanMode(*statIter));
 	return server->compareStatus(statuses);
 }
