@@ -948,7 +948,7 @@ void InspIRCd::receiveData() {
 		if (parsedLine[1] == "PING" && parsedLine[3] == serverConf["sid"]) {
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 				callOtherDataHook(*userIter, parsedLine);
-			sendOther(":" + serverConf["sid"] + " PONG " + parsedLine[3] + parsedLine[2]);
+			sendOther(":" + serverConf["sid"] + " PONG " + parsedLine[3] + " " + parsedLine[2]);
 		} else if (parsedLine[0] == "CAPAB") {
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 				callOtherDataHook(*userIter, parsedLine);
