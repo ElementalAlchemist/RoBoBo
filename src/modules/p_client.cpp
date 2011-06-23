@@ -284,7 +284,7 @@ std::string Client::channelTopic(std::string channel) {
 	std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(channel);
 	if (chanIter == inChannels.end())
 		return "";
-	return chanIter->second->first;
+	return chanIter->second.first;
 }
 
 std::set<std::string> Client::channelUsers(std::string channel) {
