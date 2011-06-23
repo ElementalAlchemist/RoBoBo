@@ -866,7 +866,7 @@ void Client::setChanMode(bool addMode, bool list, std::string channel, std::stri
 
 void Client::setStatus(bool addMode, std::string channel, std::string status, std::string user) {
 	std::tr1::unordered_map<std::string, User*>::iterator rankedUser = users.find(user);
-	if (rankedUser = users.end())
+	if (rankedUser == users.end())
 		return;
 	rankedUser->second->status(channel, status, addMode);
 }
