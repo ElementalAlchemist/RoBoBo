@@ -264,8 +264,8 @@ void Channel::addMode(std::string mode, bool list) {
 		return;
 	}
 	std::string modeonly = mode.substr(0, mode.find_first_of('=')), param = mode.substr(mode.find_first_of('=') + 1);
-	chanModes.insert(modeOnly);
-	modeParams.insert(std::pair<std::string, std::string> (modeOnly, param));
+	chanModes.insert(modeonly);
+	modeParams.insert(std::pair<std::string, std::string> (modeonly, param));
 }
 
 void Channel::removeMode(std::string mode) {
