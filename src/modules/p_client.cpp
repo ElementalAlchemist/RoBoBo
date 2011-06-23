@@ -116,7 +116,7 @@ void User::removeChannel(std::string channel) {
 
 std::list<std::string> User::channelList() {
 	std::list<std::string> listOfChannels;
-	for (std::tr1::unordered_map<std::string, char>::iterator chanIter = channels.begin(); chanIter != channels.end(); ++chanIter)
+	for (std::tr1::unordered_map<std::string, std::set<std::string> >::iterator chanIter = channels.begin(); chanIter != channels.end(); ++chanIter)
 		listOfChannels.push_back(chanIter->first);
 	return listOfChannels;
 }
