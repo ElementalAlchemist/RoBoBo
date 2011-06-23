@@ -11,9 +11,9 @@ Base::Base(std::string confdir, std::string confname, unsigned short debug) : de
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modConfIter->first, modConfIter->second));
 		if (loadModule(modConfIter->first, true)) {
 			if (debugLevel >= 2)
-				std::cout << "Module " << modConfIter->first << " loaded successfully." << std::endl;
+				std::cout << "Module m_" << modConfIter->first << " loaded successfully." << std::endl;
 		} else
-			std::cout << "Module " << modConfIter->first << " failed to load." << std::endl; // debug level 1
+			std::cout << "Module m_" << modConfIter->first << " failed to load." << std::endl; // debug level 1
 	}
 	
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end(); ++modIter)
@@ -1048,14 +1048,14 @@ bool Base::loadModule(std::string modName, bool startup) {
 	std::string fileLoc = directory + "/modules/m_" + modName + ".so";
 	void* openModule = dlopen(fileLoc.c_str(), RTLD_NOW);
 	if (openModule == NULL) {
-		std::string error = "Could not open module " + modName + ": " + dlerror();
+		std::string error = "Could not open module m_" + modName + ": " + dlerror();
 		std::perror(error.c_str()); // debug level 1
 		return false;
 	}
 	module_spawn_t spawnModule = (module_spawn_t) dlsym(openModule, "spawn");
 	const char* dlsymError = dlerror();
 	if (dlsymError) {
-		std::string error = "Could not load module " + modName + ": " + dlsymError;
+		std::string error = "Could not load module m_" + modName + ": " + dlsymError;
 		std::perror(error.c_str()); // debug level 1
 		return false;
 	}
@@ -1063,7 +1063,7 @@ bool Base::loadModule(std::string modName, bool startup) {
 	Module* newModule = (Module*) spawnModule(modConf->second, this, modName, directory, debugLevel);
 	if (newModule->botAPIversion() != 2000) { // compare to current API version
 		dlclose(openModule);
-		std::cout << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
+		std::cout << "Module m_" << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
 		return false;
 	}
 	switch (newModule->receivePriority()) {
