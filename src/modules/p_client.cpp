@@ -398,7 +398,7 @@ void Client::handleData() {
 		if (parsedLine[1] == "001") { // welcome to the network
 			sendOther("MODE " + serverConf["nick"] + " +B"); // set bot mode
 			if (serverConf["channels"] != "")
-				joinChannel(serverConf["channels"]);
+				joinChannel("", serverConf["channels"]);
 			registered = true;
 			sendOther("WHOIS " + serverConf["nick"]);
 			callNumericHook(serverConf["nick"], "001", parsedLine);
@@ -429,7 +429,7 @@ void Client::handleData() {
 			callNumericHook(serverConf["nick"], "366", parsedLine);
 		} else if (parsedLine[1] == "433" && !registered) { // nickname already in use
 			if (!altChanged) {
-				changeNick(serverConf["altnick"]);
+				changeNick("", serverConf["altnick"]);
 				serverConf["nick"] = serverConf["altnick"];
 				altChanged = true;
 			} else
@@ -471,8 +471,8 @@ void Client::handleData() {
 					else {
 						int category;
 						bool found = false, prefix = false;
-						for (unsigned int j = 0; j < statusPrefixes.size(); j++) {
-							if (statusPrefixes[j].first == parsedLine[3][i]) {
+						for (std::list<std::pair<char, char> >::iterator statusIter = statusPrefixes.begin(); statusIter != statusPrefixes.end(); ++statusIter) {
+							if ((*statusIter).first == parsedLine[3][i]) {
 								category = 0; // count it as a list mode since it's a list of users who hold a status
 								found = true;
 								prefix = true;
