@@ -1000,7 +1000,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		inChannels[channel].second.second.insert(nick);
 		joiningUser->second->addChannel(channel);
 		for (size_t i = 0; i < rank.size(); i++)
-			joiningUser->second->status(channel, rank, true);
+			joiningUser->second->status(channel, rank[i], true);
 	}
 	if (firstNames) {
 		if (users.find(name)->second->ident() == "" || users.find(name)->second->host() == "")
