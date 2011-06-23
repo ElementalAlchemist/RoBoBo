@@ -107,7 +107,7 @@ std::string User::host() {
 }
 
 void User::addChannel(std::string channel) {
-	channels.insert(std::pair<std::string, std::set<char> > (channel, std::set<char> ()));
+	channels.insert(std::pair<std::string, std::set<std::string> > (channel, std::set<std::string> ()));
 }
 
 void User::removeChannel(std::string channel) {
