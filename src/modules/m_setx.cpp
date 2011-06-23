@@ -36,11 +36,13 @@ void SetX::onRehash() {
 }
 
 void SetX::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
+	if (!serverIsClient(server))
+		return;
 	if (numeric != "001")
 		return;
 	for (unsigned int i = 0; i < xServers.size(); i++) {
 		if (xServers[i] == server) {
-			setMode(server, serverData(server)["nick"], "cloak", true);
+			setMode(server, clientInfo(server, client)["nick"], "cloak", true);
 			return;
 		}
 	}
