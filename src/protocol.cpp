@@ -74,8 +74,11 @@ std::vector<std::string> Protocol::parseLine(std::string rawLine) {
 	std::string linePart = "";
 	for (unsigned int i = 0; i < rawLine.size(); i++) {
 		if (i != 0 && rawLine[i] == ':' && rawLine[i-1] == ' ') {
-			while (i < rawLine.size())
+			i++; // Move off of colon
+			while (i < rawLine.size()) {
 				linePart += rawLine[i];
+				i++;
+			}
 			parsedLine.push_back(linePart);
 			return parsedLine;
 		}
