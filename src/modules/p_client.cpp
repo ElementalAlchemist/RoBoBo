@@ -936,7 +936,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 				chanModes.push_back(modes);
 		} else if (parsedLine[i].size() > 10 && parsedLine[i].substr(0, 10) == "CHANTYPES=") {
 			for (unsigned int j = 10; j < parsedLine[i].size(); j++)
-				chanTypes.push_back(parsedLine[i][j]);
+				chanTypes.insert(parsedLine[i][j]);
 		} else if (parsedLine[i].size() > 6 && parsedLine[i].substr(0, 6) == "MODES=") {
 			std::istringstream modeNum (parsedLine[i].substr(6));
 			modeNum >> maxModes;
