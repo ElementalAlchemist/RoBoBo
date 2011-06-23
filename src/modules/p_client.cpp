@@ -997,7 +997,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 			joiningUser->second->ident(ident);
 			joiningUser->second->host(host);
 		}
-		inChannels[channel].second.second.second.insert(nick);
+		inChannels[channel].second.second.insert(nick);
 		joiningUser->second->addChannel(channel);
 		for (size_t i = 0; i < rank.size(); i++)
 			joiningUser->second->status(channel, rank, true);
