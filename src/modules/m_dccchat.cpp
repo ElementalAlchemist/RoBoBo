@@ -1,5 +1,6 @@
 #include "modinclude.h"
 #include "dcc_chat.h"
+#define DCC_CHAT
 #include "s_plaintext.cpp" // steal use of existing socket system
 #include <pthread.h>
 

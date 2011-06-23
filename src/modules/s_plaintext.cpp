@@ -93,6 +93,8 @@ std::string PlainText::receive() {
 	return "";
 }
 
+#ifndef DCC_CHAT // I cheated. :D
 extern "C" Socket* spawn() {
 	return new PlainText;
 }
+#endif
