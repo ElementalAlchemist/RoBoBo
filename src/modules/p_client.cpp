@@ -914,7 +914,7 @@ std::string Client::convertUserMode(char mode) {
 
 void Client::parse005(std::vector<std::string> parsedLine) {
 	for (unsigned int i = 0; i < parsedLine.size(); i++) {
-		if (parsedLine[i].size() > 8 && parsedLine.substr(0, 7) == "PREFIX=") {
+		if (parsedLine[i].size() > 8 && parsedLine[i].substr(0, 7) == "PREFIX=") {
 			std::queue<char> prefixModes;
 			unsigned int j = 8;
 			for (; parsedLine[i][j] != ')'; j++)
@@ -923,7 +923,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 				statusPrefixes.push_back(std::pair<char, char> (prefixModes.front(), parsedLine[i][j]));
 				prefixModes.pop();
 			}
-		} else if (parsedLine[i].size() > 10 && parsedLine.substr(0, 10) == "CHANMODES=") {
+		} else if (parsedLine[i].size() > 10 && parsedLine[i].substr(0, 10) == "CHANMODES=") {
 			std::vector<char> modes;
 			for (unsigned int j = 10; j < parsedLine[i].size(); j++) {
 				if (parsedLine[i][j] == ',') {
@@ -934,10 +934,10 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 			}
 			if (!modes.empty())
 				chanModes.push_back(modes);
-		} else if (parsedLine[i].size() > 10 && parsedLine.substr(0, 10) == "CHANTYPES=") {
+		} else if (parsedLine[i].size() > 10 && parsedLine[i].substr(0, 10) == "CHANTYPES=") {
 			for (unsigned int j = 10; j < parsedLine[i].size(); j++)
 				chanTypes.push_back(parsedLine[i][j]);
-		} else if (parsedLine[i].size() > 6 && parsedLine.substr(0, 6) == "MODES=") {
+		} else if (parsedLine[i].size() > 6 && parsedLine[i].substr(0, 6) == "MODES=") {
 			std::istringstream modeNum (parsedLine[i].substr(6));
 			modeNum >> maxModes;
 		}
