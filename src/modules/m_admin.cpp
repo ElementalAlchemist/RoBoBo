@@ -282,8 +282,8 @@ void Admin::onChannelKickPost(std::string server, std::string channel, std::stri
 	sendVerbose(2, server + ": " + kicker + " KICK " + kickee + " from " + channel + " (" + reason + ")");
 }
 
-void Admin::onChannelModePost(std::string server, std::string channel, std::string setter, char mode, bool add, std::string param) {
-	sendVerbose(2, server + ": (" + channel + ") " + setter + " set MODE " + (add ? "+" : "-") + mode + " " + param);
+void Admin::onChannelModePost(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param) {
+	sendVerbose(2, server + ": (" + channel + ") " + setter + " set mode " + (add ? "+" : "-") + mode + "=" + param);
 }
 
 void Admin::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {
