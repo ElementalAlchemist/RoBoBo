@@ -634,7 +634,7 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 			chans.find(target)->second->addMode(modeList[i], listmode);
 			std::ostringstream currTime;
 			currTime << time(NULL);
-			connection->sendData(":" + client + " FMODE " + target + " " + currTime + " " + modes + params);
+			connection->sendData(":" + client + " FMODE " + target + " " + currTime.str() + " " + modes + params);
 			callChannelModePostHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), true, newParam);
 		} else {
 			if (nicks.find(target) != nicks.end())
