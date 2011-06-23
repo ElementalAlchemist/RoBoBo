@@ -712,7 +712,7 @@ void Client::sendData() {
 			else if (ctcp)
 				callUserCTCPReplySendHook(serverConf["nick"], targetName, message);
 			else if (channel)
-				callChannelNoticeSendHook(serverConf["nick"], targetName, message);
+				callChannelNoticeSendHook(serverConf["nick"], targetName, status, message);
 			else
 				callUserNoticeSendHook(serverConf["nick"], targetName, message);
 		}
