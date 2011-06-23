@@ -56,7 +56,10 @@ void AdminChannelControl::onModuleChange() {
 }
 
 std::string AdminChannelControl::description() {
-	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to make the bot join and part channels.";
+	std::string desc = "Allows ";
+	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
+	desc += " to make the bot join and part channels.";
+	return desc;
 }
 
 std::vector<std::string> AdminChannelControl::supports() {

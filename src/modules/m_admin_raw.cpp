@@ -56,7 +56,10 @@ void RawCommand::onModuleChange() {
 }
 
 std::string RawCommand::description() {
-	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + "to send raw IRC text.";
+	std::string desc = "Allows ";
+	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
+	desc += "to send raw IRC text.";
+	return desc;
 }
 
 std::vector<std::string> RawCommand::supports() {

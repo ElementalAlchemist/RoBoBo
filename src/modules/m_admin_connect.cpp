@@ -57,7 +57,10 @@ void ConnectServerCommand::onModuleChange() {
 }
 
 std::string ConnectServerCommand::description() {
-	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to connect the bot to and disconnect the bot from servers.";
+	std::string desc = "Allows ";
+	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
+	desc += " to connect the bot to and disconnect the bot from servers.";
+	return desc;
 }
 
 std::vector<std::string> ConnectServerCommand::supports() {
