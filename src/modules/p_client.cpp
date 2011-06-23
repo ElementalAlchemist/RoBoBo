@@ -947,7 +947,7 @@ void Client::parse005(std::vector<std::string> parsedLine) {
 void Client::parseNames(std::string channel, std::string namesList) {
 	bool firstNames = false;
 	if (!readingNames[channel]) {
-		for (std::set<std::string>::iterator nickIter = inChannels[channel].second.second.second.begin(); nickIter != inChannels[channel].second.second.second.end(); ++nickIter) {
+		for (std::set<std::string>::iterator nickIter = inChannels[channel].second.second.begin(); nickIter != inChannels[channel].second.second.end(); ++nickIter) {
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(*nickIter);
 			if (userIter == users.end())
 				continue;
@@ -957,7 +957,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 				users.erase(userIter);
 			}
 		}
-		inChannels[channel].second.second.second.clear();
+		inChannels[channel].second.second.clear();
 		readingNames[channel] = firstNames = true;
 	}
 	std::vector<std::string> names;
