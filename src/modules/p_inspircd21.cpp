@@ -876,7 +876,7 @@ void InspIRCd::removeClient(std::string client, std::string reason) {
 		return;
 	ourClients.erase(ourClients.find(client));
 	callQuitHook(client);
-	std::tr1::unordered_map<std::pair, User*>::iterator userIter = users.find(client);
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
 	std::set<std::string> userChannels = userIter->second->channels();
 	for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
 		chans.find(chanIter)->second->partUser(client);
