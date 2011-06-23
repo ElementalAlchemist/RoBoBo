@@ -132,7 +132,7 @@ void User::status(std::string channel, std::string status, bool adding) {
 
 std::string User::status(std::string channel) {
 	if (channels.find(channel) == channels.end())
-		return '0';
+		return "";
 	std::set<std::string> statusChars = channels.find(channel)->second;
 	std::set<std::string> statuses;
 	for (std::set<std::string>::iterator statIter = statusChars.begin(); statIter != statusChars.end(); ++statIter)
