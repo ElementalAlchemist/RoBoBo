@@ -124,6 +124,7 @@ class InspIRCd : public Protocol {
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > xLines;
 		std::string uidCount;
 		std::string useUID();
+		void sendData(std::string data);
 };
 
 User::User(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, time_t theConnectTime) : userNick(theNick), userIdent(theIdent), userHost(theHost), GECOS(theGecos), nickChgTime(theConnectTime) {}
@@ -358,10 +359,10 @@ void InspIRCd::connectServer() {
 	connection->connectServer(serverName, port);
 	sleep(1);
 	pthread_create(&receiveThread, &detachedState, receiveData_thread, this);
-	connection->sendData("CAPAB START");
-	connection->sendData("CAPAB CAPABILITIES :PROTOCOL=1203");
-	connection->sendData("CAPAB END");
-	connection->sendData("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
+	sendData("CAPAB START");
+	sendData("CAPAB CAPABILITIES :PROTOCOL=1203");
+	sendData("CAPAB END");
+	sendData("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
 	sendOther(":" + serverConf["sid"] + " BURST");
 	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
 	unsigned int i = 0;
@@ -525,9 +526,9 @@ void InspIRCd::sendMsg(std::string client, std::string target, std::string messa
 		}
 	}
 	if (status == ' ')
-		connection->sendData(":" + client + " PRIVMSG " + target + " :" + message);
+		sendData(":" + client + " PRIVMSG " + target + " :" + message);
 	else
-		connection->sendData(":" + client + " PRIVMSG " + status + target + " :" + message);
+		sendData(":" + client + " PRIVMSG " + status + target + " :" + message);
 	if (channel && ctcp)
 		callChannelCTCPSendHook(client, target, status, message);
 	else if (channel)
@@ -583,9 +584,9 @@ void InspIRCd::sendNotice(std::string client, std::string target, std::string me
 		}
 	}
 	if (status == ' ')
-		connection->sendData(":" + client + " NOTICE " + target + " :" + message);
+		sendData(":" + client + " NOTICE " + target + " :" + message);
 	else
-		connection->sendData(":" + client + " NOTICE " + status + target + " :" + message);
+		sendData(":" + client + " NOTICE " + status + target + " :" + message);
 	if (channel && ctcp)
 		callChannelCTCPReplySendHook(client, target, status, message);
 	else if (channel)
@@ -643,14 +644,14 @@ void InspIRCd::setMode(std::string client, std::string target, std::string mode)
 			chans.find(target)->second->addMode(modeList[i], listmode);
 			std::ostringstream currTime;
 			currTime << time(NULL);
-			connection->sendData(":" + client + " FMODE " + target + " " + currTime.str() + " " + modes + params);
+			sendData(":" + client + " FMODE " + target + " " + currTime.str() + " " + modes + params);
 			callChannelModePostHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), true, newParam);
 		} else {
 			if (nicks.find(target) != nicks.end())
 				target = nicks.find(target)->second; // Convert the target nick to a UUID since that's kinda important and stuff.
 			callUserModePreHook(target, modeList[i], true);
 			users.find(target)->second->addMode(modeList[i]);
-			connection->sendData(":" + client + " MODE " + target + " " + modeList[i]);
+			sendData(":" + client + " MODE " + target + " " + modeList[i]);
 			callUserModePostHook(target, modeList[i], true);
 		}
 	}
@@ -703,14 +704,14 @@ void InspIRCd::removeMode(std::string client, std::string target, std::string mo
 			chans.find(target)->second->addMode(modeList[i], listmode);
 			std::ostringstream currTime;
 			currTime << time(NULL);
-			connection->sendData(":" + client + " FMODE " + target + " " + currTime.str() + " " + modes + params);
+			sendData(":" + client + " FMODE " + target + " " + currTime.str() + " " + modes + params);
 			callChannelModePostHook(target, users.find(client)->second->nick(), modeList[i].substr(0, modeList[i].find_first_of('=')), false, newParam);
 		} else {
 			if (nicks.find(target) != nicks.end())
 				target = nicks.find(target)->second; // Convert the target nick to a UUID since that's kinda important and stuff.
 			callUserModePreHook(target, modeList[i], false);
 			users.find(target)->second->addMode(modeList[i]);
-			connection->sendData(":" + client + " MODE " + target + " " + modeList[i]);
+			sendData(":" + client + " MODE " + target + " " + modeList[i]);
 			callUserModePostHook(target, modeList[i], false);
 		}
 	}
@@ -734,14 +735,14 @@ void InspIRCd::partChannel(std::string client, std::string channel, std::string 
 	callChannelPartPreHook(channel, userIter->second->hostmask(), reason);
 	userIter->second->partChannel(channel);
 	chans.find(channel)->second->partUser(client);
-	connection->sendData(":" + client + " PART " + channel + " :" + reason);
+	sendData(":" + client + " PART " + channel + " :" + reason);
 	callChannelPartPostHook(channel, userIter->second->hostmask(), reason);
 }
 
 void InspIRCd::quitServer(std::string reason) {
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callQuitHook(*userIter);
-	connection->sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
+	sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
 	connection->closeConnection();
 	keepServer = false; // if the bot is intentionally quitting, it's not necessary to keep this server anymore
 	// The bot automatically detects where the keepServer variable is when the server check comes around and uses it to decide whether to restart the server.
@@ -756,7 +757,7 @@ void InspIRCd::kickUser(std::string client, std::string channel, std::string use
 	callChannelKickPreHook(channel, users.find(client)->second->nick(), user, reason);
 	chans.find(channel)->second->partUser(target);
 	users.find(target)->second->partChannel(channel);
-	connection->sendData(":" + client + " KICK " + channel + " " + user + " :" + reason);
+	sendData(":" + client + " KICK " + channel + " " + user + " :" + reason);
 	callChannelKickPostHook(channel, users.find(client)->second->nick(), user, reason);
 }
 
@@ -769,7 +770,7 @@ void InspIRCd::changeNick(std::string client, std::string newNick) {
 	time_t nickTime = time(NULL);
 	std::ostringstream currTime;
 	currTime << nickTime;
-	connection->sendData(":" + client + " NICK " + newNick + " " + currTime.str());
+	sendData(":" + client + " NICK " + newNick + " " + currTime.str());
 	userIter->second->nick(newNick);
 	userIter->second->updateTime(nickTime);
 	callNickChangePostHook(oldNick, newNick);
@@ -780,7 +781,7 @@ void InspIRCd::oper(std::string client, std::string username, std::string passwo
 		return;
 	std::string nick = users.find(client)->second->nick();
 	callUserOperPreHook(nick, username);
-	connection->sendData(":" + client + " OPERTYPE :" + username);
+	sendData(":" + client + " OPERTYPE :" + username);
 	users.find(client)->second->operup(username);
 	callUserOperPostHook(nick, username);
 }
@@ -805,7 +806,7 @@ void InspIRCd::killUser(std::string client, std::string user, std::string reason
 		callQuitHook(user);
 	else
 		callUserQuitPreHook(userIter->second->hostmask(), "Killed by " + clientNick + " (" + reason + ")");
-	connection->sendData(":" + client + " KILL " + user + " :" + reason);
+	sendData(":" + client + " KILL " + user + " :" + reason);
 	std::set<std::string> userChannels = userIter->second->channels();
 	for (std::set<std::string>::iterator chanIter = userChannels.begin(); chanIter != userChannels.end(); ++chanIter)
 		chans.find(*chanIter)->second->partUser(user);
@@ -827,7 +828,7 @@ void InspIRCd::setXLine(std::string client, std::string lineType, std::string ho
 	currTime << time(NULL);
 	length << duration;
 	std::string sendLine = ":" + client + " ADDLINE " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason;
-	connection->sendData(sendLine);
+	sendData(sendLine);
 	std::vector<std::string> parsedLine = parseLine(sendLine);
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callOtherDataHook(*userIter, parsedLine);
@@ -839,7 +840,7 @@ void InspIRCd::removeXLine(std::string client, std::string lineType, std::string
 	if (client == "")
 		client = serverConf["sid"];
 	std::string sendLine = ":" + client + " DELLINE " + lineType + " " + hostmask;
-	connection->sendData(sendLine);
+	sendData(sendLine);
 	std::vector<std::string> parsedLine = parseLine(sendLine);
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callOtherDataHook(*userIter, parsedLine);
@@ -851,14 +852,14 @@ std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t
 
 void InspIRCd::sendSNotice(char snomask, std::string text) {
 	std::string sendLine = ":" + serverConf["sid"] + " SNONOTICE " + snomask + " :" + text;
-	connection->sendData(sendLine);
+	sendData(sendLine);
 	std::vector<std::string> parsedLine = parseLine(sendLine);
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callOtherDataHook(*userIter, parsedLine);
 }
 
 void InspIRCd::sendOther(std::string rawLine) {
-	connection->sendData(rawLine);
+	sendData(rawLine);
 	std::vector<std::string> parsedLine = parseLine(rawLine);
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callOtherDataHook(*userIter, parsedLine);
@@ -874,7 +875,7 @@ std::string InspIRCd::addClient(std::string nick, std::string ident, std::string
 	std::ostringstream currTime;
 	currTime << time(NULL);
 	std::string sendLine = ":" + serverConf["sid"] + " UID " + uuid + " " + currTime.str() + " " + nick + " " + host + " " + host + " " + ident + " 127.0.0.1 " + currTime.str() + " + :" + gecos;
-	connection->sendData(sendLine);
+	sendData(sendLine);
 	std::vector<std::string> parsedLine = parseLine(sendLine);
 	callConnectHook(uuid);
 	return uuid;
@@ -892,7 +893,7 @@ void InspIRCd::removeClient(std::string client, std::string reason) {
 	nicks.erase(nicks.find(userIter->second->nick()));
 	delete userIter->second;
 	users.erase(userIter);
-	connection->sendData(":" + client + " QUIT :" + reason);
+	sendData(":" + client + " QUIT :" + reason);
 }
 
 std::set<std::string> InspIRCd::clients() {
@@ -1399,7 +1400,7 @@ void InspIRCd::receiveData() {
 			chans.find(parsedLine[3])->second->joinUser(parsedLine[2]);
 			std::ostringstream createTime;
 			createTime << chans.find(parsedLine[3])->second->creationTime();
-			connection->sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
+			sendData(":" + serverConf["sid"] + " FJOIN " + parsedLine[3] + " " + createTime.str() + " + ," + parsedLine[2]);
 			callChannelJoinPostHook(parsedLine[3], userIter->second->hostmask());
 		} else if (parsedLine[1] == "SVSMODE") {
 			if (parsedLine[2][0] == '#') {
@@ -1468,7 +1469,7 @@ void InspIRCd::receiveData() {
 				std::string fmode = ":" + serverConf["sid"] + " FMODE " + parsedLine[2] + " " + chanTime.str() + " " + parsedLine[3];
 				for (size_t i = 4; i < parsedLine.size(); i++)
 					fmode += " " + parsedLine[i];
-				connection->sendData(fmode);
+				sendData(fmode);
 			} else {
 				if (nicks.find(parsedLine[2]) != nicks.end())
 					parsedLine[2] = nicks.find(parsedLine[2])->second;
@@ -1512,9 +1513,9 @@ void InspIRCd::receiveData() {
 							else
 								userIter->second->removeSnomask(parsedLine[4][i]);
 						}
-						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3] + " " + parsedLine[4]);
+						sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3] + " " + parsedLine[4]);
 					} else
-						connection->sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3]);
+						sendData(":" + serverConf["sid"] + " MODE " + userIter->first + " " + parsedLine[3]);
 				}
 			}
 		} else if (parsedLine[1] == "SVSNICK" && parsedLine[2].substr(0, 3) == serverConf["sid"] && nicks.find(parsedLine[3]) == nicks.end()) { // ignore it if it's not for us or if the nick is already in use
@@ -1528,7 +1529,7 @@ void InspIRCd::receiveData() {
 			time_t nickTime;
 			givenTimestamp >> nickTime;
 			userIter->second->updateTime(nickTime);
-			connection->sendData(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
+			sendData(":" + userIter->first + " NICK " + parsedLine[3] + " " + parsedLine[4]);
 			callNickChangePostHook(oldnick, parsedLine[3]);
 		} else if (parsedLine[1] == "SVSPART" && parsedLine[2].substr(0, 3) == serverConf["sid"]) { // ignore if not for us
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(parsedLine[2]);
@@ -1542,7 +1543,7 @@ void InspIRCd::receiveData() {
 				delete chanIter->second;
 				chans.erase(chanIter);
 			}
-			connection->sendData(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
+			sendData(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
 			callChannelPartPostHook(parsedLine[3], hostmask, "SVSPART received");
 		} else if (parsedLine[1] == "ENCAP" && (parsedLine[2] == "*" || parsedLine[2] == serverConf["sid"])) {
 			if (parsedLine[3] == "ALLTIME") {
@@ -1695,7 +1696,7 @@ void InspIRCd::joinUsers(std::string channel, std::vector<std::string> userList)
 		callChannelJoinPostHook(channel, hostmask);
 	}
 	joiningUsers = joiningUsers.substr(1); // remove opening space
-	connection->sendData(":" + serverConf["sid"] + " FJOIN " + channel + " " + chanTimeS.str() + " " + modes + " :" + joiningUsers);
+	sendData(":" + serverConf["sid"] + " FJOIN " + channel + " " + chanTimeS.str() + " " + modes + " :" + joiningUsers);
 }
 
 std::string InspIRCd::useUID() {
@@ -1725,6 +1726,12 @@ std::string InspIRCd::useUID() {
 	} else
 		uidCount[5]++;
 	return uidToUse;
+}
+
+void InspIRCd::sendData(std::string data) {
+	connection->sendData(data);
+	if (debugLevel >= 3)
+		std::cout << " -> " << data << std::endl;
 }
 
 extern "C" Protocol* spawn(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debugLevel) {
