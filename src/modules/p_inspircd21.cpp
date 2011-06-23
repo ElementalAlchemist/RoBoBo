@@ -1086,7 +1086,7 @@ void InspIRCd::receiveData() {
 				chanIter->second->joinUsers(chanUsers);
 				for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
 					User* user = users.find(*userIter)->second;
-					std::set<std::string> statuses = user->statuses();
+					std::set<std::string> statuses = user->statuses(chanIter->first);
 					for (std::set<std::string>::iterator prefixIter = statuses.begin(); prefixIter != statuses.end(); ++prefixIter)
 						user->removeStatus(chanIter->first, *prefixIter);
 				}
