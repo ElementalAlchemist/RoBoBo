@@ -46,7 +46,7 @@ class Channel {
 		Channel(time_t creation);
 		std::set<std::string> modes();
 		void addMode(std::string mode, bool list);
-		void removeMode(std::string mode);
+		void removeMode(std::string mode, bool list);
 		std::set<std::string> users();
 		void joinUser(std::string user);
 		void partUser(std::string user);
@@ -268,12 +268,21 @@ void Channel::addMode(std::string mode, bool list) {
 	modeParams.insert(std::pair<std::string, std::string> (modeonly, param));
 }
 
-void Channel::removeMode(std::string mode) {
-	std::set<std::string>::iterator modeIter = chanModes.find(mode);
+void Channel::removeMode(std::string mode, bool list) {
+	if (list || mode.find_first_of('=') == std::string::npos) {
+		std::set<std::string>::iterator modeIter = chanModes.find(mode);
+		if (modeIter != chanModes.end()) {
+			chanModes.erase(mode);
+			return;
+		}
+	}
+	std::string modeonly = mode.substr(0, mode.find_first_of('='));
+	std::set<std::string>::iterator modeIter = chanModes.find(modeonly);
 	if (modeIter != chanModes.end())
 		chanModes.erase(modeIter);
-	if (modeParams.find(mode.substr(0, mode.find_first_of('='))) != modeParams.end())
-		modeParams.erase(modeParams.find(mode.substr(0, mode.find_first_of('='))));
+	std::tr1::unordered_map<std::string, std::string>::iterator paramIter = modeParams.find(modeonly);
+	if (paramIter != modeParams.end())
+		modeParams.erase(paramIter);
 }
 
 std::set<std::string> Channel::users() {
@@ -1177,7 +1186,7 @@ void InspIRCd::receiveData() {
 					if (adding)
 						chanIter->second->addMode(longmode, list);
 					else
-						chanIter->second->removeMode(longmode);
+						chanIter->second->removeMode(longmode, list);
 					if (param)
 						callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[parameter++]);
 					else
