@@ -57,7 +57,10 @@ void LoadModCommand::onModuleChange() {
 }
 
 std::string LoadModCommand::description() {
-	return "Allows " + (config["masteronly"] == "yes" ? "the bot master" : "bot admins") + " to load and unload modules.";
+	std::string desc = "Allows ";
+	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
+	desc += " to load and unload modules.";
+	return desc;
 }
 
 std::vector<std::string> LoadModCommand::supports() {
