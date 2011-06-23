@@ -553,7 +553,7 @@ void Client::handleData() {
 				size_t exclaim = hostmask.find_first_of('!');
 				std::string ident = hostmask.substr(exclaim, hostmask.find_first_of('@') - exclaim);
 				std::string host = hostmask.substr(hostmask.find_first_of('@'));
-				users.insert(std::pair<std::string, User*> (nick, new User(ident, host)));
+				users.insert(std::pair<std::string, User*> (nick, new User(ident, host, this)));
 			}
 			inChannels.find(parsedLine[2])->second.second.second.insert(nick);
 			users.find(nick)->second->addChannel(parsedLine[2]);
