@@ -1234,7 +1234,7 @@ void InspIRCd::receiveData() {
 				chanIter->second->topic(parsedLine[4], topicTime);
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter) {
 				std::set<std::string> channelsList = users.find(*userIter)->second->channels();
-				if (channelsList.find(parsedLine[2]) != chans.end())
+				if (channelsList.find(parsedLine[2]) != channelsList.end())
 					callOtherDataHook(*userIter, parsedLine);
 			}
 		} else if (parsedLine[1] == "FIDENT") {
