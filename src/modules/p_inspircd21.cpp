@@ -1066,7 +1066,7 @@ void InspIRCd::receiveData() {
 			time_t createTime;
 			cTime >> createTime;
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
-			if (chanIter = chans.end())
+			if (chanIter == chans.end())
 				chanIter = chans.insert(std::pair<std::string, Channel*> (parsedLine[2], new Channel (createTime))).first;
 			if (createTime < chanIter->second->creationTime()) {
 				std::string topic = chanIter->second->topic();
