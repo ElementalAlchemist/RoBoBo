@@ -77,7 +77,7 @@ class Client : public Protocol {
 		std::tr1::unordered_map<char, std::string> allChanModes, allUserModes;
 		void setChanMode(bool addMode, bool list, std::string channel, std::string mode, std::string param = "");
 		void setStatus(bool addMode, std::string channel, std::string status, std::string user);
-		void saveMode(std::string longmode, char modeChar);
+		void saveMode(std::string longmode, char modeChar, bool chanMode);
 		char convertMode(std::string mode);
 		std::string convertChanMode(char mode);
 		std::string convertUserMode(char mode);
