@@ -49,7 +49,7 @@ class Client : public Protocol {
 		void changeNick(std::string client, std::string newNick);
 		void oper(std::string client, std::string username, std::string password);
 		void sendOther(std::string rawLine);
-		std::list<std::string> clients();
+		std::set<std::string> clients();
 		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
 		std::list<std::string> userModes(std::string client);
 	private:
