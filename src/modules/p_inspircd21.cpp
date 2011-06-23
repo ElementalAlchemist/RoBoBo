@@ -760,7 +760,7 @@ void InspIRCd::changeNick(std::string client, std::string newNick) {
 	time_t nickTime = time(NULL);
 	std::ostringstream currTime;
 	currTime << nickTime;
-	connection->sendData(":" + client + " NICK " + newNick + " " + currTime);
+	connection->sendData(":" + client + " NICK " + newNick + " " + currTime.str());
 	userIter->second->nick(newNick);
 	userIter->second->updateTime(nickTime);
 	callNickChangePostHook(oldNick, newNick);
