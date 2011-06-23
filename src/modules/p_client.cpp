@@ -1,5 +1,6 @@
 #include "protoinclude.h"
 #include <algorithm>
+#include <queue>
 
 class Client;
 class User {
