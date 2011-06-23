@@ -252,7 +252,10 @@ bool Client::isClient() {
 }
 
 std::list<std::pair<std::string, char> > Client::prefixes() {
-	return statusPrefixes;
+	std::list<std::pair<std::string, char> > longPrefixes;
+	for (std::list<std::pair<char, char> >::iterator statusIter = statusPrefixes.begin(); statusIter != statusPrefixes.end(); ++statusIter)
+		longPrefixes.push_back(std::pair<std::string, char> (convertChanMode((*statusIter).first), (*statusIter).second));
+	return longPrefixes;
 }
 
 std::set<char> Client::channelTypes() {
