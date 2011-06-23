@@ -35,6 +35,7 @@ server irc.example.com {
 serverconf irc.server.net { # This server will not be connected on startup, but its configuration will be saved so that it can be connected to later
 	protocol = "inspircd21"; # This example block is set up for InspIRCd connections.
 	sockettype = "plaintext";
+	servername = "robobo.server.net"; # Name this server!  Mostly because you have to.
 	sid = "00A"; # The server ID is required for InspIRCd server connections.
 	password = "password"; # A password for connecting is also required.
 	port = "6667";
