@@ -893,7 +893,7 @@ std::set<std::string> InspIRCd::clients() {
 std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::string client) {
 	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(client);
 	if (userIter == users.end())
-		return;
+		return std::tr1::unordered_map<std::string, std::string> ();
 	std::tr1::unordered_map<std::string, std::string> info;
 	info["nick"] = userIter->second->nick();
 	info["ident"] = userIter->second->ident();
@@ -903,6 +903,7 @@ std::tr1::unordered_map<std::string, std::string> InspIRCd::clientInfo(std::stri
 	connTime << userIter->second->nickTime();
 	info["connecttime"] = connTime.str();
 	info["opertype"] = userIter->second->opertype();
+	return info;
 }
 
 std::list<std::string> InspIRCd::userModes(std::string client) {
