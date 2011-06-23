@@ -395,7 +395,7 @@ void InspIRCd::connectServer() {
 		clientOper << i << "/oper";
 		clientChannels << i << "/channels";
 	}
-	for (std::tr1::unordered_map<std::string, std::string>::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter)
+	for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter)
 		joinUsers(jcIter->first, jcIter->second);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
 }
