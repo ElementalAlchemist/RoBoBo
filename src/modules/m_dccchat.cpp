@@ -140,7 +140,7 @@ void DCCChatModule::dccListen(std::string id, Socket* listenSocket) {
 			dccSend(id, "Disconnecting DCC...");
 			break;
 		}
-		std::tr1::unordered_map<std::string, Module*> modules = getModules(); // get a new one each time in case it is updated
+		std::tr1::unordered_map<std::string, Module*> moduleList = modules(); // get a new one each time in case it is updated
 		for (std::tr1::unordered_map<std::string, std::string>::iterator hookIter = moduleTriggers.begin(); hookIter != moduleTriggers.end(); ++hookIter) {
 			if (hookIter->first == receivedMsg.substr(0, receivedMsg.find_first_of(' '))) {
 				bool alreadyReporting = false;
@@ -155,8 +155,8 @@ void DCCChatModule::dccListen(std::string id, Socket* listenSocket) {
 			}
 		}
 		for (unsigned int i = 0; i < ourReportingModules->second.size(); i++) {
-			std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules->second[i]);
-			if (modIter == modules.end())
+			std::tr1::unordered_map<std::string, Module*>::iterator modIter = moduleList.find(ourReportingModules->second[i]);
+			if (modIter == moduleList.end())
 				ourReportingModules->second.erase(ourReportingModules->second.begin()+i);
 			else {
 				std::vector<std::string> modSupports = modIter->second->supports();
@@ -170,9 +170,9 @@ void DCCChatModule::dccListen(std::string id, Socket* listenSocket) {
 			}
 		}
 	}
-	std::tr1::unordered_map<std::string, Module*> modules = modules();
+	std::tr1::unordered_map<std::string, Module*> moduleList = modules();
 	for (unsigned int i = 0; i < ourReportingModules->second.size(); i++) {
-		std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules.find(ourReportingModules->second[i]);
+		std::tr1::unordered_map<std::string, Module*>::iterator modIter = moduleList.find(ourReportingModules->second[i]);
 		dccChat* dccMod = (dccChat*) modIter->second;
 		dccMod->onDCCEnd(id); // call the DCC end hook for each watching module as the DCC session ends
 	}
