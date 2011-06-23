@@ -326,7 +326,7 @@ std::pair<std::string, char> Client::userStatus(std::string channel, std::string
 std::string Client::compareStatus(std::set<std::string> statuses) {
 	for (std::list<std::pair<char, char> >::iterator statIter = statusPrefixes.begin(); statIter != statusPrefixes.end(); ++statIter) {
 		std::string thisStatus = convertChanMode(statIter->first);
-		if (statuses.find(thisStatus))
+		if (statuses.find(thisStatus) != statuses.end())
 			return thisStatus;
 	}
 	return "";
