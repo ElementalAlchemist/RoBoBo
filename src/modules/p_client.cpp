@@ -837,7 +837,7 @@ void Client::setChanMode(bool addMode, bool list, std::string channel, std::stri
 		return;
 	if (addMode) {
 		if (list) {
-			chanIter->second.second.first.insert(mode + "=" + param);
+			chanIter->second.second.first.push_back(mode + "=" + param);
 			return;
 		}
 		for (std::list<std::string>::iterator modeIter = chanIter->second.second.first.begin(); modeIter != chanIter->second.second.first.end(); ++modeIter) {
@@ -850,9 +850,9 @@ void Client::setChanMode(bool addMode, bool list, std::string channel, std::stri
 			}
 		}
 		if (param == "")
-			chanIter->second.second.first.insert(mode);
+			chanIter->second.second.first.push_back(mode);
 		else
-			chanIter->second.second.first.insert(mode + "=" + param);
+			chanIter->second.second.first.push_back(mode + "=" + param);
 	} else {
 		if (list || param != "") {
 			std::list<std::string>::iterator foundMode = std::find(chanIter->second.second.first.begin(), chanIter->second.second.first.end(), mode + "=" + param);
