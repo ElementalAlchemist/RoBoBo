@@ -1131,6 +1131,7 @@ void InspIRCd::receiveData() {
 				}
 			}
 		} else if (parsedLine[1] == "FMODE") {
+			std::string origin = parsedLine[0].substr(1);
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
 			std::istringstream cTime (parsedLine[3]);
 			time_t createTime;
@@ -1151,13 +1152,13 @@ void InspIRCd::receiveData() {
 					bool param = false, list = false;
 					for (std::list<std::pair<std::string, char> >::iterator prefixIter = chanRanks.begin(); prefixIter != chanRanks.end(); ++prefixIter) {
 						if (longmode == (*prefixIter).first) {
-							callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[parameter]);
+							callChannelModePreHook(parsedLine[2], origin, longmode, adding, parsedLine[parameter]);
 							param = true;
 							if (adding)
 								users.find(parsedLine[parameter])->second->addStatus(parsedLine[2], longmode);
 							else
 								users.find(parsedLine[parameter])->second->removeStatus(parsedLine[2], longmode);
-							callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[parameter++]);
+							callChannelModePostHook(parsedLine[2], origin, longmode, adding, parsedLine[parameter++]);
 							break;
 						}
 					}
@@ -1180,18 +1181,18 @@ void InspIRCd::receiveData() {
 						}
 					}
 					if (param) {
-						callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[parameter]);
+						callChannelModePreHook(parsedLine[2], origin, longmode, adding, parsedLine[parameter]);
 						longmode += "=" + parsedLine[parameter];
 					} else
-						callChannelModePreHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
+						callChannelModePreHook(parsedLine[2], origin, longmode, adding);
 					if (adding)
 						chanIter->second->addMode(longmode, list);
 					else
 						chanIter->second->removeMode(longmode, list);
 					if (param)
-						callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding, parsedLine[parameter++]);
+						callChannelModePostHook(parsedLine[2], origin, longmode, adding, parsedLine[parameter++]);
 					else
-						callChannelModePostHook(parsedLine[2], parsedLine[0].substr(1), longmode, adding);
+						callChannelModePostHook(parsedLine[2], origin, longmode, adding);
 				}
 			}
 		} else if (parsedLine[1] == "MODE") {
