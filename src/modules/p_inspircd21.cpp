@@ -109,6 +109,7 @@ class InspIRCd : public Protocol {
 		static void* receiveData_thread(void* ptr);
 		void receiveData();
 		std::string connectedSID;
+		volatile bool bursting;
 		std::set<std::string> ourClients;
 		std::tr1::unordered_map<std::string, User*> users;
 		std::tr1::unordered_map<std::string, std::string> nicks;
@@ -365,8 +366,9 @@ void InspIRCd::connectServer() {
 	sendData("CAPAB END");
 	sendData("SERVER " + serverConf["servername"] + " " + serverConf["password"] + " 0 " + serverConf["sid"] + " :" + serverConf["description"]);
 	sendOther(":" + serverConf["sid"] + " BURST");
+	bursting = true;
+	while (bursting) {}
 	sendOther(":" + serverConf["sid"] + " VERSION :RoBoBo-IRC-BoBo-2.0 InspIRCd-2.1-compat");
-	sleep(1);
 	unsigned int i = 0;
 	std::ostringstream clientNick, clientIdent, clientHost, clientGecos, clientOper, clientChannels, currTimeS;
 	clientNick << i << "/nick";
@@ -972,6 +974,10 @@ void InspIRCd::receiveData() {
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 				callOtherDataHook(*userIter, parsedLine);
 			sendOther(":" + serverConf["sid"] + " PONG " + parsedLine[3] + " " + parsedLine[2]);
+		} else if (parsedLine[1] == "ENDBURST") {
+			bursting = false;
+			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+				callOtherDataHook(*userIter, parsedLine);
 		} else if (parsedLine[0] == "CAPAB") {
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 				callOtherDataHook(*userIter, parsedLine);
