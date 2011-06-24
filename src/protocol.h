@@ -75,8 +75,8 @@ class Protocol {
 		void callUserQuitPostHook(std::string hostmask, std::string reason = "");
 		void callNickChangePreHook(std::string oldNick, std::string newNick);
 		void callNickChangePostHook(std::string oldNick, std::string newNick);
-		void callChannelKickPreHook(std::string channel, std::string kicker, std::string kickee, std::string reason);
-		void callChannelKickPostHook(std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelKickPreHook(std::string channel, std::string kicker, std::string kickee, std::string reason = "");
+		void callChannelKickPostHook(std::string channel, std::string kicker, std::string kickee, std::string reason = "");
 		void callChannelModePreHook(std::string channel, std::string setter, std::string mode, bool add, std::string param = "");
 		void callChannelModePostHook(std::string channel, std::string setter, std::string mode, bool add, std::string param = "");
 		void callUserModePreHook(std::string client, std::string mode, bool add);

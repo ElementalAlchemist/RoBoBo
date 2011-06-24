@@ -1356,17 +1356,35 @@ void InspIRCd::receiveData() {
 			std::string uuid = parsedLine[0].substr(1); // strip starting colon
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
 			std::string hostmask = userIter->second->hostmask();
-			callChannelPartPreHook(parsedLine[2], hostmask, parsedLine[3]);
+			bool reason = false;
+			if (parsedLine.size() == 3)
+				callChannelPartPreHook(parsedLine[2], hostmask);
+			else {
+				callChannelPartPreHook(parsedLine[2], hostmask, parsedLine[3]);
+				reason = true;
+			}
 			chans.find(parsedLine[2])->second->partUser(uuid);
 			userIter->second->partChannel(parsedLine[2]);
-			callChannelPartPostHook(parsedLine[2], hostmask, parsedLine[3]);
+			if (reason)
+				callChannelPartPostHook(parsedLine[2], hostmask, parsedLine[3]);
+			else
+				callChannelPartPostHook(parsedLine[2], hostmask);
 		} else if (parsedLine[1] == "KICK") {
 			std::string kicker = parsedLine[0].substr(1);
 			std::string kickeeNick = users.find(parsedLine[3])->second->nick();
-			callChannelKickPreHook(parsedLine[2], kicker, kickeeNick, parsedLine[4]);
+			bool reason = false;
+			if (parsedLine.size() == 4)
+				callChannelKickPreHook(parsedLine[2], kicker, kickeeNick);
+			else {
+				callChannelKickPreHook(parsedLine[2], kicker, kickeeNick, parsedLine[4]);
+				reason = true;
+			}
 			chans.find(parsedLine[2])->second->partUser(parsedLine[3]);
 			users.find(parsedLine[3])->second->partChannel(parsedLine[2]);
-			callChannelKickPostHook(parsedLine[2], kicker, kickeeNick, parsedLine[4]);
+			if (reason)
+				callChannelKickPostHook(parsedLine[2], kicker, kickeeNick, parsedLine[4]);
+			else
+				callChannelKickPostHook(parsedLine[2], kicker, kickeeNick);
 		} else if (parsedLine[1] == "QUIT") { // QUIT not valid from remote servers for local clients, so no need to check for that.
 			std::string uuid = parsedLine[0].substr(1); // strip starting colon
 			std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
