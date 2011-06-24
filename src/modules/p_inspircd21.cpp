@@ -1141,19 +1141,19 @@ void InspIRCd::receiveData() {
 						longmode += "=" + parsedLine[param++];
 					chanIter->second->addMode(longmode, list);
 				}
-				for (size_t i = 0; i < joinUserList.size(); i++) {
-					std::list<std::string> prefixes;
-					while (joinUserList[i][0] != ',') {
-						prefixes.push_back(convertChanMode(joinUserList[i][0]));
-						joinUserList[i] = joinUserList[i].substr(1);
-					}
-					chanIter->second->joinUser(joinUserList[i]);
-					std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(joinUserList[i]);
-					userIter->second->joinChannel(chanIter->first);
-					for (std::list<std::string>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter)
-						userIter->second->addStatus(chanIter->first, *prefixIter);
-					callChannelJoinPostHook(chanIter->first, userIter->second->hostmask());
+			}
+			for (size_t i = 0; i < joinUserList.size(); i++) {
+				std::list<std::string> prefixes;
+				while (joinUserList[i][0] != ',') {
+					prefixes.push_back(convertChanMode(joinUserList[i][0]));
+					joinUserList[i] = joinUserList[i].substr(1);
 				}
+				chanIter->second->joinUser(joinUserList[i]);
+				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(joinUserList[i]);
+				userIter->second->joinChannel(chanIter->first);
+				for (std::list<std::string>::iterator prefixIter = prefixes.begin(); prefixIter != prefixes.end(); ++prefixIter)
+					userIter->second->addStatus(chanIter->first, *prefixIter);
+				callChannelJoinPostHook(chanIter->first, userIter->second->hostmask());
 			}
 		} else if (parsedLine[1] == "FMODE") {
 			std::string origin = parsedLine[0].substr(1);
