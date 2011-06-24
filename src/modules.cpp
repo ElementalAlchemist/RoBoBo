@@ -331,6 +331,10 @@ std::set<std::string> Module::channelUsers(std::string server, std::string chann
 	return serverData->channelUsers(server, channel);
 }
 
+std::set<std::string> Module::channelModes(std::string server, std::string channel) {
+	return serverData->channelModes(server, channel);
+}
+
 std::string Module::userIdent(std::string server, std::string user) {
 	return serverData->userIdent(server, user);
 }

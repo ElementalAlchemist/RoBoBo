@@ -116,6 +116,7 @@ class Module {
 		std::list<std::string> channels(std::string server);
 		std::string channelTopic(std::string server, std::string channel);
 		std::set<std::string> channelUsers(std::string server, std::string channel);
+		std::set<std::string> channelModes(std::string server, std::string channel);
 		std::string userIdent(std::string server, std::string user);
 		std::string userHost(std::string server, std::string user);
 		std::list<std::string> userModes(std::string server, std::string user);

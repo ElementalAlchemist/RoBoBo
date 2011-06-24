@@ -900,6 +900,13 @@ std::set<std::string> Base::channelUsers(std::string server, std::string channel
 	return servIter->second->channelUsers(channel);
 }
 
+std::set<std::string> Base::channelModes(std::string server, std::string channel) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::set<std::string> ();
+	return servIter->second->channelModes(channel);
+}
+
 std::string Base::userIdent(std::string server, std::string user) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
