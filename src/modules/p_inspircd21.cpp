@@ -1148,6 +1148,7 @@ void InspIRCd::receiveData() {
 					prefixes.push_back(convertChanMode(joinUserList[i][0]));
 					joinUserList[i] = joinUserList[i].substr(1);
 				}
+				joinUserList[i] = joinUserList[i].substr(1); // Strip comma from UUID.
 				chanIter->second->joinUser(joinUserList[i]);
 				std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(joinUserList[i]);
 				userIter->second->joinChannel(chanIter->first);
