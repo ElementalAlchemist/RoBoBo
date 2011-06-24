@@ -1153,6 +1153,8 @@ void InspIRCd::receiveData() {
 				bool adding = true;
 				size_t parameter = 5;
 				for (size_t i = 0; i < parsedLine[4].size(); i++) {
+					if (parsedLine[4][i] == '=')
+						continue; // Sometimes the line starts with an equal sign instead.  Just ignore that symbol there.  Yeah.
 					if (parsedLine[4][i] == '+') {
 						adding = true;
 						continue;
