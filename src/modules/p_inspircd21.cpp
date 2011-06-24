@@ -1244,9 +1244,9 @@ void InspIRCd::receiveData() {
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
 			if (topicTime > chanIter->second->topicSetTime())
 				chanIter->second->topic(parsedLine[4], topicTime);
-			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter) {
-				std::set<std::string> channelsList = users.find(*userIter)->second->channels();
-				if (channelsList.find(parsedLine[2]) != channelsList.end())
+			std::set<std::string> chanUsers = chanIter->second->users();
+			for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
+				if (ourClients.find(*userIter) != ourClients.end())
 					callOtherDataHook(*userIter, parsedLine);
 			}
 		} else if (parsedLine[1] == "FIDENT") {
