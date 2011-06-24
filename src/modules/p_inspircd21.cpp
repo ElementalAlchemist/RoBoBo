@@ -1255,7 +1255,7 @@ void InspIRCd::receiveData() {
 			cTime >> topicTime;
 			std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(parsedLine[2]);
 			if (topicTime > chanIter->second->topicSetTime())
-				chanIter->second->topic(parsedLine[4], topicTime);
+				chanIter->second->topic(parsedLine[5], topicTime);
 			std::set<std::string> chanUsers = chanIter->second->users();
 			for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter) {
 				if (ourClients.find(*userIter) != ourClients.end())
