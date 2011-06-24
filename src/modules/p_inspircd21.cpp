@@ -450,6 +450,9 @@ std::set<std::string> InspIRCd::channelUsers(std::string channel) {
 }
 
 std::string InspIRCd::userIdent(std::string user) {
+	std::tr1::unordered_map<std::string, std::string>::iterator nickIter = nicks.find(user);
+	if (nickIter != nicks.end())
+		user = nickIter->second;
 	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
 	if (userIter == users.end())
 		return "";
@@ -457,6 +460,9 @@ std::string InspIRCd::userIdent(std::string user) {
 }
 
 std::string InspIRCd::userHost(std::string user) {
+	std::tr1::unordered_map<std::string, std::string>::iterator nickIter = nicks.find(user);
+	if (nickIter != nicks.end())
+		user = nickIter->second;
 	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
 	if (userIter == users.end())
 		return "";
@@ -464,6 +470,9 @@ std::string InspIRCd::userHost(std::string user) {
 }
 
 std::pair<std::string, char> InspIRCd::userStatus(std::string channel, std::string user) {
+	std::tr1::unordered_map<std::string, std::string>::iterator nickIter = nicks.find(user);
+	if (nickIter != nicks.end())
+		user = nickIter->second;
 	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
 	if (userIter == users.end())
 		return std::pair<std::string, char> ("", ' ');
