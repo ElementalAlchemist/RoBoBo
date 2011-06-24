@@ -443,7 +443,10 @@ std::set<std::string> InspIRCd::channelUsers(std::string channel) {
 	std::tr1::unordered_map<std::string, Channel*>::iterator chanIter = chans.find(channel);
 	if (chanIter == chans.end())
 		return std::set<std::string> ();
-	return chanIter->second->users();
+	std::set<std::string> chanUsers = chanIter->second->users(), chanNicks;
+	for (std::set<std::string>::iterator userIter = chanUsers.begin(); userIter != chanUsers.end(); ++userIter)
+		chanNicks.insert(users.find(*userIter)->second->nick());
+	return chanNicks;
 }
 
 std::string InspIRCd::userIdent(std::string user) {
