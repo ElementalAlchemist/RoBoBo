@@ -34,6 +34,7 @@ class Client : public Protocol {
 		std::list<std::string> channels();
 		std::string channelTopic(std::string channel);
 		std::set<std::string> channelUsers(std::string channel);
+		std::set<std::string> channelModes(std::string channel);
 		std::string userIdent(std::string user);
 		std::string userHost(std::string user);
 		std::pair<std::string, char> userStatus(std::string channel, std::string user);
@@ -292,6 +293,16 @@ std::set<std::string> Client::channelUsers(std::string channel) {
 	if (chanIter == inChannels.end())
 		return std::set<std::string>();
 	return chanIter->second.second.second;
+}
+
+std::set<std::string> Client::channelModes(std::string channel) {
+	std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator chanIter = inChannels.find(channel);
+	if (chanIter == inChannels.end())
+		return std::set<std::string>();
+	std::set<std::string> modes;
+	for (std::list<std::string>::iterator modeIter = chanIter->second.second.first.begin(); modeIter != chanIter->second.second.first.end(); ++modeIter)
+		modes.insert(*modeIter);
+	return modes;
 }
 
 std::string Client::userIdent(std::string user) {

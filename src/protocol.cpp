@@ -32,6 +32,8 @@ std::string Protocol::channelTopic(std::string channel) { return ""; }
 
 std::set<std::string> Protocol::channelUsers(std::string channel) { return std::set<std::string> (); }
 
+std::set<std::string> Protocol::channelModes(std::string channel) { return std::set<std::string> (); }
+
 std::string Protocol::userIdent(std::string user) { return ""; }
 
 std::string Protocol::userHost(std::string user) { return ""; }
