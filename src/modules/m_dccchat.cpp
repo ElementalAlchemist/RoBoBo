@@ -177,6 +177,7 @@ void DCCChatModule::dccListen(std::string id, Socket* listenSocket) {
 		dccChat* dccMod = (dccChat*) modIter->second;
 		dccMod->onDCCEnd(id); // call the DCC end hook for each watching module as the DCC session ends
 	}
+	listenSocket->closeConnection();
 	delete listenSocket;
 	activeConnections.erase(id);
 }
