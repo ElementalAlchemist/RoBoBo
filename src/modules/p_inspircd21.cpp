@@ -753,8 +753,10 @@ void InspIRCd::partChannel(std::string client, std::string channel, std::string 
 }
 
 void InspIRCd::quitServer(std::string reason) {
-	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
+	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter) {
 		callQuitHook(*userIter);
+		sendData(":" + *userIter + " QUIT :" + reason);
+	}
 	sendData(":" + serverConf["sid"] + " SQUIT " + serverConf["sid"] + " :" + reason);
 	connection->closeConnection();
 	keepServer = false; // if the bot is intentionally quitting, it's not necessary to keep this server anymore
