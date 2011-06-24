@@ -753,6 +753,8 @@ void InspIRCd::partChannel(std::string client, std::string channel, std::string 
 }
 
 void InspIRCd::quitServer(std::string reason) {
+	if (reason == "")
+		reason = "Shutdown command received.";
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter) {
 		callQuitHook(*userIter);
 		sendData(":" + *userIter + " QUIT :" + reason);
