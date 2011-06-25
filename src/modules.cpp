@@ -319,6 +319,10 @@ std::list<std::pair<std::string, char> > Module::serverPrefixes(std::string serv
 	return serverData->serverPrefixes(server);
 }
 
+std::string Module::compareStatus(std::string server, std::set<std::string> statuses) {
+	return serverData->compareStatus(server, statuses);
+}
+
 std::list<std::string> Module::channels(std::string server) {
 	return serverData->channels(server);
 }

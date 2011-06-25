@@ -60,6 +60,13 @@ std::list<std::pair<std::string, char> > Base::serverPrefixes(std::string server
 	return serverIter->second->prefixes();
 }
 
+std::string Base::compareStatus(std::string server, std::set<std::string> statuses) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator serverIter = servers.find(server);
+	if (serverIter == servers.end())
+		return "";
+	return serverIter->second->compareStatus(statuses);
+}
+
 bool Base::callChanMsgHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	bool keepGoing = true;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin(); modIter != highModules.end() && keepGoing; ++modIter)

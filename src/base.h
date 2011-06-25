@@ -12,6 +12,7 @@ class Base {
 		std::tr1::unordered_map<std::string, std::string> serverData(std::string server);
 		std::vector<std::vector<std::string> > serverChanModes(std::string server);
 		std::list<std::pair<std::string, char> > serverPrefixes(std::string server);
+		std::string compareStatus(std::string server, std::set<std::string> statuses);
 		bool callChanMsgHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
 		bool callUserMsgHook(std::string server, std::string client, std::string nick, std::string message);
 		bool callChanNoticeHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);

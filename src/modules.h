@@ -113,6 +113,7 @@ class Module {
 		std::tr1::unordered_map<std::string, std::string> serverInfo(std::string server);
 		std::vector<std::vector<std::string> > serverChanModes(std::string server);
 		std::list<std::pair<std::string, char> > serverPrefixes(std::string server);
+		std::string compareStatus(std::string server, std::set<std::string> statuses);
 		std::list<std::string> channels(std::string server);
 		std::string channelTopic(std::string server, std::string channel);
 		std::set<std::string> channelUsers(std::string server, std::string channel);
