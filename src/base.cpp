@@ -1150,8 +1150,6 @@ void Base::serverCheck() {
 					std::cout << serverName << " lost connection.  Reconnecting..." << std::endl;
 				if (restartServer)
 					connectServer(serverName); // make new server for reconnecting
-				else
-					servers.erase(servIter);
 			}
 		}
 	}
