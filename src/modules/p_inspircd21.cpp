@@ -355,6 +355,17 @@ unsigned int InspIRCd::apiVersion() {
 
 void InspIRCd::connectServer() {
 	callPreConnectHook();
+	std::tr1::unordered_map<std::string, std::vector<std::string> > addUsers;
+	while (!users.empty()) { // Allow modules to call addClient onPreConnect
+		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.begin();
+		std::vector<std::string> client;
+		client.push_back(userIter->second->ident());
+		client.push_back(userIter->second->host());
+		client.push_back(userIter->second->gecos());
+		addUsers.insert(std::pair<std::string, std::vector<std::string> (userIter->second->nick(), client));
+		delete userIter->second;
+		users.erase(userIter);
+	}
 	std::istringstream portNumber (serverConf["port"]);
 	unsigned short port;
 	portNumber >> port;
@@ -379,6 +390,9 @@ void InspIRCd::connectServer() {
 	clientChannels << i << "/channels";
 	std::tr1::unordered_map<std::string, std::vector<std::string> > joiningChannels;
 	while (serverConf[clientNick.str()] != "") {
+		std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator addIter = addUsers.find(serverConf[clientNick.str()]);
+		if (addIter != addUsers.end())
+			addUsers.erase(addIter);
 		std::string uuid = addClient(serverConf[clientNick.str()], serverConf[clientIdent.str()], serverConf[clientHost.str()], serverConf[clientGecos.str()]);
 		std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(uuid);
 		if (serverConf[clientOper.str()] != "")
@@ -409,6 +423,8 @@ void InspIRCd::connectServer() {
 		clientOper << i << "/oper";
 		clientChannels << i << "/channels";
 	}
+	for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator addIter = addUsers.begin(); addIter != addUsers.end(); ++addIter)
+		std::string uuid = addClient(addIter->first, addIter->second[0], addIter->second[1], addIter->second[2]);
 	for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator jcIter = joiningChannels.begin(); jcIter != joiningChannels.end(); ++jcIter)
 		joinUsers(jcIter->first, jcIter->second);
 	sendOther(":" + serverConf["sid"] + " ENDBURST");
@@ -893,6 +909,10 @@ void InspIRCd::sendOther(std::string rawLine) {
 }
 
 std::string InspIRCd::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
+	if (!connection->isConnected()) { // if called before connection is made
+		users.insert(std::pair<std::string, User*> (nick, new User (nick, ident, host, gecos, time(NULL)))); // Doesn't really matter what the UUID is because it's accessed iteratively and no need to depete UUIDs early
+		return ""; // Whatever we return won't truly be the client handle, so do this for now.
+	}
 	std::string uuid = serverConf["sid"] + useUID();
 	if (nicks.find(nick) != nicks.end())
 		nick = uuid; // Properly implement uuid as an alt nick.
