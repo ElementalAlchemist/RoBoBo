@@ -239,8 +239,8 @@ std::vector<std::string> Module::splitHostmask(std::string hostmask) {
 	int exclamationPoint = hostmask.find_first_of('!');
 	int atSign = hostmask.find_first_of('@');
 	splitmask.push_back(hostmask.substr(0, exclamationPoint));
-	splitmask.push_back(hostmask.substr(exclamationPoint, atSign - exclamationPoint));
-	splitmask.push_back(hostmask.substr(atSign));
+	splitmask.push_back(hostmask.substr(exclamationPoint + 1, atSign - exclamationPoint - 1));
+	splitmask.push_back(hostmask.substr(atSign + 1));
 	return splitmask;
 }
 
