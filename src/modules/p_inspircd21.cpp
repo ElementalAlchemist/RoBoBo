@@ -362,7 +362,7 @@ void InspIRCd::connectServer() {
 		client.push_back(userIter->second->ident());
 		client.push_back(userIter->second->host());
 		client.push_back(userIter->second->gecos());
-		addUsers.insert(std::pair<std::string, std::vector<std::string> (userIter->second->nick(), client));
+		addUsers.insert(std::pair<std::string, std::vector<std::string> > (userIter->second->nick(), client));
 		delete userIter->second;
 		users.erase(userIter);
 	}
