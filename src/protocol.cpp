@@ -40,6 +40,8 @@ std::string Protocol::userHost(std::string user) { return ""; }
 
 std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) { return std::pair<std::string, char> ("", ' '); }
 
+std::string Protocol::userMetadata(std::string user, std::string key) { return ""; }
+
 std::string Protocol::compareStatus(std::set<std::string> statuses) { return *(statuses.begin()); } // It may or may not be correct for the server, but it's a valid answer.
 
 void Protocol::sendMsg(std::string client, std::string target, std::string message) {}

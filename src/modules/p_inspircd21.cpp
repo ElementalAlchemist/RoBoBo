@@ -81,6 +81,7 @@ class InspIRCd : public Protocol {
 		std::string userIdent(std::string user);
 		std::string userHost(std::string user);
 		std::pair<std::string, char> userStatus(std::string channel, std::string user);
+		std::string userMetadata(std::string user, std::string key);
 		std::string compareStatus(std::set<std::string> statuses);
 		void sendMsg(std::string client, std::string target, std::string message);
 		void sendNotice(std::string client, std::string target, std::string message);
@@ -510,6 +511,16 @@ std::pair<std::string, char> InspIRCd::userStatus(std::string channel, std::stri
 			return std::pair<std::string, char> ((*statIter).first, (*statIter).second);
 	}
 	return std::pair<std::string, char> ("", ' '); // oh noez! a bug!
+}
+
+std::string InspIRCd::userMetadata(std::string user, std::string key) {
+	std::tr1::unordered_map<std::string, std::string>::iterator nickIter = nicks.find(user);
+	if (nickIter != nicks.end())
+		user = nickIter->second;
+	std::tr1::unordered_map<std::string, User*>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->seeMetadata(key);
 }
 
 std::string InspIRCd::compareStatus(std::set<std::string> statuses) {

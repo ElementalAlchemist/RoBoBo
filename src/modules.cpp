@@ -354,3 +354,7 @@ std::list<std::string> Module::userModes(std::string server, std::string user) {
 std::pair<std::string, char> Module::userStatus(std::string server, std::string channel, std::string user) {
 	return serverData->userStatus(server, channel, user);
 }
+
+std::string Module::userMetadata(std::string server, std::string user, std::string key) {
+	return serverData->userMetadata(server, user, key);
+}

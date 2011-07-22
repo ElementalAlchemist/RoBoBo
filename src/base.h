@@ -96,6 +96,7 @@ class Base {
 		std::string userHost(std::string server, std::string user);
 		std::list<std::string> userModes(std::string server, std::string user);
 		std::pair<std::string, char> userStatus(std::string server, std::string channel, std::string user);
+		std::string userMetadata(std::string server, std::string user, std::string key);
 		Socket* assignSocket(std::string socketType);
 		void rehash();
 		bool connectServer(std::string serverName);

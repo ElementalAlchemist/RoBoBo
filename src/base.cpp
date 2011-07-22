@@ -942,6 +942,13 @@ std::pair<std::string, char> Base::userStatus(std::string server, std::string ch
 	return servIter->second->userStatus(channel, user);
 }
 
+std::string Base::userMetadata(std::string server, std::string user, std::string key) {
+	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->userMetadata(user, key);
+}
+
 Socket* Base::assignSocket(std::string socketType) {
 	void* openSocket;
 	if (socketFiles.find(socketType) == socketFiles.end()) {

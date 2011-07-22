@@ -24,6 +24,7 @@ class Protocol {
 		virtual std::string userIdent(std::string user);
 		virtual std::string userHost(std::string user);
 		virtual std::pair<std::string, char> userStatus(std::string channel, std::string user);
+		virtual std::string userMetadata(std::string user, std::string key);
 		virtual std::string compareStatus(std::set<std::string> statuses);
 		
 		virtual void sendMsg(std::string client, std::string target, std::string message);
