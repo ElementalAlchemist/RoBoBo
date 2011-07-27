@@ -449,7 +449,53 @@ void Client::handleData() {
 			callNumericHook(serverConf["nick"], "433", parsedLine);
 		} else if (isNumeric(parsedLine[1]))
 			callNumericHook(serverConf["nick"], parsedLine[1], parsedLine);
-		else if (parsedLine[1] == "MODE") {
+		else if (parsedLine[1] == "PRIVMSG") {
+			if (chanTypes.find(parsedLine[2][0]) == chanTypes.end() && chanTypes.find(parsedLine[2][1]) == chanTypes.end()) { // user message
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					callUserCTCPHook(serverConf["nick"], parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+				} else
+					callUserMsgHook(serverConf["nick"], parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+			} else { // channel message
+				char status = ' ';
+				if (chanTypes.find(parsedLine[2][0]) == chanTypes.end()) {
+					status = parsedLine[2][0];
+					parsedLine[2] = parsedLine[2].substr(1);
+				}
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					callChannelCTCPHook(serverConf["nick"], parsedLine[2], status, parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+				} else
+					callChanMsgHook(serverConf["nick"], parsedLine[2], status, parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+			}
+		} else if (parsedLine[1] == "NOTICE") {
+			if (chanTypes.find(parsedLine[2][0]) == chanTypes.end() && chanTypes.find(parsedLine[2][1]) == chanTypes.end()) { // user notice
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					callUserCTCPReplyHook(serverConf["nick"], parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+				} else
+					callUserNoticeHook(serverConf["nick"], parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+			} else { // channel notice
+				char status = ' ';
+				if (chanTypes.find(parsedLine[2][0]) == chanTypes.end()) {
+					status = parsedLine[2][0];
+					parsedLine[2] = parsedLine[2].substr(1);
+				}
+				if (parsedLine[3][0] == (char)1) {
+					parsedLine[3] = parsedLine[3].substr(1);
+					if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+						parsedLine[3] = parsedLine[3].substr(0, parsedLine[3].size() - 1);
+					callChannelCTCPReplyHook(serverConf["nick"], parsedLine[2], status, parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+				} else
+					callChanNoticeHook(serverConf["nick"], parsedLine[2], status, parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1), parsedLine[3]);
+			}
+		} else if (parsedLine[1] == "MODE") {
 			bool addMode = true;
 			if (parsedLine[2] == serverConf["nick"]) { // if it's a user mode
 				for (unsigned int i = 0; i < parsedLine[3].size(); i++) {
