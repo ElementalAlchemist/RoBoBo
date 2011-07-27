@@ -695,14 +695,14 @@ void Client::sendData() {
 		parsedLine = parseLine(sendingMessage);
 		command = parsedLine[0];
 		if (command == "PRIVMSG") {
-			std::string message;
+			std::string message = parsedLine[2];
 			bool channel = false, ctcp = false;
 			char status = ' ';
 			std::string targetName = parsedLine[1];
 			if (chanTypes.find(targetName[0]) == chanTypes.end() && chanTypes.find(targetName[1]) == chanTypes.end()) { // User message!
-				if (parsedLine[2][0] == (char)1) {
+				if (message[0] == (char)1) {
 					ctcp = true;
-					message = parsedLine[2].substr(1);
+					message = message.substr(1);
 					if (message[message.size() - 1] == (char)1)
 						message = message.substr(0, message.size() - 1);
 					message = (char)1 + callUserCTCPOutHook(serverConf["nick"], targetName, message) + (char)1;
@@ -714,9 +714,9 @@ void Client::sendData() {
 					status = targetName[0];
 					targetName = targetName.substr(1);
 				}
-				if (parsedLine[2][0] == (char)1) {
+				if (message[0] == (char)1) {
 					ctcp = true;
-					message = parsedLine[2].substr(1);
+					message = message.substr(1);
 					if (message[message.size() - 1] == (char)1)
 						message = message.substr(0, message.size() - 1);
 					message = (char)1 + callChannelCTCPOutHook(serverConf["nick"], targetName, status, message) + (char)1;
@@ -736,7 +736,7 @@ void Client::sendData() {
 			else
 				callUserMessageSendHook(serverConf["nick"], targetName, message);
 		} else if (command == "NOTICE") {
-			std::string message;
+			std::string message = parsedLine[2];
 			bool channel = false, ctcp = false;
 			char status = ' ';
 			std::string targetName = parsedLine[1];
