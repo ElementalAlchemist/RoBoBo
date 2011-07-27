@@ -6,8 +6,8 @@ class Cap : public CapModule {
 		Cap(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		void onModuleChange();
-		void onOtherData(std::string server, std::vector<std::string> parsedLine);
-		void onConnect(std::string server);
+		void onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine);
+		void onConnect(std::string server, std::string client);
 		void capRegister(std::string capCommand, std::string moduleName);
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);
@@ -94,7 +94,7 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 	}
 }
 
-void Cap::onConnect(std::string server) {
+void Cap::onConnect(std::string server, std::string client) {
 	if (serverIsClient(server)) {
 		sendOtherCommand(server, "CAP", "LS");
 		blockingModules[server].clear();
