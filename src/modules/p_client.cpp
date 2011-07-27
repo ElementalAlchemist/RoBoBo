@@ -775,6 +775,7 @@ void Client::sendData() {
 					params += " " + splitLine[i].substr(splitLine[i].find_first_of('=') + 1);
 			}
 			sendingMessage = newCommand + params;
+			secondsToAdd = 1;
 			for (unsigned int i = 0; i < splitLine.size(); i++) {
 				if (splitLine[i] == "cloak")
 					secondsToAdd = 6; // because cloaking/setting umode +x is apparently such an expensive operation.
@@ -1013,6 +1014,7 @@ void Client::parseNames(std::string channel, std::string namesList) {
 		joiningUser->second->addChannel(channel);
 		for (size_t i = 0; i < rank.size(); i++)
 			joiningUser->second->status(channel, rank[i], true);
+		name = nick; // for check below; doesn't really matter which nick it is.
 	}
 	if (firstNames) {
 		if (users.find(name)->second->ident() == "" || users.find(name)->second->host() == "")
