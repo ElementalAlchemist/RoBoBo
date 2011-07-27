@@ -49,7 +49,7 @@ void Cap::onModuleChange() {
 	}
 }
 
-void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
+void Cap::onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "CAP") {
 		if (parsedLine[3] == "LS") {
 			std::string capReq = "";
