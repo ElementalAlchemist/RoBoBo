@@ -407,7 +407,8 @@ void Client::handleData() {
 			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
 		if (parsedLine[1] == "001") { // welcome to the network
-			sendOther("MODE " + serverConf["nick"] + " +B"); // set bot mode
+			if (allModes.find("bot") != allModes.end())
+				setMode(serverConf["nick"], serverConf["nick"], "bot"); // set bot mode
 			if (serverConf["channels"] != "")
 				joinChannel("", serverConf["channels"]);
 			registered = true;
