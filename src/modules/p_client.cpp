@@ -799,7 +799,7 @@ void Client::sendData() {
 				splitLine = keepModes;
 				dataToSend.push(newModeCommand);
 			}
-			std::string newCommand = "MODE " + parsedLine[1] + " ", params = "";
+			std::string newCommand = "MODE " + parsedLine[1], params = "";
 			bool adding = true;
 			for (size_t i = 0; i < splitLine.size(); i++) {
 				if (splitLine[i][0] == '+') {
@@ -826,6 +826,8 @@ void Client::sendData() {
 				if (splitLine[i] == "cloak")
 					secondsToAdd = 6; // because cloaking/setting umode +x is apparently such an expensive operation.
 			}
+			if (newCommand == "MODE " + parsedLine[1])
+				continue; // No modes are being sent, so skip this line.
 		} else { // MODE processes its own penalty addition
 			if (command == "GLINE" || command == "KLINE" || (command == "NICK" && !registered) || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
 				secondsToAdd = 0;
