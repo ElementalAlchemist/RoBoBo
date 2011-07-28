@@ -831,9 +831,9 @@ void Client::sendData() {
 		} else { // MODE processes its own penalty addition
 			if (command == "GLINE" || command == "KLINE" || (command == "NICK" && !registered) || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
 				secondsToAdd = 0;
-			else if (command == "JOIN" || command == "MAP" || command == "REHASH" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
+			else if (command == "MAP" || command == "REHASH" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
 				secondsToAdd = 2;
-			else if (command == "CYCLE")
+			else if (command == "JOIN" || command == "CYCLE") // JOIN gets an extra second so we can also send MODE
 				secondsToAdd = 3;
 			else if (command == "INVITE" || command == "NICK")
 				secondsToAdd = 4;
@@ -856,6 +856,11 @@ void Client::sendData() {
 		connection->sendData(sendingMessage);
 		if (debugLevel >= 3)
 			std::cout << " -> " << sendingMessage << std::endl;
+		if (command == "JOIN") { // get channel modes
+			connection->sendData("MODE " + parsedLine[1]);
+			if (debugLevel >= 3)
+				std::cout << " -> MODE " << parsedLine[1] << std::endl;
+		}
 		if (command == "QUIT") {
 			connection->closeConnection();
 			keepServer = false;
