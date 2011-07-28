@@ -716,18 +716,11 @@ void Base::sendNotice(std::string server, std::string client, std::string target
 	servIter->second->sendNotice(client, target, message);
 }
 
-void Base::setMode(std::string server, std::string client, std::string target, std::string mode) {
+void Base::setMode(std::string server, std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->setMode(client, target, mode);
-}
-
-void Base::removeMode(std::string server, std::string client, std::string target, std::string mode) {
-	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
-	if (servIter == servers.end())
-		return;
-	servIter->second->removeMode(client, target, mode);
+	servIter->second->setMode(client, target, addModes, remModes);
 }
 
 void Base::joinChannel(std::string server, std::string client, std::string channel, std::string key) {

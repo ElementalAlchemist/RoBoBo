@@ -64,8 +64,7 @@ class Base {
 		
 		void sendPrivMsg(std::string server, std::string client, std::string target, std::string message);
 		void sendNotice(std::string server, std::string client, std::string target, std::string message);
-		void setMode(std::string server, std::string client, std::string target, std::string mode);
-		void removeMode(std::string server, std::string client, std::string target, std::string mode);
+		void setMode(std::string server, std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes);
 		void joinChannel(std::string server, std::string client, std::string channel, std::string key = "");
 		void partChannel(std::string server, std::string client, std::string channel, std::string reason = "");
 		void quitServer(std::string server, std::string reason = "");

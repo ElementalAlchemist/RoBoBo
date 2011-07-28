@@ -81,8 +81,7 @@ class Module {
 		void joinChannel(std::string server, std::string client, std::string channel, std::string key = "");
 		void partChannel(std::string server, std::string client, std::string channel, std::string reason = "");
 		void kickChannelUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason = "");
-		void setMode(std::string server, std::string client, std::string channel, std::string mode);
-		void removeMode(std::string server, std::string client, std::string channel, std::string mode);
+		void setMode(std::string server, std::string client, std::string channel, std::list<std::string> addModes, std::list<std::string> remModes);
 		void changeNick(std::string server, std::string client, std::string nick);
 		void oper(std::string server, std::string client, std::string username, std::string password = "");
 		void killUser(std::string server, std::string client, std::string user, std::string reason);

@@ -150,12 +150,8 @@ void Module::kickChannelUser(std::string server, std::string client, std::string
 	serverData->kickUser(server, client, channel, nick, reason);
 }
 
-void Module::setMode(std::string server, std::string client, std::string channel, std::string mode) {
-	serverData->setMode(server, client, channel, mode);
-}
-
-void Module::removeMode(std::string server, std::string client, std::string channel, std::string mode) {
-	serverData->removeMode(server, client, channel, mode);
+void Module::setMode(std::string server, std::string client, std::string channel, std::list<std::string> addModes, std::list<std::string> remModes) {
+	serverData->setMode(server, client, channel, addModes, remModes);
 }
 
 void Module::changeNick(std::string server, std::string client, std::string nick) {

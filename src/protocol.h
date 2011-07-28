@@ -29,8 +29,7 @@ class Protocol {
 		
 		virtual void sendMsg(std::string client, std::string target, std::string message);
 		virtual void sendNotice(std::string client, std::string target, std::string message);
-		virtual void setMode(std::string client, std::string target, std::string mode);
-		virtual void removeMode(std::string client, std::string target, std::string mode);
+		virtual void setMode(std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes);
 		virtual void joinChannel(std::string client, std::string channel, std::string key = "");
 		virtual void partChannel(std::string client, std::string channel, std::string reason = "");
 		virtual void quitServer(std::string reason = "");

@@ -46,8 +46,7 @@ std::string Protocol::compareStatus(std::set<std::string> statuses) { return *(s
 
 void Protocol::sendMsg(std::string client, std::string target, std::string message) {}
 void Protocol::sendNotice(std::string client, std::string target, std::string message) {}
-void Protocol::setMode(std::string client, std::string target, std::string mode) {}
-void Protocol::removeMode(std::string client, std::string target, std::string mode) {}
+void Protocol::setMode(std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes) {}
 void Protocol::joinChannel(std::string client, std::string channel, std::string key) {}
 void Protocol::partChannel(std::string client, std::string channel, std::string reason) {}
 void Protocol::quitServer(std::string reason) {}
