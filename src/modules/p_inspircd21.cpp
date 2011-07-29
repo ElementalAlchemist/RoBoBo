@@ -730,7 +730,7 @@ void InspIRCd::setMode(std::string client, std::string target, std::list<std::st
 		remModeChars = "";
 	if (target[0] == '#') {
 		std::ostringstream chanTime;
-		chanTime << channels.find(target)->second->creationTime();
+		chanTime << chans.find(target)->second->creationTime();
 		sendData(":" + client + " FMODE " + target + " " + chanTime.str() + " " + addModeChars + remModeChars + params);
 	} else
 		sendData(":" + client + " MODE " + target + " " + addModeChars + remModeChars + params);
