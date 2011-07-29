@@ -450,8 +450,11 @@ void Client::handleData() {
 			std::cout << receivedLine << std::endl;
 		parsedLine = parseLine(receivedLine);
 		if (parsedLine[1] == "001") { // welcome to the network
-			if (allModes.find("bot") != allModes.end())
-				setMode(serverConf["nick"], serverConf["nick"], "bot"); // set bot mode
+			if (allModes.find("bot") != allModes.end()) {
+				std::list<std::string> botMode;
+				botMode.push_back("bot");
+				setMode(serverConf["nick"], serverConf["nick"], botMode, std::list<std::string> ()); // set bot mode
+			}
 			if (serverConf["channels"] != "")
 				joinChannel("", serverConf["channels"]);
 			registered = true;
