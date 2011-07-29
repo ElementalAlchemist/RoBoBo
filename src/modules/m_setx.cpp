@@ -42,7 +42,9 @@ void SetX::onNumeric(std::string server, std::string client, std::string numeric
 		return;
 	for (unsigned int i = 0; i < xServers.size(); i++) {
 		if (xServers[i] == server) {
-			setMode(server, client, clientInfo(server, client)["nick"], "cloak");
+			std::list<std::string> addMode;
+			addMode.push_back("cloak");
+			setMode(server, client, clientInfo(server, client)["nick"], addMode, std::list<std::string> ());
 			return;
 		}
 	}
