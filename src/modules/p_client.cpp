@@ -41,8 +41,7 @@ class Client : public Protocol {
 		std::string compareStatus(std::set<std::string> statuses);
 		void sendMsg(std::string client, std::string target, std::string message);
 		void sendNotice(std::string client, std::string target, std::string message);
-		void setMode(std::string client, std::string target, std::string mode);
-		void removeMode(std::string client, std::string target, std::string mode);
+		void setMode(std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes);
 		void joinChannel(std::string client, std::string channel, std::string key = "");
 		void partChannel(std::string client, std::string channel, std::string reason = "");
 		void quitServer(std::string reason);
@@ -351,12 +350,56 @@ void Client::sendNotice(std::string client, std::string target, std::string mess
 	dataToSend.push("NOTICE " + target + " :" + message);
 }
 
-void Client::setMode(std::string client, std::string target, std::string mode) {
-	dataToSend.push("MODE " + target + " +" + mode);
-}
-
-void Client::removeMode(std::string client, std::string target, std::string mode) {
-	dataToSend.push("MODE " + target + " -" + mode);
+void Client::setMode(std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes) {
+	std::string modeCommand = "MODE " + target + " ", addModeChars = "+", remModeChars = "-", params = "";
+	if (addModes.size() > maxModes) {
+		std::list<std::string> newAddModes = addModes;
+		std::list<std::string>::iterator modeIter = addModes.begin(), newModeIter = newAddModes.begin();
+		for (unsigned int i = 0; i < maxModes; i++) {
+			++modeIter;
+			++newModeIter;
+		}
+		newAddModes.erase(newAddModes.begin(), newModeIter);
+		setMode(client, target, newAddModes, remModes);
+		addModes.erase(modeIter, addModes.end());
+		remModes.clear();
+	} else if (addModes.size() + remModes.size() > maxModes) {
+		unsigned int numModes = maxModes - addModes.size();
+		std::list<std::string> newRemModes = remModes;
+		std::list<std::string>::iterator modeIter= remModes.begin(), newModeIter = newRemModes.begin();
+		for (unsigned int i = 0; i < numModes; i++) {
+			++modeIter;
+			++newModeIter;
+		}
+		newRemModes.erase(newRemModes.begin(), newModeIter);
+		setMode(client, target, std::list<std::string> (), newRemModes);
+		remModes.erase(modeIter, remModes.end());
+	}
+	for (std::list<std::string>::iterator modeIter = addModes.begin(); modeIter != addModes.end(); ++modeIter) {
+		char modeChar = convertMode(*modeIter);
+		if (modeChar == ' ')
+			continue;
+		if ((*modeIter).find_first_of('=') != std::string::npos)
+			params += " " + (*modeIter).substr((*modeIter).find_first_of('=') + 1);
+		addModeChars += modeChar;
+	}
+	for (std::list<std::string>::iterator modeIter = remModes.begin(); modeIter != remModes.end(); ++modeIter) {
+		char modeChar = convertMode(*modeIter);
+		if (modeChar == ' ')
+			continue;
+		if ((*modeIter).find_first_of('=') != std::string::npos)
+			params += " " + (*modeIter).substr((*modeIter).find_first_of('=') + 1);
+		remModeChars += modeChar;
+	}
+	if (addModeChars == "+" && remModeChars == "-")
+		return; // No modes passed here were good, so don't send blank mode command
+	std::string modeString = "MODE " + target + " ";
+	if (addModeChars != "+")
+		modeString += addModeChars;
+	if (remModeChars != "-")
+		modeString += remModeChars;
+	modeString += params;
+	dataToSend.push(modeString);
 }
 
 void Client::joinChannel(std::string client, std::string channel, std::string key) {
@@ -776,58 +819,8 @@ void Client::sendData() {
 		}
 		if (command == "MODE") {
 			secondsToAdd = 1;
-			std::string tempStr = "";
-			std::vector<std::string> splitLine;
-			for (unsigned int i = 0; i < sendingMessage.size(); i++) {
-				if (sendingMessage[i] == ' ') {
-					splitLine.push_back(tempStr);
-					tempStr = "";
-					continue;
-				}
-				tempStr += sendingMessage[i];
-			}
-			if (tempStr != "")
-				splitLine.push_back(tempStr);
-			if (splitLine.size() > maxModes) {
-				unsigned int i = 0;
-				std::vector<std::string> keepModes;
-				std::string newModeCommand = "MODE " + parsedLine[1];
-				for (; i < maxModes; i++)
-					keepModes.push_back(splitLine[i]);
-				for (; i < splitLine.size(); i++)
-					newModeCommand += " " + splitLine[i];
-				splitLine = keepModes;
-				dataToSend.push(newModeCommand);
-			}
-			std::string newCommand = "MODE " + parsedLine[1], params = "";
-			bool adding = true;
-			for (size_t i = 0; i < splitLine.size(); i++) {
-				if (splitLine[i][0] == '+') {
-					if (!adding || i == 0) {
-						adding = true;
-						newCommand += '+';
-					}
-				} else if (splitLine[i][0] == '-') {
-					if (adding) {
-						adding = false;
-						newCommand += '-';
-					}
-				}
-				char modeChar = convertMode(splitLine[i].substr(1));
-				if (modeChar == ' ') // provided mode does not exist/does not match a mode letter; discard mode
-					continue;
-				newCommand += modeChar;
-				if (splitLine[i].find_first_of('=') != std::string::npos)
-					params += " " + splitLine[i].substr(splitLine[i].find_first_of('=') + 1);
-			}
-			sendingMessage = newCommand + params;
-			secondsToAdd = 1;
-			for (unsigned int i = 0; i < splitLine.size(); i++) {
-				if (splitLine[i] == "cloak")
-					secondsToAdd = 6; // because cloaking/setting umode +x is apparently such an expensive operation.
-			}
-			if (newCommand == "MODE " + parsedLine[1])
-				continue; // No modes are being sent, so skip this line.
+			if (parsedLine[2].find_first_of(convertMode("cloak")) != std::string::npos)
+				secondsToAdd = 6; // Because apparently cloaking/setting hosts is so resource-intensive.
 		} else { // MODE processes its own penalty addition
 			if (command == "GLINE" || command == "KLINE" || (command == "NICK" && !registered) || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
 				secondsToAdd = 0;
