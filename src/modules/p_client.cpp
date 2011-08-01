@@ -467,6 +467,41 @@ void Client::handleData() {
 			serverConf["ident"] = parsedLine[4];
 			serverConf["host"] = parsedLine[5];
 			callNumericHook(serverConf["nick"], "311", parsedLine);
+		} else if (parsedLine[1] == "324") { //:stitch.chatspike.net 324 Werewolf #robobo +nt
+			inChannels.find(parsedLine[3])->second.second.first.clear();
+			unsigned int currParam = 5;
+			for (size_t i = 0; i < parsedLine[4].size(); i++) {
+				if (parsedLine[4][i] == '+')
+					continue;
+				std::string mode = convertMode(parsedLine[4][i]);
+				bool param = false;
+				for (size_t i = 0; i < chanModes[0].size(); i++) {
+					if (mode == chanModes[0][i]) {
+						param = true;
+						break;
+					}
+				}
+				if (!param) {
+					for (size_t i = 0; i < chanModes[1].size(); i++) {
+						if (mode == chanModes[1][i]) {
+							param = true;
+							break;
+						}
+					}
+				}
+				if (!param) {
+					for (size_t i = 0; i < chanModes[2].size(); i++) {
+						if (mode == chanModes[2][i]) {
+							param = true;;
+							break;
+						}
+					}
+				}
+				if (param)
+					mode += "=" + parsedLine[currParam++];
+				inChannels.find(parsedLine[3])->second.second.first.push_back(mode);
+			}
+			callNumericHook(serverConf["nick"], "324", parsedLine);
 		} else if (parsedLine[1] == "332") { // channel topic
 			std::tr1::unordered_map<std::string, std::pair<std::string, std::pair<std::list<std::string>, std::set<std::string> > > >::iterator it = inChannels.find(parsedLine[3]);
 			if (it != inChannels.end())
