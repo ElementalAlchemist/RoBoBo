@@ -1483,7 +1483,7 @@ void InspIRCd::receiveData() {
 			for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 				callOtherDataHook(*userIter, parsedLine);
 			sendOther(":" + serverConf["sid"] + " TIME " + parsedLine[0].substr(1) + " " + parsedLine[3] + " " + currTime.str());
-		} else if (parsedLine[1] == "METADATA") {
+		} else if (parsedLine[1] == "METADATA" && parsedLine[2] != "*") {
 			if (parsedLine[2][0] == '#')
 				chans.find(parsedLine[2])->second->changeMetadata(parsedLine[3], parsedLine[4]);
 			else
