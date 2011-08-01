@@ -1,6 +1,6 @@
 #include "protocol.h"
 
-Protocol::Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : serverName(serverAddress), debugLevel(debug), serverConf(confVars), botBase(theBase), keepServer(true) {
+Protocol::Protocol(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : serverName(serverAddress), keepServer(true), debugLevel(debug), serverConf(confVars), botBase(theBase) {
 	connection = botBase->assignSocket(confVars["sockettype"]);
 }
 
