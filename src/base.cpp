@@ -1154,11 +1154,13 @@ void Base::serverCheck() {
 				std::string serverName = servIter->first;
 				servers.erase(servIter);
 				if (debugLevel >= 2)
-					std::cout << serverName << " lost connection.  Reconnecting..." << std::endl;
+					std::cout << serverName << " lost connection." << std::endl;
 				if (restartServer)
 					connectServer(serverName); // make new server for reconnecting
 			}
 		}
+		if (servers.empty())
+			exit(0);
 	}
 }
 
