@@ -473,17 +473,17 @@ void Client::handleData() {
 			for (size_t i = 0; i < parsedLine[4].size(); i++) {
 				if (parsedLine[4][i] == '+')
 					continue;
-				std::string mode = convertMode(parsedLine[4][i]);
+				std::string mode = convertChanMode(parsedLine[4][i]);
 				bool param = false;
 				for (size_t i = 0; i < chanModes[0].size(); i++) {
-					if (mode == chanModes[0][i]) {
+					if (parsedLine[4][i] == chanModes[0][i]) {
 						param = true;
 						break;
 					}
 				}
 				if (!param) {
 					for (size_t i = 0; i < chanModes[1].size(); i++) {
-						if (mode == chanModes[1][i]) {
+						if (parsedLine[4][i] == chanModes[1][i]) {
 							param = true;
 							break;
 						}
@@ -491,7 +491,7 @@ void Client::handleData() {
 				}
 				if (!param) {
 					for (size_t i = 0; i < chanModes[2].size(); i++) {
-						if (mode == chanModes[2][i]) {
+						if (parsedLine[4][i] == chanModes[2][i]) {
 							param = true;;
 							break;
 						}
