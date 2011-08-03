@@ -112,6 +112,4 @@ void RawCommand::onAdminCommand(std::string server, std::string client, std::str
 		dccMod->dccSend(server + "/" + nick, "Command sent.");
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
-	return new RawCommand (modConf, modFace, modName, dir, debug);
-}
+MODULE_SPAWN(RawCommand)

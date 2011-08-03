@@ -87,6 +87,4 @@ std::string VersionReply::description() {
 	return "This module sends a reply to CTCP version.";
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
-	return new VersionReply (modConf, modFace, modName, dir, debug);
-}
+MODULE_SPAWN(VersionReply)

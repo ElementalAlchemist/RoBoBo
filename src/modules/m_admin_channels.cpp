@@ -119,6 +119,4 @@ void AdminChannelControl::onAdminCommand(std::string server, std::string client,
 		partChannel(server, channel, keason);
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
-	return new AdminChannelControl (modConf, modFace, modName, dir, debug);
-}
+MODULE_SPAWN(AdminChannelControl)

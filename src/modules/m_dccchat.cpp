@@ -189,6 +189,4 @@ void DCCChatModule::closeDCCConnection(std::string dccid) {
 	dccConnection->second->closeConnection();
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
-	return new DCCChatModule (modConf, modFace, modName, dir, debug);
-}
+MODULE_SPAWN(DCCChatModule)

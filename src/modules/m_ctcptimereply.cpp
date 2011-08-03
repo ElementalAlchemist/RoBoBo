@@ -89,6 +89,4 @@ void TimeReply::sendTime(std::string server, std::string client, std::string tar
 	sendCTCPReply(server, client, target, "TIME", timeOutput.str());
 }
 
-extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {
-	return new TimeReply (modConf, modFace, modName, dir, debug);
-}
+MODULE_SPAWN(TimeReply)
