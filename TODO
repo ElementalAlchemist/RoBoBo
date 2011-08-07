@@ -54,7 +54,7 @@ Current TODO List
 	[ ] - MODULES
 	[ ] - README
 [ ] - Enhance bot control admin modules (say, channels, etc.) with the ability to choose a client on that server
-	[ ] - Possibly include client list in all of these, or individual m_admin_clientlist?
+	[x] - Possibly include client list in all of these, or individual m_admin_clientlist?
 [ ] - Prettier build output.
 
 ???

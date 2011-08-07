@@ -100,6 +100,10 @@ module admin_channels {
 	#masteronly = "no";
 }
 
+module admin_clientlist {
+	#masteronly = "no";
+}
+
 module admin_connect {
 	#masteronly = "yes";
 }
