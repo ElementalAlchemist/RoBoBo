@@ -258,6 +258,8 @@ std::vector<std::string> Module::splitBySpace(std::string line) {
 std::string Module::stripColors(std::string message) {
 	while (message.find_first_of((char)2) != std::string::npos)
 		message.erase(message.find_first_of((char)2), 1);
+	while (message.find_first_of((char)29) != std::string::npos)
+		message.erase(message.find_first_of((char)2), 1);
 	while (message.find_first_of((char)31) != std::string::npos)
 		message.erase(message.find_first_of((char)31), 1);
 	while (message.find_first_of((char)3) != std::string::npos) {
