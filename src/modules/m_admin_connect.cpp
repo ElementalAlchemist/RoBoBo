@@ -85,13 +85,16 @@ std::vector<std::vector<std::string> > ConnectServerCommand::adminCommands() {
 	quitCommand.push_back("quit");
 	quitCommand.push_back("Makes the bot quit a server.");
 	quitCommand.push_back("Syntax: quit <server> <reason>");
+	quitCommand.push_back("Syntax: quit <server>/<client> <reason>");
 	quitCommand.push_back("When this command is issued, the bot will quit the server specified.  The server parameter must be the server address that was used to connect.");
+	quitCommand.push_back("If specified, the client is the local client to disconnect.");
 	if (config["masteronly"] == "yes")
 		quitCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(quitCommand);
 	disconnectCommand.push_back("disconnect");
 	disconnectCommand.push_back("Makes the bot disconnect from a server.");
 	disconnectCommand.push_back("Syntax: disconnect <server> <reason>");
+	disconnectCommand.push_back("Syntax: disconnect <server>/<client> <reason>");
 	disconnectCommand.push_back("Does the same thing as quit.  See \"help quit\" for more information.");
 	theCommands.push_back(disconnectCommand);
 	return theCommands;
@@ -128,6 +131,10 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string client
 	} // everything below is quit/disconnect
 	std::string quitServerName = message.substr(0, message.find_first_of(' '));
 	std::string quitReason = message.substr(message.find_first_of(' ') + 1);
+	if (quitServerName.find_first_of('/') != std::string::npos) {
+		client = quitServerName.substr(quitServerName.find_first_of('/') + 1);
+		quitServerName = quitServerName.substr(0, quitServerName.find_first_of('/'));
+	}
 	if (dccMod == NULL)
 		sendPrivMsg(server, client, nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	else

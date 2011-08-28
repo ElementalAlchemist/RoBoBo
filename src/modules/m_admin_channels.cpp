@@ -75,10 +75,13 @@ std::vector<std::vector<std::string> > AdminChannelControl::adminCommands() {
 	joinCommand.push_back("Makes the bot join a channel.");
 	joinCommand.push_back("Syntax: join <#channel> [key]");
 	joinCommand.push_back("Syntax: join <server>/<#channel> [key]");
+	joinCommand.push_back("Syntax: join <server>/<client>/<#channel> [key]");
 	joinCommand.push_back("Example: join #robobo");
 	joinCommand.push_back("Example: join #privatechan thepassword");
 	joinCommand.push_back("Example: join irc.server.net/#channel");
-	joinCommand.push_back("This command makes RoBoBo join a channel.  The server part of the command is only necessary if you want RoBoBo to join a channel on a server different from the one from which you identified.");
+	joinCommand.push_back("Example: join irc.server.net/RoBoBo/#channel letmein");
+	joinCommand.push_back("This command makes RoBoBo join a channel.  The server part of the command is only necessary if you want RoBoBo to join a channel on a server different from the one from which you identified or if you wish to specify a specific client.");
+	joinCommand.push_back("Specifying a client may be required on non-client protocols.");
 	if (config["masteronly"] == "yes")
 		joinCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(joinCommand);
@@ -87,9 +90,11 @@ std::vector<std::vector<std::string> > AdminChannelControl::adminCommands() {
 	partCommand.push_back("Makes the bot part a channel.");
 	partCommand.push_back("Syntax: part <#channel> <reason>");
 	partCommand.push_back("Syntax: part <server>/<#channel> <reason>");
+	partCommand.push_back("Syntax: part <server>/<client>/<#channel> <reason>");
 	partCommand.push_back("Example: part #robobo Bye.");
 	partCommand.push_back("Example: part irc.server.net/#channel It's only when you look at ants through a magnifying glass that you realize how often they burst into flames.");
-	partCommand.push_back("This command makes RoBoBo part a channel.  The server part of the command is only necessary if you want RoBoBo to part a channel on a server different from the one from which you identified.");
+	partCommand.push_back("This command makes RoBoBo part a channel.  The server part of the command is only necessary if you want RoBoBo to part a channel on a server different from the one from which you identified or if you wish to specify a specitic client.");
+	partCommand.push_back("Specifying a client may be required on non-client protocols.");
 	if (config["masteronly"] == "yes")
 		partCommand.push_back("This command is only available to bot masters.");
 	theCommands.push_back(partCommand);
@@ -109,14 +114,18 @@ void AdminChannelControl::onAdminCommand(std::string server, std::string client,
 		server = msgServer;
 		message = message.substr(message.find_first_of('/') + 1);
 	}
+	if (message.find_first_of('/') != std::string::npos && message.find_first_of('/') < message.find_first_of(' ')) {
+		client = message.substr(0, message.find_first_of('/'));
+		message = message.substr(message.find_first_of('/') + 1);
+	}
 	std::string channel = message.substr(0, message.find_first_of(' '));
 	std::string keason = "";
 	if (channel != message)
 		keason = message.substr(message.find_first_of(' ') + 1);
 	if (command == "join")
-		joinChannel(server, channel, keason);
+		joinChannel(server, client, channel, keason);
 	else if (command == "part")
-		partChannel(server, channel, keason);
+		partChannel(server, client, channel, keason);
 }
 
 MODULE_SPAWN(AdminChannelControl)

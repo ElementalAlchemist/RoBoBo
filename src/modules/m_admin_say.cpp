@@ -75,6 +75,7 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	sayCommand.push_back("Example: say User Hi!");
 	sayCommand.push_back("Example: say irc.othernetwork.net/#channel Hello, everyone!");
 	sayCommand.push_back("Example: say irc.othernetwork.net/User Hi!");
+	sayCommand.push_back("Example: say irc.othernetwork.net/OtherRoBoBo/#channel I'm saying things!");
 	sayCommand.push_back("This command makes the bot send the specified message to the specified target.");
 	sayCommand.push_back("The target can be a user or a channel.");
 	sayCommand.push_back("The server portion of the target is required only when you are sending the message to a server");
@@ -89,6 +90,7 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	actCommand.push_back("Example: act #channel stabs User");
 	actCommand.push_back("Example: act User stabs you");
 	actCommand.push_back("Example: act irc.othernetwork.net/#channel is on another network!");
+	actCommand.push_back("Example: act irc.othernetwork.net/OtherRoBoBo/#channel says things.");
 	actCommand.push_back("Example: act irc.othernetwork.net/User greets you from another server.");
 	actCommand.push_back("This command makes the bot send the specified action to the specified target.");
 	actCommand.push_back("The target can be a user or a channel.");
@@ -115,6 +117,10 @@ void AdminSay::onAdminCommand(std::string server, std::string client, std::strin
 		targetServer = server;
 	else
 		target = target.substr(target.find_first_of('/') + 1);
+	if (target.find_first_of('/') != std::string::npos) {
+		client = target.substr(0, target.find_first_of('/'));
+		target = target.substr(target.find_first_of('/') + 1);
+	}
 	message = message.substr(message.find_first_of(' ') + 1);
 	if (command == "say")
 		sendPrivMsg(targetServer, client, target, message);
