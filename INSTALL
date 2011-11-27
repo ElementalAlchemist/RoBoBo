@@ -6,7 +6,7 @@ process.
 unless you delete the entire project or you upgrade to a new version with
 configure fixes.  If you accidentally delete the configure binary file later
 but need it again, you can rebuild it from the robobo main directory:
-g++ src/configure -o configure
+g++ src/configure.cpp -o configure
 
 2. ./configure: This finds the module source files and puts the correct
 Makefiles together.  This overwrites the Makefile that builds the configure
@@ -15,9 +15,11 @@ binary unless you have access to the original Makefile or know how to build it
 from command line.
 
 3. make: Now that the Makefile is different, this command will build the bot.
+Once this build is complete, the bot is fully compiled and ready to go.
 
 Before you run the bot, you need to copy the file robobo.conf.example to
 robobo.conf and edit it completely.  You only need to do this once, unless you
-delete the robobo.conf file.
+delete the robobo.conf file.  See CONFIGURING for help with the configuration
+file.
 
 After this, you can simply run the bot with the command ./robobo.
