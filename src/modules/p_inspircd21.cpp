@@ -682,9 +682,12 @@ void InspIRCd::setMode(std::string client, std::string target, std::list<std::st
 		} else { // user mode
 			if (nicks.find(target) != nicks.end())
 				target = nicks.find(target)->second;
-			callUserModePreHook(target, *modeIter, true);
+			bool callHook = ourClients.find(target) != ourClients.end();
+			if (callHook)
+				callUserModePreHook(target, *modeIter, true);
 			users.find(target)->second->addMode(*modeIter);
-			callUserModePostHook(target, *modeIter, true);
+			if (callHook)
+				callUserModePostHook(target, *modeIter, true);
 		}
 	}
 	for (std::list<std::string>::iterator modeIter = remModes.begin(); modeIter != remModes.end(); ++modeIter) {
@@ -717,9 +720,12 @@ void InspIRCd::setMode(std::string client, std::string target, std::list<std::st
 		} else {
 			if (nicks.find(target) != nicks.end())
 				target = nicks.find(target)->second;
-			callUserModePreHook(target, *modeIter, false);
+			bool callHook = ourClients.find(target) != ourClients.end();
+			if (callHook)
+				callUserModePreHook(target, *modeIter, false);
 			users.find(target)->second->removeMode(*modeIter);
-			callUserModePostHook(target, *modeIter, false);
+			if (callHook)
+				callUserModePostHook(target, *modeIter, false);
 		}
 	}
 	if (addModeChars == "+" && remModeChars == "-")
@@ -1591,13 +1597,14 @@ void InspIRCd::receiveData() {
 						std::string longmode = convertUserMode(parsedLine[3][i]);
 						if (longmode == "")
 							continue;
-						if (ourClients.find(userIter->first) != ourClients.end())
+						bool callHook = ourClients.find(userIter->first) != ourClients.end();
+						if (callHook)
 							callUserModePreHook(userIter->first, longmode, adding);
 						if (adding)
 							userIter->second->addMode(longmode);
 						else
 							userIter->second->removeMode(longmode);
-						if (ourClients.find(userIter->first) != ourClients.end())
+						if (callHook)
 							callUserModePostHook(userIter->first, longmode, adding);
 					}
 					if (parsedLine.size() > 4) {
