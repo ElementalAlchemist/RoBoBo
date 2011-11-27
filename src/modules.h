@@ -89,8 +89,8 @@ class Module {
 		void changeNick(std::string server, std::string client, std::string nick);
 		void oper(std::string server, std::string client, std::string username = "", std::string password = "");
 		void killUser(std::string server, std::string client, std::string user, std::string reason);
-		void setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason);
-		void removeXLine(std::string server, std::string client, char lineType, std::string hostmask);
+		void setXLine(std::string server, std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason);
+		void removeXLine(std::string server, std::string client, std::string lineType, std::string hostmask);
 		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > listXLines(std::string server);
 		void sendSNotice(std::string server, char snomask, std::string text);
 		void sendOtherCommand(std::string server, std::string command, std::string data); // catch-all, just in case

@@ -166,11 +166,11 @@ void Module::killUser(std::string server, std::string client, std::string user, 
 	serverData->killUser(server, client, user, reason);
 }
 
-void Module::setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {
+void Module::setXLine(std::string server, std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason) {
 	serverData->setXLine(server, client, lineType, hostmask, duration, reason);
 }
 
-void Module::removeXLine(std::string server, std::string client, char lineType, std::string hostmask) {
+void Module::removeXLine(std::string server, std::string client, std::string lineType, std::string hostmask) {
 	serverData->removeXLine(server, client, lineType, hostmask);
 }
 

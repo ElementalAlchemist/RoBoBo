@@ -772,14 +772,14 @@ void Base::killUser(std::string server, std::string client, std::string user, st
 	servIter->second->killUser(client, user, reason);
 }
 
-void Base::setXLine(std::string server, std::string client, char lineType, std::string hostmask, time_t duration, std::string reason) {
+void Base::setXLine(std::string server, std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
 	servIter->second->setXLine(client, lineType, hostmask, duration, reason);
 }
 
-void Base::removeXLine(std::string server, std::string client, char lineType, std::string hostmask) {
+void Base::removeXLine(std::string server, std::string client, std::string lineType, std::string hostmask) {
 	std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
