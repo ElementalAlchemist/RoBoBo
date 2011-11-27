@@ -256,12 +256,16 @@ std::vector<std::string> Module::splitBySpace(std::string line) {
 }
 
 std::string Module::stripColors(std::string message) {
-	while (message.find_first_of((char)2) != std::string::npos)
+	while (message.find_first_of((char)2) != std::string::npos) // bold
 		message.erase(message.find_first_of((char)2), 1);
-	while (message.find_first_of((char)29) != std::string::npos)
+	while (message.find_first_of((char)29) != std::string::npos) // italic
 		message.erase(message.find_first_of((char)2), 1);
-	while (message.find_first_of((char)31) != std::string::npos)
+	while (message.find_first_of((char)31) != std::string::npos) // underline
 		message.erase(message.find_first_of((char)31), 1);
+	while (message.find_first_of((char)22) != std::string::npos) // reverse
+		message.erase(message.find_first_of((char)22), 1);
+	while (message.find_first_of((char)15) != std::string::npos) // plain
+		message.erase(message.find_first_of((char)15), 1);
 	while (message.find_first_of((char)3) != std::string::npos) {
 		size_t colorpos = message.find_first_of((char)3);
 		std::string afterColor = message.substr(colorpos, 6);
