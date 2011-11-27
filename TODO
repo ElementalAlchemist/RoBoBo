@@ -20,7 +20,6 @@ Current TODO List
 			[x] - allow configurable changes
 		[x] - Module API
 [x] - Modular sockets: allow protocol modules to pick a socket class to use
-	[ ] - allows more than just plaintext, e.g. SSL without stunnel, etc.
 [x] - Change how users are handled (p_client)
 	[x] - Server has channels and users
 [x] - Provide a per-server option to bypass core flood control (clients only--servers don't need flood control)
@@ -56,6 +55,9 @@ Current TODO List
 [x] - Enhance bot control admin modules (say, channels, etc.) with the ability to choose a client on that server
 	[x] - Possibly include client list in all of these, or individual m_admin_clientlist?
 
+2.0 Beta 2
+=======================================
+[ ] - Make the InspIRCd module handle x:lines; currently, they are not received or stored properly
 ???
 =======================================
 [ ] - SSL socket module
