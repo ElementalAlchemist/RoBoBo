@@ -49,7 +49,6 @@ void ConnectServerCommand::onRehash() {
 
 void ConnectServerCommand::onModuleChange() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = moduleAbilities.find("BOT_ADMIN");
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
 		unloadModule();
