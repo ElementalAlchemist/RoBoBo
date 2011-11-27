@@ -1837,6 +1837,4 @@ void InspIRCd::sendData(std::string data) {
 		std::cout << " -> " << data << std::endl;
 }
 
-extern "C" Protocol* spawn(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debugLevel) {
-	return new InspIRCd (serverAddr, config, base, debugLevel);
-}
+PROTOCOL_SPAWN(InspIRCd)

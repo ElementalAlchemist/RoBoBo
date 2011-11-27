@@ -1136,6 +1136,4 @@ bool Client::isNumeric(std::string command) {
 	return false;
 }
 
-extern "C" Protocol* spawn(std::string serverAddr, std::tr1::unordered_map<std::string, std::string> config, Base* base, unsigned short debugLevel) {
-	return new Client (serverAddr, config, base, debugLevel);
-}
+PROTOCOL_SPAWN(Client)

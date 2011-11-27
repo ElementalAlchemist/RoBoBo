@@ -11,6 +11,10 @@
 #include <cstdio>
 #include <fcntl.h>
 
+#define SOCKET_SPAWN(name) extern "C" Socket* spawn() {\
+	return new name;\
+}
+
 class Socket {
 	public:
 		Socket();

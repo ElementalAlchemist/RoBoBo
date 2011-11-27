@@ -94,7 +94,5 @@ std::string PlainText::receive() {
 }
 
 #ifndef DCC_CHAT // I cheated. :D
-extern "C" Socket* spawn() {
-	return new PlainText;
-}
+SOCKET_SPAWN(PlainText)
 #endif
