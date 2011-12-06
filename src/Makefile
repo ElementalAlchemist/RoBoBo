@@ -13,6 +13,7 @@ debug:
 	DEBUG="-g -O0" make -C .
 
 robobo: $(SOURCES:.cpp=.o)
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(SOURCES:.cpp=.o) robobo.cpp -o robobo $(LIBS)
 
 .PHONY: modules clean
 
