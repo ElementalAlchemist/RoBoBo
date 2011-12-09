@@ -9,7 +9,7 @@ block_type block_name {
 	var6 = "not " + var2;
 }
 
-Currently there are only four block types.  These are as follows:
+There are only four block types.  These are as follows:
 server - loads the configuration for the server and connects to it on startup
 serverconf - loads the configuration for the server and saves it for later
 	connection
@@ -21,8 +21,8 @@ The end of the block type is signaled by any kind of whitespace.  After that,
 you must specify the block name.
 For server and serverconf, the block name is the address of the server, e.g.
 	irc.example.net
-For module and moduleconf, the block name is the filename of the module with
-	the extension, e.g. m_example.so
+For module and moduleconf, the block name is the filename without the prefix
+	and the extension, e.g. example (which loads m_example.so)
 
 The block name must be followed by an opening brace ({).
 Inside the block, you can have any number of variables.  Variable names must be
@@ -31,7 +31,7 @@ assume anything not in quotes is a variable name from earlier in the block (and
 if it's not, it'll be replaced with nothing).  You can append strings using the
 plus (+) sign.  The strings can be literal strings that you put in the config
 file (in quotes) or variable names from earlier in that block (not in quotes).
-The plus sign does not add numbers if there are numbers in the string, but it
+The plus sign does not add numbers if there are numbers in the string; it
 simply concatenates the strings.
 In the example above, the following definitions are the same as the definitions
 in the block:
