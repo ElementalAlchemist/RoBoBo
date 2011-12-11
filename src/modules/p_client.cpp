@@ -168,7 +168,7 @@ Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	saveMode("censor", 'G', true);
 	saveMode("chanacl", 'W', true);
 	saveMode("cloak", 'x', false);
-	saveMode("deaf", 'c', false);
+	saveMode("deaf", 'd', false);
 	saveMode("deaf_commonchan", 'c', false);
 	saveMode("delayjoin", 'D', true);
 	saveMode("delaymsg", 'd', true);
