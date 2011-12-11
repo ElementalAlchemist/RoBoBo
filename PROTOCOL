@@ -1,0 +1,816 @@
+RoBoBo-IRC-BoBo
+Creating Protocol Modules Help File
+=======================
+Table of Contents
+
+1. Current API
+2. Specifics of Implementation
+3. Communication with the Bot
+- 3.1 Requests from Modules
+- 3.2 Module Hooks
+- 3.3 Other Variables and Functions
+4. Helpful Variables and Functions
+5. Long-Name Modes List
+- 5.1 Channel Modes
+- 5.2 User Modes
+
+=======================
+1. CURRENT API
+
+The current API version is 2.0.0.
+
+unsigned int ProtocolClass::apiVersion() {
+	return 2000;
+}
+
+Module-breaking changes to the API are avoided starting with the release
+candidate.  The API version in use as of 2.0.0RC1 was 2.0.0.
+
+=======================
+2. SPECIFICS OF IMPLEMENTATION
+
+The set of classes that must be included to interface with the bot are defined
+in protoinclude.h.  Including this file allows you to extend the Protocol class
+and interface with the bot core.
+
+You will also need a function that returns your class, allowing the bot core to
+load it.  This function is already defined as a macro in the bot core, allowing
+you to use it easily.  This line must be the last one in your source file.
+
+PROTOCOL_SPAWN(ProtocolName)
+
+In this line, change ProtocolName to the name of the class in your file that
+extends Protocol and is to be the main entry point for interaction with other
+parts of the bot.
+
+At this point, you are ready to begin your coding adventure!  You must have a
+class that extends the module class.
+
+class ProtocolName : public Protocol {
+	// Look!  Protocol support stuff!
+};
+
+You must define a constructor that calls the constructor for the parent
+Protocol class.  This allows the bot to load all the information it needs into
+the class variables and loads your module with the appropriate information to
+send data back to the bot core.  If this is not define, your module will not
+function properly.
+
+ProtocolName(std::string serverAddress, std::tr1::unordered_map<std::string, std::string> confVars, Base* theBase, unsigned short debug) : Protocol(serverAddress, confVars, theBase, debug) {}
+
+This is the base constructor that should be used.  You may, if necessary, add
+to the constructor to initialize variables and other stuff.  Connecting to the
+server and communication with the bot core should not occur until
+connectServer() is called (see section 3.3, below).
+
+There is a pure virtual function, apiVersion().  This function must return an
+integer corresponding to the API version with which your module complies.
+Information about the current API version is listed in section 1, above.
+
+From here, you have the skeleton of your protocol module.  The rest of this
+document contains information on integrating your protocol module with the rest
+of the bot.  Compared to normal bot modules, protocol modules rely much more on
+the module author to ensure that it integrates properly with the bot, including
+calling all the appropriate hooks and relaying following the appropriate line
+format guidelines any information back to the server.  Protocol modules must
+call module hooks at appropriate times and properly communicate with the
+server.
+
+=======================
+3. COMMUNICATION WITH THE BOT
+
+This section outlines some useful and important functions which can be used to
+fully integrate with the bot as necessary or simply to make your life easier.
+
+=======================
+3.1. REQUESTS FROM MODULES
+
+Modules may request things of the protocol module, whether that be returning
+information on a certain user or sending a message to a channel.  You will need
+to define these functions.
+
+std::list<std::pair<std::string, char> > prefixes();
+	This function is used to request a list of prefixes in order from highest to lowest rank on the server.  It returns
+		a list where the first member of each contained pair is the long-name mode of the rank, and the second is the
+		rank's symbol.
+
+std::set<char> channelTypes();
+	This function is used to request the types of channels allowed.  This is the symbol at the start of the channel name,
+		most commonly '#'.  Some servers allow other symbols such as '&'.
+
+std::vector<std::vector<std::string> > channelModes();
+	This function is used to request the allowed channel modes.  It returns a list of long-name modes split in the outer
+		vector by the 005 CHANMODES order (i.e. 4 elements in the order of list modes, then modes that take a parameter
+		for both setting and unsetting (typically just k), then modes that take a parameter only for setting, then modes
+		without parameters).
+
+std::list<std::string> channels();
+	This function is used to request a list of channels on the server.  For client modules, the most the module can easily
+		see is the channels the bot is in; server modules can return up to all the channels on the server.
+
+std::string channelTopic(std::string channel);
+	This function returns the topic for a specified channel.
+	channel: The channel to return the topic of
+
+std::set<std::string> channelUsers(std::string channel);
+	This function returns a set of all users in the channel.
+	channel: The channel to return the users of
+
+std::set<std::string> channelModes(std::string channel);
+	This function returns the long-name modes of a channel.  If any modes have parameters, the parameters are included in
+		the mode string, separated from the mode by an equals sign, e.g. "limit=40"
+	channel: The channel to return the modes of
+
+std::string userIdent(std::string user);
+	This function returns the ident of a user.
+	user: The nick of a user to return the ident of
+
+std::string userHost(std::string user);
+	This function returns the host of a user.
+	user: The nick of a user to return the host of
+
+std::pair<std::string, char> userStatus(std::string channel, std::string user);
+	This function returns the highest status a user holds in the specified channel.
+	channel: The channel to check for statuses
+	user: The user to return the status for
+
+std::string userMetadata(std::string user, std::string key);
+	This function returns metadata stored by the server for a user.  It is not necessary to define this function for client modules.
+	user: The user to return data on
+	key: The piece of data to return
+
+std::string compareStatus(std::set<std::string> statuses);
+	This function returns the long-name mode of the highest status from a set of long-name status modes.
+	statuses: A set of statuses to compare.
+
+void sendMsg(std::string client, std::string target, std::string message);
+	This function sends a message to the server.
+	client: The client to send the data
+	target: The data's intended destination (a user or a channel)
+	message: The message to send
+
+void sendNotice(std::string client, std::string target, std::string message);
+	This function sends a notice to the server.
+	client: The client to send the data
+	target: The data's intended destination (a user or a channel)
+	message: The message to send
+
+void setMode(std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes);
+	This function sets given modes on a channel or user.
+	client: The client to set the modes
+	target: The thing to set modes on; typically channels, may be identical to client if changing user modes, or the name
+		of another user if a server module that can do that
+	addModes: A list of long-name modes to set.  Modes with parameters will be separated from the parameters by equals signs.
+	remModes: A list of long-name modes to unset.  Modes with parameters will be separated from the parameters by equals signs.
+
+void joinChannel(std::string client, std::string channel, std::string key = "");
+	This function makes the bot join a channel.
+	client: The client that is to join a channel
+	channel: The channel to join
+	key: The channel key
+
+void partChannel(std::string client, std::string channel, std::string reason = "");
+	This function makes the bot part a channel.
+	client: The client that is to part a channel
+	channel: The channel to part
+	reason: The part reason
+
+void quitServer(std::string reason = "");
+	This function makes the bot disconnect from the server.  All quitting and cleanup should be done here, and the appropriate
+		variables should be set (see section 3.3, below) for proper destruction and cleanup of the class by the serverCheck.
+	reason: The quit/squit reason.
+
+void kickUser(std::string client, std::string channel, std::string user, std::string reason = "");
+	This function makes the bot kick a user from a channel.
+	client: The client that is to kick
+	channel: The channel from which to kick
+	user: The user to kick from the channel
+	reason: The kick reason
+
+void changeNick(std::string client, std::string newNick);
+	This function makes the bot change its nick.
+	client: The client to change nicks
+	nick: The nick to change to
+
+void oper(std::string client, std::string username, std::string password);
+	This function makes the bot try to oper-up.
+	client: The client to operup
+	username: The username of the oper or the opertype to oper as, depending on the requirements
+	password: The password to oper; should be ignored when no password is required
+
+void killUser(std::string client, std::string user, std::string reason);
+	This function makes the bot kill a user.
+	client: The client to send the kill
+	user: The user to kill
+	reason: The kill reason
+
+void setXLine(std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason);
+	This function makes the bot set an x:line (g:line, z:line, e:line, etc.).
+	client: The client to set the x:line
+	lineType: The type of line (e.g. "G" "E" "SHUN" etc.)
+	hostmask: The mask on which to set an x:line (ident@host for g:lines, IP address for z:lines, etc.)
+	duration: The duration (not expiry time) of the x:line in seconds
+	reason: The reason for the x:line
+
+void removeXLine(std::string client, std::string lineType, std::string hostmask);
+	This function makes the bot remove an x:line (g:line, z:line, e:line, etc.).
+	client: The client to remove the x:line
+	lineType: The type of line (e.g. "G" "E" "SHUN" etc.)
+	hostmask: The mask on which to remove the x:line (ident@host for g:lines, IP address for z:lines, etc.)
+
+std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > listXLines();
+	This function returns a map of x:lines set on the server.  The key for the outer map is a line type; the value for
+		each given line type is an inner map where the key is the hostmask, and the value is the time of expiry.
+
+void sendSNotice(char snomask, std::string text);
+	This function sends a server notice to opers with the given SNOmask set.
+	snomask: The SNOmask to send the text to
+	text: The text to send
+
+void sendOther(std::string rawLine);
+	This function sends any other command to the server not covered by other functions.
+	rawLine: The line to send to the server
+
+std::string addClient(std::string nick, std::string ident, std::string host, std::string gecos);
+	This function causes the introduction of a client to a server.  This function can be ignored where client introduction
+		isn't possible.  It returns a string that modules can use as the client parameter to reference the new client.
+	nick: The new client's nick
+	ident: The new client's ident
+	host: The new client's host
+	gecos: The new client's gecos
+	
+void removeClient(std::string client, std::string reason = "");
+	This function causes a client to be removed.  This function can be ignored where client introduction isn't possible.
+	client: The client to remove
+	reason: The client's quit reason
+
+std::set<std::string> clients();
+	This function returns a set of all clients currently connected to the server.
+
+std::tr1::unordered_map<std::string, std::string> clientInfo(std::string client);
+	This function returns information on a client connected to the server such as nick, ident, etc.
+	client: The client on which to return info
+
+std::list<std::string> userModes(std::string client);
+	This function returns usermodes set on a client.
+	client: The client for which to return usermodes
+
+=======================
+3.2. MODULE HOOKS
+
+In order to properly integrate with the bot, you will need to call module
+hooks, passing data as appropriate.  These functions are already defined to
+call what they need in the bot core.  They cycle through all of the loaded
+modules to call the hook specified by each function.
+All of the hooks that apply to your module must be called at some point (i.e.
+client modules won't be able to use the onUserConnect hooks, but it can use
+most of the others, so the others are present while the onUserConnect hooks
+aren't).  Many times, modules will use only one of a pre/post series of hooks,
+so it is important to call both at the appropriate times.
+
+bool callChanMsgHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+	This function calls the module hook for incoming channel messages.  It returns true if no module signaled that it
+		should be ignored.
+	client: The client who received the message
+	channel: The channel the message was sent to
+	target: The status the message was sent to; ' ' if none
+	nick: The nick of the message sender
+	message: The message
+
+bool callUserMsgHook(std::string client, std::string nick, std::string message);
+	This function calls the module hook for incoming private messages.  It returns true if no module signaled that it
+		should be ignored.
+	client: The client who received the message
+	nick: The nick of the message sender
+	message: The message
+
+bool callChanNoticeHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+	This function calls the module hook for incoming channel notices.  It returns true if no module signaled that it
+		should be ignored.
+	client: The client who received the notice
+	channel: The channel the notice was sent to
+	target: The status the notice was sent to; ' ' if none
+	nick: The nick of the notice sender
+	message: The message
+
+bool callUserNoticeHook(std::string client, std::string nick, std::string message);
+	This function calls the module hook for incoming user notices.  It returns true if no module signaled that it should
+		be ignored.
+	client: The client who received the notice
+	nick: The nick of the notice sender
+	message: The message
+
+bool callChannelCTCPHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+	This function calls the module hook for incoming channel CTCP requests.  It returns true if no module signaled that
+		it should be ignored.
+	client: The client who received the CTCP request
+	channel: The channel the CTCP request was sent to
+	target: The status the CTCP request was sent to; ' ' if none
+	nick: The nick of the CTCP request sender
+	message: The contents of the CTCP request, including the type (PING, VERSION, etc.) and associated parameters
+
+bool callUserCTCPHook(std::string client, std::string nick, std::string message);
+	This function calls the module hook for incoming user CTCP requests.  It returns true if no module signaled that it
+		should be ignored.
+	client: The client who received the CTCP request
+	nick: The nick of the CTCP request sender
+	message: The contents of the CTCP request, including the type (PING, VERSION, etc.) and associated parameters
+
+bool callChannelCTCPReplyHook(std::string client, std::string channel, char target, std::string nick, std::string message);
+	This function calls the module hook for incoming channel CTCP replies.  It returns true if no module signaled that it
+		should be ignored.
+	client: The client who received the CTCP reply
+	channel: The channel the CTCP reply was sent to
+	target: The status the CTCP reply was sent to; ' ' if none
+	nick: The nick of the CTCP reply sender
+	message: The contents of the CTCP reply, including the type (PING, VERSION, etc.) and associated data
+
+bool callUserCTCPReplyHook(std::string client, std::string nick, std::string message);
+	This function calls the module hook for incoming user CTCP replies.  It returns true if no module signaled that it
+		should be ignored.
+	client: The client who received the CTCP reply
+	nick: The nick of the CTCP reply sender
+	message: The contents of the CTCP reply, including the type (PING, VERSION, etc.) and associated data
+
+void callChannelJoinPreHook(std::string channel, std::string hostmask);
+	This function calls the module hook for channel joins.  It must be called before the channel join is processed.
+	channel: The channel that was joined
+	hostmask: The hostmask of the user that joined
+
+void callChannelJoinPostHook(std::string channel, std::string hostmask);
+	This function calls the module hook for channel joins.  It must be called after the channel join is processed.
+	channel: The channel that was joined
+	hostmask: The hostmask of the user that joined
+
+void callChannelPartPreHook(std::string channel, std::string hostmask, std::string reason = "");
+	This function calls the module hook for channel parts.  It must be called before the channel part is processed.
+	channel: The channel that was parted
+	hostmask: The hostmask of the user that parted
+	reason: The part reason given
+
+void callChannelPartPostHook(std::string channel, std::string hostmask, std::string reason = "");
+	This function calls the module hook for channel parts.  It must be called after the channel part is processed.
+	channel: The channel that was parted
+	hostmask: The hostmask of the user that parted
+	reason: The part reason given
+
+void callUserConnectPreHook(std::string nick, std::string ident, std::string host, std::string gecos);
+	This function calls the module hook for connecting users.  It must be called before the connection is processed.
+	nick: The nick of the user that connected
+	ident: The ident of the user that connected
+	host: The host of the user that connected
+	gecos: The gecos of the user that connected
+
+void callUserConnectPostHook(std::string nick, std::string ident, std::string host, std::string gecos);
+	This function calls the module hook for connecting users.  It must be called after the connection is processed.
+	nick: The nick of the user that connected
+	ident: The ident of the user that connected
+	host: The host of the user that connected
+	gecos: The gecos of the user that connected
+
+void callUserQuitPreHook(std::string hostmask, std::string reason = "");
+	This function calls the module hook for quitting users.  It must be called before the quit is processed.
+	hostmask: The hostmask of the user that quit
+	reason: The quit reason given
+
+void callUserQuitPostHook(std::string hostmask, std::string reason = "");
+	This function calls the module hook for quitting users.  It must be called after the quit is processed.
+	hostmask: The hostmask of the user that quit
+	reason: The quit reason given
+
+void callNickChangePreHook(std::string oldNick, std::string newNick);
+	This function calls the module hook for nick changes.  It must be called before the quit is processed.
+	oldNick: The old nick of the user
+	newNick: The new nick of the user
+
+void callNickChangePostHook(std::string oldNick, std::string newNick);
+	This function calls the module hook for nick changes.  It must be called after the quit processed.
+	oldNick: The old nick of the user
+	newNick: The new nick of the user
+
+void callChannelKickPreHook(std::string channel, std::string kicker, std::string kickee, std::string reason = "");
+	This function calls the module hook for kicks.  It must be called before the kick is processed.
+	channel: The channel in which the kick occurred
+	kicker: The nick of the user who kicked
+	kickee: The nick of the user who was kicked
+	reason: The kick reason given
+
+void callChannelKickPostHook(std::string channel, std::string kicker, std::string kickee, std::string reason = "");
+	This function calls the module hook for kicks.  It must be called after the kick is processed.
+	channel: The channel in which the kick occurred
+	kicker: The nick of the user who kicked
+	kickee: The nick of the user who was kicked
+	reason: The kick reason given
+
+void callChannelModePreHook(std::string channel, std::string setter, std::string mode, bool add, std::string param = "");
+	This function calls the module hook for channel modes.  It must be called one mode at a time before the modes are processed.
+	channel: The channel on which the mode is set
+	setter: The nick of the user who set the mode
+	mode: The mode that was set
+	add: Whether the mode was set or unset; true if set, false if unset
+	param: If defined, the param associated with the mode
+
+void callChannelModePostHook(std::string channel, std::string setter, std::string mode, bool add, std::string param = "");
+	This function calls the module hook for channel modes.  It must be called one mode at a time after the modes are processed.
+	channel: The channel on which the mode is set
+	setter: The nick of the user who set the mode
+	mode: The mode that was set
+	add: Whether the mode was set or unset; true if set, false if unset
+	param: If defined, the param associated with the mode
+
+void callUserModePreHook(std::string client, std::string mode, bool add);
+	This function calls the module hook for user modes set on a bot client.  It must be called one mode at a time before
+		the modes are processed.
+	client: The client the mode was set on
+	mode: The mode that was set
+	add: Whether the mode was set or unset; true if set, false if unset
+
+void callUserModePostHook(std::string client, std::string mode, bool add);
+	This function calls the module hook for user modes set on a bot client.  It must be called one mode at a time after
+		the modes are processed.
+	client: The client the mode was set on
+	mode: The mode that was set
+	add: Whether the mode was set or unset; true if set, false if unset
+
+void callUserOperPreHook(std::string user, std::string opertype);
+	This function calls the module hook for oper-ups.  It must be called before the opers are processed.
+	user: The user who opered
+	opertype: The opertype of the opered user
+
+void callUserOperPostHook(std::string user, std::string opertype);
+	This function calls the module hook for oper-ups.  It must be called after the opers are processed.
+	user: The user who opered
+	opertype: The opertype of the opered user
+
+void callNumericHook(std::string client, std::string numeric, std::vector<std::string> parsedLine);
+	This function calls the module hook for numerics.  It should be called after the numeric line is processed.
+	client: The client who received the numeric
+	numeric: The numeric
+	parsedLine: The entire line parsed into tokens according to the IRC standard
+
+void callOtherDataHook(std::string client, std::vector<std::string> parsedLine);
+	This function calls the module hook for lines not handled by other hooks.
+	client: The client who received the line.
+	parsedLine: The entire line parsed into tokens according to the IRC standard
+
+void callPreConnectHook();
+	This function calls the module hook for the bot connecting to a server.
+
+void callConnectHook(std::string client);
+	This function calls the module hook for a client connecting to a server.
+	client: The client connecting to the server
+
+void callQuitHook(std::string client);
+	This function calls the module hook for a client quitting from a server.
+	client: The client quitting from the server
+
+std::string callChannelMessageOutHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing message to a channel.  It is to be called before the
+		message is sent.  It returns the final message to send or an empty string to cancel the message.
+	client: The client sending the message
+	target: The channel to which the message is being sent
+	status: The status the message is being sent to; ' ' if none
+	message: The original message to be sent
+
+void callChannelMessageSendHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing message to a channel.  It is to be called after the
+		message is sent.
+	client: The client sending the message
+	target: The channel to which the message is being sent
+	status: The status the message was sent to; ' ' if none
+	message: The message being sent
+
+std::string callUserMessageOutHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing message to a user.  It is to be called before the
+		message is sent.  It returns the final message to send or an empty string to cancel the message.
+	client: The client sending the message
+	target: The user to which the message is being sent
+	message: The original message to be sent
+
+void callUserMessageSendHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing message to a user.  It is to be called after the
+		message is sent.
+	client: The client that sent the message
+	target: The user to which the message was sent
+	message: The message that was sent
+
+std::string callChannelNoticeOutHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing notice to a channel.  It is to be called before the
+		notice is sent.  It returns the final message to send or an empty string to cancel the notice.
+	client: The client sending the notice
+	target: The channel to which the notice is being sent
+	status: The status the notice is being sent to; ' ' if none
+	message: The original message to be sent
+
+void callChannelNoticeSendHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing notice to a channel.  It is to be called after the
+		notice is sent.
+	client: The client that sent the notice
+	target: The channel to which the notice was sent
+	status: The status the notice was sent to; ' ' if none
+	message: The message that was sent
+
+std::string callUserNoticeOutHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing notice to a user.  It is to be called before
+		the notice is sent.  It returns the final message to send or an empty string to cancel the notice.
+	client: The client sending the notice
+	target: The user the notice is being sent to
+	message: The original message to be sent
+
+void callUserNoticeSendHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing notice to a user.  It is to be called after
+		the notice is sent.
+	client: The client that sent the notice
+	target: The user the notice was sent to
+	message: The message that was sent
+
+std::string callChannelCTCPOutHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing CTCP request to a channel.  It is to be called before
+		the CTCP request is sent.  It returns the final request to send or an empty string to cancel the CTCP.
+		The ^A character (char 1) at the beginning and end of the CTCP should be stripped before this function
+		is called and readded to the returned message.
+	client: The client sending the CTCP request
+	target: The channel to which the CTCP request is to be sent
+	status: The status the CTCP request is to be sent to; ' ' if none
+	message: The CTCP request itself, including the type (PING, VERSION, etc.) and any associated parameters
+
+void callChannelCTCPSendHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing CTCP request to a channel.  It is to be called after
+		the CTCP request is sent.  The ^A character (char 1) at the beginning and end of the CTCP should be
+		stripped before this function is called.
+	client: The client that sent the CTCP request
+	target: The channel to which the CTCP request was sent
+	status: The status the CTCP request was sent to; ' ' if none
+	message: The CTCP request itself, including the type (PING, VERSION, etc.) and any associated parameters
+
+std::string callUserCTCPOutHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing CTCP request to a user.  It is to be called before the
+		CTCP request is sent.  It returns the final request to send or an empty string to cancel the CTCP.  The
+		^A character (char 1) at the beginning and end of the CTCP should be stripped before this function is
+		called and readded to the returned message.
+	client: The client sending the CTCP request
+	target: The user to which the CTCP request is to be sent
+	message: The CTCP request itself, including the type (PING, VERSION, etc.) and any associated parameters
+
+void callUserCTCPSendHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing CTCP request to a user.  It is to be called after the
+		CTCP request is sent.  The ^A character (char 1) should be stripped from the beginning and end of the
+		CTCP before this function is called.
+	client: The client that sent the CTCP request
+	target: The user the CTCP request was sent to
+	message: The CTCP request itself, including the type (PING, VERSION, etc.) and any associated parameters
+
+std::string callChannelCTCPReplyOutHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing CTCP reply to a channel.  It is to be called before the
+		CTCP reply is sent.  It returns the final CTCP reply to send or an empty string to cancel the CTCP.  The
+		^A character (char 1) should be stripped from the beginning and end of the CTCP reply before this function
+		is called and readded to the returned message.
+	client: The client sending the CTCP reply
+	target: The channel to which the CTCP reply is being sent
+	status: The status the CTCP reply is being sent to; ' ' if none
+	message: The CTCP reply itself, including the type (PING, VERSION, etc.) and any associated data
+
+void callChannelCTCPReplySendHook(std::string client, std::string target, char status, std::string message);
+	This function calls the module hook for an outgoing CTCP reply to a channel.  It is to be called after
+		the CTCP reply is sent.  The ^A character (char 1) should be stripped from the beginning and end of
+		the CTCP reply before this function is called.
+	client: The client that sent the CTCP reply
+	target: The channel to which the CTCP reply was sent
+	status: The status the CTCP reply was sent to; ' ' if none
+	message: The CTCP reply itself, including the type (PING, VERSION, etc.) and any associated data
+
+std::string callUserCTCPReplyOutHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing CTCP reply to a user.  It is to be called before the CTCP
+		reply is sent.  It returns the final CTCP reply to send or an empty string to cancel the CTCP.  The ^A
+		character (char 1) should be stripped from the beginning and end of the CTCP reply before this function
+		is called and readded to the returned message.
+	client: The client sending the CTCP reply
+	target: The user to whom the CTCP reply is being sent
+	message: The CTCP reply itself, including the type (PING, VERSION, etc.) and any associated data
+
+void callUserCTCPReplySendHook(std::string client, std::string target, std::string message);
+	This function calls the module hook for an outgoing CTCP reply to a user.  It is to be called after the CTCP
+		reply is sent.  The ^A character (char 1) should be stripped from the beginning and end of the CTCP reply
+		before this function is called.
+	client: The client that sent the CTCP reply
+	target: The user to whom the CTCP reply was sent
+	message: The CTCP reply itself, including the type (PING, VERSION, etc.) and any associated data
+
+=======================
+3.3. OTHER VARIABLES AND FUNCTIONS
+
+There are a couple other functions that need to be defined for proper operation
+of a protocol module.
+
+bool keepServer;
+	This variable is checked when the bot is disconnected from your server.  If
+	it is true, the bot will restart your module; if false, it will simply
+	clean it up and leave the server disconnected.  It is true by default.
+
+void connectServer();
+	This function is called by the bot when your module is to connect to the
+	server.  This is where you should initiate the connection with the server.
+
+bool isClient();
+	This function determines whether your module is connected to the server as
+	a client or not.  If not defined, this returns false.  You should only
+	change this if you actually are connecting to the server as a client.
+
+=======================
+4. HELPFUL VARIABLES AND FUNCTIONS
+
+Some variables and functions are provided to assist in communication.
+
+std::string serverName;
+	This variable gives the name of your server connection as referenced
+	throughout the bot.  Due to the setup of the configuration file, this will
+	also be the server address to connect to.
+
+unsigned short debugLevel;
+	This variable tells you what debug level the bot was started at so that you
+	can filter debug messages appropriately.
+
+std::tr1::unordered_map<std::string, std::string> serverConf;
+	This variable contains the configuration for the server specified in the
+	configuration.
+
+Socket* connection;
+	This variable is a pointer to the socket module assigned to the server.
+	The socket module contains functions that allow you to easily send and
+	receive data to communicate with the server; see SOCKET for more
+	information.
+
+std::vector<std::string> parseLine(std::string rawLine);
+	This function is provided by the bot core and parses a given string into
+	tokens according to the IRC standard.
+
+=======================
+5. LONG-NAME MODES LIST
+
+The following is a list of long-name modes and their common single-letter
+counterparts.  The single-letter variants may vary by IRCd, but many are fairly
+standard among IRCds.  You do not have to use all of these if your IRCd doesn't
+support them.
+Modes listed as uncommon are modes not commonly supported in IRCds.  The mode
+letter associated with these is the default associated with it in p_client.
+
+=======================
+5.1 CHANNEL MODES
+
+admin = +a
+	Channel prefix for the admin rank.
+allowinvite = uncommon (+A)
+	Allows non-ops to invite users to the channel.
+auditorium = +u
+	Hides the userlist from users; may show channel ops.
+autoop = uncommon (+w)
+	Holds an IRCd-side autoop list (separate from services).
+ban = +b
+	Prevents users from joining a channel.  May perform other actions through
+	IRCd-specific extbans.
+banexception = +e
+	Provides exceptions allowing some banned users to join the channel anyway.
+	May exempt other restrictions through IRCd-specific extbans.
+blockcaps = uncommon (+B)
+	Blocks messages to the channel that exceed a certain caps threshold.
+blockcolor = +c
+	Blocks messages sent to the channel if they contain color codes.
+c_registered = +r
+	Used by some services packages to indicate that the channel is registered.
+censor = +G
+	Uses the IRCd global word censor to replace bad words.
+chanacl = uncommon (+W)
+	Allows fine-grained channel permissions by opflags or op level.
+delayjoin = uncommon (+D)
+	The IRCd does not send JOIN lines until the user says something in the
+	channel.
+delaymsg = uncommon (+d)
+	Users in the channel may not speak until the number of seconds specifed as
+	the mode's parameter have passed since join.
+exemptchanops = uncommon (+X)
+	Allows channel-specific exemptions for specified op ranks from certain
+	restrictions on the channel.
+filter = uncommon (+g)
+	Creates a channel-specific word filter and blocks messages containing that
+	word.
+flood = +f
+	Specifies a flood limit for messages sent to the channel.
+founder = +q
+	Channel prefix for the owner rank.
+halfop = +h
+	Channel prefix for the halfop rank.
+history = uncommon (+H)
+	Shows the last X number of lines said within the last Y seconds before
+	joining users as specified by the mode parameter X:Y.
+invex = +I
+	Holds a list of users who may join the channel without an invitation
+	despite inviteonly being set on the channel.
+inviteonly = +i
+	Only users who have been invited to the channel or match a mask in invex
+	are allowed to join the channel.
+joinflood = +j
+	Prevents people from joining the channel too quickly by blocking people
+	from joining during large bursts.
+key = +k
+	Specifies a channel password that must be given for users to be able to
+	join.
+kicknorejoin = uncommon (+J)
+	Prevents users from joining for the number of seconds given in the
+	parameter after a kick, defeating autorejoin features in most clients.
+limit = +l
+	Specifies the maximum number of users that may be in the channel at one
+	time.
+longmode = uncommon (+Z)
+	Can be used to set long-name modes on the channel; sent to clients when a
+	server does not specify a mode letter for it.
+moderated = +m
+	Only voiced users and above may speak in the channel.
+nickflood = uncommon (+F)
+	Prevents users in the channel from changing their nicks too often.
+noctcp = +C
+	Blocks CTCPs except ACTION sent to the channel.
+noextmsg = +n
+	Requires users to be in the channel to send messages to it.
+nokick = +Q
+	Blocks channel kicks.
+noknock = +K
+	Prevents users from sending /knock to the channel.
+nonick = +N
+	Prevents users from changing their nicks while in the channel.
+nonotice = +T
+	Prevents users from sending notices to the channel.
+official-join = uncommon (+Y)
+	Channel prefix that designates an oper who joined the channel on official
+	network business.
+op = +o
+	Channel prefix for the op rank.
+operonly = +O
+	Prevents non-opered users from joining the channel.
+operprefix = uncommon, varies (+y)
+	Channel prefix that designates a network oper.
+opmoderated = uncommon, varies (+U)
+	When set with +m, sends all messages sent by users who normally can't speak
+	to channel operators.
+permanent = uncommon (+P)
+	Prevents the channel from being destroyed after the last user leaves,
+	preserving the topic, modes, etc.
+private = +p
+	Hides the channel from /list.
+redirect = +L
+	When the channel is full, sends users who attempt to join the channel to
+	the channel specified by the parameter.
+reginvite = +R
+	Prevents unregistered (with services) users from joining the channel.
+regmoderated = +M
+	Prevents unregistered (with services) users from speaking in the channel.
+secret = +s
+	Hides the channel from /list and /whois.
+sslonly = +z
+	Allows only users connected to the server via SSL to join the channel.
+stripcolor = +S (sometimes +c in place of blockcolor)
+	Strips color codes from messages sent to the channel.
+topiclock = +t
+	Prevents non-ops from changing the channel topic.
+voice = +v
+	Channel prefix for the voice rank.
+
+=======================
+5.2 USER MODES
+
+bot = +B
+	Marks the client as a bot.
+callerid = uncommon (+g)
+	Blocks user messages unless the user accepts the sender.
+cloak = +x
+	Cloaks the host of the user.
+deaf = +d
+	Prevents the user from receiving channel messages.
+deaf_commonchan = uncommon (+c)
+	Blocks user messages from users who are not in at least one channel you
+	are.
+hidechans = varies (+I)
+	Hides the channel list in /whois requests.
+hideoper = +H
+	Hides oper status in /whois.
+invisible = +i
+	Hides user from /who unless the command issuer is also in the channel.
+noautoop = uncommon (+n)
+	Prevents autoop when joining channels (see autoop chanmode).
+oper = +o
+	Indicates that the user is an IRC oper.
+regdeaf = +R
+	Blocks user messages from unregistered (with services) users.
+showwhois = +W
+	Alerts the user when someone does a /whois on the user.
+snomask = +s
+	Allows IRC opers to receive server notices.  On some IRCds, allows opers
+	to change server notice masks to filter server notices.
+u_censor = +G
+	Censors all bad words sent to the user.  Similar to the censor chanmode but
+	works for all data sent to the user.
+u_registered = +r
+	Used by some services packages to indicate that the user is registered.
+u_stripcolor = uncommon (+S)
+	Strips color codes from all messages sent to the user.
+wallops = +w
+	Allows the user to receive wallops messages.
