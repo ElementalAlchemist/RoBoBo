@@ -40,6 +40,17 @@ var5 = "value 142";
 var6 = "not value 1";
 You can concatenate as many strings as you wish for one variable.
 
+In server blocks, there are two required variables.  These variables are used
+by the bot core to determine how to connect to the server.
+protocol: This variable must contain the name of a protocol module file
+without the p_ prefix or .so extension and is used to load the correct protocol
+module for that server connection.  If you're not sure what to use, "client"
+will load p_client, the default IRC client connection.
+socket: This variable must contain the name of a socket module file without the
+s_ prefix or .so extension and is used to load the correct socket module for
+that server connection.  If you're not sure what to use, "plaintext" will load
+s_plaintext, the normal (no SSL, etc.) plain-text connection.
+
 You must end each block with a closing brace (}).
 
 If you wish, you may separate your config into different files and include each
