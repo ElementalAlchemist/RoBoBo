@@ -51,6 +51,13 @@ s_ prefix or .so extension and is used to load the correct socket module for
 that server connection.  If you're not sure what to use, "plaintext" will load
 s_plaintext, the normal (no SSL, etc.) plain-text connection.
 
+When using p_client, you can specify for each server which mode letters mean
+what by specifing the mode's longname (a list of these is in section 5 of
+PROTOCOL) as the variable name and the letter used by the server as the value.
+To prevent mode letter conflicts, make sure to use "disable" as the value on
+any modes that aren't used on the server and have a default letter of a
+different mode that does exist.
+
 You must end each block with a closing brace (}).
 
 If you wish, you may separate your config into different files and include each
