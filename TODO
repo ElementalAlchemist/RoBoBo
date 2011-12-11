@@ -48,10 +48,10 @@ Current TODO List
 
 2.0 Beta 1
 =======================================
-[ ] - Documentation updates
-	[ ] - PROTOCOL
-	[ ] - MODULES
-	[ ] - README
+[x] - Documentation updates
+	[x] - PROTOCOL
+	[x] - MODULES
+	[x] - README
 [x] - Enhance bot control admin modules (say, channels, etc.) with the ability to choose a client on that server
 	[x] - Possibly include client list in all of these, or individual m_admin_clientlist?
 
