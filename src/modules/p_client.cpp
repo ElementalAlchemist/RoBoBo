@@ -154,11 +154,18 @@ Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, s
 		floodControl = false;
 	else
 		floodControl = true;
-	saveMode("admin", 'a', true); // long form, default char, whether it's a channel mode
-	saveMode("allowinvite", 'A', true); // This function allows repeated additions of modes
-	saveMode("auditorium", 'u', true); // to saved mode conversions without too much code
-	saveMode("autoop", 'w', true); // duplication and allowing easy changes to mode
-	saveMode("ban", 'b', true); // customization, if necessary.
+	/* saveMode(long form, default char, whether it's a channel mode)
+	 * This function allows repeated additions of modes to saved mode conversions
+	 * without too much code duplication and allowing easy changes to mode customization
+	 * if necessary.  The modes specified here represent the default list of long name
+	 * modes and their associated mode letters.  If you are using this list as a reference,
+	 * the list is alphebetized by the long names.
+	 */
+	saveMode("admin", 'a', true);
+	saveMode("allowinvite", 'A', true);
+	saveMode("auditorium", 'u', true);
+	saveMode("autoop", 'w', true);
+	saveMode("ban", 'b', true);
 	saveMode("banexception", 'e', true);
 	saveMode("blockcaps", 'B', true);
 	saveMode("blockcolor", 'c', true);
