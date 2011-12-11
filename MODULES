@@ -59,12 +59,18 @@ class ModName : public Module {
 // Look!  A module!
 };
 
-If you wish you may write a constructor for your modules to initialize class
-variables.  No parameters are passed to the constructor, and, as such, there is
-not access to bot functions in the constructor.  Use onLoadComplete() instead
-(see below, section 3.3), which the bot calls once your module has been loaded
-(or if your module is loaded at startup, after all startup modules have been
-loaded).
+You must define a constructor that calls the constructor for the parent Module
+class; this allows the bot to load all the information it needs into the class
+variables provided and loads your module with the appropriate information to
+send data back to the bot core.  If this is not defined, your module will not
+work correctly.
+
+ModName(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
+
+This is the base constructor that should be used.  You may, if you wish, add to
+the constructor to initialize variables or do other things related to startup
+of your module.  You should not start calling anything that interacts with the
+rest of the bot until onLoadComplete() (see section 3.3, below).
 
 Finally, the Module class contains a pure virtual function, botAPIversion().
 This function must return an integer corresponding to the version of the bot
