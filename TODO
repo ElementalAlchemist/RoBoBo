@@ -57,7 +57,7 @@ Current TODO List
 
 2.0 Beta 2
 =======================================
-[ ] - Make the InspIRCd module handle x:lines; currently, they are not received or stored properly
+[x] - Make the InspIRCd module handle x:lines; currently, they are not received or stored properly
 [ ] - Add longmode mode to client module for proper handling of such a thing
 
 ???

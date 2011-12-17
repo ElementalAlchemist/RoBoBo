@@ -854,10 +854,12 @@ void InspIRCd::setXLine(std::string client, std::string lineType, std::string ho
 	if (client == "")
 		client = serverConf["sid"];
 	std::ostringstream currTime, length;
-	currTime << time(NULL);
+	time_t now = time(NULL);
+	currTime << now;
 	length << duration;
-	std::string sendLine = ":" + client + " ADDLINE " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason;
+	std::string sendLine = ":" + client + " F " + lineType + " " + hostmask + " " + client + " " + currTime.str() + " " + length.str() + " :" + reason;
 	sendData(sendLine);
+	xLines[lineType].insert(std::pair<std::string, time_t> (hostmask, now + duration));
 	std::vector<std::string> parsedLine = parseLine(sendLine);
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callOtherDataHook(*userIter, parsedLine);
@@ -866,10 +868,14 @@ void InspIRCd::setXLine(std::string client, std::string lineType, std::string ho
 void InspIRCd::removeXLine(std::string client, std::string lineType, std::string hostmask) {
 	if (ourClients.find(client) == ourClients.end() && client != "")
 		return;
+	std::tr1::unordered_map<std::string, std::unordered_map<std::string, time_t> >::iterator xLineIter = xLines.find(lineType);
+	if (xLineIter->second.find(hostmask) == xLineIter->second.end())
+		return;
 	if (client == "")
 		client = serverConf["sid"];
 	std::string sendLine = ":" + client + " DELLINE " + lineType + " " + hostmask;
 	sendData(sendLine);
+	xLines[lineType].erase(xLines[lineType].find(hostmask));
 	std::vector<std::string> parsedLine = parseLine(sendLine);
 	for (std::set<std::string>::iterator userIter = ourClients.begin(); userIter != ourClients.end(); ++userIter)
 		callOtherDataHook(*userIter, parsedLine);
@@ -1655,6 +1661,20 @@ void InspIRCd::receiveData() {
 			}
 			sendData(":" + parsedLine[2] + " PART " + parsedLine[3] + " :SVSPART received");
 			callChannelPartPostHook(parsedLine[3], hostmask, "SVSPART received");
+		} else if (parsedLine[1] == "ADDLINE") {
+			std::istringstream setTime (parsedLine[5]);
+			std::istringstream durationTime (parsedLine[6]);
+			time_t expiryTime, duration;
+			setTime >> expiryTime;
+			durationTime >> duration;
+			expiryTime += duration;
+			if (xLines[parsedLine[2]].find(parsedLine[3]) == xLines[parsedLine[2]].end()) {
+				xLines[parsedLine[2]][parsedLine[3]] = expiryTime;
+			} else
+				xLines[parsedLine[2]].insert(std::pair<std::string, time_t> (parsedLine[3], expiryTime));
+		} else if (parsedLine[1] == "DELLINE") {
+			if (xLines[parsedLine[2]].find(parsedLine[3]) != xLines[parsedLine[2]].end())
+				xLines[parsedLine[2]].erase(xLines[parsedLine[2]].find(parsedLine[3]));
 		} else if (parsedLine[1] == "ENCAP" && (parsedLine[2] == "*" || parsedLine[2] == serverConf["sid"])) {
 			if (parsedLine[3] == "ALLTIME") {
 				std::ostringstream currTime;
