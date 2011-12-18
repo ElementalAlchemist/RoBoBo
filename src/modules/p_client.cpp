@@ -194,6 +194,7 @@ Client::Client(std::string serverAddress, std::tr1::unordered_map<std::string, s
 	saveMode("key", 'k', true);
 	saveMode("kicknorejoin", 'J', true);
 	saveMode("limit", 'l', true);
+	saveMode("longmode", 'Z', true);
 	saveMode("moderated", 'm', true);
 	saveMode("nickflood", 'F', true);
 	saveMode("noautoop", 'n', false);
@@ -384,10 +385,15 @@ void Client::setMode(std::string client, std::string target, std::list<std::stri
 	}
 	for (std::list<std::string>::iterator modeIter = addModes.begin(); modeIter != addModes.end(); ++modeIter) {
 		char modeChar = convertMode(*modeIter);
-		if (modeChar == ' ')
+		if (modeChar == ' ' && convertMode("longmode") != ' ') {
+			modeChar = convertMode("longmode");
+			params += " " + *modeIter;
+		} else if (modeChar == ' ')
 			continue;
-		if ((*modeIter).find_first_of('=') != std::string::npos)
-			params += " " + (*modeIter).substr((*modeIter).find_first_of('=') + 1);
+		else {
+			if ((*modeIter).find_first_of('=') != std::string::npos)
+				params += " " + (*modeIter).substr((*modeIter).find_first_of('=') + 1);
+		}
 		addModeChars += modeChar;
 	}
 	for (std::list<std::string>::iterator modeIter = remModes.begin(); modeIter != remModes.end(); ++modeIter) {
@@ -641,6 +647,10 @@ void Client::handleData() {
 						}
 						std::string setterNick = parsedLine[0].substr(1, parsedLine[0].find_first_of('!') - 1);
 						std::string longmode = convertChanMode(parsedLine[3][i]);
+						if (longmode == "longmode") {
+							longmode = parsedLine[currParam].substr(0, parsedLine[currParam].find_first_of('='));
+							parsedLine[currParam] = parsedLine[currParam].substr(parsedLine[currParam].find_first_of('=') + 1);
+						}
 						if (category == 0 || category == 1 || (category == 2 && addMode))
 							callChannelModePreHook(parsedLine[2], setterNick, longmode, addMode, parsedLine[currParam]);
 						else
@@ -864,7 +874,7 @@ void Client::sendData() {
 		}
 		if (command == "MODE") {
 			secondsToAdd = 1;
-			if (parsedLine[2].find_first_of(convertMode("cloak")) != std::string::npos)
+			if (chanTypes.find(parsedLine[1][0]) == chanTypes.end() && parsedLine[2].find_first_of(convertMode("cloak")) != std::string::npos) // The usermode for cloaking
 				secondsToAdd = 6; // Because apparently cloaking/setting hosts is so resource-intensive.
 		} else { // MODE processes its own penalty addition
 			if (command == "GLINE" || command == "KLINE" || (command == "NICK" && !registered) || command == "PASS" || command == "PING" || command == "PONG" || command == "QLINE" || command == "USER" || command == "ZLINE" || command == "OJOIN" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC")
