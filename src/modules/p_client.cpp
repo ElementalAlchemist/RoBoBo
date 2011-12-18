@@ -528,7 +528,7 @@ void Client::handleData() {
 			readingNames[parsedLine[3]] = false;
 			callNumericHook(serverConf["nick"], "366", parsedLine);
 		} else if (parsedLine[1] == "433" && !registered) { // nickname already in use
-			if (!altChanged) {
+			if (!altChanged && serverConf["altnick"] != "") {
 				changeNick("", serverConf["altnick"]);
 				serverConf["nick"] = serverConf["altnick"];
 				altChanged = true;
