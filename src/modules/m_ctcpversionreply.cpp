@@ -55,6 +55,9 @@ VersionReply::VersionReply(std::tr1::unordered_map<std::string, std::string> mod
 		case 1950:
 			versionReply += "v2.0.0b1";
 			break;
+		case 1951:
+			versionReply += "v2.0.0b2";
+			break;
 		default:
 			std::ostringstream thisVersion;
 			thisVersion << "v";
