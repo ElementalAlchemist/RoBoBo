@@ -9,28 +9,11 @@ class VersionReply : public Module {
 		std::string description();
 	private:
 		void sendVersionReply(std::string server, std::string client, std::string target);
+		std::string versionReply;
 };
 
-VersionReply::VersionReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
-
-int VersionReply::botAPIversion() {
-	return 2000;
-}
-
-bool VersionReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
-	if (splitBySpace(message)[0] == "VERSION")
-		sendVersionReply(server, client, nick);
-	return true;
-}
-
-bool VersionReply::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
-	if (splitBySpace(message)[0] == "VERSION")
-		sendVersionReply(server, client, nick);
-	return true;
-}
-
-void VersionReply::sendVersionReply(std::string server, std::string client, std::string target) {
-	std::string versionReply = "RoBoBo-IRC-BoBo IRC Bot ";
+VersionReply::VersionReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {
+	versionReply = "RoBoBo-IRC-BoBo IRC Bot ";
 	unsigned int thisBotVersion = botVersion();
 	switch (thisBotVersion) { // get bot version, so this mod isn't restricted to one version of the bot and doesn't have to be updated with each version
 		case 900:
@@ -86,7 +69,22 @@ void VersionReply::sendVersionReply(std::string server, std::string client, std:
 	} // More of these may be added as they exist.
 	if (config["replystring"] != "")
 		versionReply += " " + config["replystring"];
-	sendCTCPReply(server, client, target, "VERSION", versionReply);
+}
+
+int VersionReply::botAPIversion() {
+	return 2000;
+}
+
+bool VersionReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	if (splitBySpace(message)[0] == "VERSION")
+		sendCTCPReply(server, client, nick, "VERSION", versionReply);
+	return true;
+}
+
+bool VersionReply::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
+	if (splitBySpace(message)[0] == "VERSION")
+		sendCTCPReply(server, client, nick, "VERSION", versionReply);
+	return true;
 }
 
 std::string VersionReply::description() {
