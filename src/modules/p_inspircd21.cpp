@@ -868,7 +868,7 @@ void InspIRCd::setXLine(std::string client, std::string lineType, std::string ho
 void InspIRCd::removeXLine(std::string client, std::string lineType, std::string hostmask) {
 	if (ourClients.find(client) == ourClients.end() && client != "")
 		return;
-	std::tr1::unordered_map<std::string, std::unordered_map<std::string, time_t> >::iterator xLineIter = xLines.find(lineType);
+	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> >::iterator xLineIter = xLines.find(lineType);
 	if (xLineIter->second.find(hostmask) == xLineIter->second.end())
 		return;
 	if (client == "")
