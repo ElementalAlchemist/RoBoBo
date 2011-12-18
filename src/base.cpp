@@ -1157,6 +1157,7 @@ void Base::serverCheck() {
 					std::cout << serverName << " lost connection." << std::endl;
 				if (restartServer)
 					connectServer(serverName); // make new server for reconnecting
+				servIter = servers.begin(); // Reset servIter to remove reference to dead server
 			}
 		}
 		if (servers.empty())
