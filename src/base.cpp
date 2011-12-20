@@ -1218,7 +1218,15 @@ void Base::tUnloadMod() {
 	modules->erase(modIter);
 	dlclose(modFileIter->second);
 	moduleFiles.erase(modFileIter);
-	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = modules->begin(); moduleIter != modules->end(); ++moduleIter)
+	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = highModules.begin(); moduleIter != highModules.end(); ++moduleIter)
 		moduleIter->second->onModuleChange(); // provide modules with a way to detect unloading
+	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = mediumHighModules.begin(); moduleIter != mediumHighModules.end(); ++moduleIter)
+		moduleIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = normalModules.begin(); moduleIter != normalModules.end(); ++moduleIter)
+		moduleIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = mediumLowModules.begin(); moduleIter != mediumLowModules.end(); ++moduleIter)
+		moduleIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = lowModules.begin(); moduleIter != lowModules.end(); ++moduleIter)
+		moduleIter->second->onModuleChange();
 	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we just removed
 }
