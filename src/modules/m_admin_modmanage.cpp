@@ -134,6 +134,14 @@ void LoadModCommand::onAdminCommand(std::string server, std::string client, std:
 				dccMod->dccSend(server + "/" + nick, "Usage: unloadmod <module>");
 			return;
 		}
+		if (message == moduleName) {
+			if (dccMod == NULL)
+				sendPrivMsg(server, client, nick, "Unloading module " + moduleName);
+			else
+				dccMod->dccSend(server + "/" + nick, "Unloading module " + moduleName);
+			unloadModule();
+			return;
+		}
 		if (unloadModule(message)) {
 			if (dccMod == NULL)
 				sendPrivMsg(server, client, nick, "Unloading module " + message);
