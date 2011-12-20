@@ -1178,9 +1178,9 @@ void* Base::tUnloadMod_thread(void* mip) {
 }
 
 void Base::tUnloadMod() {
+	sleep(1);
 	if (moduleToUnload.empty())
 		return;
-	sleep(1);
 	std::tr1::unordered_map<std::string, Module*>* modules;
 	if (highModules.find(moduleToUnload[0]) != highModules.end())
 		modules = &highModules;
@@ -1196,6 +1196,7 @@ void Base::tUnloadMod() {
 		return;
 	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->find(moduleToUnload[0]);
 	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(moduleToUnload[0]);
+	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we are removing
 	if (!modIter->second->abilities().empty()) {
 		std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
 		while (modAbleIter != modAbilities.end()) {
@@ -1230,5 +1231,4 @@ void Base::tUnloadMod() {
 		moduleIter->second->onModuleChange();
 	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = lowModules.begin(); moduleIter != lowModules.end(); ++moduleIter)
 		moduleIter->second->onModuleChange();
-	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we just removed
 }
