@@ -11,7 +11,7 @@ class ServicesID : public Module {
 ServicesID::ServicesID(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, short unsigned int debug): Module(modConf, modFace, modName, dir, debug) {}
 
 int ServicesID::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 void ServicesID::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine) {

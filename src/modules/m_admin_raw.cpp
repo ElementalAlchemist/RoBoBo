@@ -17,7 +17,7 @@ class RawCommand : public AdminHook {
 RawCommand::RawCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : AdminHook(modConf, modFace, modName, dir, debug) {}
 
 int RawCommand::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 bool RawCommand::onLoadComplete() {

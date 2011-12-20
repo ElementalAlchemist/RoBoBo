@@ -25,7 +25,7 @@ Cap::Cap(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFac
 }
 
 int Cap::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 void Cap::onModuleChange() {

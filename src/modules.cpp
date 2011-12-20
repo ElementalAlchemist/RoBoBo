@@ -8,6 +8,10 @@ void Module::reconf(std::tr1::unordered_map<std::string, std::string> modConf) {
 	config = modConf;
 }
 
+bool Module::flaggedForUnload() {
+	return unloadMod;
+}
+
 Priority Module::receivePriority() { return PRI_NORMAL; }
 
 bool Module::onLoadComplete() { return true; }
@@ -215,11 +219,11 @@ bool Module::loadModule(std::string modName) {
 }
 
 void Module::unloadModule() {
-	serverData->unloadModule(moduleName);
+	unloadMod = true;
 }
 
-void Module::unloadModule(std::string modName) {
-	serverData->unloadModule(modName);
+bool Module::unloadModule(std::string modName) {
+	return serverData->unloadModule(modName);
 }
 
 void Module::rehashBot() {

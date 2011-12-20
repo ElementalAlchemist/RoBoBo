@@ -37,7 +37,7 @@ class DCCChatModule : public dccSender {
 DCCChatModule::DCCChatModule(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : dccSender(modConf, modFace, modName, dir, debug) {}
 
 int DCCChatModule::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 void DCCChatModule::onNickChangePre(std::string server, std::string oldNick, std::string newNick) {

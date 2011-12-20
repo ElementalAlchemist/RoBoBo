@@ -12,7 +12,7 @@ class PingReply : public Module {
 PingReply::PingReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int PingReply::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 bool PingReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {

@@ -13,7 +13,7 @@ class GlobMatcher : public PatternMatcher {
 GlobMatcher::GlobMatcher(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : PatternMatcher(modConf, modFace, modName, dir, debug) {}
 
 int GlobMatcher::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 std::string GlobMatcher::description() {

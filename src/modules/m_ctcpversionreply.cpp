@@ -75,7 +75,7 @@ VersionReply::VersionReply(std::tr1::unordered_map<std::string, std::string> mod
 }
 
 int VersionReply::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 bool VersionReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {

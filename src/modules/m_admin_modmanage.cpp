@@ -17,7 +17,7 @@ class LoadModCommand : public AdminHook {
 LoadModCommand::LoadModCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : AdminHook(modConf, modFace, modName, dir, debug) {}
 
 int LoadModCommand::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 bool LoadModCommand::onLoadComplete() {
@@ -134,20 +134,17 @@ void LoadModCommand::onAdminCommand(std::string server, std::string client, std:
 				dccMod->dccSend(server + "/" + nick, "Usage: unloadmod <module>");
 			return;
 		}
-		std::tr1::unordered_map<std::string, Module*> loadedModules = modules();
-		std::tr1::unordered_map<std::string, Module*>::iterator modIter = loadedModules.find(message);
-		if (modIter == loadedModules.end()) {
+		if (unloadModule(message)) {
+			if (dccMod == NULL)
+				sendPrivMsg(server, client, nick, "Unloading module " + message);
+			else
+				dccMod->dccSend(server + "/" + nick, "Unloading module " + message);
+		} else {
 			if (dccMod == NULL)
 				sendPrivMsg(server, client, nick, "Could not unload module " + message + ": does not exist.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Could not unload module " + message + ": does not exist.");
-			return;
 		}
-		unloadModule(message);
-		if (dccMod == NULL)
-			sendPrivMsg(server, client, nick, "Unloading module " + message);
-		else
-			dccMod->dccSend(server + "/" + nick, "Unloading module " + message);
 	}
 }
 

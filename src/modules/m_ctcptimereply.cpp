@@ -15,7 +15,7 @@ class TimeReply : public Module {
 TimeReply::TimeReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int TimeReply::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 bool TimeReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {

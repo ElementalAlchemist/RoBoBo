@@ -100,9 +100,11 @@ class Base {
 		void rehash();
 		bool connectServer(std::string serverName);
 		bool loadModule(std::string modName, bool startup);
-		void unloadModule(std::string modName);
+		bool unloadModule(std::string modName);
 		static void* serverCheck_thread(void* ptr);
 		void serverCheck();
+		static void* moduleCheck_thread(void* ptr);
+		void moduleCheck();
 	private:
 		std::tr1::unordered_map<std::string, Protocol*> servers;
 		std::tr1::unordered_map<std::string, Module*> highModules, mediumHighModules, normalModules, mediumLowModules, lowModules;
@@ -116,10 +118,7 @@ class Base {
 		std::string directory;
 		std::string configName;
 		bool charIsNumeric(char number);
-		static void* tUnloadMod_thread(void* mip);
-		void tUnloadMod();
-		std::vector<std::string> moduleToUnload;
-		pthread_t serverCheckThread;
+		pthread_t serverCheckThread, moduleCheckThread;
 		pthread_attr_t detachedState;
 };
 #endif

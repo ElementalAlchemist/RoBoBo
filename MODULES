@@ -17,14 +17,14 @@ Table of Contents
 =======================
 1. CURRENT API
 
-The current API version is 2.0.0.
+The current API version is 2.0.1.
 
 int ModuleClass::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 Module-breaking changes to the API are avoided starting with the release
-candidate.  The API version in use as of 2.0.0RC1 was 2.0.0.
+candidate.  The API version in use as of 2.0.0RC1 was 2.0.1.
 
 =======================
 2. SPECIFICS OF IMPLEMENTATION

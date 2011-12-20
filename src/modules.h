@@ -18,6 +18,7 @@ class Module {
 		virtual ~Module();
 		virtual int botAPIversion() = 0;
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
+		bool flaggedForUnload();
 		virtual Priority receivePriority();
 		virtual bool onLoadComplete();
 		virtual void onRehash();
@@ -128,6 +129,7 @@ class Module {
 		std::string userMetadata(std::string server, std::string user, std::string key);
 	private:
 		Base* serverData;
+		bool unloadMod;
 };
 #include "protocol.h"
 #endif

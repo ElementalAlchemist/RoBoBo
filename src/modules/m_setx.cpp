@@ -15,7 +15,7 @@ class SetX : public Module {
 SetX::SetX(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 int SetX::botAPIversion() {
-	return 2000;
+	return 2001;
 }
 
 bool SetX::onLoadComplete() {

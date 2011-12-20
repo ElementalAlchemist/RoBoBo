@@ -4,6 +4,7 @@ Base::Base(std::string confdir, std::string confname, unsigned short debug) : de
 	pthread_attr_init(&detachedState);
 	pthread_attr_setdetachstate(&detachedState, PTHREAD_CREATE_DETACHED);
 	pthread_create(&serverCheckThread, &detachedState, serverCheck_thread, this); // start thread that checks for disconnected servers
+	pthread_create(&moduleCheckThread, &detachedState, moduleCheck_thread, this); // start thread for modules that flag themselves for unload
 	ConfigReader config (confname, confdir);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConf = config.servers(true);
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > moduleConf = config.modules(true);
@@ -1075,7 +1076,7 @@ bool Base::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*) spawnModule(modConf->second, this, modName, directory, debugLevel);
-	if (newModule->botAPIversion() != 2000) { // compare to current API version
+	if (newModule->botAPIversion() != 2000 && newModule->botAPIversion() != 2001) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module m_" << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
 		return false;
@@ -1132,10 +1133,56 @@ bool Base::loadModule(std::string modName, bool startup) {
 	return true;
 }
 
-void Base::unloadModule(std::string modName) {
-	moduleToUnload.push_back(modName);
-	pthread_t tum;
-	pthread_create(&tum, NULL, tUnloadMod_thread, this);
+bool Base::unloadModule(std::string modName) {
+	std::tr1::unordered_map<std::string, Module*>* modules; // Make a pointer to point to the module priority map we need.
+	if (highModules.find(modName) != highModules.end())
+		modules = &highModules;
+	else if (mediumHighModules.find(modName) != mediumHighModules.end())
+		modules = &mediumHighModules;
+	else if (normalModules.find(modName) != normalModules.end())
+		modules = &normalModules;
+	else if (mediumLowModules.find(modName) != mediumLowModules.end())
+		modules = &mediumLowModules;
+	else if (lowModules.find(modName) != lowModules.end())
+		modules = &lowModules;
+	else
+		return false;
+	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->find(modName);
+	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modName);
+	if (!modIter->second->abilities().empty()) {
+		std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+		while (modAbleIter != modAbilities.end()) {
+			if (modAbleIter->second == modName) {
+				modAbilities.erase(modAbleIter);
+				modAbleIter = modAbilities.begin();
+			} else
+				++modAbleIter;
+		}
+	}
+	if (!modIter->second->supports().empty()) {
+		for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSuppIter = modSupports.begin(); modSuppIter != modSupports.end(); ++modSuppIter) {
+			for (size_t i = 0; i < modSuppIter->second.size(); i++) {
+				if (modSuppIter->second[i] == modName) {
+					modSuppIter->second.erase(modSuppIter->second.begin() + i);
+					break;
+				}
+			}
+		}
+	}
+	delete modIter->second;
+	modules->erase(modIter);
+	dlclose(modFileIter->second);
+	moduleFiles.erase(modFileIter);
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
+		modHookIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
+		modHookIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
+		modHookIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
+		modHookIter->second->onModuleChange();
+	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
+		modHookIter->second->onModuleChange();
 }
 
 void* Base::serverCheck_thread(void* ptr) {
@@ -1165,70 +1212,65 @@ void Base::serverCheck() {
 	}
 }
 
+void* Base::moduleCheck_thread(void* ptr) {
+	Base* mod = (Base*) ptr;
+	mod->moduleCheck();
+	return NULL;
+}
+
+void Base::moduleCheck() {
+	while (true) {
+		sleep(1);
+		std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin();
+		while (modIter != highModules.end()) {
+			if (modIter->second->flaggedForUnload()) {
+				delete modIter->second;
+				highModules.erase(modIter);
+				modIter = highModules.begin();
+			} else
+				++modIter;
+		}
+		modIter = mediumHighModules.begin();
+		while (modIter != mediumHighModules.end()) {
+			if (modIter->second->flaggedForUnload()) {
+				delete modIter->second;
+				mediumHighModules.erase(modIter);
+				modIter = mediumHighModules.begin();
+			} else
+				++modIter;
+		}
+		modIter = normalModules.begin();
+		while (modIter != normalModules.end()) {
+			if (modIter->second->flaggedForUnload()) {
+				delete modIter->second;
+				normalModules.erase(modIter);
+				modIter = normalModules.begin();
+			} else
+				++modIter;
+		}
+		modIter = mediumLowModules.begin();
+		while (modIter != mediumLowModules.end()) {
+			if (modIter->second->flaggedForUnload()) {
+				delete modIter->second;
+				mediumLowModules.erase(modIter);
+				modIter = mediumLowModules.begin();
+			} else
+				++modIter;
+		}
+		modIter = lowModules.begin();
+		while (modIter != lowModules.end()) {
+			if (modIter->second->flaggedForUnload()) {
+				delete modIter->second;
+				lowModules.erase(modIter);
+				modIter = lowModules.begin();
+			} else
+				++modIter;
+		}
+	}
+}
+
 bool Base::charIsNumeric(char number) {
 	if (number == '0' || number == '1' || number == '2' || number == '3' || number == '4' || number == '5' || number == '6' || number == '7' || number == '8' || number == '9')
 		return true;
 	return false;
-}
-
-void* Base::tUnloadMod_thread(void* mip) {
-	Base* modi = (Base*) mip;
-	modi->tUnloadMod();
-	return NULL;
-}
-
-void Base::tUnloadMod() {
-	sleep(1);
-	if (moduleToUnload.empty())
-		return;
-	std::tr1::unordered_map<std::string, Module*>* modules;
-	if (highModules.find(moduleToUnload[0]) != highModules.end())
-		modules = &highModules;
-	else if (mediumHighModules.find(moduleToUnload[0]) != mediumHighModules.end())
-		modules = &mediumHighModules;
-	else if (normalModules.find(moduleToUnload[0]) != normalModules.end())
-		modules = &normalModules;
-	else if (mediumLowModules.find(moduleToUnload[0]) != mediumLowModules.end())
-		modules = &mediumLowModules;
-	else if (lowModules.find(moduleToUnload[0]) != lowModules.end())
-		modules = &lowModules;
-	else
-		return;
-	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->find(moduleToUnload[0]);
-	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(moduleToUnload[0]);
-	moduleToUnload.erase(moduleToUnload.begin()); // remove first element, the one we are removing
-	if (!modIter->second->abilities().empty()) {
-		std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
-		while (modAbleIter != modAbilities.end()) {
-			if (modAbleIter->second == modIter->first) {
-				modAbilities.erase(modAbleIter);
-				modAbleIter = modAbilities.begin();
-			} else
-				++modAbleIter;
-		}
-	}
-	if (!modIter->second->supports().empty()) {
-		for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSuppIter = modSupports.begin(); modSuppIter != modSupports.end(); ++modSuppIter) {
-			for (unsigned int i = 0; i < modSuppIter->second.size(); i++) {
-				if (modSuppIter->second[i] == modIter->first) {
-					modSuppIter->second.erase(modSuppIter->second.begin() + i);
-					break;
-				}
-			}
-		}
-	}
-	delete modIter->second;
-	modules->erase(modIter);
-	dlclose(modFileIter->second);
-	moduleFiles.erase(modFileIter);
-	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = highModules.begin(); moduleIter != highModules.end(); ++moduleIter)
-		moduleIter->second->onModuleChange(); // provide modules with a way to detect unloading
-	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = mediumHighModules.begin(); moduleIter != mediumHighModules.end(); ++moduleIter)
-		moduleIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = normalModules.begin(); moduleIter != normalModules.end(); ++moduleIter)
-		moduleIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = mediumLowModules.begin(); moduleIter != mediumLowModules.end(); ++moduleIter)
-		moduleIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator moduleIter = lowModules.begin(); moduleIter != lowModules.end(); ++moduleIter)
-		moduleIter->second->onModuleChange();
 }
