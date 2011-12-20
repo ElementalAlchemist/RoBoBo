@@ -1197,11 +1197,13 @@ void Base::tUnloadMod() {
 	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->find(moduleToUnload[0]);
 	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(moduleToUnload[0]);
 	if (!modIter->second->abilities().empty()) {
-		for (std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin(); modAbleIter != modAbilities.end(); ++modAbleIter) {
+		std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+		while (modAbleIter != modAbilities.end()) {
 			if (modAbleIter->second == modIter->first) {
 				modAbilities.erase(modAbleIter);
-				--modAbleIter;
-			}
+				modAbleIter = modAbilities.begin();
+			} else
+				++modAbleIter;
 		}
 	}
 	if (!modIter->second->supports().empty()) {
