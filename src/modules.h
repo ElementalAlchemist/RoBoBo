@@ -103,7 +103,7 @@ class Module {
 		void quitServer(std::string server, std::string reason = "");
 		bool loadModule(std::string modName);
 		void unloadModule();
-		void unloadModule(std::string modName);
+		bool unloadModule(std::string modName);
 		void rehashBot();
 		unsigned int botVersion();
 		std::list<std::string> servers();

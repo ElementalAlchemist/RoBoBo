@@ -1183,6 +1183,7 @@ bool Base::unloadModule(std::string modName) {
 		modHookIter->second->onModuleChange();
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
 		modHookIter->second->onModuleChange();
+	return true;
 }
 
 void* Base::serverCheck_thread(void* ptr) {
