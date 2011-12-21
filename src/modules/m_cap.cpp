@@ -8,6 +8,7 @@ class Cap : public CapModule {
 		void onModuleChange();
 		void onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine);
 		void onConnect(std::string server, std::string client);
+		std::string description();
 		void capRegister(std::string capCommand, std::string moduleName);
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);
@@ -99,6 +100,10 @@ void Cap::onConnect(std::string server, std::string client) {
 		sendOtherCommand(server, "CAP", "LS");
 		blockingModules[server].clear();
 	}
+}
+
+std::string Cap::description() {
+	return "Adds support for the CAP command on connect.";
 }
 
 void Cap::capRegister(std::string capCommand, std::string moduleName) {
