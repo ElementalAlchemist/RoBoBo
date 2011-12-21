@@ -9,7 +9,7 @@ block_type block_name {
 	var6 = "not " + var2;
 }
 
-Currently there are only four block types.  These are as follows:
+There are only four block types.  These are as follows:
 server - loads the configuration for the server and connects to it on startup
 serverconf - loads the configuration for the server and saves it for later
 	connection
@@ -21,8 +21,8 @@ The end of the block type is signaled by any kind of whitespace.  After that,
 you must specify the block name.
 For server and serverconf, the block name is the address of the server, e.g.
 	irc.example.net
-For module and moduleconf, the block name is the filename of the module with
-	the extension, e.g. m_example.so
+For module and moduleconf, the block name is the filename without the prefix
+	and the extension, e.g. example (which loads m_example.so)
 
 The block name must be followed by an opening brace ({).
 Inside the block, you can have any number of variables.  Variable names must be
@@ -31,7 +31,7 @@ assume anything not in quotes is a variable name from earlier in the block (and
 if it's not, it'll be replaced with nothing).  You can append strings using the
 plus (+) sign.  The strings can be literal strings that you put in the config
 file (in quotes) or variable names from earlier in that block (not in quotes).
-The plus sign does not add numbers if there are numbers in the string, but it
+The plus sign does not add numbers if there are numbers in the string; it
 simply concatenates the strings.
 In the example above, the following definitions are the same as the definitions
 in the block:
@@ -39,6 +39,24 @@ var4 = "value 1";
 var5 = "value 142";
 var6 = "not value 1";
 You can concatenate as many strings as you wish for one variable.
+
+In server blocks, there are two required variables.  These variables are used
+by the bot core to determine how to connect to the server.
+protocol: This variable must contain the name of a protocol module file
+without the p_ prefix or .so extension and is used to load the correct protocol
+module for that server connection.  If you're not sure what to use, "client"
+will load p_client, the default IRC client connection.
+socket: This variable must contain the name of a socket module file without the
+s_ prefix or .so extension and is used to load the correct socket module for
+that server connection.  If you're not sure what to use, "plaintext" will load
+s_plaintext, the normal (no SSL, etc.) plain-text connection.
+
+When using p_client, you can specify for each server which mode letters mean
+what by specifing the mode's longname (a list of these is in section 5 of
+PROTOCOL) as the variable name and the letter used by the server as the value.
+To prevent mode letter conflicts, make sure to use "disable" as the value on
+any modes that aren't used on the server and have a default letter of a
+different mode that does exist.
 
 You must end each block with a closing brace (}).
 

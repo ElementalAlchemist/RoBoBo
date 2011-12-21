@@ -3,6 +3,12 @@
 # etc.
 
 server irc.example.com {
+	# protocol: the protocol to use to connect to the server
+	# Unless you're trying to connect RoBoBo as a server, you'll want "client"
+	protocol = "client";
+	# sockettype: the type of connection to use to connect to the server
+	# Unless you're using SSL or something else, "plaintext" will make a normal connection
+	sockettype = "plaintext";
 	# port: the port that the IRC server uses for client connections
 	# This is usually 6667
 	port = "6667";
@@ -27,18 +33,26 @@ server irc.example.com {
 }
 
 serverconf irc.server.net { # This server will not be connected on startup, but its configuration will be saved so that it can be connected to later
+	protocol = "inspircd21"; # This example block is set up for InspIRCd connections.
+	sockettype = "plaintext";
+	servername = "robobo.server.net"; # Name this server!  Mostly because you have to.
+	sid = "00A"; # The server ID is required for InspIRCd server connections.
+	password = "password"; # A password for connecting is also required.
+	description = "Server description!"; # Also provide a server description.
 	port = "6667";
-	nick = "RoBoBo";
-	altnick = nick + "_";
-	ident = nick;
-	gecos = "RoBoBo-IRC-BoBo IRC Bot";
-	# password = "";
-	# channels = "";
+	0/nick = "RoBoBo"; # Adding clients is optional.  If not specified, no clients will be created on connect.
+	0/ident = nick;
+	0/host = "i.am.a.magical.bot";
+	0/gecos = "RoBoBo-IRC-BoBo IRC Bot";
+	# 0/oper = "RoBoBoper"; # An oper type is optional and only if you want other servers to know this client is supposed to be an oper
+		# This may be required for some services usage or maybe some other situations.
+	# 0/channels = "#robobo,#more-robobo"; # A comma-separated list of channels is also optional and makes the client in question autojoin the listed channels.
+	# Other clients may be specified as long as you increase the number before the slash for each of the variables for each new client.
 }
 
-module m_cap.so {}
+module cap {}
 
-module m_services_identify.so {
+module services_identify {
 	irc.server.net/service = "NickServ";
 	#irc.server.net/service = "AuthServ@service.server.net"; # Nickname should be in this form if the server requires identification to be sent to a nick like this
 	irc.server.net/command = "IDENTIFY";
@@ -47,58 +61,58 @@ module m_services_identify.so {
 	# Repeat for each server on which the bot should identify.
 }
 
-moduleconf m_setx.so {
+moduleconf setx {
 	servers = "irc.server1.net,irc.server2.net"; # comma-separated list of servers on which to set +x
 }
 
-module m_ctcpversionreply.so { # This module replies to CTCP VERSION requests sent to the bot.
+module ctcpversionreply { # This module replies to CTCP VERSION requests sent to the bot.
 	# replystring: Text added to the end of the VERSION reply sent from the bot. Optional.
 	#replystring = "";
 }
 
-module m_ctcppingreply.so {} # This module replies to CTCP PING requests sent to the bot.  There are no configurable options.
+module ctcppingreply {} # This module replies to CTCP PING requests sent to the bot.  There are no configurable options.
 
-module m_ctcptimereply.so {} # This module replies to CTCP TIME requests sent to the bot.  There are no configurable options.
+module ctcptimereply {} # This module replies to CTCP TIME requests sent to the bot.  There are no configurable options.
 
-module m_dccchat.so {} # This module allows the bot to accept DCC chat requests and open a DCC chat session.  There are no configurable options.
+module dccchat {} # This module allows the bot to accept DCC chat requests and open a DCC chat session.  There are no configurable options.
 
-module m_admin.so {
+module admin {
 	# Admins start with 0.  The module considers admin #0 as the bot master.
-	0/server = "irc.freenode.net"; # server name must be the same as the name of the server block (server name {...})
-	0/nick = "ElementAlchemist"; # your IRC nick
+	0/server = "irc.chatspike.net"; # server name must be the same as the name of the server block (server name {...})
+	0/nick = "ElementalAlchemist"; # your IRC nick
 	0/password = "password"; # the admin password you will use for the bot
 	0/verbose = "1"; # be verbose about what's happening with the bot with this admin?  DCC only.
 }
 
-module m_admin_loadmod.so {
+module admin_modmanage {
 	#masteronly = "yes"; # whether or not this command is to be available only to the bot master. Uncomment and change to change.
-}
+} # The admin module masteronly settings default to the settings shown.  "yes" and "no" are the accepted values.
 
-module m_admin_unloadmod.so {
+module admin_rehash {
 	#masteronly = "yes";
 }
 
-module m_admin_rehash.so {
-	#masteronly = "yes";
-}
-
-module m_admin_say.so {
+module admin_say {
 	#masteronly = "no";
 }
 
-module m_admin_channels.so {
+module admin_channels {
 	#masteronly = "no";
 }
 
-module m_admin_connect.so {
+module admin_clientlist {
+	#masteronly = "no";
+}
+
+module admin_connect {
 	#masteronly = "yes";
 }
 
-module m_admin_die.so {
+module admin_die {
 	#masteronly = "yes";
 }
 
-moduleconf m_admin_raw.so {
+moduleconf admin_raw {
 	#masteronly = "no";
 } # This module is not loaded on start but can be loaded while the bot is running
-# You should not load m_admin_raw unless you know the IRC protocol.
+# You should not load m_admin_raw unless you know the IRC protocol.  Also be aware that some changes to the channel state while using raw may desync the bot.

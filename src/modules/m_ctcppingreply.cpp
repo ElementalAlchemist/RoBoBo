@@ -2,38 +2,41 @@
 
 class PingReply : public Module {
 	public:
+		PingReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
-		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserCTCP(std::string server, std::string nick, std::string message);
+		bool onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
 		std::string description();
 };
 
+PingReply::PingReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
+
 int PingReply::botAPIversion() {
-	return 1100;
+	return 2001;
 }
 
-void PingReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool PingReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "PING") {
 		if (message.size() > 4)
-			sendCTCPReply(server, nick, "PING", message.substr(message.find_first_of(' ')));
+			sendCTCPReply(server, client, nick, "PING", message.substr(message.find_first_of(' ')));
 		else
-			sendCTCPReply(server, nick, "PING", "");
+			sendCTCPReply(server, client, nick, "PING", "");
 	}
+	return true;
 }
 
-void PingReply::onUserCTCP(std::string server, std::string nick, std::string message) {
+bool PingReply::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "PING") {
 		if (message.size() > 4)
-			sendCTCPReply(server, nick, "PING", message.substr(message.find_first_of(' ')));
+			sendCTCPReply(server, client, nick, "PING", message.substr(message.find_first_of(' ')));
 		else
-			sendCTCPReply(server, nick, "PING", "");
+			sendCTCPReply(server, client, nick, "PING", "");
 	}
+	return true;
 }
 
 std::string PingReply::description() {
 	return "Responds to CTCP PING requests.";
 }
 
-extern "C" Module* spawn() {
-	return new PingReply;
-}
+MODULE_SPAWN(PingReply)

@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 				std::cout << "\t\t-d: same as --debug" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--version") == 0 || strcmp(argv[i], "-v") == 0) {
-				std::cout << "RoBoBo-IRC-BoBo Version 1.1.0" << std::endl;
+				std::cout << "RoBoBo-IRC-BoBo Version 2.0.0 RC 1" << std::endl;
 				exitAfter = true;
 			} else if (strcmp(argv[i], "--confdir") == 0) {
 				if (++i >= argc) {
@@ -60,6 +60,6 @@ int main(int argc, char** argv) {
 	std::cout << "RoBoBo-IRC-BoBo started." << std::endl;
 	if (debug == 0)
 		daemon(1,0);
-	new ModuleInterface (confDir, confName, debug); //run actual bot
+	new Base (confDir, confName, debug); //run actual bot
 	pthread_exit(NULL);
 }

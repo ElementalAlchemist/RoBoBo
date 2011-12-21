@@ -2,16 +2,20 @@
 
 class AdminHook : public dccChat {
 	public:
+		AdminHook(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~AdminHook();
 		virtual std::vector<std::vector<std::string> > adminCommands();
-		virtual void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		virtual void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
 class AdminMod : public dccChat {
 	public:
+		AdminMod(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~AdminMod();
 		virtual void sendVerbose(int verboseLevel, std::string message);
 };
+
+AdminHook::AdminHook(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : dccChat(modConf, modFace, modName, dir, debug) {}
 
 AdminHook::~AdminHook() {}
 
@@ -29,21 +33,24 @@ vector -> {
 		"But don't tell anyone! ;)"
 	}
 	vector -> {
-		"anothercommand" // this bot supports two commands
-		"This command calls the first command."
-		"Syntax: anothercommand"
+		"anothercommand" // this mod supports two commands.  Right here is the second one,
+		"This command calls the first command." // the second one's description
+		"Syntax: anothercommand" // and the rest is, as above, some help text for it.
 		"Blah."
 	}
 }
-Using push_back, the strings should be added to the inner vector in that order.  Vectors added to the outer vector can
+The strings should appear in the inner vector in that order.  Vectors added to the outer vector can
 be added in any order.
 */
 
-void AdminHook::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {}
-/* onAdminCommand(std::string, std::string, std::string, std::string, dccSender*, bool)
-This function is called by the admin module whenever a command that you told the admin module in adminCommands().
+void AdminHook::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {}
+/* onAdminCommand(std::string, std::string, std::string, std::string, std::string, dccSender*, bool)
+This function is called by the admin module whenever a command that you told the admin module in adminCommands() to activate on is given
+by a bot admin.
 The parameters are provided as follows:
 - server: the server (as known by the bot) to which the user sending the command is connected
+- client: the client to which the admin command was sent.  This is only relevant if DCC is disabled as the DCC chat module doesn't care about
+	specific local clients to a server.
 - nick: the nick the user sending the command is using
 - command: the command given (you won't need to check this if you only gave one command in adminCommands())
 - message: All of the parameters given to the command (i.e. the entire message starting immediately after the space after the command)
@@ -52,6 +59,8 @@ The parameters are provided as follows:
 	If the command is not given to the admin via DCC, the dccMod pointer will be NULL.
 - master: Whether a bot master sent the command.  If true, the bot master sent the command.  If false, an admin who is not the bot master sent it.
 */
+
+AdminMod::AdminMod(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : dccChat(modConf, modFace, modName, dir, debug) {}
 
 AdminMod::~AdminMod() {}
 

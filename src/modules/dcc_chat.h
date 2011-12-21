@@ -1,5 +1,6 @@
 class dccChat : public Module {
 	public:
+		dccChat(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~dccChat();
 		virtual void onDCCReceive(std::string dccid, std::string message);
 		virtual void onDCCEnd(std::string dccid);
@@ -7,6 +8,7 @@ class dccChat : public Module {
 
 class dccSender : public Module {
 	public:
+		dccSender(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		virtual ~dccSender();
 		virtual void dccSend(std::string dccid, std::string message);
 		virtual bool hookDCCMessage(std::string modName, std::string hookMsg);
@@ -14,6 +16,8 @@ class dccSender : public Module {
 		virtual std::vector<std::string> getConnections();
 		virtual void closeDCCConnection(std::string dccid);
 };
+
+dccChat::dccChat(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, short unsigned int debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 dccChat::~dccChat() {}
 
@@ -29,6 +33,8 @@ void dccChat::onDCCEnd(std::string dccid) {}
 This function is called when a DCC chat session is terminated.  The DCC ID of the user whose chat was terminated
 is provided.
 */
+
+dccSender::dccSender(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
 
 dccSender::~dccSender() {}
 

@@ -11,17 +11,22 @@
 #include <cstdio>
 #include <fcntl.h>
 
+#define SOCKET_SPAWN(name) extern "C" Socket* spawn() {\
+	return new name;\
+}
+
 class Socket {
 	public:
 		Socket();
-		~Socket();
-		bool bindSocket(std::string address);
-		void connectServer(std::string address, unsigned short port);
-		bool sendData(std::string message);
-		std::string receive();
-		void closeConnection();
+		virtual ~Socket();
+		virtual unsigned int apiVersion() = 0;
+		virtual bool bindSocket(std::string address);
+		virtual void connectServer(std::string address, unsigned short port);
+		virtual bool sendData(std::string message);
+		virtual std::string receive();
+		virtual void closeConnection();
 		bool isConnected();
-	private:
+	protected:
 		int socketfd;
 		sockaddr_in socketAddr;
 		bool connected;

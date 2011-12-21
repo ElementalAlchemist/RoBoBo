@@ -3,6 +3,7 @@
 
 class DieCommand : public AdminHook {
 	public:
+		DieCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
@@ -10,18 +11,20 @@ class DieCommand : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
+DieCommand::DieCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : AdminHook(modConf, modFace, modName, dir, debug) {}
+
 int DieCommand::botAPIversion() {
-	return 1100;
+	return 2001;
 }
 
 bool DieCommand::onLoadComplete() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -45,16 +48,19 @@ void DieCommand::onRehash() {
 }
 
 void DieCommand::onModuleChange() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (botAdminAbility == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	std::multimap<std::string, std::string>::iterator botAdminAbility = moduleAbilities.find("BOT_ADMIN");
+	if (botAdminAbility == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
+		unloadModule();
 	}
 }
 
 std::string DieCommand::description() {
-	return "Allows the bot master to shut the bot down from IRC.";
+	std::string desc = "Allows ";
+	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
+	desc += " to shut the bot down from IRC.";
+	return desc;
 }
 
 std::vector<std::string> DieCommand::supports() {
@@ -76,15 +82,15 @@ std::vector<std::vector<std::string> > DieCommand::adminCommands() {
 	return theCommands;
 }
 
-void DieCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void DieCommand::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "The die command is available only to bot masters.");
+			sendPrivMsg(server, client, nick, "The die command is available only to bot masters.");
 		else
 			dccMod->dccSend(server + "/" + nick, "The die command is available only to bot masters.");
 		return;
 	}
-	std::list<std::string> connectedServers = getServers();
+	std::list<std::string> connectedServers = servers();
 	for (std::list<std::string>::iterator servIter = connectedServers.begin(); servIter != connectedServers.end(); ++servIter)
 		quitServer(*servIter, message);
 	if (dccMod != NULL) {
@@ -93,10 +99,8 @@ void DieCommand::onAdminCommand(std::string server, std::string nick, std::strin
 			dccMod->closeDCCConnection(connectedDCC[i]);
 	}
 	std::cout << "Shutting down by admin command: die" << std::endl; // debug level 1
-	sleep(1); // give the send queue a little time to flush quits
+	sleep(1); // give the send queue a little time to flush quits in case of client protocol use (likely)
 	std::exit(0);
 }
 
-extern "C" Module* spawn() {
-	return new DieCommand;
-}
+MODULE_SPAWN(DieCommand)

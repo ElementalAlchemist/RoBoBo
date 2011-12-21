@@ -3,6 +3,7 @@
 
 class AdminSay : public AdminHook {
 	public:
+		AdminSay(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
@@ -10,18 +11,20 @@ class AdminSay : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
+AdminSay::AdminSay(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : AdminHook(modConf, modFace, modName, dir, debug) {}
+
 int AdminSay::botAPIversion() {
-	return 1100;
+	return 2001;
 }
 
 bool AdminSay::onLoadComplete() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -45,10 +48,10 @@ void AdminSay::onRehash() {
 }
 
 void AdminSay::onModuleChange() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN was not found, but is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 	}
 }
 
@@ -72,6 +75,7 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	sayCommand.push_back("Example: say User Hi!");
 	sayCommand.push_back("Example: say irc.othernetwork.net/#channel Hello, everyone!");
 	sayCommand.push_back("Example: say irc.othernetwork.net/User Hi!");
+	sayCommand.push_back("Example: say irc.othernetwork.net/OtherRoBoBo/#channel I'm saying things!");
 	sayCommand.push_back("This command makes the bot send the specified message to the specified target.");
 	sayCommand.push_back("The target can be a user or a channel.");
 	sayCommand.push_back("The server portion of the target is required only when you are sending the message to a server");
@@ -86,6 +90,7 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	actCommand.push_back("Example: act #channel stabs User");
 	actCommand.push_back("Example: act User stabs you");
 	actCommand.push_back("Example: act irc.othernetwork.net/#channel is on another network!");
+	actCommand.push_back("Example: act irc.othernetwork.net/OtherRoBoBo/#channel says things.");
 	actCommand.push_back("Example: act irc.othernetwork.net/User greets you from another server.");
 	actCommand.push_back("This command makes the bot send the specified action to the specified target.");
 	actCommand.push_back("The target can be a user or a channel.");
@@ -97,10 +102,10 @@ std::vector<std::vector<std::string> > AdminSay::adminCommands() {
 	return theCommands;
 }
 
-void AdminSay::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void AdminSay::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "Only the bot admin has access to this command.");
+			sendPrivMsg(server, client, nick, "Only the bot admin has access to this command.");
 		else
 			dccMod->dccSend(server + "/" + nick, "Only the bot admin has access to this command.");
 		return;
@@ -112,13 +117,15 @@ void AdminSay::onAdminCommand(std::string server, std::string nick, std::string 
 		targetServer = server;
 	else
 		target = target.substr(target.find_first_of('/') + 1);
+	if (target.find_first_of('/') != std::string::npos) {
+		client = target.substr(0, target.find_first_of('/'));
+		target = target.substr(target.find_first_of('/') + 1);
+	}
 	message = message.substr(message.find_first_of(' ') + 1);
 	if (command == "say")
-		sendPrivMsg(targetServer, target, message);
+		sendPrivMsg(targetServer, client, target, message);
 	if (command == "act")
-		sendCTCP(targetServer, target, "ACTION", message);
+		sendCTCP(targetServer, client, target, "ACTION", message);
 }
 
-extern "C" Module* spawn() {
-	return new AdminSay;
-}
+MODULE_SPAWN(AdminSay)

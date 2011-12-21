@@ -1,0 +1,124 @@
+#ifndef BASE_H
+#define BASE_H
+#include "modules.h"
+
+typedef void* (*module_spawn_t)(std::tr1::unordered_map<std::string, std::string>, Base*, std::string, std::string, unsigned short);
+typedef void* (*proto_spawn_t)(std::string, std::tr1::unordered_map<std::string, std::string>, Base*, unsigned short);
+typedef void* (*socket_spawn_t)();
+
+class Base {
+	public:
+		Base(std::string confdir, std::string confname, unsigned short debug);
+		std::tr1::unordered_map<std::string, std::string> serverData(std::string server);
+		std::vector<std::vector<std::string> > serverChanModes(std::string server);
+		std::list<std::pair<std::string, char> > serverPrefixes(std::string server);
+		std::string compareStatus(std::string server, std::set<std::string> statuses);
+		bool callChanMsgHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserMsgHook(std::string server, std::string client, std::string nick, std::string message);
+		bool callChanNoticeHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserNoticeHook(std::string server, std::string client, std::string nick, std::string message);
+		bool callChannelCTCPHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserCTCPHook(std::string server, std::string client, std::string nick, std::string message);
+		bool callChannelCTCPReplyHook(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool callUserCTCPReplyHook(std::string server, std::string client, std::string nick, std::string message);
+		void callChannelJoinPreHook(std::string server, std::string channel, std::string hostmask);
+		void callChannelJoinPostHook(std::string server, std::string channel, std::string hostmask);
+		void callChannelPartPreHook(std::string server, std::string channel, std::string hostmask, std::string reason);
+		void callChannelPartPostHook(std::string server, std::string channel, std::string hostmask, std::string reason);
+		void callUserConnectPreHook(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
+		void callUserConnectPostHook(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
+		void callUserQuitPreHook(std::string server, std::string hostmask, std::string reason);
+		void callUserQuitPostHook(std::string server, std::string hostmask, std::string reason);
+		void callNickChangePreHook(std::string server, std::string oldNick, std::string newNick);
+		void callNickChangePostHook(std::string server, std::string oldNick, std::string newNick);
+		void callChannelKickPreHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelKickPostHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChannelModePreHook(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callChannelModePostHook(std::string server, std::string channel, std::string setter, std::string mode, bool add, std::string param);
+		void callUserModePreHook(std::string server, std::string client, std::string mode, bool add);
+		void callUserModePostHook(std::string server, std::string client, std::string mode, bool add);
+		void callUserOperPreHook(std::string server, std::string user, std::string opertype);
+		void callUserOperPostHook(std::string server, std::string user, std::string opertype);
+		void callNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> parsedLine);
+		void callOtherDataHook(std::string server, std::string client, std::vector<std::string> parsedLine);
+		void callPreConnectHook(std::string server);
+		void callConnectHook(std::string server, std::string client);
+		void callQuitHook(std::string server, std::string client);
+		
+		std::string callChannelMessageOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelMessageSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserMessageOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserMessageSendHook(std::string server, std::string client, std::string target, std::string message);
+		std::string callChannelNoticeOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelNoticeSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserNoticeOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserNoticeSendHook(std::string server, std::string client, std::string target, std::string message);
+		std::string callChannelCTCPOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelCTCPSendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserCTCPOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserCTCPSendHook(std::string server, std::string client, std::string target, std::string message);
+		std::string callChannelCTCPReplyOutHook(std::string server, std::string client, std::string target, char status, std::string message);
+		void callChannelCTCPReplySendHook(std::string server, std::string client, std::string target, char status, std::string message);
+		std::string callUserCTCPReplyOutHook(std::string server, std::string client, std::string target, std::string message);
+		void callUserCTCPReplySendHook(std::string server, std::string client, std::string target, std::string message);
+		
+		void sendPrivMsg(std::string server, std::string client, std::string target, std::string message);
+		void sendNotice(std::string server, std::string client, std::string target, std::string message);
+		void setMode(std::string server, std::string client, std::string target, std::list<std::string> addModes, std::list<std::string> remModes);
+		void joinChannel(std::string server, std::string client, std::string channel, std::string key = "");
+		void partChannel(std::string server, std::string client, std::string channel, std::string reason = "");
+		void quitServer(std::string server, std::string reason = "");
+		void kickUser(std::string server, std::string client, std::string channel, std::string user, std::string reason = "");
+		void changeNick(std::string server, std::string client, std::string newNick);
+		void oper(std::string server, std::string client, std::string username, std::string password);
+		void killUser(std::string server, std::string client, std::string user, std::string reason);
+		void setXLine(std::string server, std::string client, std::string lineType, std::string hostmask, time_t duration, std::string reason);
+		void removeXLine(std::string server, std::string client, std::string lineType, std::string hostmask);
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, time_t> > listXLines(std::string server);
+		void sendSNotice(std::string server, char snomask, std::string text);
+		void sendOther(std::string server, std::string rawLine);
+		std::string addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
+		void removeClient(std::string server, std::string client, std::string reason);
+		std::set<std::string> clients(std::string server);
+		std::tr1::unordered_map<std::string, std::string> clientInfo(std::string server, std::string client);
+		bool isChanType(char chanPrefix, std::string server);
+		std::tr1::unordered_map<std::string, Module*> loadedModules();
+		std::list<std::string> serverList();
+		std::multimap<std::string, std::string> moduleAbilities();
+		std::tr1::unordered_map<std::string, std::vector<std::string> > moduleSupports();
+		bool serverIsClient(std::string server);
+		std::list<std::string> channels(std::string server);
+		std::string channelTopic(std::string server, std::string channel);
+		std::set<std::string> channelUsers(std::string server, std::string channel);
+		std::set<std::string> channelModes(std::string server, std::string channel);
+		std::string userIdent(std::string server, std::string user);
+		std::string userHost(std::string server, std::string user);
+		std::list<std::string> userModes(std::string server, std::string user);
+		std::pair<std::string, char> userStatus(std::string server, std::string channel, std::string user);
+		std::string userMetadata(std::string server, std::string user, std::string key);
+		Socket* assignSocket(std::string socketType);
+		void rehash();
+		bool connectServer(std::string serverName);
+		bool loadModule(std::string modName, bool startup);
+		bool unloadModule(std::string modName);
+		static void* serverCheck_thread(void* ptr);
+		void serverCheck();
+		static void* moduleCheck_thread(void* ptr);
+		void moduleCheck();
+	private:
+		std::tr1::unordered_map<std::string, Protocol*> servers;
+		std::tr1::unordered_map<std::string, Module*> highModules, mediumHighModules, normalModules, mediumLowModules, lowModules;
+		std::tr1::unordered_map<std::string, void*> moduleFiles;
+		std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> > serverConfigs, moduleConfigs;
+		std::multimap<std::string, std::string> modAbilities;
+		std::tr1::unordered_map<std::string, std::vector<std::string> > modSupports;
+		std::tr1::unordered_map<std::string, void*> protocolFiles;
+		std::tr1::unordered_map<std::string, void*> socketFiles;
+		unsigned short debugLevel;
+		std::string directory;
+		std::string configName;
+		bool charIsNumeric(char number);
+		pthread_t serverCheckThread, moduleCheckThread;
+		pthread_attr_t detachedState;
+};
+#endif

@@ -3,33 +3,38 @@
 
 class TimeReply : public Module {
 	public:
+		TimeReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
-		void onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message);
-		void onUserCTCP(std::string server, std::string nick, std::string message);
+		bool onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message);
+		bool onUserCTCP(std::string server, std::string client, std::string nick, std::string message);
 		std::string description();
 	private:
-		void sendTime(std::string server, std::string target);
+		void sendTime(std::string server, std::string client, std::string target);
 };
 
+TimeReply::TimeReply(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : Module(modConf, modFace, modName, dir, debug) {}
+
 int TimeReply::botAPIversion() {
-	return 1100;
+	return 2001;
 }
 
-void TimeReply::onChannelCTCP(std::string server, std::string channel, char target, std::string nick, std::string message) {
+bool TimeReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "TIME")
-		sendTime(server, nick);
+		sendTime(server, client, nick);
+	return true;
 }
 
-void TimeReply::onUserCTCP(std::string server, std::string nick, std::string message) {
+bool TimeReply::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
 	if (splitBySpace(message)[0] == "TIME")
-		sendTime(server, nick);
+		sendTime(server, client, nick);
+	return true;
 }
 
 std::string TimeReply::description() {
 	return "Responds to CTCP TIME requests.";
 }
 
-void TimeReply::sendTime(std::string server, std::string target) {
+void TimeReply::sendTime(std::string server, std::string client, std::string target) {
 	time_t unixTimestamp = time(NULL);
 	tm* currTime = localtime(&unixTimestamp);
 	std::string month;
@@ -81,9 +86,7 @@ void TimeReply::sendTime(std::string server, std::string target) {
 		timeOutput << "0";
 	timeOutput << currTime->tm_sec << " ";
 	timeOutput << "(" << unixTimestamp << ")";
-	sendCTCPReply(server, target, "TIME", timeOutput.str());
+	sendCTCPReply(server, client, target, "TIME", timeOutput.str());
 }
 
-extern "C" Module* spawn() {
-	return new TimeReply;
-}
+MODULE_SPAWN(TimeReply)

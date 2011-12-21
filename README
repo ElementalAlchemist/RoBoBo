@@ -27,7 +27,8 @@ and make again.
 =======================
 2. CONFIGURING
 
-See the CONFIGURING file for help with modifying robobo.conf.
+See the CONFIGURING file for help with modifying robobo.conf and using multiple
+configuration files.
 
 =======================
 3. INSTALLING
@@ -48,6 +49,10 @@ help you find a good tutorial.
 For the specifics on creating modules, see the MODULES file.  The MODULES file
 assumes you have a basic grasp of C++ and jumps right into what you need to
 know just for this bot.
+For the specifics on creating protocol modules, see the PROTOCOL file.  The
+same disclaimer above for the MODULES file applies here.
+For the specifics on creating socket modules, see the SOCKET file.  This file
+expects at least basic knowledge of socket programming in C/C++.
 
 =======================
 6. ACKNOWLEDGEMENTS

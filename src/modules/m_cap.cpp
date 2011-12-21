@@ -3,12 +3,13 @@
 
 class Cap : public CapModule {
 	public:
-		Cap();
+		Cap(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		void onModuleChange();
-		void onOtherData(std::string server, std::vector<std::string> parsedLine);
-		void onConnect(std::string server);
-		void capRegister(std::string moduleName, std::string capCommand);
+		void onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine);
+		void onConnect(std::string server, std::string client);
+		std::string description();
+		void capRegister(std::string capCommand, std::string moduleName);
 		void blockCap(std::string server, std::string moduleName);
 		void continueCap(std::string server, std::string moduleName);
 	private:
@@ -17,18 +18,19 @@ class Cap : public CapModule {
 		std::tr1::unordered_map<std::string, std::vector<std::string> > blockingModules;
 };
 
-Cap::Cap() {
+Cap::Cap(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) : CapModule(modConf, modFace, modName, dir, debug) {
 	std::vector<std::string> theCore;
 	theCore.push_back("");
 	capCommands.insert(std::pair<std::string, std::vector<std::string> > ("multi-prefix", theCore));
+	capCommands.insert(std::pair<std::string, std::vector<std::string> > ("userhost-in-names", theCore));
 }
 
 int Cap::botAPIversion() {
-	return 1100;
+	return 2001;
 }
 
 void Cap::onModuleChange() {
-	std::tr1::unordered_map<std::string, Module*> modulesList = getModules();
+	std::tr1::unordered_map<std::string, Module*> modulesList = modules();
 	for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator capIter = capCommands.begin(); capIter != capCommands.end(); ++capIter) {
 		for (unsigned int i = 0; i < capIter->second.size(); i++) {
 			if (modulesList.find(capIter->second[i]) == modulesList.end()) {
@@ -48,7 +50,7 @@ void Cap::onModuleChange() {
 	}
 }
 
-void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
+void Cap::onOtherData(std::string server, std::string client, std::vector<std::string> parsedLine) {
 	if (parsedLine[1] == "CAP") {
 		if (parsedLine[3] == "LS") {
 			std::string capReq = "";
@@ -78,7 +80,7 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 					for (unsigned int j = 0; j < capAck->second.size(); j++) {
 						if (capAck->second[j] == "")
 							continue;
-						CapClient* ackMod = (CapClient*) getModules().find(capAck->second[j])->second;
+						CapClient* ackMod = (CapClient*) modules().find(capAck->second[j])->second;
 						ackMod->onCapAccept(server, capAck->first);
 					}
 				}
@@ -93,12 +95,18 @@ void Cap::onOtherData(std::string server, std::vector<std::string> parsedLine) {
 	}
 }
 
-void Cap::onConnect(std::string server) {
-	sendOtherCommand(server, "CAP", "LS");
-	blockingModules[server].clear();
+void Cap::onConnect(std::string server, std::string client) {
+	if (serverIsClient(server)) {
+		sendOtherCommand(server, "CAP", "LS");
+		blockingModules[server].clear();
+	}
 }
 
-void Cap::capRegister(std::string moduleName, std::string capCommand) {
+std::string Cap::description() {
+	return "Adds support for the CAP command on connect.";
+}
+
+void Cap::capRegister(std::string capCommand, std::string moduleName) {
 	capCommands[capCommand].push_back(moduleName);
 }
 
@@ -123,6 +131,4 @@ void Cap::endCap(std::string server) {
 	}
 }
 
-extern "C" Module* spawn() {
-	return new Cap;
-}
+MODULE_SPAWN(Cap)

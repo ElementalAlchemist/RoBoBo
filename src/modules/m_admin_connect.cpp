@@ -3,6 +3,7 @@
 
 class ConnectServerCommand : public AdminHook {
 	public:
+		ConnectServerCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug);
 		int botAPIversion();
 		bool onLoadComplete();
 		void onRehash();
@@ -10,18 +11,20 @@ class ConnectServerCommand : public AdminHook {
 		std::string description();
 		std::vector<std::string> supports();
 		std::vector<std::vector<std::string> > adminCommands();
-		void onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
+		void onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master);
 };
 
+ConnectServerCommand::ConnectServerCommand(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, short unsigned int debug): AdminHook(modConf, modFace, modName, dir, debug) {}
+
 int ConnectServerCommand::botAPIversion() {
-	return 1100;
+	return 2001;
 }
 
 bool ConnectServerCommand::onLoadComplete() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) { // BOT_ADMIN not provided but required for this module
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
-		unloadModule(moduleName);
+		unloadModule();
 		return false;
 	}
 	if (config["masteronly"] != "") {
@@ -45,16 +48,18 @@ void ConnectServerCommand::onRehash() {
 }
 
 void ConnectServerCommand::onModuleChange() {
-	std::multimap<std::string, std::string> modAbilities = getModAbilities();
-	std::multimap<std::string, std::string>::iterator botAdminAbility = modAbilities.find("BOT_ADMIN");
-	if (modAbilities.find("BOT_ADMIN") == modAbilities.end()) {
+	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
+	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) {
 		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl;
-		unloadModule(moduleName);
+		unloadModule();
 	}
 }
 
 std::string ConnectServerCommand::description() {
-	return "Allows admins to connect to and disconnect from servers.";
+	std::string desc = "Allows ";
+	desc += config["masteronly"] == "yes" ? "the bot master" : "bot admins";
+	desc += " to connect the bot to and disconnect the bot from servers.";
+	return desc;
 }
 
 std::vector<std::string> ConnectServerCommand::supports() {
@@ -79,22 +84,25 @@ std::vector<std::vector<std::string> > ConnectServerCommand::adminCommands() {
 	quitCommand.push_back("quit");
 	quitCommand.push_back("Makes the bot quit a server.");
 	quitCommand.push_back("Syntax: quit <server> <reason>");
+	quitCommand.push_back("Syntax: quit <server>/<client> <reason>");
 	quitCommand.push_back("When this command is issued, the bot will quit the server specified.  The server parameter must be the server address that was used to connect.");
+	quitCommand.push_back("If specified, the client is the local client to disconnect.");
 	if (config["masteronly"] == "yes")
 		quitCommand.push_back("This command is available only to bot masters.");
 	theCommands.push_back(quitCommand);
 	disconnectCommand.push_back("disconnect");
 	disconnectCommand.push_back("Makes the bot disconnect from a server.");
 	disconnectCommand.push_back("Syntax: disconnect <server> <reason>");
+	disconnectCommand.push_back("Syntax: disconnect <server>/<client> <reason>");
 	disconnectCommand.push_back("Does the same thing as quit.  See \"help quit\" for more information.");
 	theCommands.push_back(disconnectCommand);
 	return theCommands;
 }
 
-void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
+void ConnectServerCommand::onAdminCommand(std::string server, std::string client, std::string nick, std::string command, std::string message, dccSender* dccMod, bool master) {
 	if (config["masteronly"] == "yes" && !master) {
 		if (dccMod == NULL)
-			sendPrivMsg(server, nick, "This command is available only to the bot master.");
+			sendPrivMsg(server, client, nick, "This command is available only to the bot master.");
 		else
 			dccMod->dccSend(server + "/" + nick, "This command is available only to the bot master.");
 		return;
@@ -102,19 +110,19 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, 
 	if (command == "connect") {
 		if (message.substr(0, message.find_first_of(' ')) != message) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Too many parameters for connect.");
+				sendPrivMsg(server, client, nick, "Too many parameters for connect.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Too many parameters for connect.");
 			return;
 		}
 		if (connectServer(message)) {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Connecting to " + message + ".");
+				sendPrivMsg(server, client, nick, "Connecting to " + message + ".");
 			else
 				dccMod->dccSend(server + "/" + nick, "Connecting to " + message + ".");
 		} else {
 			if (dccMod == NULL)
-				sendPrivMsg(server, nick, "Cannot connect to " + message + ".  Please put a server block for " + message + " in the configuration file and try again.");
+				sendPrivMsg(server, client, nick, "Cannot connect to " + message + ".  Please put a server block for " + message + " in the configuration file and try again.");
 			else
 				dccMod->dccSend(server + "/" + nick, "Cannot connect to " + message + ".  Please put a server block for " + message  + " in the configuration file and try again.");
 		}
@@ -122,13 +130,15 @@ void ConnectServerCommand::onAdminCommand(std::string server, std::string nick, 
 	} // everything below is quit/disconnect
 	std::string quitServerName = message.substr(0, message.find_first_of(' '));
 	std::string quitReason = message.substr(message.find_first_of(' ') + 1);
+	if (quitServerName.find_first_of('/') != std::string::npos) {
+		client = quitServerName.substr(quitServerName.find_first_of('/') + 1);
+		quitServerName = quitServerName.substr(0, quitServerName.find_first_of('/'));
+	}
 	if (dccMod == NULL)
-		sendPrivMsg(server, nick, "Quitting server " + quitServerName + " with reason " + quitReason);
+		sendPrivMsg(server, client, nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	else
 		dccMod->dccSend(server + "/" + nick, "Quitting server " + quitServerName + " with reason " + quitReason);
 	quitServer(quitServerName, quitReason);
 }
 
-extern "C" Module* spawn() {
-	return new ConnectServerCommand;
-}
+MODULE_SPAWN(ConnectServerCommand)
