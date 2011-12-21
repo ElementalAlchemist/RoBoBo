@@ -23,7 +23,7 @@ int DieCommand::botAPIversion() {
 bool DieCommand::onLoadComplete() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	if (moduleAbilities.find("BOT_ADMIN") == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
 		unloadModule();
 		return false;
 	}
@@ -51,7 +51,7 @@ void DieCommand::onModuleChange() {
 	std::multimap<std::string, std::string> moduleAbilities = modAbilities();
 	std::multimap<std::string, std::string>::iterator botAdminAbility = moduleAbilities.find("BOT_ADMIN");
 	if (botAdminAbility == moduleAbilities.end()) { // BOT_ADMIN not provided but required for this module
-		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading" << moduleName << "..." << std::endl; // debug level 1
+		std::cout << "A module providing BOT_ADMIN is required for " << moduleName << ".  Unloading " << moduleName << "..." << std::endl; // debug level 1
 		unloadModule();
 	}
 }
