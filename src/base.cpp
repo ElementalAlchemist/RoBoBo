@@ -1232,6 +1232,16 @@ void Base::moduleCheck() {
 				delete modIter->second;
 				highModules.erase(modIter);
 				modIter = highModules.begin();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
 			} else
 				++modIter;
 		}
@@ -1243,6 +1253,16 @@ void Base::moduleCheck() {
 				delete modIter->second;
 				mediumHighModules.erase(modIter);
 				modIter = mediumHighModules.begin();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
 			} else
 				++modIter;
 		}
@@ -1254,6 +1274,16 @@ void Base::moduleCheck() {
 				delete modIter->second;
 				normalModules.erase(modIter);
 				modIter = normalModules.begin();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
 			} else
 				++modIter;
 		}
@@ -1265,6 +1295,16 @@ void Base::moduleCheck() {
 				delete modIter->second;
 				mediumLowModules.erase(modIter);
 				modIter = mediumLowModules.begin();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
 			} else
 				++modIter;
 		}
@@ -1276,6 +1316,16 @@ void Base::moduleCheck() {
 				delete modIter->second;
 				lowModules.erase(modIter);
 				modIter = lowModules.begin();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
+				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
+					modHookIter->second->onModuleChange();
 			} else
 				++modIter;
 		}
