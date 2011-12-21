@@ -12,6 +12,10 @@ bool Module::flaggedForUnload() {
 	return unloadMod;
 }
 
+void Module::flagForUnload() {
+	unloadMod = true;
+}
+
 Priority Module::receivePriority() { return PRI_NORMAL; }
 
 bool Module::onLoadComplete() { return true; }

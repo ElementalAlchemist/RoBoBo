@@ -19,6 +19,7 @@ class Module {
 		virtual int botAPIversion() = 0;
 		void reconf(std::tr1::unordered_map<std::string, std::string> modConf);
 		bool flaggedForUnload();
+		void flagForUnload();
 		virtual Priority receivePriority();
 		virtual bool onLoadComplete();
 		virtual void onRehash();

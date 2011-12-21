@@ -1134,58 +1134,27 @@ bool Base::loadModule(std::string modName, bool startup) {
 }
 
 bool Base::unloadModule(std::string modName) {
-	std::tr1::unordered_map<std::string, Module*>* modules; // Make a pointer to point to the module priority map we need.
-	if (highModules.find(modName) != highModules.end())
-		modules = &highModules;
-	else if (mediumHighModules.find(modName) != mediumHighModules.end())
-		modules = &mediumHighModules;
-	else if (normalModules.find(modName) != normalModules.end())
-		modules = &normalModules;
-	else if (mediumLowModules.find(modName) != mediumLowModules.end())
-		modules = &mediumLowModules;
-	else if (lowModules.find(modName) != lowModules.end())
-		modules = &lowModules;
-	else
-		return false;
-	std::tr1::unordered_map<std::string, Module*>::iterator modIter = modules->find(modName);
-	std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modName);
-	if (!modIter->second->abilities().empty()) {
-		std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
-		while (modAbleIter != modAbilities.end()) {
-			if (modAbleIter->second == modName) {
-				modAbilities.erase(modAbleIter);
-				modAbleIter = modAbilities.begin();
-			} else
-				++modAbleIter;
-		}
+	if (highModules.find(modName) != highModules.end()) {
+		highModules.find(modName)->second->flagForUnload();
+		return true;
 	}
-	if (!modIter->second->supports().empty()) {
-		for (std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSuppIter = modSupports.begin(); modSuppIter != modSupports.end(); ++modSuppIter) {
-			for (size_t i = 0; i < modSuppIter->second.size(); i++) {
-				if (modSuppIter->second[i] == modName) {
-					modSuppIter->second.erase(modSuppIter->second.begin() + i);
-					break;
-				}
-			}
-		}
+	if (mediumHighModules.find(modName) != mediumHighModules.end()) {
+		mediumHighModules.find(modName)->second->flagForUnload();
+		return true;
 	}
-	delete modIter->second;
-	modules->erase(modIter);
-	dlclose(modFileIter->second);
-	moduleFiles.erase(modFileIter);
-	if (debugLevel >= 2)
-		std::cout << "Module m_" << modName << " has unloaded." << std::endl;
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
-		modHookIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
-		modHookIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = normalModules.begin(); modHookIter != normalModules.end(); ++modHookIter)
-		modHookIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumLowModules.begin(); modHookIter != mediumLowModules.end(); ++modHookIter)
-		modHookIter->second->onModuleChange();
-	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = lowModules.begin(); modHookIter != lowModules.end(); ++modHookIter)
-		modHookIter->second->onModuleChange();
-	return true;
+	if (normalModules.find(modName) != normalModules.end()) {
+		normalModules.find(modName)->second->flagForUnload();
+		return true;
+	}
+	if (mediumLowModules.find(modName) != mediumLowModules.end()) {
+		mediumLowModules.find(modName)->second->flagForUnload();
+		return true;
+	}
+	if (lowModules.find(modName) != lowModules.end()) {
+		lowModules.find(modName)->second->flagForUnload();
+		return true;
+	}
+	return false;
 }
 
 void* Base::serverCheck_thread(void* ptr) {
