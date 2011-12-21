@@ -1173,6 +1173,8 @@ bool Base::unloadModule(std::string modName) {
 	modules->erase(modIter);
 	dlclose(modFileIter->second);
 	moduleFiles.erase(modFileIter);
+	if (debugLevel >= 2)
+		std::cout << "Module m_" << modName << " has unloaded." << std::endl;
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 		modHookIter->second->onModuleChange();
 	for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = mediumHighModules.begin(); modHookIter != mediumHighModules.end(); ++modHookIter)
@@ -1225,6 +1227,8 @@ void Base::moduleCheck() {
 		std::tr1::unordered_map<std::string, Module*>::iterator modIter = highModules.begin();
 		while (modIter != highModules.end()) {
 			if (modIter->second->flaggedForUnload()) {
+				if (debugLevel >= 2)
+					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				highModules.erase(modIter);
 				modIter = highModules.begin();
@@ -1234,6 +1238,8 @@ void Base::moduleCheck() {
 		modIter = mediumHighModules.begin();
 		while (modIter != mediumHighModules.end()) {
 			if (modIter->second->flaggedForUnload()) {
+				if (debugLevel >= 2)
+					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				mediumHighModules.erase(modIter);
 				modIter = mediumHighModules.begin();
@@ -1243,6 +1249,8 @@ void Base::moduleCheck() {
 		modIter = normalModules.begin();
 		while (modIter != normalModules.end()) {
 			if (modIter->second->flaggedForUnload()) {
+				if (debugLevel >= 2)
+					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				normalModules.erase(modIter);
 				modIter = normalModules.begin();
@@ -1252,6 +1260,8 @@ void Base::moduleCheck() {
 		modIter = mediumLowModules.begin();
 		while (modIter != mediumLowModules.end()) {
 			if (modIter->second->flaggedForUnload()) {
+				if (debugLevel >= 2)
+					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				mediumLowModules.erase(modIter);
 				modIter = mediumLowModules.begin();
@@ -1261,6 +1271,8 @@ void Base::moduleCheck() {
 		modIter = lowModules.begin();
 		while (modIter != lowModules.end()) {
 			if (modIter->second->flaggedForUnload()) {
+				if (debugLevel >= 2)
+					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				lowModules.erase(modIter);
 				modIter = lowModules.begin();
