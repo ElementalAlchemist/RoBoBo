@@ -1076,7 +1076,7 @@ bool Base::loadModule(std::string modName, bool startup) {
 	}
 	
 	Module* newModule = (Module*) spawnModule(modConf->second, this, modName, directory, debugLevel);
-	if (newModule->botAPIversion() != 2000 && newModule->botAPIversion() != 2001) { // compare to current API version
+	if (newModule->botAPIversion() != 2001 && newModule->botAPIversion() != 2000) { // compare to current API version
 		dlclose(openModule);
 		std::cout << "Module m_" << modName << " is not compatible with this version of RoBoBo." << std::endl; // debug level 1
 		return false;
@@ -1200,6 +1200,9 @@ void Base::moduleCheck() {
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				highModules.erase(modIter);
+				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
+				dlclose(modFileIter->second);
+				moduleFiles.erase(modFileIter);
 				modIter = highModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1221,6 +1224,9 @@ void Base::moduleCheck() {
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				mediumHighModules.erase(modIter);
+				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
+				dlclose(modFileIter->second);
+				moduleFiles.erase(modFileIter);
 				modIter = mediumHighModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1242,6 +1248,9 @@ void Base::moduleCheck() {
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				normalModules.erase(modIter);
+				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
+				dlclose(modFileIter->second);
+				moduleFiles.erase(modFileIter);
 				modIter = normalModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1263,6 +1272,9 @@ void Base::moduleCheck() {
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				mediumLowModules.erase(modIter);
+				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
+				dlclose(modFileIter->second);
+				moduleFiles.erase(modFileIter);
 				modIter = mediumLowModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1284,6 +1296,9 @@ void Base::moduleCheck() {
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
 				lowModules.erase(modIter);
+				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
+				dlclose(modFileIter->second);
+				moduleFiles.erase(modFileIter);
 				modIter = lowModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
