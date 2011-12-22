@@ -1199,10 +1199,10 @@ void Base::moduleCheck() {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
-				highModules.erase(modIter);
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
 				moduleFiles.erase(modFileIter);
+				highModules.erase(modIter);
 				modIter = highModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1223,10 +1223,10 @@ void Base::moduleCheck() {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
-				mediumHighModules.erase(modIter);
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
 				moduleFiles.erase(modFileIter);
+				mediumHighModules.erase(modIter);
 				modIter = mediumHighModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1247,10 +1247,10 @@ void Base::moduleCheck() {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
-				normalModules.erase(modIter);
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
 				moduleFiles.erase(modFileIter);
+				normalModules.erase(modIter);
 				modIter = normalModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1271,10 +1271,10 @@ void Base::moduleCheck() {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
-				mediumLowModules.erase(modIter);
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
 				moduleFiles.erase(modFileIter);
+				mediumLowModules.erase(modIter);
 				modIter = mediumLowModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
@@ -1295,10 +1295,10 @@ void Base::moduleCheck() {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
 				delete modIter->second;
-				lowModules.erase(modIter);
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
 				moduleFiles.erase(modFileIter);
+				lowModules.erase(modIter);
 				modIter = lowModules.begin();
 				for (std::tr1::unordered_map<std::string, Module*>::iterator modHookIter = highModules.begin(); modHookIter != highModules.end(); ++modHookIter)
 					modHookIter->second->onModuleChange();
