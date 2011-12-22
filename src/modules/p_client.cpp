@@ -488,23 +488,23 @@ void Client::handleData() {
 					continue;
 				std::string mode = convertChanMode(parsedLine[4][i]);
 				bool param = false;
-				for (size_t i = 0; i < chanModes[0].size(); i++) {
-					if (parsedLine[4][i] == chanModes[0][i]) {
+				for (size_t j = 0; i < chanModes[0].size(); i++) {
+					if (parsedLine[4][i] == chanModes[0][j]) {
 						param = true;
 						break;
 					}
 				}
 				if (!param) {
-					for (size_t i = 0; i < chanModes[1].size(); i++) {
-						if (parsedLine[4][i] == chanModes[1][i]) {
+					for (size_t j = 0; i < chanModes[1].size(); i++) {
+						if (parsedLine[4][i] == chanModes[1][j]) {
 							param = true;
 							break;
 						}
 					}
 				}
 				if (!param) {
-					for (size_t i = 0; i < chanModes[2].size(); i++) {
-						if (parsedLine[4][i] == chanModes[2][i]) {
+					for (size_t j = 0; i < chanModes[2].size(); i++) {
+						if (parsedLine[4][i] == chanModes[2][j]) {
 							param = true;;
 							break;
 						}
