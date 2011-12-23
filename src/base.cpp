@@ -1055,6 +1055,8 @@ bool Base::connectServer(std::string serverName) {
 }
 
 bool Base::loadModule(std::string modName, bool startup) {
+	if (highModules.find(modName) != highModules.end() || mediumHighModules.find(modName) != mediumHighModules.end() || normalModules.find(modName) != normalModules.end() || mediumLowModules.find(modName) != mediumLowModules.end() || lowModules.find(modName) != lowModules.end())
+		return false; // Do not load modules currently loaded; could happen on accident in the <= 1 second after issuing unload if the user is fast enough or uses chat history
 	std::tr1::unordered_map<std::string, std::tr1::unordered_map<std::string, std::string> >::iterator modConf = moduleConfigs.find(modName);
 	if (modConf == moduleConfigs.end()) { // give module a blank config and let the module reject it if it wants
 		moduleConfigs.insert(std::pair<std::string, std::tr1::unordered_map<std::string, std::string> > (modName, std::tr1::unordered_map<std::string, std::string> ()));
