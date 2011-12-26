@@ -5,10 +5,6 @@
 #include <dlfcn.h>
 #include <map>
 
-#define MODULE_SPAWN(name) extern "C" Module* spawn(std::tr1::unordered_map<std::string, std::string> modConf, Base* modFace, std::string modName, std::string dir, unsigned short debug) {\
-	return new name (modConf, modFace, modName, dir, debug); \
-}
-
 enum Priority { PRI_HIGH, PRI_MEDIUM_HIGH, PRI_NORMAL, PRI_MEDIUM_LOW, PRI_LOW };
 
 class Base;
