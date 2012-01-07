@@ -37,7 +37,7 @@ In the example above, the following definitions are the same as the definitions
 in the block:
 var4 = "value 1";
 var5 = "value 142";
-var6 = "not value 1";
+var6 = "not value 2";
 You can concatenate as many strings as you wish for one variable.
 
 In server blocks, there are two required variables.  These variables are used
