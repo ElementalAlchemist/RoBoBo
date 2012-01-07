@@ -56,7 +56,9 @@ what by specifing the mode's longname (a list of these is in section 5 of
 PROTOCOL) as the variable name and the letter used by the server as the value.
 To prevent mode letter conflicts, make sure to use "disable" as the value on
 any modes that aren't used on the server and have a default letter of a
-different mode that does exist.
+different mode that does exist.  It is strongly advised that you disable
+longmode on servers where the long-name modes list mode is not supported
+(currently almost all of them). (longmode = "disable";)
 
 You must end each block with a closing brace (}).
 
