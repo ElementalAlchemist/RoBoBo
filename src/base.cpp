@@ -845,8 +845,10 @@ bool Base::isChanType(char chanPrefix, std::string server) {
 
 std::list<std::string> Base::serverList() {
 	std::list<std::string> listOfServers;
-	for (std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter)
-		listOfServers.insert(listOfServers.end(), servIter->first);
+	for (std::tr1::unordered_map<std::string, Protocol*>::iterator servIter = servers.begin(); servIter != servers.end(); ++servIter) {
+		if (servIter->second->stillConnected() || servIter->second->shouldReset()) // Show server only if it's currently connected or to be reconnected
+			listOfServers.insert(listOfServers.end(), servIter->first);
+	}
 	return listOfServers;
 }
 
