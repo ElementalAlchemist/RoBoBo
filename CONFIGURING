@@ -71,7 +71,7 @@ include relative/path/to/filename.conf;
 
 Relative paths are relative to the robobo executable.
 
-If you wish to use different confs and load different ones at runtime, you can
+If you wish to use multiple confs and load different ones at runtime, you can
 do so using the --confdir and --confname options (you don't need to use both if
 it's not necessary).
 --confdir <directory> allows you to specify a directory to look in for the
