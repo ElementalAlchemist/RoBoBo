@@ -970,10 +970,12 @@ void Client::setChanMode(bool addMode, bool list, std::string channel, std::stri
 	} else {
 		if (list || param != "") {
 			std::list<std::string>::iterator foundMode = std::find(chanIter->second.second.first.begin(), chanIter->second.second.first.end(), mode + "=" + param);
-			chanIter->second.second.first.erase(foundMode);
+			if (foundMode != chanIter->second.second.first.end()) // The server may sometimes send us channel mode changes before we've received the mode list.
+				chanIter->second.second.first.erase(foundMode);
 		} else {
 			std::list<std::string>::iterator foundMode = std::find(chanIter->second.second.first.begin(), chanIter->second.second.first.end(), mode);
-			chanIter->second.second.first.erase(foundMode);
+			if (foundMode != chanIter->second.second.first.end()) // The server may sometimes send us channel mode changes before we've received the mode list.
+				chanIter->second.second.first.erase(foundMode);
 		}
 	}
 }
