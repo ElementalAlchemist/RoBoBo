@@ -1214,7 +1214,7 @@ void Base::moduleCheck() {
 				while (modSupportIter != modSupports.end()) {
 					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
 						if (modSupportIter->second[i] == modIter->first) {
-							modSupportIter->second.erase(modSupportIter.begin() + i);
+							modSupportIter->second.erase(modSupportIter->second.begin() + i);
 							break;
 						}
 					}
@@ -1260,7 +1260,7 @@ void Base::moduleCheck() {
 				while (modSupportIter != modSupports.end()) {
 					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
 						if (modSupportIter->second[i] == modIter->first) {
-							modSupportIter->second.erase(modSupportIter.begin() + i);
+							modSupportIter->second.erase(modSupportIter->second.begin() + i);
 							break;
 						}
 					}
@@ -1306,7 +1306,7 @@ void Base::moduleCheck() {
 				while (modSupportIter != modSupports.end()) {
 					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
 						if (modSupportIter->second[i] == modIter->first) {
-							modSupportIter->second.erase(modSupportIter.begin() + i);
+							modSupportIter->second.erase(modSupportIter->second.begin() + i);
 							break;
 						}
 					}
@@ -1352,7 +1352,7 @@ void Base::moduleCheck() {
 				while (modSupportIter != modSupports.end()) {
 					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
 						if (modSupportIter->second[i] == modIter->first) {
-							modSupportIter->second.erase(modSupportIter.begin() + i);
+							modSupportIter->second.erase(modSupportIter->second.begin() + i);
 							break;
 						}
 					}
@@ -1398,7 +1398,7 @@ void Base::moduleCheck() {
 				while (modSupportIter != modSupports.end()) {
 					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
 						if (modSupportIter->second[i] == modIter->first) {
-							modSupportIter->second.erase(modSupportIter.begin() + i);
+							modSupportIter->second.erase(modSupportIter->second.begin() + i);
 							break;
 						}
 					}
