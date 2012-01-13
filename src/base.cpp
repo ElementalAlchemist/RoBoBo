@@ -1202,6 +1202,28 @@ void Base::moduleCheck() {
 			if (modIter->second->flaggedForUnload()) {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
+				std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+				while (modAbleIter != modAbilities.end()) {
+					if (modAbleIter->second == modIter->first) {
+						modAbilities.erase(modAbleIter);
+						modAbleIter = modAbilities.begin();
+					} else
+						++modAbleIter;
+				}
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSupportIter = modSupports.begin();
+				while (modSupportIter != modSupports.end()) {
+					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
+						if (modSupportIter->second[i] == modIter->first) {
+							modSupportIter->second.erase(modSupportIter.begin() + i);
+							break;
+						}
+					}
+					if (modSupportIter->second.empty()) {
+						modSupports.erase(modSupportIter);
+						modSupportIter = modSupports.begin();
+					} else
+						++modSupportIter;
+				}
 				delete modIter->second;
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
@@ -1226,6 +1248,28 @@ void Base::moduleCheck() {
 			if (modIter->second->flaggedForUnload()) {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
+				std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+				while (modAbleIter != modAbilities.end()) {
+					if (modAbleIter->second == modIter->first) {
+						modAbilities.erase(modAbleIter);
+						modAbleIter = modAbilities.begin();
+					} else
+						++modAbleIter;
+				}
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSupportIter = modSupports.begin();
+				while (modSupportIter != modSupports.end()) {
+					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
+						if (modSupportIter->second[i] == modIter->first) {
+							modSupportIter->second.erase(modSupportIter.begin() + i);
+							break;
+						}
+					}
+					if (modSupportIter->second.empty()) {
+						modSupports.erase(modSupportIter);
+						modSupportIter = modSupports.begin();
+					} else
+						++modSupportIter;
+				}
 				delete modIter->second;
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
@@ -1250,6 +1294,28 @@ void Base::moduleCheck() {
 			if (modIter->second->flaggedForUnload()) {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
+				std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+				while (modAbleIter != modAbilities.end()) {
+					if (modAbleIter->second == modIter->first) {
+						modAbilities.erase(modAbleIter);
+						modAbleIter = modAbilities.begin();
+					} else
+						++modAbleIter;
+				}
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSupportIter = modSupports.begin();
+				while (modSupportIter != modSupports.end()) {
+					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
+						if (modSupportIter->second[i] == modIter->first) {
+							modSupportIter->second.erase(modSupportIter.begin() + i);
+							break;
+						}
+					}
+					if (modSupportIter->second.empty()) {
+						modSupports.erase(modSupportIter);
+						modSupportIter = modSupports.begin();
+					} else
+						++modSupportIter;
+				}
 				delete modIter->second;
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
@@ -1274,6 +1340,28 @@ void Base::moduleCheck() {
 			if (modIter->second->flaggedForUnload()) {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
+				std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+				while (modAbleIter != modAbilities.end()) {
+					if (modAbleIter->second == modIter->first) {
+						modAbilities.erase(modAbleIter);
+						modAbleIter = modAbilities.begin();
+					} else
+						++modAbleIter;
+				}
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSupportIter = modSupports.begin();
+				while (modSupportIter != modSupports.end()) {
+					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
+						if (modSupportIter->second[i] == modIter->first) {
+							modSupportIter->second.erase(modSupportIter.begin() + i);
+							break;
+						}
+					}
+					if (modSupportIter->second.empty()) {
+						modSupports.erase(modSupportIter);
+						modSupportIter = modSupports.begin();
+					} else
+						++modSupportIter;
+				}
 				delete modIter->second;
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
@@ -1298,6 +1386,28 @@ void Base::moduleCheck() {
 			if (modIter->second->flaggedForUnload()) {
 				if (debugLevel >= 2)
 					std::cout << "Module m_" << modIter->first << " has unloaded." << std::endl;
+				std::multimap<std::string, std::string>::iterator modAbleIter = modAbilities.begin();
+				while (modAbleIter != modAbilities.end()) {
+					if (modAbleIter->second == modIter->first) {
+						modAbilities.erase(modAbleIter);
+						modAbleIter = modAbilities.begin();
+					} else
+						++modAbleIter;
+				}
+				std::tr1::unordered_map<std::string, std::vector<std::string> >::iterator modSupportIter = modSupports.begin();
+				while (modSupportIter != modSupports.end()) {
+					for (size_t i = 0; i < modSupportIter->second.size(); i++) {
+						if (modSupportIter->second[i] == modIter->first) {
+							modSupportIter->second.erase(modSupportIter.begin() + i);
+							break;
+						}
+					}
+					if (modSupportIter->second.empty()) {
+						modSupports.erase(modSupportIter);
+						modSupportIter = modSupports.begin();
+					} else
+						++modSupportIter;
+				}
 				delete modIter->second;
 				std::tr1::unordered_map<std::string, void*>::iterator modFileIter = moduleFiles.find(modIter->first);
 				dlclose(modFileIter->second);
