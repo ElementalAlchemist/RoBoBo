@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	// We're done parsing command line arguments; it's time to start!
-	Base botInstance (workingDir, confDir, confName, debugLevel);
+	Base botInstance (workingDir, confDir, confName, debugLevel, logDump);
 	botInstance.readConfiguration();
 	botInstance.startQueueThread();
 	botInstance.loadModules();
