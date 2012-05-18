@@ -62,14 +62,12 @@ int main(int argc, char** argv) {
 		}
 	}
 	// We're done parsing command line arguments; it's time to start!
-	// The bot instance starts by reading and parsing the configuration file so it knows what to do
 	Base botInstance (workingDir, confDir, confName, debugLevel);
-	// Initialize message queue thread
+	botInstance.readConfiguration();
 	botInstance.startQueueThread();
-	// And then we start doing everything
 	botInstance.loadModules();
 	botInstance.connectServers();
 	botInstance.checkModules();
-	// If we make it to this point, the bot is shutting down
+	// If checkModules returns, the bot is shutting down, so kill all the things
 	botInstance.unloadEverything();
 }
