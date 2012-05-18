@@ -20,8 +20,8 @@ class Base {
 		const bool logDump;
 		std::unordered_map<std::string, std::unordered_map<std::string, std::string>> serverConfig, moduleConfig;
 		std::list<std::string> startupServers;
-		std::unordered_map<std::string, Module*> modules;
+		std::map<std::string, Protocol*> servers;
+		std::map<std::string, Module*> modules;
 		std::unordered_map<std::string, void*> moduleFiles;
-		std::unordered_map<std::string, Protocol*> servers;
 		// TODO: everything
 };
