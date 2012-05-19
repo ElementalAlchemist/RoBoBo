@@ -1,7 +1,14 @@
 #include "main.h"
+#include <dlfcn.h>
 
-enum LoadResult { LOAD_SUCCESS, LOAD_NOEXIST, LOAD_ALREADYLOADED };
+enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_ERROR, LOAD_INCOMPATIBLE, LOAD_FAILURE };
 enum MsgType { MSG_PRIVMSG, MSG_NOTICE, MSG_CTCP, MSG_CTCPREPLY, MSG_JOIN, MSG_PART, MSG_QUIT, MSG_MODE, MSG_TOPIC, MSG_NUMERIC, MSG_OTHER }; // TODO: finish this list
+
+#include "socket.h"
+#include "protocol.h"
+#include "module.h"
+
+typedef void* (module_spawn_t)(); // TODO: Fill in parameter types for module spawn
 
 class Base {
 	public:
@@ -28,8 +35,9 @@ class Base {
 		std::unordered_map<std::string, std::unordered_map<std::string, std::string>> serverConfig, moduleConfig;
 		std::list<std::string> startupServers, startupModules;
 		std::map<std::string, Protocol*> servers;
-		std::map<std::string, Module*> modules;
+		std::map<std::string, Module*> highModules, mediumHighModules, normalModules, mediumLowModules, lowModules;
 		std::unordered_map<std::string, void*> moduleFiles;
+		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
 		std::thread queueThread;
 		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;
 };
