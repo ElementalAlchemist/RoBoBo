@@ -6,7 +6,6 @@ enum MsgType { MSG_PRIVMSG, MSG_NOTICE, MSG_CTCP, MSG_CTCPREPLY, MSG_JOIN, MSG_P
 class Base {
 	public:
 		Base(std::string working, std::string config, std::string configFileName, unsigned short debug, bool log);
-		~Base();
 		void readConfiguration();
 		void startQueueThread();
 		void loadModules();
