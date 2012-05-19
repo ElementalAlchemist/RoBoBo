@@ -10,7 +10,7 @@ class Base {
 		void startQueueThread();
 		void loadModules();
 		void connectServers();
-		void checkModules();
+		void checkServers();
 		void unloadEverything();
 		// TODO: Module hooks
 		// TODO: Protocol hooks

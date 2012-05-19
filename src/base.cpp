@@ -20,8 +20,8 @@ void Base::connectServers() {
 		connectServer(serverName);
 }
 
-void Base::checkModules() {
-	// TODO: module and server check
+void Base::checkServers() {
+	// TODO: server check
 }
 
 void Base::unloadEverything() {

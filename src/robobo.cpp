@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
 	botInstance.startQueueThread();
 	botInstance.loadModules();
 	botInstance.connectServers();
-	botInstance.checkModules();
+	botInstance.checkServers();
 	// If checkModules returns, the bot is shutting down, so kill all the things
 	botInstance.unloadEverything();
 }
