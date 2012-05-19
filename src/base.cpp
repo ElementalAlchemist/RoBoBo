@@ -52,6 +52,11 @@ void Base::disconnectServer(std::string server) {
 	// TODO: pretty much, what did you expect?
 }
 
+Socket* Base::loadSocket(std::string sockettype) {
+	// TODO: load and return a socket
+	return NULL;
+}
+
 void Base::messageQueue() {
 	// TODO: process the queue once I get a better-defined list of types
 }

@@ -19,6 +19,7 @@ class Base {
 		void unloadModule(std::string modName);
 		void connectServer(std::string server);
 		void disconnectServer(std::string server);
+		Socket* loadSocket(std::string sockettype);
 		void messageQueue();
 	private:
 		const std::string workingDir, configDir, configName;
@@ -32,5 +33,4 @@ class Base {
 		std::unordered_map<std::string, void*> moduleFiles;
 		std::thread queueThread;
 		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;
-		// TODO: everything
 };
