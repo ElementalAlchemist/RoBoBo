@@ -11,7 +11,7 @@ void Base::readConfiguration() {
 }
 
 void Base::startQueueThread() {
-	// TODO: start message queue thread once module API is started
+	queueThread = std::thread(&Base::messageQueue);
 }
 
 void Base::loadModules() {
@@ -50,4 +50,8 @@ void Base::connectServer(std::string server) {
 
 void Base::disconnectServer(std::string server) {
 	// TODO: pretty much, what did you expect?
+}
+
+void Base::messageQueue() {
+	// TODO: process the queue once I get a better-defined list of types
 }

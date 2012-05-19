@@ -1,6 +1,7 @@
 #include "main.h"
 
 enum LoadResult { LOAD_SUCCESS, LOAD_NOEXIST, LOAD_ALREADYLOADED };
+enum MsgType { MSG_PRIVMSG, MSG_NOTICE, MSG_CTCP, MSG_CTCPREPLY, MSG_JOIN, MSG_PART, MSG_QUIT, MSG_MODE, MSG_TOPIC, MSG_NUMERIC, MSG_OTHER }; // TODO: finish this list
 
 class Base {
 	public:
@@ -18,6 +19,7 @@ class Base {
 		void unloadModule(std::string modName);
 		void connectServer(std::string server);
 		void disconnectServer(std::string server);
+		void messageQueue();
 	private:
 		const std::string workingDir, configDir, configName;
 		const unsigned short debugLevel;
@@ -28,5 +30,7 @@ class Base {
 		std::map<std::string, Protocol*> servers;
 		std::map<std::string, Module*> modules;
 		std::unordered_map<std::string, void*> moduleFiles;
+		std::thread queueThread;
+		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;
 		// TODO: everything
 };
