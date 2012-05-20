@@ -8,7 +8,7 @@ enum MsgType { MSG_PRIVMSG, MSG_NOTICE, MSG_CTCP, MSG_CTCPREPLY, MSG_JOIN, MSG_P
 #include "protocol.h"
 #include "module.h"
 
-typedef void* (module_spawn_t)(); // TODO: Fill in parameter types for module spawn
+typedef void* (module_spawn_t)(std::string, std::map<std::string, std::string>, std::string, unsigned short, Base*);
 
 class Base {
 	public:

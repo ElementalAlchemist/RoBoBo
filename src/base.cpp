@@ -86,7 +86,7 @@ LoadResult Base::loadModule(std::string modName) {
 	}
 	// The spawn function of modules returns a module instance that we can use
 	module_spawn_t moduleSpawn = dlsym(modFile, "spawn");
-	Module* newModule = moduleSpawn(); // TODO: fill in with appropriate spawn parameters
+	Module* newModule = moduleSpawn(modName, moduleConfig[modName], workingDir, debugLevel, this);
 	if (newModule->apiVersion() != 3000) {
 		std::cerr << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl;
 		return LOAD_INCOMPATIBLE;
