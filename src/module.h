@@ -19,6 +19,8 @@ class Module {
 		virtual void onRehash();
 		virtual void onModuleLoad(std::string modName);
 		virtual void onModuleUnload(std::string modName);
+		void rehash(std::map<std::string, std::string> conf);
+		void endDebug();
 		
 		virtual MsgAction onChanMsg(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message);
 		virtual MsgAction onUserMsg(std::string server, std::string client, std::string nick, std::string message);

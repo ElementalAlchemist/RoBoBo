@@ -13,6 +13,14 @@ void Module::onModuleLoad(std::string modName) {}
 
 void Module::onModuleUnload(std::string modName) {}
 
+void Module::rehash(std::map<std::string, std::string> conf) {
+	config = conf;
+}
+
+void Module::endDebug() {
+	debugLevel = 0;
+}
+
 MsgAction Module::onChanMsg(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
 	return MSG_CONTINUE;
 }
