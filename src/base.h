@@ -2,7 +2,8 @@
 #include <dlfcn.h>
 
 enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_ERROR, LOAD_INCOMPATIBLE, LOAD_FAILURE };
-enum MsgType { MSG_PRIVMSG, MSG_NOTICE, MSG_CTCP, MSG_CTCPREPLY, MSG_JOIN, MSG_PART, MSG_QUIT, MSG_MODE, MSG_TOPIC, MSG_NUMERIC, MSG_OTHER }; // TODO: finish this list
+enum ModDataType { }; // TODO: fill this list with module hooks
+enum ServerDataType { }; // TODO: fill this list with server/protocol hooks
 
 #include "socket.h"
 #include "protocol.h"
@@ -27,7 +28,8 @@ class Base {
 		void disconnectServer(std::string server);
 		Socket* loadSocket(std::string sockettype);
 		void unloadSocket(std::string sockettype, Socket* socketptr);
-		void messageQueue();
+		void moduleQueue();
+		void serverQueue();
 	private:
 		const std::string workingDir, configDir, configName;
 		const unsigned short debugLevel;
@@ -42,6 +44,7 @@ class Base {
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
 		std::map<std::string, std::string> moduleDescriptions;
 		std::unordered_map<std::string, void*> socketFiles;
-		std::thread queueThread;
-		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;
+		std::thread moduleQueueThread, serverQueueThread;
+		std::queue<std::tuple<ModDataType, std::vector<std::string>>> moduleDataQueue;
+		std::queue<std::tuple<ServerDataType, std::string, std::vector<std::string>>> serverDataQueue;
 };

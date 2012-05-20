@@ -7,7 +7,8 @@ void Base::readConfiguration() {
 }
 
 void Base::startQueueThread() {
-	queueThread = std::thread(&Base::messageQueue);
+	moduleQueueThread = std::thread(&(this->moduleQueue));
+	serverQueueThread = std::thread(&(this->serverQueue));
 }
 
 void Base::loadModules() {
