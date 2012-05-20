@@ -22,7 +22,7 @@ class Base {
 		// TODO: Module hooks
 		// TODO: Protocol hooks
 		LoadResult loadModule(std::string modName);
-		void unloadModule(std::string modName);
+		void unloadModule(std::string modName, bool wasLoaded);
 		void connectServer(std::string server);
 		void disconnectServer(std::string server);
 		Socket* loadSocket(std::string sockettype);

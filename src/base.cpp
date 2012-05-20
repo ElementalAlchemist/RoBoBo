@@ -27,11 +27,33 @@ void Base::loadModules() {
 		std::list<std::string> modSupports = module.second->supports();
 		for (std::string supporting : modSupports)
 			moduleSupports[supporting].push_back(module.first);
-		if (!module.second->onLoadComplete())
+		if (module.second->onLoadComplete()) {
+			// Since it's successful, call the hook in other modules for this module being loaded
+			for (std::pair<std::string, Module*> module : highModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : mediumHighModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : normalModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : mediumLowModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : lowModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+		} else
 			unloadList.push_back(module.first);
 	}
 	for (std::string modToUnload : unloadList)
-		unloadModule(modToUnload);
+		unloadModule(modToUnload, false);
 }
 
 void Base::connectServers() {
@@ -46,16 +68,9 @@ void Base::checkServers() {
 void Base::unloadEverything() {
 	for (std::pair<std::string, Protocol*> server : servers)
 		disconnectServer(server.first);
-	for (std::pair<std::string, Module*> module : highModules)
-		unloadModule(module.first);
-	for (std::pair<std::string, Module*> module : mediumHighModules)
-		unloadModule(module.first);
-	for (std::pair<std::string, Module*> module : normalModules)
-		unloadModule(module.first);
-	for (std::pair<std::string, Module*> module : mediumLowModules)
-		unloadModule(module.first);
-	for (std::pair<std::string, Module*> module : lowModules)
-		unloadModule(module.first);
+	// Every module is represented in moduleFiles, so just use that to unload all the modules
+	for (std::pair<std::string, void*> module : moduleFiles)
+		unloadModule(module.first, true);
 }
 
 LoadResult Base::loadModule(std::string modName) {
@@ -106,7 +121,7 @@ LoadResult Base::loadModule(std::string modName) {
 			// Check that the module's requirements are met
 			if (moduleServices[requirement].empty()) {
 				std::cerr << "Module " << modName << " requires the service " << requirement << ", which is not provided by another module." << std::endl;
-				unloadModule(modName);
+				unloadModule(modName, false);
 				return LOAD_FAILURE;
 			}
 			moduleSupports[requirement].push_back(modName);
@@ -114,18 +129,62 @@ LoadResult Base::loadModule(std::string modName) {
 		std::list<std::string> modSupports = newModule->supports();
 		for (std::string supporting : modSupports)
 			moduleSupports[supporting].push_back(modName);
-		if (!newModule->onLoadComplete()) {
-			unloadModule(modName);
+		if (newModule->onLoadComplete()) {
+			// Since it's successful, call the hook in other modules for this module being loaded
+			for (std::pair<std::string, Module*> module : highModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : mediumHighModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : normalModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : mediumLowModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+			for (std::pair<std::string, Module*> module : lowModules) {
+				if (module.first != modName)
+					module.second->onModuleLoad(modName);
+			}
+		} else {
+			unloadModule(modName, false);
 			return LOAD_FAILURE;
 		}
 	}
 	return LOAD_SUCCESS;
 }
 
-void Base::unloadModule(std::string modName) {
+void Base::unloadModule(std::string modName, bool wasLoaded) {
 	if (moduleFiles.find(modName) == moduleFiles.end())
-		return;
-		// Do not try to unload the module if it's not currently loaded
+		return; // Do not try to unload the module if it's not currently loaded
+	if (wasLoaded) {
+		// Call the hook for unloading this module in all other modules
+		for (std::pair<std::string, Module*> module : highModules) {
+			if (module.first != modName)
+				module.second->onModuleUnload(modName);
+		}
+		for (std::pair<std::string, Module*> module : mediumHighModules) {
+			if (module.first != modName)
+				module.second->onModuleUnload(modName);
+		}
+		for (std::pair<std::string, Module*> module : normalModules) {
+			if (module.first != modName)
+				module.second->onModuleUnload(modName);
+		}
+		for (std::pair<std::string, Module*> module : mediumLowModules) {
+			if (module.first != modName)
+				module.second->onModuleUnload(modName);
+		}
+		for (std::pair<std::string, Module*> module : lowModules) {
+			if (module.first != modName)
+				module.second->onModuleUnload(modName);
+		}
+	}
 	for (std::pair<std::string, std::list<std::string>> service : moduleServices)
 		service.second.remove(modName);
 	for (std::pair<std::string, std::list<std::string>> service : moduleSupports)
