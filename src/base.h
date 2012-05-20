@@ -26,6 +26,7 @@ class Base {
 		void connectServer(std::string server);
 		void disconnectServer(std::string server);
 		Socket* loadSocket(std::string sockettype);
+		void unloadSocket(std::string sockettype, Socket* socketptr);
 		void messageQueue();
 	private:
 		const std::string workingDir, configDir, configName;
@@ -39,6 +40,7 @@ class Base {
 		std::unordered_map<std::string, void*> moduleFiles;
 		std::map<std::string, Priority> modulePriority;
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
+		std::unordered_map<std::string, void*> socketFiles;
 		std::thread queueThread;
 		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;
 };

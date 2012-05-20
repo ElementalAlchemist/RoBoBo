@@ -174,6 +174,10 @@ Socket* Base::loadSocket(std::string sockettype) {
 	return NULL;
 }
 
+void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
+	// TODO: take socket and unregister it
+}
+
 void Base::messageQueue() {
 	// TODO: process the queue once I get a better-defined list of types
 }
