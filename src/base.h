@@ -37,6 +37,7 @@ class Base {
 		std::map<std::string, Protocol*> servers;
 		std::map<std::string, Module*> highModules, mediumHighModules, normalModules, mediumLowModules, lowModules;
 		std::unordered_map<std::string, void*> moduleFiles;
+		std::map<std::string, Priority> modulePriority;
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
 		std::thread queueThread;
 		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;

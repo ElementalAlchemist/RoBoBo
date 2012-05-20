@@ -77,6 +77,7 @@ LoadResult Base::loadModule(std::string modName) {
 		return LOAD_INCOMPATIBLE;
 	}
 	// Add the module to the appropriate module list according to its priority
+	modulePriority.insert(std::pair<std::string, Priority> (modName, newModule->priority));
 	switch (newModule->priority) {
 		case PRI_HIGH:
 			highModules.insert(std::pair<std::string, Module*> (modName, newModule));
@@ -121,7 +122,43 @@ LoadResult Base::loadModule(std::string modName) {
 }
 
 void Base::unloadModule(std::string modName) {
-	// TODO: also unload modules
+	if (moduleFiles.find(modName) == moduleFiles.end())
+		return;
+		// Do not try to unload the module if it's not currently loaded
+	for (std::pair<std::string, std::list<std::string>> service : moduleServices)
+		service.second.remove(modName);
+	for (std::pair<std::string, std::list<std::string>> service : moduleSupports)
+		service.second.remove(modName);
+	std::map<std::string, Module*>::iterator modEntry;
+	switch (modulePriority[modName]) {
+		case PRI_HIGH:
+			modEntry = highModules.find(modName);
+			delete modEntry->second;
+			highModules.erase(modEntry);
+			break;
+		case PRI_MEDIUM_HIGH:
+			modEntry = mediumHighModules.find(modName);
+			delete modEntry->second;
+			mediumHighModules.erase(modEntry);
+			break;
+		case PRI_NORMAL:
+			modEntry = normalModules.find(modName);
+			delete modEntry->second;
+			normalModules.erase(modEntry);
+			break;
+		case PRI_MEDIUM_LOW:
+			modEntry = mediumLowModules.find(modName);
+			delete modEntry->second;
+			mediumLowModules.erase(modEntry);
+			break;
+		case PRI_LOW:
+			modEntry = lowModules.find(modName);
+			delete modEntry->second;
+			lowModules.erase(modEntry);
+	}
+	modulePriority.erase(modulePriority.find(modName));
+	dlclose(moduleFiles[modName]);
+	moduleFiles.erase(moduleFiles.find(modName));
 }
 
 void Base::connectServer(std::string server) {
