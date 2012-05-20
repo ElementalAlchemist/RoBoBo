@@ -99,6 +99,7 @@ LoadResult Base::loadModule(std::string modName) {
 	std::list<std::string> modProvides = newModule->provides();
 	for (std::string provided : modProvides)
 		moduleServices[provided].push_back(modName);
+	moduleDescriptions.insert(std::pair<std::string, std::string> (modName, newModule->description()));
 	if (!startup) {
 		std::list<std::string> modRequires = newModule->requires();
 		for (std::string requirement : modRequires) {
@@ -157,6 +158,7 @@ void Base::unloadModule(std::string modName) {
 			lowModules.erase(modEntry);
 	}
 	modulePriority.erase(modulePriority.find(modName));
+	moduleDescriptions.erase(moduleDescriptions.find(modName));
 	dlclose(moduleFiles[modName]);
 	moduleFiles.erase(moduleFiles.find(modName));
 }

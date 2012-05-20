@@ -40,6 +40,7 @@ class Base {
 		std::unordered_map<std::string, void*> moduleFiles;
 		std::map<std::string, Priority> modulePriority;
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
+		std::map<std::string, std::string> moduleDescriptions;
 		std::unordered_map<std::string, void*> socketFiles;
 		std::thread queueThread;
 		std::queue<std::tuple<MsgType, std::vector<std::string>, bool>> dataQueue;
