@@ -15,6 +15,7 @@ class Base {
 		Base(std::string working, std::string config, std::string configFileName, unsigned short debug, bool log);
 		void readConfiguration();
 		void loadModules();
+		bool completeStartupLoad(std::string modName, Module* modptr);
 		void connectServers();
 		void checkServers();
 		void unloadEverything();

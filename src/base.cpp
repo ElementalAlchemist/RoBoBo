@@ -12,44 +12,45 @@ void Base::loadModules() {
 	// Because this function is called at startup, also run through the requires/supports and onLoadCompletes
 	std::list<std::string> unloadList; // Keep a list of modules to unload at the end to keep the loop sane
 	for (std::pair<std::string, Module*> module : highModules) {
-		std::list<std::string> modRequires = module.second->requires();
-		for (std::string requirement : modRequires) {
-			if (moduleServices[requirement].empty()) {
-				std::cerr << "Module " << module.first << " requires the service " << requirement << ", which is not provided by another module." << std::endl;
-				unloadList.push_back(module.first);
-			}
-			moduleSupports[requirement].push_back(module.first);
-		}
-		std::list<std::string> modSupports = module.second->supports();
-		for (std::string supporting : modSupports)
-			moduleSupports[supporting].push_back(module.first);
-		if (module.second->onLoadComplete()) {
-			// Since it's successful, call the hook in other modules for this module being loaded
-			for (std::pair<std::string, Module*> module : highModules) {
-				if (module.first != modName)
-					module.second->onModuleLoad(modName);
-			}
-			for (std::pair<std::string, Module*> module : mediumHighModules) {
-				if (module.first != modName)
-					module.second->onModuleLoad(modName);
-			}
-			for (std::pair<std::string, Module*> module : normalModules) {
-				if (module.first != modName)
-					module.second->onModuleLoad(modName);
-			}
-			for (std::pair<std::string, Module*> module : mediumLowModules) {
-				if (module.first != modName)
-					module.second->onModuleLoad(modName);
-			}
-			for (std::pair<std::string, Module*> module : lowModules) {
-				if (module.first != modName)
-					module.second->onModuleLoad(modName);
-			}
-		} else
+		if (!completeStartupLoad(module.first, module.second))
+			unloadList.push_back(module.first);
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		if (!completeStartupLoad(module.first, module.second))
+			unloadList.push_back(module.first);
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		if (!completeStartupLoad(module.first, module.second))
+			unloadList.push_back(module.first);
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		if (!completeStartupLoad(module.first, module.second))
+			unloadList.push_back(module.first);
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		if (!completeStartupLoad(module.first, module.second))
 			unloadList.push_back(module.first);
 	}
 	for (std::string modToUnload : unloadList)
 		unloadModule(modToUnload, false);
+}
+
+bool Base::completeStartupLoad(std::string modName, Module* modptr) {
+	std::list<std::string> modRequires = modptr->requires();
+	for (std::string requirement : modRequires) {
+		if (moduleServices[requirement].empty()) {
+			std::cerr << "Module " << modName << " requires the service " << requirement << ", which is not provided by another module." << std::endl;
+			return false;
+		}
+		moduleSupports[requirement].push_back(modName);
+	}
+	std::list<std::string> modSupports = modptr->supports();
+	for (std::string supporting : modSupports)
+		moduleSupports[supporting].push_back(modName);
+	if (modptr->onLoadComplete())
+		return true; // Also since it's successful, tell the loadModules loop that all is well
+	// Or if it's not successful, tell it that all is not well
+	return false;
 }
 
 void Base::connectServers() {
