@@ -85,6 +85,10 @@ void Module::onXLineAdd(std::string server, std::string lineType, std::string ma
 
 void Module::onXLineRemove(std::string server, std::string lineType, std::string mask) {}
 
+void Module::onServerConnect (std::string server, std::string newServerName) {}
+
+void Module::onServerQuit (std::string server, std::string quitServerName, std::string reason) {}
+
 void Module::onOtherData(std::string server, std::string client, std::vector<std::string> lineTokens) {}
 
 void Module::onChanMsgOut(std::string server, std::string client, std::string channel, char status, std::string &message) {}

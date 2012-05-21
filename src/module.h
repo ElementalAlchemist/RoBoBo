@@ -47,6 +47,8 @@ class Module {
 		virtual void onServerData(std::string server, std::string dataType, std::string params);
 		virtual void onXLineAdd(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);
 		virtual void onXLineRemove(std::string server, std::string lineType, std::string mask);
+		virtual void onServerConnect(std::string server, std::string newServerName);
+		virtual void onServerQuit(std::string server, std::string quitServerName, std::string reason);
 		virtual void onOtherData(std::string server, std::string client, std::vector<std::string> lineTokens);
 		
 		virtual void onChanMsgOut(std::string server, std::string client, std::string channel, char status, std::string &message);
