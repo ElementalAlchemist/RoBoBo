@@ -69,6 +69,8 @@ void Module::onUserConnect(std::string server, std::string client, std::string n
 
 void Module::onUserQuit(std::string server, std::string client, std::string nick, std::string reason) {}
 
+void Module::onUserNick(std::string server, std::string client, std::string oldNick, std::string newNick) {}
+
 void Module::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> data) {}
 
 void Module::onOper(std::string server, std::string nick, std::string operType) {}

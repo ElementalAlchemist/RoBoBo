@@ -39,6 +39,7 @@ class Module {
 		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
 		virtual void onUserConnect(std::string server, std::string client, std::string nick);
 		virtual void onUserQuit(std::string server, std::string client, std::string nick, std::string reason);
+		virtual void onUserNick(std::string server, std::string client, std::string oldNick, std::string newNick);
 		virtual void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> data);
 		virtual void onOper(std::string server, std::string nick, std::string operType);
 		virtual void onSNotice(std::string server, std::string snotype, std::string message);
