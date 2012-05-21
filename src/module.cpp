@@ -65,7 +65,7 @@ void Module::onChanJoin(std::string server, std::string client, std::string chan
 
 void Module::onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {}
 
-void Module::onUserConnect(std::string server, std::string client, std::string nick) {}
+void Module::onUserConnect(std::string server, std::string nick) {}
 
 void Module::onUserQuit(std::string server, std::string client, std::string nick, std::string reason) {}
 

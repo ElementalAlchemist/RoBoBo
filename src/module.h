@@ -37,7 +37,7 @@ class Module {
 		virtual void onChanTopic(std::string server, std::string client, std::string channel, std::string topic);
 		virtual void onChanJoin(std::string server, std::string client, std::string channel, std::string nick);
 		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
-		virtual void onUserConnect(std::string server, std::string client, std::string nick);
+		virtual void onUserConnect(std::string server, std::string nick);
 		virtual void onUserQuit(std::string server, std::string client, std::string nick, std::string reason);
 		virtual void onUserNick(std::string server, std::string client, std::string oldNick, std::string newNick);
 		virtual void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> data);
