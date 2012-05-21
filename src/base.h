@@ -46,6 +46,6 @@ class Base {
 		std::map<std::string, std::string> moduleDescriptions;
 		std::unordered_map<std::string, void*> socketFiles;
 		std::thread moduleQueueThread, serverQueueThread;
-		std::queue<std::tuple<ModDataType, std::vector<std::string>>> moduleDataQueue;
+		std::queue<std::pair<ModDataType, std::vector<std::string>>> moduleDataQueue;
 		std::queue<std::tuple<ServerDataType, std::string, std::vector<std::string>>> serverDataQueue;
 };
