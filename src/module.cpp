@@ -13,6 +13,10 @@ void Module::onModuleLoad(std::string modName) {}
 
 void Module::onModuleUnload(std::string modName) {}
 
+bool Module::forceKeepAlive() {
+	return false;
+}
+
 void Module::rehash(std::map<std::string, std::string> conf) {
 	config = conf;
 }

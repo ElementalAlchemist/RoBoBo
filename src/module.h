@@ -20,6 +20,7 @@ class Module {
 		virtual void onRehash();
 		virtual void onModuleLoad(std::string modName);
 		virtual void onModuleUnload(std::string modName);
+		virtual bool forceKeepAlive();
 		void rehash(std::map<std::string, std::string> conf);
 		void endDebug();
 		
