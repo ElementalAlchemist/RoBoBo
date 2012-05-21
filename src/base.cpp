@@ -320,7 +320,7 @@ void Base::modUserMetadataHook(std::string server, std::string nick, std::string
 	
 }
 
-void Base::modServerDataHook(std::string server, std::string dataType, std::string params) {
+void Base::modServerDataHook(std::string server, std::string dataType, std::vector<std::string> params) {
 	
 }
 
