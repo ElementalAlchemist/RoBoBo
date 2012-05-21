@@ -3,8 +3,6 @@
 #include <dlfcn.h>
 
 enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_ERROR, LOAD_INCOMPATIBLE, LOAD_FAILURE };
-enum ModDataType { }; // TODO: fill this list with module hooks
-enum ServerDataType { }; // TODO: fill this list with server/protocol hooks
 
 #include "socket.h"
 #include "protocol.h"
@@ -16,7 +14,6 @@ class Base {
 	public:
 		Base(std::string working, std::string config, std::string configFileName, unsigned short debug, bool log);
 		void readConfiguration();
-		void startQueueThread();
 		void loadModules();
 		void connectServers();
 		void checkServers();
@@ -29,8 +26,6 @@ class Base {
 		void disconnectServer(std::string server);
 		Socket* loadSocket(std::string sockettype);
 		void unloadSocket(std::string sockettype, Socket* socketptr);
-		void moduleQueue();
-		void serverQueue();
 	private:
 		const std::string workingDir, configDir, configName;
 		const unsigned short debugLevel;
@@ -45,7 +40,4 @@ class Base {
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
 		std::map<std::string, std::string> moduleDescriptions;
 		std::unordered_map<std::string, void*> socketFiles;
-		std::thread moduleQueueThread, serverQueueThread;
-		std::queue<std::pair<ModDataType, std::vector<std::string>>> moduleDataQueue;
-		std::queue<std::tuple<ServerDataType, std::string, std::vector<std::string>>> serverDataQueue;
 };

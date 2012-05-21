@@ -6,11 +6,6 @@ void Base::readConfiguration() {
 	// TODO: parse config file
 }
 
-void Base::startQueueThread() {
-	moduleQueueThread = std::thread(&(this->moduleQueue));
-	serverQueueThread = std::thread(&(this->serverQueue));
-}
-
 void Base::loadModules() {
 	for (std::string modName : startupModules)
 		loadModule(modName);
@@ -238,12 +233,4 @@ Socket* Base::loadSocket(std::string sockettype) {
 
 void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
 	// TODO: take socket and unregister it
-}
-
-void Base::moduleQueue() {
-	// TODO: process the queue once I get a better-defined list of types
-}
-
-void Base::serverQueue() {
-	// TODO: process this queue also when I get a better-defined list of types
 }
