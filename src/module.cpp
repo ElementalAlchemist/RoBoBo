@@ -53,17 +53,11 @@ MsgAction Module::onUserCTCPReply(std::string server, std::string client, std::s
 	return MSG_CONTINUE;
 }
 
-void Module::onChanModeAdd(std::string server, std::string client, std::string channel, std::string mode, std::string param) {}
+void Module::onChanMode(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param) {}
 
-void Module::onChanModeRemove(std::string server, std::string client, std::string channel, std::string mode, std::string param) {}
+void Module::onUserMode(std::string server, std::string client, bool add, std::string mode) {}
 
-void Module::onUserModeAdd(std::string server, std::string client, std::string mode) {}
-
-void Module::onUserModeRemove(std::string server, std::string client, std::string mode) {}
-
-void Module::onUserSNOMaskAdd(std::string server, std::string client, char snomask) {}
-
-void Module::onUserSNOMaskRemove(std::string server, std::string client, char snomask) {}
+void Module::onUserSNOMask(std::string server, std::string client, bool add, char snomask) {}
 
 void Module::onChanTopic(std::string server, std::string client, std::string channel, std::string topic) {}
 

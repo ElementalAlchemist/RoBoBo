@@ -31,12 +31,9 @@ class Module {
 		virtual MsgAction onUserCTCP(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
 		virtual MsgAction onChanCTCPReply(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data);
 		virtual MsgAction onUserCTCPReply(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
-		virtual void onChanModeAdd(std::string server, std::string client, std::string channel, std::string mode, std::string param);
-		virtual void onChanModeRemove(std::string server, std::string client, std::string channel, std::string mode, std::string param);
-		virtual void onUserModeAdd(std::string server, std::string client, std::string mode);
-		virtual void onUserModeRemove(std::string server, std::string client, std::string mode);
-		virtual void onUserSNOMaskAdd(std::string server, std::string client, char snomask);
-		virtual void onUserSNOMaskRemove(std::string server, std::string client, char snomask);
+		virtual void onChanMode(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param);
+		virtual void onUserMode(std::string server, std::string client, bool add, std::string mode);
+		virtual void onUserSNOMask(std::string server, std::string client, bool add, char snomask);
 		virtual void onChanTopic(std::string server, std::string client, std::string channel, std::string topic);
 		virtual void onChanJoin(std::string server, std::string client, std::string channel, std::string nick);
 		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
