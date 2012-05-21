@@ -69,6 +69,178 @@ void Base::unloadEverything() {
 		unloadModule(module.first, true);
 }
 
+void Base::modChanMsgHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
+	
+}
+
+void Base::modUserMsgHook(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::modChanNoticeHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
+	
+}
+
+void Base::modUserNoticeHook(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::modChanCTCPHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data) {
+	
+}
+
+void Base::modUserCTCPHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string data) {
+	
+}
+
+void Base::modChanCTCPReplyHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data) {
+	
+}
+
+void Base::modUserCTCPReplyHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string data) {
+	
+}
+
+void Base::modChanModeHook(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param) {
+	
+}
+
+void Base::modUserModeHook(std::string server, std::string client, bool add, std::string mode) {
+	
+}
+
+void Base::modUserSNOMaskHook(std::string server, std::string client, bool add, std::string snomask) {
+	
+}
+
+void Base::modChanTopicHook(std::string server, std::string client, std::string channel, std::string topic) {
+	
+}
+
+void Base::modChanJoinHook(std::string server, std::string client, std::string channel, std::string nick) {
+	
+}
+
+void Base::modChanPartHook(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
+	
+}
+
+void Base::modUserConnectHook(std::string server, std::string nick) {
+	
+}
+
+void Base::modUserQuitHook(std::string server, std::string client, std::string nick, std::string reason) {
+	
+}
+
+void Base::modUserNickHook(std::string server, std::string client, std::string oldNick, std::string newNick) {
+	
+}
+
+void Base::modNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> data) {
+	
+}
+
+void Base::modOperHook(std::string server, std::string nick, std::string operType) {
+	
+}
+
+void Base::modSNoticeHook(std::string server, std::string snotype, std::string message) {
+	
+}
+
+void Base::modUserMetadataHook(std::string server, std::string nick, std::string dataKey, std::string dataValue) {
+	
+}
+
+void Base::modServerDataHook(std::string server, std::string dataType, std::string params) {
+	
+}
+
+void Base::modXLineAddHook(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason) {
+	
+}
+
+void Base::modXLineRemoveHook(std::string server, std::string lineType, std::string mask) {
+	
+}
+
+void Base::modServerConnectHook(std::string server, std::string newServerName) {
+	
+}
+
+void Base::modServerQuitHook(std::string server, std::string quitServerName, std::string reason) {
+	
+}
+
+void Base::modOtherDataHook(std::string server, std::string client, std::vector<std::string> lineTokens) {
+	
+}
+
+void Base::modChanMsgOutHook(std::string server, std::string client, std::string channel, char status, std::string &message) {
+	
+}
+
+void Base::modChanMsgSendHook(std::string server, std::string client, std::string channel, char status, std::string message) {
+	
+}
+
+void Base::modUserMsgOutHook(std::string server, std::string client, std::string channel, char status, std::string &message) {
+	
+}
+
+void Base::modUserMsgSendHook(std::string server, std::string client, std::string channel, char status, std::string message) {
+	
+}
+
+void Base::modChanNoticeOutHook(std::string server, std::string client, std::string channel, char status, std::string &message) {
+	
+}
+
+void Base::modChanNoticeSendHook(std::string server, std::string client, std::string channel, char status, std::string message) {
+	
+}
+
+void Base::modUserNoticeOutHook(std::string server, std::string client, std::string nick, std::string &message) {
+	
+}
+
+void Base::modUserNoticeSendHook(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::modChanCTCPOutHook(std::string server, std::string client, std::string channel, char status, std::string &ctcp, std::string &params) {
+	
+}
+
+void Base::modChanCTCPSendHook(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	
+}
+
+void Base::modUserCTCPOutHook(std::string server, std::string client, std::string nick, std::string &ctcp, std::string &params) {
+	
+}
+
+void Base::modUserCTCPSendHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
+void Base::modChanCTCPReplyOutHook(std::string server, std::string client, std::string channel, char status, std::string &ctcp, std::string &params) {
+	
+}
+
+void Base::modChanCTCPReplySendHook(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	
+}
+
+void Base::modUserCTCPReplyOutHook(std::string server, std::string client, std::string nick, std::string &ctcp, std::string &params) {
+	
+}
+
+void Base::modUserCTCPReplySendHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
 LoadResult Base::loadModule(std::string modName) {
 	if (moduleFiles.find(modName) != moduleFiles.end())
 		return LOAD_ALREADYLOADED; // Do not attempt to load a module if it's already here
