@@ -240,6 +240,10 @@ void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
 	// TODO: take socket and unregister it
 }
 
-void Base::messageQueue() {
+void Base::moduleQueue() {
 	// TODO: process the queue once I get a better-defined list of types
+}
+
+void Base::serverQueue() {
+	// TODO: process this queue also when I get a better-defined list of types
 }
