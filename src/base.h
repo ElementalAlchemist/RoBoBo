@@ -83,4 +83,5 @@ class Base {
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
 		std::map<std::string, std::string> moduleDescriptions;
 		std::unordered_map<std::string, void*> socketFiles;
+		std::mutex modHookMutex;
 };
