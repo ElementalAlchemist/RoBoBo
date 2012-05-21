@@ -119,7 +119,7 @@ LoadResult Base::loadModule(std::string modName) {
 			if (moduleServices[requirement].empty()) {
 				std::cerr << "Module " << modName << " requires the service " << requirement << ", which is not provided by another module." << std::endl;
 				unloadModule(modName, false);
-				return LOAD_FAILURE;
+				return LOAD_NODEPENDS;
 			}
 			moduleSupports[requirement].push_back(modName);
 		}

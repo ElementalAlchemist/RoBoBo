@@ -2,7 +2,7 @@
 #include "main.h"
 #include <dlfcn.h>
 
-enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_ERROR, LOAD_INCOMPATIBLE, LOAD_FAILURE };
+enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_ERROR, LOAD_INCOMPATIBLE, LOAD_NODEPENDS, LOAD_FAILURE };
 
 #include "socket.h"
 #include "protocol.h"
