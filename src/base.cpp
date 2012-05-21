@@ -62,11 +62,11 @@ void Base::checkServers() {
 }
 
 void Base::unloadEverything() {
-	for (std::pair<std::string, Protocol*> server : servers)
-		disconnectServer(server.first);
+	while (!servers.empty())
+		disconnectServer(servers.begin()->first);
 	// Every module is represented in moduleFiles, so just use that to unload all the modules
-	for (std::pair<std::string, void*> module : moduleFiles)
-		unloadModule(module.first, true);
+	while (!moduleFiles.empty())
+		unloadModule(moduleFiles.begin()->first, true);
 }
 
 void Base::modChanMsgHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
