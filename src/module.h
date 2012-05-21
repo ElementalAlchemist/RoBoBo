@@ -1,3 +1,4 @@
+#pragma once
 #include "main.h"
 
 enum Priority { PRI_HIGH, PRI_MEDIUM_HIGH, PRI_NORMAL, PRI_MEDIUM_LOW, PRI_LOW };
