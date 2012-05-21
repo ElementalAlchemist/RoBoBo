@@ -19,6 +19,12 @@ class Base {
 		void connectServers();
 		void checkServers();
 		void unloadEverything();
+		LoadResult loadModule(std::string modName);
+		void unloadModule(std::string modName, bool wasLoaded);
+		void connectServer(std::string server);
+		void disconnectServer(std::string server);
+		Socket* loadSocket(std::string sockettype);
+		void unloadSocket(std::string sockettype, Socket* socketptr);
 		void modChanMsgHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message);
 		void modUserMsgHook(std::string server, std::string client, std::string nick, std::string message);
 		void modChanNoticeHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message);
@@ -63,12 +69,6 @@ class Base {
 		void modUserCTCPReplyOutHook(std::string server, std::string client, std::string nick, std::string &ctcp, std::string &params);
 		void modUserCTCPReplySendHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params);
 		// TODO: Protocol hooks
-		LoadResult loadModule(std::string modName);
-		void unloadModule(std::string modName, bool wasLoaded);
-		void connectServer(std::string server);
-		void disconnectServer(std::string server);
-		Socket* loadSocket(std::string sockettype);
-		void unloadSocket(std::string sockettype, Socket* socketptr);
 	private:
 		const std::string workingDir, configDir, configName;
 		const unsigned short debugLevel;
