@@ -54,8 +54,8 @@ class Base {
 		void modOtherDataHook(std::string server, std::string client, std::vector<std::string> lineTokens);
 		void modChanMsgOutHook(std::string server, std::string client, std::string channel, char status, std::string &message);
 		void modChanMsgSendHook(std::string server, std::string client, std::string channel, char status, std::string message);
-		void modUserMsgOutHook(std::string server, std::string client, std::string channel, char status, std::string &message);
-		void modUserMsgSendHook(std::string server, std::string client, std::string channel, char status, std::string message);
+		void modUserMsgOutHook(std::string server, std::string client, std::string nick, std::string &message);
+		void modUserMsgSendHook(std::string server, std::string client, std::string nick, std::string message);
 		void modChanNoticeOutHook(std::string server, std::string client, std::string channel, char status, std::string &message);
 		void modChanNoticeSendHook(std::string server, std::string client, std::string channel, char status, std::string message);
 		void modUserNoticeOutHook(std::string server, std::string client, std::string nick, std::string &message);
