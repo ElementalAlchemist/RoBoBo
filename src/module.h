@@ -17,6 +17,7 @@ class Module {
 		const Priority priority;
 		virtual unsigned int apiVersion() = 0;
 		virtual bool onLoadComplete();
+		virtual void onUnload();
 		virtual void onRehash();
 		virtual void onModuleLoad(std::string modName);
 		virtual void onModuleUnload(std::string modName);

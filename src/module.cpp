@@ -7,6 +7,8 @@ bool Module::onLoadComplete() {
 	return true;
 }
 
+void Module::onUnload() {}
+
 void Module::onRehash() {}
 
 void Module::onModuleLoad(std::string modName) {}

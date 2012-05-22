@@ -160,6 +160,23 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 	if (moduleFiles.find(modName) == moduleFiles.end())
 		return; // Do not try to unload the module if it's not currently loaded
 	if (wasLoaded) {
+		// Call the onUnload hook so this module can clean up after itself
+		switch (modulePriority[modName]) {
+			case PRI_HIGH:
+				highModules.find(modName)->second->onUnload();
+				break;
+			case PRI_MEDIUM_HIGH:
+				mediumHighModules.find(modName)->second->onUnload();
+				break;
+			case PRI_NORMAL:
+				normalModules.find(modName)->second->onUnload();
+				break;
+			case PRI_MEDIUM_LOW:
+				mediumLowModules.find(modName)->second->onUnload();
+				break;
+			case PRI_LOW:
+				lowModules.find(modName)->second->onUnload();
+		}
 		// Call the hook for unloading this module in all other modules
 		for (std::pair<std::string, Module*> module : highModules) {
 			if (module.first != modName)
