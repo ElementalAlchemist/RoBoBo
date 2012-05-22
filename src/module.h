@@ -75,9 +75,8 @@ class Module {
 		virtual std::list<std::string> requires();
 		virtual std::list<std::string> supports();
 	protected:
-		std::string moduleName;
+		const std::string moduleName, workingDir;
 		std::map<std::string, std::string> config;
-		std::string workingDir;
 		unsigned short debugLevel;
 	private:
 		Base* bot;
