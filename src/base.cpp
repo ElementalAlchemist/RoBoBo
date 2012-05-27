@@ -713,18 +713,18 @@ void Base::modSNoticeHook(std::string server, std::string snotype, std::string m
 	modHookMutex.unlock();
 }
 
-void Base::modUserMetadataHook(std::string server, std::string nick, std::string dataKey, std::string dataValue) {
+void Base::modMetadataHook(std::string server, std::string target, std::string dataKey, std::string dataValue) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onUserMetadata(server, nick, dataKey, dataValue);
+		module.second->onMetadata(server, target, dataKey, dataValue);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onUserMetadata(server, nick, dataKey, dataValue);
+		module.second->onMetadata(server, target, dataKey, dataValue);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onUserMetadata(server, nick, dataKey, dataValue);
+		module.second->onMetadata(server, target, dataKey, dataValue);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onUserMetadata(server, nick, dataKey, dataValue);
+		module.second->onMetadata(server, target, dataKey, dataValue);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onUserMetadata(server, nick, dataKey, dataValue);
+		module.second->onMetadata(server, target, dataKey, dataValue);
 	modHookMutex.unlock();
 }
 

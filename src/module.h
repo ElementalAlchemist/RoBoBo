@@ -45,7 +45,7 @@ class Module {
 		virtual void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> data);
 		virtual void onOper(std::string server, std::string nick, std::string operType);
 		virtual void onSNotice(std::string server, std::string snotype, std::string message);
-		virtual void onUserMetadata(std::string server, std::string nick, std::string dataKey, std::string dataValue);
+		virtual void onMetadata(std::string server, std::string target, std::string dataKey, std::string dataValue);
 		virtual void onServerData(std::string server, std::string dataType, std::vector<std::string> params);
 		virtual void onXLineAdd(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);
 		virtual void onXLineRemove(std::string server, std::string lineType, std::string mask);

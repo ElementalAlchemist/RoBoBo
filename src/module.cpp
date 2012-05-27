@@ -83,7 +83,7 @@ void Module::onOper(std::string server, std::string nick, std::string operType) 
 
 void Module::onSNotice(std::string server, std::string snotype, std::string message) {}
 
-void Module::onUserMetadata(std::string server, std::string nick, std::string dataKey, std::string dataValue) {}
+void Module::onMetadata(std::string server, std::string target, std::string dataKey, std::string dataValue) {}
 
 void Module::onServerData(std::string server, std::string dataType, std::vector<std::string> params) {}
 
