@@ -1180,3 +1180,75 @@ void Base::modUserCTCPReplySendHook(std::string server, std::string client, std:
 		module.second->onUserCTCPReplySend(server, client, nick, ctcp, params);
 	modHookMutex.unlock();
 }
+
+void Base::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
+	
+}
+
+void Base::sendNotice(std::string server, std::string client, std::string target, std::string message) {
+	
+}
+
+void Base::sendCTCP(std::string server, std::string client, std::string target, std::string ctcp, std::string params) {
+	
+}
+
+void Base::sendCTCPReply(std::string server, std::string client, std::string target, std::string ctcp, std::string params) {
+	
+}
+
+void Base::setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {
+	
+}
+
+void Base::setSNOMask(std::string server, std::string client, std::string snomask) {
+	
+}
+
+void Base::setChanTopic(std::string server, std::string client, std::string channel, std::string topic) {
+	
+}
+
+void Base::joinChannel(std::string server, std::string client, std::string channel, std::string key) {
+	
+}
+
+void Base::partChannel(std::string server, std::string client, std::string channel, std::string reason) {
+	
+}
+
+std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	
+}
+
+void Base::removeClient(std::string server, std::string client) {
+	
+}
+
+void Base::changeNick(std::string server, std::string client, std::string newNick) {
+	
+}
+
+void Base::oper(std::string server, std::string client, std::string username, std::string password) {
+	
+}
+
+void Base::sendSNotice(std::string server, std::string snomask, std::string message) {
+	
+}
+
+void Base::setMetadata(std::string server, std::string target, std::string key, std::string value) {
+	
+}
+
+void Base::setXLine(std::string server, std::string client, std::string linetype, std::string mask, time_t duration, std::string reason) {
+	
+}
+
+void Base::delXLine(std::string server, std::string client, std::string linetype, std::string mask) {
+	
+}
+
+void Base::sendOtherData(std::string server, std::string client, std::string line) {
+	
+}

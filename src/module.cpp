@@ -144,3 +144,83 @@ std::list<std::string> Module::requires() {
 std::list<std::string> Module::supports() {
 	return std::list<std::string>();
 }
+
+void Module::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
+	bot->sendPrivMsg(server, client, target, message);
+}
+
+void Module::sendNotice(std::string server, std::string client, std::string target, std::string message) {
+	bot->sendNotice(server, client, target, message);
+}
+
+void Module::sendCTCP(std::string server, std::string client, std::string target, std::string ctcp, std::string params) {
+	bot->sendCTCP(server, client, target, ctcp, params);
+}
+
+void Module::sendCTCPReply(std::string server, std::string client, std::string target, std::string ctcp, std::string params) {
+	bot->sendCTCPReply(server, client, target, ctcp, params);
+}
+
+void Module::setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {
+	bot->setMode(server, client, target, setModes, delModes);
+}
+
+void Module::setSNOMask(std::string server, std::string client, std::string snomask) {
+	bot->setSNOMask(server, client, snomask);
+}
+
+void Module::setChanTopic(std::string server, std::string client, std::string channel, std::string topic) {
+	bot->setChanTopic(server, client, channel, topic);
+}
+
+void Module::joinChannel(std::string server, std::string client, std::string channel, std::string key) {
+	bot->joinChannel(server, client, channel, key);
+}
+
+void Module::partChannel(std::string server, std::string client, std::string channel, std::string reason) {
+	bot->partChannel(server, client, channel, reason);
+}
+
+void Module::connectServer(std::string server) {
+	bot->connectServer(server);
+}
+
+std::string Module::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	return bot->addClient(server, nick, ident, host, gecos);
+}
+
+void Module::removeClient(std::string server, std::string client) {
+	bot->removeClient(server, client);
+}
+
+void Module::quitServer(std::string server) {
+	bot->disconnectServer(server);
+}
+
+void Module::changeNick(std::string server, std::string client, std::string newNick) {
+	bot->changeNick(server, client, newNick);
+}
+
+void Module::oper(std::string server, std::string client, std::string username, std::string password) {
+	bot->oper(server, client, username, password);
+}
+
+void Module::sendSNotice(std::string server, std::string snomask, std::string message) {
+	bot->sendSNotice(server, snomask, message);
+}
+
+void Module::setMetadata(std::string server, std::string target, std::string key, std::string value) {
+	bot->setMetadata(server, target, key, value);
+}
+
+void Module::setXLine(std::string server, std::string client, std::string linetype, std::string mask, time_t duration, std::string reason) {
+	bot->setXLine(server, client, linetype, mask, duration, reason);
+}
+
+void Module::delXLine(std::string server, std::string client, std::string linetype, std::string mask) {
+	bot->delXLine(server, client, linetype, mask);
+}
+
+void Module::sendOtherData(std::string server, std::string client, std::string line) {
+	bot->sendOtherData(server, client, line);
+}

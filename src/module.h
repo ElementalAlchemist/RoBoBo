@@ -78,6 +78,27 @@ class Module {
 		const std::string moduleName, workingDir;
 		std::map<std::string, std::string> config;
 		unsigned short debugLevel;
+		
+		void sendPrivMsg(std::string server, std::string client, std::string target, std::string message);
+		void sendNotice(std::string server, std::string client, std::string target, std::string message);
+		void sendCTCP(std::string server, std::string client, std::string target, std::string ctcp, std::string params = "");
+		void sendCTCPReply(std::string server, std::string client, std::string target, std::string ctcp, std::string params = "");
+		void setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes);
+		void setSNOMask(std::string server, std::string client, std::string snomask);
+		void setChanTopic(std::string server, std::string client, std::string channel, std::string topic);
+		void joinChannel(std::string server, std::string client, std::string channel, std::string key = "");
+		void partChannel(std::string server, std::string client, std::string channel, std::string reason);
+		void connectServer(std::string server);
+		std::string addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos);
+		void removeClient(std::string server, std::string client);
+		void quitServer(std::string server);
+		void changeNick(std::string server, std::string client, std::string newNick);
+		void oper(std::string server, std::string client, std::string username, std::string password);
+		void sendSNotice(std::string server, std::string snomask, std::string message);
+		void setMetadata(std::string server, std::string target, std::string key, std::string value);
+		void setXLine(std::string server, std::string client, std::string linetype, std::string mask, time_t duration, std::string reason);
+		void delXLine(std::string server, std::string client, std::string linetype, std::string mask);
+		void sendOtherData(std::string server, std::string client, std::string line);
 	private:
 		Base* bot;
 };
