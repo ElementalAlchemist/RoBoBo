@@ -41,6 +41,9 @@ class Protocol {
 		std::string serverName, workingDir;
 		std::map<std::string, std::string> config;
 		unsigned short debugLevel;
+		Socket* assignSocket(std::string socketType);
+		void killSocket(std::string socketType, Socket* sockptr);
+		
 		void callChanMsgHook(std::string client, std::string channel, char status, std::string nick, std::string message);
 		void callUserMsgHook(std::string client, std::string nick, std::string message);
 		void callChanNoticeHook(std::string client, std::string channel, char status, std::string nick, std::string message);
@@ -86,5 +89,4 @@ class Protocol {
 		void callUserCTCPReplySendHook(std::string client, std::string nick, std::string ctcp);
 	private:
 		Base* bot;
-		Socket* connection;
 };

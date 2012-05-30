@@ -60,6 +60,14 @@ void Protocol::processedChanCTCPReply(std::string client, std::string target, ch
 
 void Protocol::processedUserCTCPReply(std::string client, std::string target, std::string ctcp) {}
 
+Socket* Protocol::assignSocket(std::string socketType) {
+	return bot->loadSocket(socketType);
+}
+
+void Protocol::killSocket(std::string socketType, Socket* sockptr) {
+	bot->unloadSocket(socketType, sockptr);
+}
+
 void Protocol::callChanMsgHook(std::string client, std::string channel, char status, std::string nick, std::string message) {
 	bot->modChanMsgHook(serverName, client, channel, status, nick, message);
 }
