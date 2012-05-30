@@ -133,7 +133,7 @@ void Module::onUserCTCPReplyOut(std::string server, std::string client, std::str
 void Module::onUserCTCPReplySend(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {}
 
 std::string Module::description() {
-	return "A description has not been provided.";
+	return "A description has not been provided by the module author.";
 }
 
 std::list<std::string> Module::provides() {
