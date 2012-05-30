@@ -14,6 +14,7 @@ const bool MSG_IGNORE = false;
 class Module {
 	public:
 		Module(std::string modName, std::map<std::string, std::string> conf, std::string workDir, unsigned short debug, Base* botptr);
+		virtual ~Module();
 		const Priority priority;
 		virtual unsigned int apiVersion() = 0;
 		virtual bool onLoadComplete();
