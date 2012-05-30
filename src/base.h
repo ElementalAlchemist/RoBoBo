@@ -3,6 +3,7 @@
 #include <dlfcn.h>
 
 enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_ERROR, LOAD_INCOMPATIBLE, LOAD_NODEPENDS, LOAD_FAILURE };
+class Base;
 
 #include "socket.h"
 #include "protocol.h"
