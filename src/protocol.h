@@ -5,7 +5,7 @@
 
 class Protocol {
 	public:
-		Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, unsigned short debug, Base* botptr);
+		Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr);
 		virtual ~Protocol();
 		virtual unsigned int apiVersion() = 0;
 		virtual void connectServer();
@@ -43,6 +43,7 @@ class Protocol {
 	protected:
 		std::string serverName, workingDir;
 		std::map<std::string, std::string> config;
+		bool log;
 		unsigned short debugLevel;
 		Socket* assignSocket(std::string socketType);
 		void killSocket(std::string socketType, Socket* sockptr);

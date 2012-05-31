@@ -1,6 +1,6 @@
 #include "protocol.h"
 
-Protocol::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, short unsigned int debug, Base* botptr) : serverName(server), workingDir(workDir), config(conf), debugLevel(debug), bot(botptr), resetConnection(true) {}
+Protocol::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : serverName(server), workingDir(workDir), config(conf), log(dumpLogs), debugLevel(debug), bot(botptr), resetConnection(true) {}
 
 Protocol::~Protocol() {}
 
