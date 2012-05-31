@@ -320,8 +320,8 @@ void Base::modUserSNOMaskHook(std::string server, std::string client, bool add, 
 	callHooks.detach();
 }
 
-void Base::modChanTopicHook(std::string server, std::string client, std::string channel, std::string topic) {
-	std::thread callHooks(callChanTopicHooks, server, client, channel, topic);
+void Base::modChanTopicHook(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {
+	std::thread callHooks(callChanTopicHooks, server, client, channel, setter, topic);
 	callHooks.detach();
 }
 
@@ -882,18 +882,18 @@ void Base::callUserSNOMaskHooks(std::string server, std::string client, bool add
 	modHookMutex.unlock();
 }
 
-void Base::callChanTopicHooks(std::string server, std::string client, std::string channel, std::string topic) {
+void Base::callChanTopicHooks(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanTopic(server, client, channel, topic);
+		module.second->onChanTopic(server, client, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanTopic(server, client, channel, topic);
+		module.second->onChanTopic(server, client, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanTopic(server, client, channel, topic);
+		module.second->onChanTopic(server, client, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanTopic(server, client, channel, topic);
+		module.second->onChanTopic(server, client, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanTopic(server, client, channel, topic);
+		module.second->onChanTopic(server, client, channel, setter, topic);
 	modHookMutex.unlock();
 }
 

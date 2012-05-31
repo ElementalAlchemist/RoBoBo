@@ -37,7 +37,7 @@ class Base {
 		void modChanModeHook(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		void modUserModeHook(std::string server, std::string client, bool add, std::string mode);
 		void modUserSNOMaskHook(std::string server, std::string client, bool add, std::string snomask);
-		void modChanTopicHook(std::string server, std::string client, std::string channel, std::string topic);
+		void modChanTopicHook(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
 		void modChanJoinHook(std::string server, std::string client, std::string channel, std::string nick);
 		void modChanPartHook(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
 		void modUserConnectHook(std::string server, std::string nick);
@@ -114,7 +114,7 @@ class Base {
 		void callChanModeHooks(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		void callUserModeHooks(std::string server, std::string client, bool add, std::string mode);
 		void callUserSNOMaskHooks(std::string server, std::string client, bool add, std::string snomask);
-		void callChanTopicHooks(std::string server, std::string client, std::string channel, std::string topic);
+		void callChanTopicHooks(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
 		void callChanJoinHooks(std::string server, std::string client, std::string channel, std::string nick);
 		void callChanPartHooks(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
 		void callUserConnectHooks(std::string server, std::string nick);

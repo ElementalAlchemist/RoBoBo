@@ -68,7 +68,7 @@ void Module::onUserMode(std::string server, std::string client, bool add, std::s
 
 void Module::onUserSNOMask(std::string server, std::string client, bool add, std::string snomask) {}
 
-void Module::onChanTopic(std::string server, std::string client, std::string channel, std::string topic) {}
+void Module::onChanTopic(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {}
 
 void Module::onChanJoin(std::string server, std::string client, std::string channel, std::string nick) {}
 

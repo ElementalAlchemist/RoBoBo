@@ -39,7 +39,7 @@ class Module {
 		virtual void onChanMode(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		virtual void onUserMode(std::string server, std::string client, bool add, std::string mode);
 		virtual void onUserSNOMask(std::string server, std::string client, bool add, std::string snomask);
-		virtual void onChanTopic(std::string server, std::string client, std::string channel, std::string topic);
+		virtual void onChanTopic(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
 		virtual void onChanJoin(std::string server, std::string client, std::string channel, std::string nick);
 		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
 		virtual void onUserConnect(std::string server, std::string nick);
