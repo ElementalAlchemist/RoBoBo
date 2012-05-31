@@ -9,6 +9,9 @@ class Protocol {
 		virtual ~Protocol();
 		virtual unsigned int apiVersion() = 0;
 		virtual void connectServer();
+		virtual void disconnectServer();
+		virtual bool isConnected();
+		bool shouldReset();
 		
 		virtual void sendPrivMsg(std::string client, std::string target, std::string message);
 		virtual void sendNotice(std::string client, std::string target, std::string message);
@@ -43,6 +46,7 @@ class Protocol {
 		unsigned short debugLevel;
 		Socket* assignSocket(std::string socketType);
 		void killSocket(std::string socketType, Socket* sockptr);
+		bool resetConnection;
 		
 		void callChanMsgHook(std::string client, std::string channel, char status, std::string nick, std::string message);
 		void callUserMsgHook(std::string client, std::string nick, std::string message);

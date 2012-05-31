@@ -1,10 +1,18 @@
 #include "protocol.h"
 
-Protocol::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, short unsigned int debug, Base* botptr) : serverName(server), workingDir(workDir), config(conf), debugLevel(debug), bot(botptr) {}
+Protocol::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, short unsigned int debug, Base* botptr) : serverName(server), workingDir(workDir), config(conf), debugLevel(debug), bot(botptr), resetConnection(true) {}
 
 Protocol::~Protocol() {}
 
 void Protocol::connectServer() {}
+
+void Protocol::disconnectServer() {}
+
+bool Protocol::isConnected() { return false; }
+
+bool Protocol::shouldReset() {
+	return resetConnection;
+}
 
 void Protocol::sendPrivMsg(std::string client, std::string target, std::string message) {}
 

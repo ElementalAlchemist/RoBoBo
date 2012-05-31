@@ -204,6 +204,7 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 	for (std::pair<std::string, std::list<std::string>> service : moduleSupports)
 		service.second.remove(modName);
 	std::map<std::string, Module*>::iterator modEntry;
+	// Remove the module from whatever list it's in, based on its priority
 	switch (modulePriority[modName]) {
 		case PRI_HIGH:
 			modEntry = highModules.find(modName);
