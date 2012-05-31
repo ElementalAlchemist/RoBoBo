@@ -47,7 +47,6 @@ class Base {
 		void modOperHook(std::string server, std::string nick, std::string operType);
 		void modSNoticeHook(std::string server, std::string snotype, std::string message);
 		void modMetadataHook(std::string server, std::string target, std::string dataKey, std::string dataValue);
-		void modServerDataHook(std::string server, std::string dataType, std::vector<std::string> params);
 		void modXLineAddHook(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);
 		void modXLineRemoveHook(std::string server, std::string lineType, std::string mask);
 		void modServerConnectHook(std::string server, std::string newServerName);
@@ -124,7 +123,6 @@ class Base {
 		void callOperHooks(std::string server, std::string nick, std::string operType);
 		void callSNoticeHooks(std::string server, std::string snotype, std::string message);
 		void callMetadataHooks(std::string server, std::string target, std::string dataKey, std::string dataValue);
-		void callServerDataHooks(std::string server, std::string dataType, std::vector<std::string> params);
 		void callXLineAddHooks(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);
 		void callXLineRemoveHooks(std::string server, std::string lineType, std::string mask);
 		void callServerConnectHooks(std::string server, std::string newServerName);

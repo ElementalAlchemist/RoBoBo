@@ -370,11 +370,6 @@ void Base::modMetadataHook(std::string server, std::string target, std::string d
 	callHooks.detach();
 }
 
-void Base::modServerDataHook(std::string server, std::string dataType, std::vector<std::string> params) {
-	std::thread callHooks(callServerDataHooks, server, dataType, params);
-	callHooks.detach();
-}
-
 void Base::modXLineAddHook(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason) {
 	std::thread callHooks(callXLineAddHooks, server, lineType, mask, setter, expiry, reason);
 	callHooks.detach();
@@ -1029,21 +1024,6 @@ void Base::callMetadataHooks(std::string server, std::string target, std::string
 		module.second->onMetadata(server, target, dataKey, dataValue);
 	for (std::pair<std::string, Module*> module : lowModules)
 		module.second->onMetadata(server, target, dataKey, dataValue);
-	modHookMutex.unlock();
-}
-
-void Base::callServerDataHooks(std::string server, std::string dataType, std::vector<std::string> params) {
-	modHookMutex.lock();
-	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onServerData(server, dataType, params);
-	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onServerData(server, dataType, params);
-	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onServerData(server, dataType, params);
-	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onServerData(server, dataType, params);
-	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onServerData(server, dataType, params);
 	modHookMutex.unlock();
 }
 

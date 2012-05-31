@@ -88,8 +88,6 @@ void Module::onSNotice(std::string server, std::string snotype, std::string mess
 
 void Module::onMetadata(std::string server, std::string target, std::string dataKey, std::string dataValue) {}
 
-void Module::onServerData(std::string server, std::string dataType, std::vector<std::string> params) {}
-
 void Module::onXLineAdd(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason) {}
 
 void Module::onXLineRemove(std::string server, std::string lineType, std::string mask) {}
