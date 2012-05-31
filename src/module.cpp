@@ -62,7 +62,7 @@ MsgAction Module::onUserCTCPReply(std::string server, std::string client, std::s
 	return MSG_CONTINUE;
 }
 
-void Module::onChanMode(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param) {}
+void Module::onChanMode(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param) {}
 
 void Module::onUserMode(std::string server, std::string client, bool add, std::string mode) {}
 

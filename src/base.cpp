@@ -305,8 +305,8 @@ void Base::modUserCTCPReplyHook(std::string server, std::string client, std::str
 	callHooks.detach();
 }
 
-void Base::modChanModeHook(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param) {
-	std::thread callHooks(callChanModeHooks, server, client, channel, add, mode, param);
+void Base::modChanModeHook(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
+	std::thread callHooks(callChanModeHooks, server, client, channel, setter, add, mode, param);
 	callHooks.detach();
 }
 
@@ -837,18 +837,18 @@ void Base::callUserCTCPReplyHooks(std::string server, std::string client, std::s
 	modHookMutex.unlock();
 }
 
-void Base::callChanModeHooks(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param) {
+void Base::callChanModeHooks(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanMode(server, client, channel, add, mode, param);
+		module.second->onChanMode(server, client, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanMode(server, client, channel, add, mode, param);
+		module.second->onChanMode(server, client, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanMode(server, client, channel, add, mode, param);
+		module.second->onChanMode(server, client, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanMode(server, client, channel, add, mode, param);
+		module.second->onChanMode(server, client, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanMode(server, client, channel, add, mode, param);
+		module.second->onChanMode(server, client, channel, setter, add, mode, param);
 	modHookMutex.unlock();
 }
 

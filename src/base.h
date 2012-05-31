@@ -34,7 +34,7 @@ class Base {
 		void modUserCTCPHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
 		void modChanCTCPReplyHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data);
 		void modUserCTCPReplyHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
-		void modChanModeHook(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param);
+		void modChanModeHook(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		void modUserModeHook(std::string server, std::string client, bool add, std::string mode);
 		void modUserSNOMaskHook(std::string server, std::string client, bool add, std::string snomask);
 		void modChanTopicHook(std::string server, std::string client, std::string channel, std::string topic);
@@ -111,7 +111,7 @@ class Base {
 		void callUserCTCPHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
 		void callChanCTCPReplyHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data);
 		void callUserCTCPReplyHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
-		void callChanModeHooks(std::string server, std::string client, std::string channel, bool add, std::string mode, std::string param);
+		void callChanModeHooks(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		void callUserModeHooks(std::string server, std::string client, bool add, std::string mode);
 		void callUserSNOMaskHooks(std::string server, std::string client, bool add, std::string snomask);
 		void callChanTopicHooks(std::string server, std::string client, std::string channel, std::string topic);
