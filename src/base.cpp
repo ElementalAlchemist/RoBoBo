@@ -495,7 +495,7 @@ void Base::setMode(std::string server, std::string client, std::string target, s
 	
 }
 
-void Base::setSNOMask(std::string server, std::string client, std::string snomask) {
+void Base::setSNOMask(std::string server, std::string client, std::string snomask, bool add) {
 	
 }
 

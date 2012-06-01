@@ -24,7 +24,7 @@ void Protocol::sendCTCPReply(std::string client, std::string target, std::string
 
 void Protocol::setMode(std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {}
 
-void Protocol::setSNOMask(std::string client, std::string snomask) {}
+void Protocol::setSNOMask(std::string client, std::string snomask, bool add) {}
 
 void Protocol::setChanTopic(std::string client, std::string channel, std::string topic) {}
 

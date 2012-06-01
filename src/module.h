@@ -86,7 +86,7 @@ class Module {
 		void sendCTCP(std::string server, std::string client, std::string target, std::string ctcp, std::string params = "");
 		void sendCTCPReply(std::string server, std::string client, std::string target, std::string ctcp, std::string params = "");
 		void setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes);
-		void setSNOMask(std::string server, std::string client, std::string snomask);
+		void setSNOMask(std::string server, std::string client, std::string snomask, bool add);
 		void setChanTopic(std::string server, std::string client, std::string channel, std::string topic);
 		void joinChannel(std::string server, std::string client, std::string channel, std::string key = "");
 		void partChannel(std::string server, std::string client, std::string channel, std::string reason);

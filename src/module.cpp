@@ -166,8 +166,8 @@ void Module::setMode(std::string server, std::string client, std::string target,
 	bot->setMode(server, client, target, setModes, delModes);
 }
 
-void Module::setSNOMask(std::string server, std::string client, std::string snomask) {
-	bot->setSNOMask(server, client, snomask);
+void Module::setSNOMask(std::string server, std::string client, std::string snomask, bool add) {
+	bot->setSNOMask(server, client, snomask, add);
 }
 
 void Module::setChanTopic(std::string server, std::string client, std::string channel, std::string topic) {

@@ -18,7 +18,7 @@ class Protocol {
 		virtual void sendCTCP(std::string client, std::string target, std::string ctcp);
 		virtual void sendCTCPReply(std::string client, std::string target, std::string ctcp);
 		virtual void setMode(std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes);
-		virtual void setSNOMask(std::string client, std::string snomask);
+		virtual void setSNOMask(std::string client, std::string snomask, bool add);
 		virtual void setChanTopic(std::string client, std::string channel, std::string topic);
 		virtual void joinChannel(std::string client, std::string channel, std::string key = "");
 		virtual void partChannel(std::string client, std::string channel, std::string reason);
