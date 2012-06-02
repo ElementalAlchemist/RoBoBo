@@ -176,10 +176,6 @@ void Protocol::callMetadataHook(std::string target, std::string dataKey, std::st
 	bot->modMetadataHook(serverName, target, dataKey, dataValue);
 }
 
-void Protocol::callServerDataHook(std::string dataType, std::vector<std::string> params) {
-	bot->modServerDataHook(serverName, dataType, params);
-}
-
 void Protocol::callXLineAddHook(std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason) {
 	bot->modXLineAddHook(serverName, lineType, mask, setter, expiry, reason);
 }

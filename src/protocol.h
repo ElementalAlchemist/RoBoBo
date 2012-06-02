@@ -70,7 +70,6 @@ class Protocol {
 		void callOperHook(std::string nick, std::string operType);
 		void callSNoticeHook(char snotype, std::string message);
 		void callMetadataHook(std::string target, std::string dataKey, std::string dataValue);
-		void callServerDataHook(std::string dataType, std::vector<std::string> params);
 		void callXLineAddHook(std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);
 		void callXLineRemoveHook(std::string lineType, std::string mask);
 		void callServerConnectHook(std::string newServerName);
