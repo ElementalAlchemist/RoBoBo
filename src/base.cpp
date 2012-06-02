@@ -315,7 +315,7 @@ void Base::modUserModeHook(std::string server, std::string client, bool add, std
 	callHooks.detach();
 }
 
-void Base::modUserSNOMaskHook(std::string server, std::string client, bool add, std::string snomask) {
+void Base::modUserSNOMaskHook(std::string server, std::string client, bool add, char snomask) {
 	std::thread callHooks(callUserSNOMaskHooks, server, client, add, snomask);
 	callHooks.detach();
 }
@@ -360,7 +360,7 @@ void Base::modOperHook(std::string server, std::string nick, std::string operTyp
 	callHooks.detach();
 }
 
-void Base::modSNoticeHook(std::string server, std::string snotype, std::string message) {
+void Base::modSNoticeHook(std::string server, char snotype, std::string message) {
 	std::thread callHooks(callSNoticeHooks, server, snotype, message);
 	callHooks.detach();
 }
@@ -495,7 +495,7 @@ void Base::setMode(std::string server, std::string client, std::string target, s
 	
 }
 
-void Base::setSNOMask(std::string server, std::string client, std::string snomask, bool add) {
+void Base::setSNOMask(std::string server, std::string client, char snomask, bool add) {
 	
 }
 
@@ -527,7 +527,7 @@ void Base::oper(std::string server, std::string client, std::string username, st
 	
 }
 
-void Base::sendSNotice(std::string server, std::string snomask, std::string message) {
+void Base::sendSNotice(std::string server, char snomask, std::string message) {
 	
 }
 
@@ -862,7 +862,7 @@ void Base::callUserModeHooks(std::string server, std::string client, bool add, s
 	modHookMutex.unlock();
 }
 
-void Base::callUserSNOMaskHooks(std::string server, std::string client, bool add, std::string snomask) {
+void Base::callUserSNOMaskHooks(std::string server, std::string client, bool add, char snomask) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
 		module.second->onUserSNOMask(server, client, add, snomask);
@@ -997,7 +997,7 @@ void Base::callOperHooks(std::string server, std::string nick, std::string operT
 	modHookMutex.unlock();
 }
 
-void Base::callSNoticeHooks(std::string server, std::string snotype, std::string message) {
+void Base::callSNoticeHooks(std::string server, char snotype, std::string message) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
 		module.second->onSNotice(server, snotype, message);

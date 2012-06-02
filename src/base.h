@@ -256,10 +256,10 @@ class Base {
 		 * @param server The name of the server on which server notice masks were changed
 		 * @param client The identifier of the client whose SNOMask was changed
 		 * @param add Whether the SNOmask in question was added or removed; true if it was added
-		 * @param snomask The snomask that was added or removed; is a string in case some server uses long names instead of mode-like characters
+		 * @param snomask The snomask that was added or removed
 		 * @see callUserSNOMaskHooks
 		 */
-		void modUserSNOMaskHook(std::string server, std::string client, bool add, std::string snomask);
+		void modUserSNOMaskHook(std::string server, std::string client, bool add, char snomask);
 		
 		/** Channel topic hook thread
 		 * This function makes channel topic hook calls "nonblocking" by calling the function that actually makes the
@@ -356,7 +356,7 @@ class Base {
 		 * @param message The contents of the server notice
 		 * @see callSNoticeHooks
 		 */
-		void modSNoticeHook(std::string server, std::string snotype, std::string message);
+		void modSNoticeHook(std::string server, char snotype, std::string message);
 		
 		/** Metadata hook thread
 		 * This function makes metadata hook calls "nonblocking" by calling the function that actually makes the hook
@@ -685,7 +685,7 @@ class Base {
 		 * @param snomask The SNOmask to modify
 		 * @param add Whether to set or unset it; true to set, false to unset
 		 */
-		void setSNOMask(std::string server, std::string client, std::string snomask, bool add);
+		void setSNOMask(std::string server, std::string client, char snomask, bool add);
 		
 		/** Set channel topic
 		 * Called as a result of a module wanting to set a channel topic, this function forwards the request to
@@ -763,7 +763,7 @@ class Base {
 		 * @param snomask The SNOmask to which to send the notice
 		 * @param message The notice message
 		 */
-		void sendSNotice(std::string server, std::string snomask, std::string message);
+		void sendSNotice(std::string server, char snomask, std::string message);
 		
 		/** Set metadata
 		 * Called when a module wants to set metadata on a user or channel, this function forwards the request
@@ -975,7 +975,7 @@ class Base {
 		 * @param snomask The SNOmask being set
 		 * @see modUserSNOMaskHook
 		 */
-		void callUserSNOMaskHooks(std::string server, std::string client, bool add, std::string snomask);
+		void callUserSNOMaskHooks(std::string server, std::string client, bool add, char snomask);
 		
 		/** Channel topic hook handler
 		 * This function calls the hooks in modules for channel topic changes.
@@ -1063,7 +1063,7 @@ class Base {
 		 * @param message The message being sent
 		 * @see modSNoticeHook
 		 */
-		void callSNoticeHooks(std::string server, std::string snotype, std::string message);
+		void callSNoticeHooks(std::string server, char snotype, std::string message);
 		
 		/** Metadata hook handler
 		 * This function calls the hooks in modules for changes in metadata.

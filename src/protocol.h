@@ -18,7 +18,7 @@ class Protocol {
 		virtual void sendCTCP(std::string client, std::string target, std::string ctcp);
 		virtual void sendCTCPReply(std::string client, std::string target, std::string ctcp);
 		virtual void setMode(std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes);
-		virtual void setSNOMask(std::string client, std::string snomask, bool add);
+		virtual void setSNOMask(std::string client, char snomask, bool add);
 		virtual void setChanTopic(std::string client, std::string channel, std::string topic);
 		virtual void joinChannel(std::string client, std::string channel, std::string key = "");
 		virtual void partChannel(std::string client, std::string channel, std::string reason);
@@ -26,7 +26,7 @@ class Protocol {
 		virtual void removeClient(std::string client);
 		virtual void changeNick(std::string client, std::string newNick);
 		virtual void oper(std::string client, std::string username, std::string password);
-		virtual void sendSNotice(std::string snomask, std::string message);
+		virtual void sendSNotice(char snomask, std::string message);
 		virtual void setMetadata(std::string target, std::string key, std::string value);
 		virtual void setXLine(std::string client, std::string linetype, std::string mask, time_t duration, std::string reason);
 		virtual void delXLine(std::string client, std::string linetype, std::string mask);
@@ -59,7 +59,7 @@ class Protocol {
 		void callUserCTCPReplyHook(std::string client, std::string nick, std::string ctcp);
 		void callChanModeHook(std::string client, std::string channel, bool add, std::string mode, std::string param);
 		void callUserModeHook(std::string client, bool add, std::string mode);
-		void callUserSNOMaskHook(std::string client, bool add, std::string snomask);
+		void callUserSNOMaskHook(std::string client, bool add, char snomask);
 		void callChanTopicHook(std::string client, std::string channel, std::string topic);
 		void callChanJoinHook(std::string client, std::string channel, std::string nick);
 		void callChanPartHook(std::string client, std::string channel, std::string nick, std::string reason);
@@ -68,7 +68,7 @@ class Protocol {
 		void callUserNickHook(std::string client, std::string oldNick, std::string newNick);
 		void callNumericHook(std::string client, std::string numeric, std::vector<std::string> data);
 		void callOperHook(std::string nick, std::string operType);
-		void callSNoticeHook(std::string snotype, std::string message);
+		void callSNoticeHook(char snotype, std::string message);
 		void callMetadataHook(std::string target, std::string dataKey, std::string dataValue);
 		void callServerDataHook(std::string dataType, std::vector<std::string> params);
 		void callXLineAddHook(std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);

@@ -66,7 +66,7 @@ void Module::onChanMode(std::string server, std::string client, std::string chan
 
 void Module::onUserMode(std::string server, std::string client, bool add, std::string mode) {}
 
-void Module::onUserSNOMask(std::string server, std::string client, bool add, std::string snomask) {}
+void Module::onUserSNOMask(std::string server, std::string client, bool add, char snomask) {}
 
 void Module::onChanTopic(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {}
 
@@ -84,7 +84,7 @@ void Module::onNumeric(std::string server, std::string client, std::string numer
 
 void Module::onOper(std::string server, std::string nick, std::string operType) {}
 
-void Module::onSNotice(std::string server, std::string snotype, std::string message) {}
+void Module::onSNotice(std::string server, char snotype, std::string message) {}
 
 void Module::onMetadata(std::string server, std::string target, std::string dataKey, std::string dataValue) {}
 
@@ -166,7 +166,7 @@ void Module::setMode(std::string server, std::string client, std::string target,
 	bot->setMode(server, client, target, setModes, delModes);
 }
 
-void Module::setSNOMask(std::string server, std::string client, std::string snomask, bool add) {
+void Module::setSNOMask(std::string server, std::string client, char snomask, bool add) {
 	bot->setSNOMask(server, client, snomask, add);
 }
 
@@ -206,7 +206,7 @@ void Module::oper(std::string server, std::string client, std::string username, 
 	bot->oper(server, client, username, password);
 }
 
-void Module::sendSNotice(std::string server, std::string snomask, std::string message) {
+void Module::sendSNotice(std::string server, char snomask, std::string message) {
 	bot->sendSNotice(server, snomask, message);
 }
 

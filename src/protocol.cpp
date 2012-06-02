@@ -24,7 +24,7 @@ void Protocol::sendCTCPReply(std::string client, std::string target, std::string
 
 void Protocol::setMode(std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {}
 
-void Protocol::setSNOMask(std::string client, std::string snomask, bool add) {}
+void Protocol::setSNOMask(std::string client, char snomask, bool add) {}
 
 void Protocol::setChanTopic(std::string client, std::string channel, std::string topic) {}
 
@@ -42,7 +42,7 @@ void Protocol::changeNick(std::string client, std::string newNick) {}
 
 void Protocol::oper(std::string client, std::string username, std::string password) {}
 
-void Protocol::sendSNotice(std::string snomask, std::string message) {}
+void Protocol::sendSNotice(char snomask, std::string message) {}
 
 void Protocol::setMetadata(std::string target, std::string key, std::string value) {}
 
@@ -132,7 +132,7 @@ void Protocol::callUserModeHook(std::string client, bool add, std::string mode) 
 	bot->modUserModeHook(serverName, client, add, mode);
 }
 
-void Protocol::callUserSNOMaskHook(std::string client, bool add, std::string snomask) {
+void Protocol::callUserSNOMaskHook(std::string client, bool add, char snomask) {
 	bot->modUserSNOMaskHook(serverName, client, add, snomask);
 }
 
@@ -168,7 +168,7 @@ void Protocol::callOperHook(std::string nick, std::string operType) {
 	bot->modOperHook(serverName, nick, operType);
 }
 
-void Protocol::callSNoticeHook(std::string snotype, std::string message) {
+void Protocol::callSNoticeHook(char snotype, std::string message) {
 	bot->modSNoticeHook(serverName, snotype, message);
 }
 

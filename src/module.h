@@ -38,7 +38,7 @@ class Module {
 		virtual MsgAction onUserCTCPReply(std::string server, std::string client, std::string nick, std::string ctcp, std::string data);
 		virtual void onChanMode(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		virtual void onUserMode(std::string server, std::string client, bool add, std::string mode);
-		virtual void onUserSNOMask(std::string server, std::string client, bool add, std::string snomask);
+		virtual void onUserSNOMask(std::string server, std::string client, bool add, char snomask);
 		virtual void onChanTopic(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
 		virtual void onChanJoin(std::string server, std::string client, std::string channel, std::string nick);
 		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
@@ -47,7 +47,7 @@ class Module {
 		virtual void onUserNick(std::string server, std::string client, std::string oldNick, std::string newNick);
 		virtual void onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> data);
 		virtual void onOper(std::string server, std::string nick, std::string operType);
-		virtual void onSNotice(std::string server, std::string snotype, std::string message);
+		virtual void onSNotice(std::string server, char snotype, std::string message);
 		virtual void onMetadata(std::string server, std::string target, std::string dataKey, std::string dataValue);
 		virtual void onXLineAdd(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason);
 		virtual void onXLineRemove(std::string server, std::string lineType, std::string mask);
@@ -86,7 +86,7 @@ class Module {
 		void sendCTCP(std::string server, std::string client, std::string target, std::string ctcp, std::string params = "");
 		void sendCTCPReply(std::string server, std::string client, std::string target, std::string ctcp, std::string params = "");
 		void setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes);
-		void setSNOMask(std::string server, std::string client, std::string snomask, bool add);
+		void setSNOMask(std::string server, std::string client, char snomask, bool add);
 		void setChanTopic(std::string server, std::string client, std::string channel, std::string topic);
 		void joinChannel(std::string server, std::string client, std::string channel, std::string key = "");
 		void partChannel(std::string server, std::string client, std::string channel, std::string reason);
@@ -96,7 +96,7 @@ class Module {
 		void quitServer(std::string server);
 		void changeNick(std::string server, std::string client, std::string newNick);
 		void oper(std::string server, std::string client, std::string username, std::string password);
-		void sendSNotice(std::string server, std::string snomask, std::string message);
+		void sendSNotice(std::string server, char snomask, std::string message);
 		void setMetadata(std::string server, std::string target, std::string key, std::string value);
 		void setXLine(std::string server, std::string client, std::string linetype, std::string mask, time_t duration, std::string reason);
 		void delXLine(std::string server, std::string client, std::string linetype, std::string mask);
