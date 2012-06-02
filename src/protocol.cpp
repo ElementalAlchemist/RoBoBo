@@ -8,7 +8,9 @@ void Protocol::connectServer() {}
 
 void Protocol::disconnectServer() {}
 
-bool Protocol::isConnected() { return false; }
+bool Protocol::isConnected() {
+	return false;
+}
 
 bool Protocol::shouldReset() {
 	return resetConnection;
