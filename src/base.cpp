@@ -79,7 +79,7 @@ LoadResult Base::loadModule(std::string modName) {
 	const char* fileOpenError = dlerror();
 	if (fileOpenError != NULL) {
 		std::cerr << "Module " << modName << " could not be opened: " << fileOpenError << std::endl;
-		return LOAD_ERROR;
+		return LOAD_OPEN_ERROR;
 	}
 	// The spawn function of modules returns a module instance that we can use
 	module_spawn_t moduleSpawn = dlsym(modFile, "spawn");
