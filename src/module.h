@@ -254,6 +254,17 @@ class Module {
 		 */
 		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
 		
+		/** Channel kick hook
+		 * This function is called when a channel kick is received by the bot, allowing modules to react.
+		 * @param server The server on which a user was kicked
+		 * @param client The identifier of the client that received the kick notice
+		 * @param channel The channel from which the user was kicked
+		 * @param kicker The nick of the user who kicked
+		 * @param kickee The nick of the user who was kicked
+		 * @param reason The kick reason
+		 */
+		virtual void onChanKick(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		
 		/** User connect hook
 		 * This function is called when a user connect notice is received by the bot, allowing modules to react.
 		 * @param server The server on the network to which a user connected

@@ -34,6 +34,8 @@ void Protocol::joinChannel(std::string client, std::string channel, std::string 
 
 void Protocol::partChannel(std::string client, std::string channel, std::string reason) {}
 
+void Protocol::kickUser(std::string client, std::string channel, std::string nick, std::string reason) {}
+
 std::string Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
 	return "";
 }
@@ -148,6 +150,10 @@ void Protocol::callChanJoinHook(std::string client, std::string channel, std::st
 
 void Protocol::callChanPartHook(std::string client, std::string channel, std::string nick, std::string reason) {
 	bot->modChanPartHook(serverName, client, channel, nick, reason);
+}
+
+void Protocol::callChanKickHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	bot->modChanKickHook(serverName, client, channel, kicker, kickee, reason);
 }
 
 void Protocol::callUserConnectHook(std::string nick) {

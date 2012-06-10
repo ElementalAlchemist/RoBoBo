@@ -22,6 +22,7 @@ class Protocol {
 		virtual void setChanTopic(std::string client, std::string channel, std::string topic);
 		virtual void joinChannel(std::string client, std::string channel, std::string key = "");
 		virtual void partChannel(std::string client, std::string channel, std::string reason);
+		virtual void kickUser(std::string client, std::string channel, std::string nick, std::string reason);
 		virtual std::string addClient(std::string nick, std::string ident, std::string host, std::string gecos);
 		virtual void removeClient(std::string client);
 		virtual void changeNick(std::string client, std::string newNick);
@@ -63,6 +64,7 @@ class Protocol {
 		void callChanTopicHook(std::string client, std::string channel, std::string topic);
 		void callChanJoinHook(std::string client, std::string channel, std::string nick);
 		void callChanPartHook(std::string client, std::string channel, std::string nick, std::string reason);
+		void callChanKickHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		void callUserConnectHook(std::string nick);
 		void callUserQuitHook(std::string client, std::string nick, std::string reason);
 		void callUserNickHook(std::string client, std::string oldNick, std::string newNick);

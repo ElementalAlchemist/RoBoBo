@@ -335,6 +335,11 @@ void Base::modChanPartHook(std::string server, std::string client, std::string c
 	callHooks.detach();
 }
 
+void Base::modChanKickHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	std::thread callHooks(callChanKickHooks, server, client, channel, kicker, kickee, reason);
+	callHooks.detach();
+}
+
 void Base::modUserConnectHook(std::string server, std::string nick) {
 	std::thread callHooks(callUserConnectHooks, server, nick);
 	callHooks.detach();
@@ -923,6 +928,21 @@ void Base::callChanPartHooks(std::string server, std::string client, std::string
 		module.second->onChanPart(server, client, channel, nick, reason);
 	for (std::pair<std::string, Module*> module : lowModules)
 		module.second->onChanPart(server, client, channel, nick, reason);
+	modHookMutex.unlock();
+}
+
+void Base::callChanKickHooks(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	modHookMutex.lock();
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
 	modHookMutex.unlock();
 }
 

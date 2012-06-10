@@ -300,6 +300,18 @@ class Base {
 		 */
 		void modChanPartHook(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
 		
+		/** Channel kick hook thread
+		 * This function makes channel kick hook calls "nonblocking" by calling the function that actually makes the
+		 * hook calls in a new thread.  It is called by a protocol module when someone kicks a user from a channel.
+		 * @param server The server on which someone was kicked
+		 * @param client The identifier of the client that received the kick notice
+		 * @param channel The channel from which the user was kicked
+		 * @param kicker The nick of the user who kicked
+		 * @param kickee The nick of the user who was kicked
+		 * @param reason The reason given for the kick
+		 */
+		void modChanKickHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		
 		/** User connect hook thread
 		 * This function makes user connect hook calls "nonblocking" by calling the function that actually makes the
 		 * hook calls in a new thread.  It is called by a protocol module when someone connects to the network.
@@ -1032,6 +1044,17 @@ class Base {
 		 * @see modChanPartHook
 		 */
 		void callChanPartHooks(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
+		
+		/** Channel kick hook handler
+		 * This function calls the hooks in modules for channel kicks.
+		 * @param server The server on which a user was kicked
+		 * @param client The identifier of the client that saw the channel kick
+		 * @param channel The channel from which the user was kicked
+		 * @param kicker The nick of the user who kicked
+		 * @param kickee The nick of the user who was kicked
+		 * @param reason The kick reason given
+		 */
+		void callChanKickHooks(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		
 		/** User connect hook handler
 		 * This function calls the hooks in modules for user connections.
