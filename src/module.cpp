@@ -186,6 +186,10 @@ void Module::changeNick(std::string server, std::string client, std::string newN
 	bot->changeNick(server, client, newNick);
 }
 
+void Module::kickUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
+	bot->kickUser(server, client, channel, nick, reason);
+}
+
 void Module::connectServer(std::string server) {
 	bot->connectServer(server);
 }

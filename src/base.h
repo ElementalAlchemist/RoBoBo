@@ -721,6 +721,26 @@ class Base {
 		 */
 		void partChannel(std::string server, std::string client, std::string channel, std::string reason);
 		
+		/** Change nick
+		 * Called when a module wants to change a client's nick, this function forwards the request to the
+		 * appropriate protocol module.
+		 * @param server The server on which to change a nick
+		 * @param client The identifier of the client whose nick we wish to change
+		 * @param newNick The new nick for the client
+		 */
+		void changeNick(std::string server, std::string client, std::string newNick);
+		
+		/** Kick user
+		 * Called when a module wants to kick a user from a channel, this function forwards the request to
+		 * the appropriate protocol module.
+		 * @param server The server on which to kick a user
+		 * @param client The identifier of the client to perform the kick
+		 * @param channel The channel from which to kick
+		 * @param nick The nick of the user to kick
+		 * @param reason The kick reason
+		 */
+		void kickUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
+		
 		/** Add client
 		 * Called when a module wants the bot to introduce a new client to a server, this function forwards the
 		 * request to the appropriate protocol module.

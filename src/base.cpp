@@ -523,6 +523,10 @@ void Base::changeNick(std::string server, std::string client, std::string newNic
 	
 }
 
+void Base::kickUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
+	
+}
+
 void Base::oper(std::string server, std::string client, std::string username, std::string password) {
 	
 }

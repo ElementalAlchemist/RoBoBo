@@ -654,6 +654,16 @@ class Module {
 		 */
 		void changeNick(std::string server, std::string client, std::string newNick);
 		
+		/** Kick user
+		 * Used by modules to kick a user from a channel
+		 * @param server The server on which to kick a user
+		 * @param client The identifier of the client to perform the kicking
+		 * @param channel The channel in which to kick a user
+		 * @param nick The nick of the user to kick
+		 * @param reason The kick reason
+		 */
+		void kickUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
+		
 		/** Connect server
 		 * Used by modules to connect to a new server specified in the config
 		 * @param server The server to connect to
