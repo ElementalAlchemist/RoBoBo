@@ -182,6 +182,10 @@ void Module::partChannel(std::string server, std::string client, std::string cha
 	bot->partChannel(server, client, channel, reason);
 }
 
+void Module::changeNick(std::string server, std::string client, std::string newNick) {
+	bot->changeNick(server, client, newNick);
+}
+
 void Module::connectServer(std::string server) {
 	bot->connectServer(server);
 }
@@ -196,10 +200,6 @@ void Module::removeClient(std::string server, std::string client) {
 
 void Module::quitServer(std::string server) {
 	bot->disconnectServer(server);
-}
-
-void Module::changeNick(std::string server, std::string client, std::string newNick) {
-	bot->changeNick(server, client, newNick);
 }
 
 void Module::oper(std::string server, std::string client, std::string username, std::string password) {
