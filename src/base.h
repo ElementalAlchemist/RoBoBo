@@ -231,7 +231,6 @@ class Base {
 		 * hook calls in a new thread.  It is called by a protocol module when the bot receives notice from the server
 		 * of a change of modes in a channel.
 		 * @param server The name of the server on which channel modes were changed
-		 * @param client The identifier of the client that received the mode change notice
 		 * @param channel The channel that had its modes changed
 		 * @param setter The nick of the user who changed the modes
 		 * @param add Whether the mode was set or unset; true if the mode is being set
@@ -239,78 +238,74 @@ class Base {
 		 * @param param The mode parameter, or empty string if there is none
 		 * @see callChanModeHooks
 		 */
-		void modChanModeHook(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
+		void modChanModeHook(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		
 		/** User mode hook thread
 		 * This function makes user mode hook calls "nonblocking" by calling the function that actually makes the hook
 		 * calls in a new thread.  It is called by a protocol module when the bot receives notice from the server of a
 		 * change of user modes.
 		 * @param server The name of the server on which user modes were changed
-		 * @param client The identifier of the client whose modes were changed
+		 * @param nick The nick of the user whose modes were changed
 		 * @param add Whether the mode was set or unset; true if the mode is being set
 		 * @param mode The long name of the mode being set
 		 * @see callUserModeHooks
 		 */
-		void modUserModeHook(std::string server, std::string client, bool add, std::string mode);
+		void modUserModeHook(std::string server, std::string nick, bool add, std::string mode);
 		
 		/** User SNOMask hook thread
 		 * This function makes user SNOMask hook calls "nonblocking" by calling the function that actually makes the
 		 * hook calls in a new thread.  It is called by a protocol module when the bot receives notice from the server
 		 * of changes in a client's server notice masks.
 		 * @param server The name of the server on which server notice masks were changed
-		 * @param client The identifier of the client whose SNOMask was changed
+		 * @param nick The nick of the user whose modes were changed
 		 * @param add Whether the SNOmask in question was added or removed; true if it was added
 		 * @param snomask The snomask that was added or removed
 		 * @see callUserSNOMaskHooks
 		 */
-		void modUserSNOMaskHook(std::string server, std::string client, bool add, char snomask);
+		void modUserSNOMaskHook(std::string server, std::string nick, bool add, char snomask);
 		
 		/** Channel topic hook thread
 		 * This function makes channel topic hook calls "nonblocking" by calling the function that actually makes the
 		 * hook calls in a new thread.  It is called by a protocol module when the topic of a channel is changed.
 		 * @param server The name of the server on which the topic was changed
-		 * @param client The identifier of the client receiving this notice
 		 * @param channel The channel whose topic was changed
 		 * @param setter The nick of the user who changed the topic
 		 * @param topic The new channel topic
 		 * @see callChanTopicHooks
 		 */
-		void modChanTopicHook(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
+		void modChanTopicHook(std::string server, std::string channel, std::string setter, std::string topic);
 		
 		/** Channel join hook thread
 		 * This function makes channel join hook calls "nonblocking" by calling the function that actually makes the
 		 * hook calls in a new thread.  It is called by a protocol module when someone joins a channel.
 		 * @param server The name of the server on which a user joined a channel
-		 * @param client The identifier of the client receiving the notice of joining
 		 * @param channel The channel that was joined
 		 * @param nick The nick of the user who joined
 		 * @see callChanJoinHooks
 		 */
-		void modChanJoinHook(std::string server, std::string client, std::string channel, std::string nick);
+		void modChanJoinHook(std::string server, std::string channel, std::string nick);
 		
 		/** Channel part hook thread
 		 * This function makes channel part hook calls "nonblocking" by calling the function that actually makes the
 		 * hook calls in a new thread.  It is called by a protocol module when someone parts a channel.
 		 * @param server The server on which a user parted a channel
-		 * @param client The identifier of the client receiving the notice of parting
 		 * @param channel The channel that was parted
 		 * @param nick The nick of the user who parted
 		 * @param reason The part reason given by the user
 		 * @see callChanPartHooks
 		 */
-		void modChanPartHook(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
+		void modChanPartHook(std::string server, std::string channel, std::string nick, std::string reason);
 		
 		/** Channel kick hook thread
 		 * This function makes channel kick hook calls "nonblocking" by calling the function that actually makes the
 		 * hook calls in a new thread.  It is called by a protocol module when someone kicks a user from a channel.
 		 * @param server The server on which someone was kicked
-		 * @param client The identifier of the client that received the kick notice
 		 * @param channel The channel from which the user was kicked
 		 * @param kicker The nick of the user who kicked
 		 * @param kickee The nick of the user who was kicked
 		 * @param reason The reason given for the kick
 		 */
-		void modChanKickHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void modChanKickHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		
 		/** User connect hook thread
 		 * This function makes user connect hook calls "nonblocking" by calling the function that actually makes the
@@ -325,23 +320,21 @@ class Base {
 		 * This function makes user quit hook calls "nonblocking" by calling the function that actually makes the hook
 		 * calls in a new thread.  It is called by a protocol module when someone quits from the network.
 		 * @param server The server on the network from which the user quit
-		 * @param client The identifier of the client receiving the notice of quitting
 		 * @param nick The nick of the user who quit
 		 * @param reason The quit reason given
 		 * @see callUserQuitHooks
 		 */
-		void modUserQuitHook(std::string server, std::string client, std::string nick, std::string reason);
+		void modUserQuitHook(std::string server, std::string nick, std::string reason);
 		
 		/** User nick hook thread
 		 * This function makes user quit hook calls "nonblocking" by calling the function that actually makes the hook
 		 * calls in a new thread.  It is called by a protocol module when someone changes their nick.
 		 * @param server The server on which the user changed their nick
-		 * @param client The identifier of the client receiving the nick change notice
 		 * @param oldNick The original nick of the user
 		 * @param newNick The new nick of the user
 		 * @see callUserNickHooks
 		 */
-		void modUserNickHook(std::string server, std::string client, std::string oldNick, std::string newNick);
+		void modUserNickHook(std::string server, std::string oldNick, std::string newNick);
 		
 		/** Numeric hook thread
 		 * This function makes numeric hook calls "nonblocking" by calling the function that actually makes the hook
@@ -983,7 +976,6 @@ class Base {
 		/** Channel mode hook handler
 		 * This function calls the hooks in modules for modes set in channels.
 		 * @param server The server on which a channel mode was changed
-		 * @param client The identifier of the client that received notice of a channel mode change
 		 * @param channel The channel in which the mode was changed
 		 * @param setter The nick of the user who changed the channel mode
 		 * @param add Whether the mode is being set or unset, true if set
@@ -991,70 +983,66 @@ class Base {
 		 * @param param The mode parameter, if given; empty string if no parameter
 		 * @see modChanModeHook
 		 */
-		void callChanModeHooks(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
+		void callChanModeHooks(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		
 		/** User mode hook handler
 		 * This function calls the hooks in modules for modes set on a user.
 		 * @param server The server on which a user mode was changed
-		 * @param client The identifier of the client that had its user modes changed
+		 * @param nick The nick of the user whose modes were changed
 		 * @param add Whether the mode is being set or unset, true if set
 		 * @param mode The long name of the mode being changed
 		 * @see modUserModeHook
 		 */
-		void callUserModeHooks(std::string server, std::string client, bool add, std::string mode);
+		void callUserModeHooks(std::string server, std::string nick, bool add, std::string mode);
 		
 		/** User SNOmask hook handler
 		 * This function calls the hooks in modules for SNOmasks set on a user.
 		 * @param server The server on which a SNOmask was changed
-		 * @param client The identifier of the client that had its SNOmask changed
+		 * @param nick The nick of a user whose SNOmasks were changed
 		 * @param add Whether the SNOmask is being set or unset, true if set
 		 * @param snomask The SNOmask being set
 		 * @see modUserSNOMaskHook
 		 */
-		void callUserSNOMaskHooks(std::string server, std::string client, bool add, char snomask);
+		void callUserSNOMaskHooks(std::string server, std::string nick, bool add, char snomask);
 		
 		/** Channel topic hook handler
 		 * This function calls the hooks in modules for channel topic changes.
 		 * @param server The server on which a topic was changed
-		 * @param client The identifier of the client that saw the topic change
 		 * @param channel The channel in which the topic was changed
 		 * @param setter The nick of the user who changed the topic
 		 * @param topic The new channel topic
 		 * @see modChanTopicHook
 		 */
-		void callChanTopicHooks(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
+		void callChanTopicHooks(std::string server, std::string channel, std::string setter, std::string topic);
 		
 		/** Channel join hook handler
 		 * This function calls the hooks in modules for channel joins.
 		 * @param server The server on which a channel was joined.
-		 * @param client The identifier of the client that saw the channel join
 		 * @param channel The channel that was joined
 		 * @param nick The nick of the user who joined
 		 * @see modChanJoinHook
 		 */
-		void callChanJoinHooks(std::string server, std::string client, std::string channel, std::string nick);
+		void callChanJoinHooks(std::string server, std::string channel, std::string nick);
 		
 		/** Channel part hook handler
 		 * This function calls the hooks in modules for channel parts.
 		 * @param server The server on which a channel was parted.
-		 * @param client The identifier of the client that saw the channel part
 		 * @param channel The channel that was parted
 		 * @param nick The nick of the user who parted
 		 * @param reason The part reason given
 		 * @see modChanPartHook
 		 */
-		void callChanPartHooks(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
+		void callChanPartHooks(std::string server, std::string channel, std::string nick, std::string reason);
 		
 		/** Channel kick hook handler
 		 * This function calls the hooks in modules for channel kicks.
 		 * @param server The server on which a user was kicked
-		 * @param client The identifier of the client that saw the channel kick
 		 * @param channel The channel from which the user was kicked
 		 * @param kicker The nick of the user who kicked
 		 * @param kickee The nick of the user who was kicked
 		 * @param reason The kick reason given
 		 */
-		void callChanKickHooks(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		void callChanKickHooks(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		
 		/** User connect hook handler
 		 * This function calls the hooks in modules for user connections.
@@ -1067,22 +1055,20 @@ class Base {
 		/** User quit hook handler
 		 * This function calls the hooks in modules for user quits.
 		 * @param server The server on which the quit was seen
-		 * @param client The identifier of the client that saw the quit
 		 * @param nick The nick of the user who quit
 		 * @param reason The quit reason given
 		 * @see modUserQuitHook
 		 */
-		void callUserQuitHooks(std::string server, std::string client, std::string nick, std::string reason);
+		void callUserQuitHooks(std::string server, std::string nick, std::string reason);
 		
 		/** User nick change hook handler
 		 * This function calls the hooks in modules for user nick changes.
 		 * @param server The server on which the nick was changed
-		 * @param client The client that saw the nick change
 		 * @param oldNick The old nick of the user
 		 * @param newNick The new nick of the user
 		 * @see modUserNickHook
 		 */
-		void callUserNickHooks(std::string server, std::string client, std::string oldNick, std::string newNick);
+		void callUserNickHooks(std::string server, std::string oldNick, std::string newNick);
 		
 		/** Numeric hook handler
 		 * This function calls the hooks in modules for numerics.

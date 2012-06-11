@@ -62,25 +62,25 @@ MsgAction Module::onUserCTCPReply(std::string server, std::string client, std::s
 	return MSG_CONTINUE;
 }
 
-void Module::onChanMode(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param) {}
+void Module::onChanMode(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param) {}
 
-void Module::onUserMode(std::string server, std::string client, bool add, std::string mode) {}
+void Module::onUserMode(std::string server, std::string nick, bool add, std::string mode) {}
 
-void Module::onUserSNOMask(std::string server, std::string client, bool add, char snomask) {}
+void Module::onUserSNOMask(std::string server, std::string nick, bool add, char snomask) {}
 
-void Module::onChanTopic(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {}
+void Module::onChanTopic(std::string server, std::string channel, std::string setter, std::string topic) {}
 
-void Module::onChanJoin(std::string server, std::string client, std::string channel, std::string nick) {}
+void Module::onChanJoin(std::string server, std::string channel, std::string nick) {}
 
-void Module::onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {}
+void Module::onChanPart(std::string server, std::string channel, std::string nick, std::string reason) {}
 
-void Module::onChanKick(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
+void Module::onChanKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {}
 
 void Module::onUserConnect(std::string server, std::string nick) {}
 
-void Module::onUserQuit(std::string server, std::string client, std::string nick, std::string reason) {}
+void Module::onUserQuit(std::string server, std::string nick, std::string reason) {}
 
-void Module::onUserNick(std::string server, std::string client, std::string oldNick, std::string newNick) {}
+void Module::onUserNick(std::string server, std::string oldNick, std::string newNick) {}
 
 void Module::onNumeric(std::string server, std::string client, std::string numeric, std::vector<std::string> data) {}
 

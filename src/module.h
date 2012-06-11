@@ -199,71 +199,66 @@ class Module {
 		/** Channel mode hook
 		 * This function is called when a channel mode change is received by the bot, allowing modules to react.
 		 * @param server The server on which the channel mode change was issued
-		 * @param client The identifier of the client that received notice of the channel mode change
 		 * @param channel The channel on which the modes were changed
 		 * @param setter The nick of the user who changed the modes
 		 * @param add Whether the mode was set (true) or unset (false)
 		 * @param mode The long name of the mode set or unset
 		 * @param param The mode parameter, if given
 		 */
-		virtual void onChanMode(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param);
+		virtual void onChanMode(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		
 		/** User mode hook
 		 * This function is called when a user mode change is received by the bot, allowing modules to react.
 		 * @param server The server on which the user mode change was issued
-		 * @param client The identifier of the client whose usermode was changed
+		 * @param nick The nick of the user whose mode was changed
 		 * @param add Whether the mode was set (true) or unset (false)
 		 * @param mode The long name of the mode set or unset
 		 */
-		virtual void onUserMode(std::string server, std::string client, bool add, std::string mode);
+		virtual void onUserMode(std::string server, std::string nick, bool add, std::string mode);
 		
 		/** User SNOmask hook
 		 * This function is called when a user SNOmask change is received by the bot, allowing modules to react.
 		 * @param server The server on which the SNOmask was changed
-		 * @param client The identifier of the client whose SNOmask was changed
+		 * @param nick The nick of the user whose SNOmask was changed
 		 * @param add Whether the SNOmask type was added (true) or removed (false)
 		 * @param snomask The snomask char changed
 		 */
-		virtual void onUserSNOMask(std::string server, std::string client, bool add, char snomask);
+		virtual void onUserSNOMask(std::string server, std::string nick, bool add, char snomask);
 		
 		/** Channel topic hook
 		 * This function is called when a channel topic change is received by the bot, allowing modules to react.
 		 * @param server The server on which the topic was changed
-		 * @param client The identifier of the client that received the topic change notice
 		 * @param channel The channel whose topic was changed
 		 * @param setter The nick of the user who changed the topic
 		 * @param topic The new channel topic
 		 */
-		virtual void onChanTopic(std::string server, std::string client, std::string channel, std::string setter, std::string topic);
+		virtual void onChanTopic(std::string server, std::string channel, std::string setter, std::string topic);
 		
 		/** Channel join hook
 		 * This function is called when a channel join is received by the bot, allowing modules to react.
 		 * @param server The server on which a channel was joined
-		 * @param client The identifier of the client that received the channel join notice
 		 * @param channel The channel that was joined
 		 * @param nick The nick of the user who joined
 		 */
-		virtual void onChanJoin(std::string server, std::string client, std::string channel, std::string nick);
+		virtual void onChanJoin(std::string server, std::string channel, std::string nick);
 		
 		/** Channel part hook
 		 * This function is called when a channel part is received by the bot, allowing modules to react.
 		 * @param server The server on which a channel was parted
-		 * @param client The identifier of the client that received the channel part notice
 		 * @param channel The channel that was parted
 		 * @param nick The nick of the user who parted
 		 */
-		virtual void onChanPart(std::string server, std::string client, std::string channel, std::string nick, std::string reason);
+		virtual void onChanPart(std::string server, std::string channel, std::string nick, std::string reason);
 		
 		/** Channel kick hook
 		 * This function is called when a channel kick is received by the bot, allowing modules to react.
 		 * @param server The server on which a user was kicked
-		 * @param client The identifier of the client that received the kick notice
 		 * @param channel The channel from which the user was kicked
 		 * @param kicker The nick of the user who kicked
 		 * @param kickee The nick of the user who was kicked
 		 * @param reason The kick reason
 		 */
-		virtual void onChanKick(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason);
+		virtual void onChanKick(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason);
 		
 		/** User connect hook
 		 * This function is called when a user connect notice is received by the bot, allowing modules to react.
@@ -275,20 +270,18 @@ class Module {
 		/** User quit hook
 		 * This function is called when a user quit notice is received by the bot, allowing modules to react.
 		 * @param server The server on the network from which the user quit
-		 * @param client The identifier of the client that received the quit notice
 		 * @param nick The nick of the user who quit
 		 * @param reason The quit reason
 		 */
-		virtual void onUserQuit(std::string server, std::string client, std::string nick, std::string reason);
+		virtual void onUserQuit(std::string server, std::string nick, std::string reason);
 		
 		/** User nick hook
 		 * This function is called when a nick change is received by the bot, allowing modules to react.
 		 * @param server The server on which the nick was changed
-		 * @param client The identifier of the client that received the nick change notice
 		 * @param oldNick The old nick of the user
 		 * @param newNick The new nick of the user
 		 */
-		virtual void onUserNick(std::string server, std::string client, std::string oldNick, std::string newNick);
+		virtual void onUserNick(std::string server, std::string oldNick, std::string newNick);
 		
 		/** Numeric hook
 		 * This function is called when a numeric is received by the bot, allowing modules to react.

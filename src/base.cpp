@@ -305,38 +305,38 @@ void Base::modUserCTCPReplyHook(std::string server, std::string client, std::str
 	callHooks.detach();
 }
 
-void Base::modChanModeHook(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
-	std::thread callHooks(callChanModeHooks, server, client, channel, setter, add, mode, param);
+void Base::modChanModeHook(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
+	std::thread callHooks(callChanModeHooks, server, channel, setter, add, mode, param);
 	callHooks.detach();
 }
 
-void Base::modUserModeHook(std::string server, std::string client, bool add, std::string mode) {
-	std::thread callHooks(callUserModeHooks, server, client, add, mode);
+void Base::modUserModeHook(std::string server, std::string nick, bool add, std::string mode) {
+	std::thread callHooks(callUserModeHooks, server, nick, add, mode);
 	callHooks.detach();
 }
 
-void Base::modUserSNOMaskHook(std::string server, std::string client, bool add, char snomask) {
-	std::thread callHooks(callUserSNOMaskHooks, server, client, add, snomask);
+void Base::modUserSNOMaskHook(std::string server, std::string nick, bool add, char snomask) {
+	std::thread callHooks(callUserSNOMaskHooks, server, nick, add, snomask);
 	callHooks.detach();
 }
 
-void Base::modChanTopicHook(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {
-	std::thread callHooks(callChanTopicHooks, server, client, channel, setter, topic);
+void Base::modChanTopicHook(std::string server, std::string channel, std::string setter, std::string topic) {
+	std::thread callHooks(callChanTopicHooks, server, channel, setter, topic);
 	callHooks.detach();
 }
 
-void Base::modChanJoinHook(std::string server, std::string client, std::string channel, std::string nick) {
-	std::thread callHooks(callChanJoinHooks, server, client, channel, nick);
+void Base::modChanJoinHook(std::string server, std::string channel, std::string nick) {
+	std::thread callHooks(callChanJoinHooks, server, channel, nick);
 	callHooks.detach();
 }
 
-void Base::modChanPartHook(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
-	std::thread callHooks(callChanPartHooks, server, client, channel, nick, reason);
+void Base::modChanPartHook(std::string server, std::string channel, std::string nick, std::string reason) {
+	std::thread callHooks(callChanPartHooks, server, channel, nick, reason);
 	callHooks.detach();
 }
 
-void Base::modChanKickHook(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	std::thread callHooks(callChanKickHooks, server, client, channel, kicker, kickee, reason);
+void Base::modChanKickHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	std::thread callHooks(callChanKickHooks, server, channel, kicker, kickee, reason);
 	callHooks.detach();
 }
 
@@ -345,13 +345,13 @@ void Base::modUserConnectHook(std::string server, std::string nick) {
 	callHooks.detach();
 }
 
-void Base::modUserQuitHook(std::string server, std::string client, std::string nick, std::string reason) {
-	std::thread callHooks(callUserQuitHooks, server, client, nick, reason);
+void Base::modUserQuitHook(std::string server, std::string nick, std::string reason) {
+	std::thread callHooks(callUserQuitHooks, server, nick, reason);
 	callHooks.detach();
 }
 
-void Base::modUserNickHook(std::string server, std::string client, std::string oldNick, std::string newNick) {
-	std::thread callHooks(callUserNickHooks, server, client, oldNick, newNick);
+void Base::modUserNickHook(std::string server, std::string oldNick, std::string newNick) {
+	std::thread callHooks(callUserNickHooks, server, oldNick, newNick);
 	callHooks.detach();
 }
 
@@ -841,108 +841,108 @@ void Base::callUserCTCPReplyHooks(std::string server, std::string client, std::s
 	modHookMutex.unlock();
 }
 
-void Base::callChanModeHooks(std::string server, std::string client, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
+void Base::callChanModeHooks(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanMode(server, client, channel, setter, add, mode, param);
+		module.second->onChanMode(server, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanMode(server, client, channel, setter, add, mode, param);
+		module.second->onChanMode(server, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanMode(server, client, channel, setter, add, mode, param);
+		module.second->onChanMode(server, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanMode(server, client, channel, setter, add, mode, param);
+		module.second->onChanMode(server, channel, setter, add, mode, param);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanMode(server, client, channel, setter, add, mode, param);
+		module.second->onChanMode(server, channel, setter, add, mode, param);
 	modHookMutex.unlock();
 }
 
-void Base::callUserModeHooks(std::string server, std::string client, bool add, std::string mode) {
+void Base::callUserModeHooks(std::string server, std::string nick, bool add, std::string mode) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onUserMode(server, client, add, mode);
+		module.second->onUserMode(server, nick, add, mode);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onUserMode(server, client, add, mode);
+		module.second->onUserMode(server, nick, add, mode);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onUserMode(server, client, add, mode);
+		module.second->onUserMode(server, nick, add, mode);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onUserMode(server, client, add, mode);
+		module.second->onUserMode(server, nick, add, mode);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onUserMode(server, client, add, mode);
+		module.second->onUserMode(server, nick, add, mode);
 	modHookMutex.unlock();
 }
 
-void Base::callUserSNOMaskHooks(std::string server, std::string client, bool add, char snomask) {
+void Base::callUserSNOMaskHooks(std::string server, std::string nick, bool add, char snomask) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onUserSNOMask(server, client, add, snomask);
+		module.second->onUserSNOMask(server, nick, add, snomask);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onUserSNOMask(server, client, add, snomask);
+		module.second->onUserSNOMask(server, nick, add, snomask);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onUserSNOMask(server, client, add, snomask);
+		module.second->onUserSNOMask(server, nick, add, snomask);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onUserSNOMask(server, client, add, snomask);
+		module.second->onUserSNOMask(server, nick, add, snomask);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onUserSNOMask(server, client, add, snomask);
+		module.second->onUserSNOMask(server, nick, add, snomask);
 	modHookMutex.unlock();
 }
 
-void Base::callChanTopicHooks(std::string server, std::string client, std::string channel, std::string setter, std::string topic) {
+void Base::callChanTopicHooks(std::string server, std::string channel, std::string setter, std::string topic) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanTopic(server, client, channel, setter, topic);
+		module.second->onChanTopic(server, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanTopic(server, client, channel, setter, topic);
+		module.second->onChanTopic(server, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanTopic(server, client, channel, setter, topic);
+		module.second->onChanTopic(server, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanTopic(server, client, channel, setter, topic);
+		module.second->onChanTopic(server, channel, setter, topic);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanTopic(server, client, channel, setter, topic);
+		module.second->onChanTopic(server, channel, setter, topic);
 	modHookMutex.unlock();
 }
 
-void Base::callChanJoinHooks(std::string server, std::string client, std::string channel, std::string nick) {
+void Base::callChanJoinHooks(std::string server, std::string channel, std::string nick) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanJoin(server, client, channel, nick);
+		module.second->onChanJoin(server, channel, nick);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanJoin(server, client, channel, nick);
+		module.second->onChanJoin(server, channel, nick);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanJoin(server, client, channel, nick);
+		module.second->onChanJoin(server, channel, nick);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanJoin(server, client, channel, nick);
+		module.second->onChanJoin(server, channel, nick);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanJoin(server, client, channel, nick);
+		module.second->onChanJoin(server, channel, nick);
 	modHookMutex.unlock();
 }
 
-void Base::callChanPartHooks(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
+void Base::callChanPartHooks(std::string server, std::string channel, std::string nick, std::string reason) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanPart(server, client, channel, nick, reason);
+		module.second->onChanPart(server, channel, nick, reason);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanPart(server, client, channel, nick, reason);
+		module.second->onChanPart(server, channel, nick, reason);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanPart(server, client, channel, nick, reason);
+		module.second->onChanPart(server, channel, nick, reason);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanPart(server, client, channel, nick, reason);
+		module.second->onChanPart(server, channel, nick, reason);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanPart(server, client, channel, nick, reason);
+		module.second->onChanPart(server, channel, nick, reason);
 	modHookMutex.unlock();
 }
 
-void Base::callChanKickHooks(std::string server, std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+void Base::callChanKickHooks(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onChanKick(server, client, channel, kicker, kickee, reason);
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
 	modHookMutex.unlock();
 }
 
@@ -961,33 +961,33 @@ void Base::callUserConnectHooks(std::string server, std::string nick) {
 	modHookMutex.unlock();
 }
 
-void Base::callUserQuitHooks(std::string server, std::string client, std::string nick, std::string reason) {
+void Base::callUserQuitHooks(std::string server, std::string nick, std::string reason) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onUserQuit(server, client, nick, reason);
+		module.second->onUserQuit(server, nick, reason);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onUserQuit(server, client, nick, reason);
+		module.second->onUserQuit(server, nick, reason);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onUserQuit(server, client, nick, reason);
+		module.second->onUserQuit(server, nick, reason);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onUserQuit(server, client, nick, reason);
+		module.second->onUserQuit(server, nick, reason);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onUserQuit(server, client, nick, reason);
+		module.second->onUserQuit(server, nick, reason);
 	modHookMutex.unlock();
 }
 
-void Base::callUserNickHooks(std::string server, std::string client, std::string oldNick, std::string newNick) {
+void Base::callUserNickHooks(std::string server, std::string oldNick, std::string newNick) {
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onUserNick(server, client, oldNick, newNick);
+		module.second->onUserNick(server, oldNick, newNick);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onUserNick(server, client, oldNick, newNick);
+		module.second->onUserNick(server, oldNick, newNick);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onUserNick(server, client, oldNick, newNick);
+		module.second->onUserNick(server, oldNick, newNick);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onUserNick(server, client, oldNick, newNick);
+		module.second->onUserNick(server, oldNick, newNick);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onUserNick(server, client, oldNick, newNick);
+		module.second->onUserNick(server, oldNick, newNick);
 	modHookMutex.unlock();
 }
 

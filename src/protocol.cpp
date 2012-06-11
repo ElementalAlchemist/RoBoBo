@@ -128,44 +128,44 @@ void Protocol::callUserCTCPReplyHook(std::string client, std::string nick, std::
 		bot->modUserCTCPReplyHook(serverName, client, nick, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
 }
 
-void Protocol::callChanModeHook(std::string client, std::string channel, bool add, std::string mode, std::string param) {
-	bot->modChanModeHook(serverName, client, channel, add, mode, param);
+void Protocol::callChanModeHook(std::string channel, bool add, std::string mode, std::string param) {
+	bot->modChanModeHook(serverName, channel, add, mode, param);
 }
 
-void Protocol::callUserModeHook(std::string client, bool add, std::string mode) {
-	bot->modUserModeHook(serverName, client, add, mode);
+void Protocol::callUserModeHook(std::string nick, bool add, std::string mode) {
+	bot->modUserModeHook(serverName, nick, add, mode);
 }
 
-void Protocol::callUserSNOMaskHook(std::string client, bool add, char snomask) {
-	bot->modUserSNOMaskHook(serverName, client, add, snomask);
+void Protocol::callUserSNOMaskHook(std::string nick, bool add, char snomask) {
+	bot->modUserSNOMaskHook(serverName, nick, add, snomask);
 }
 
-void Protocol::callChanTopicHook(std::string client, std::string channel, std::string topic) {
-	bot->modChanTopicHook(serverName, client, channel, topic);
+void Protocol::callChanTopicHook(std::string channel, std::string topic) {
+	bot->modChanTopicHook(serverName, channel, topic);
 }
 
-void Protocol::callChanJoinHook(std::string client, std::string channel, std::string nick) {
-	bot->modChanJoinHook(serverName, client, channel, nick);
+void Protocol::callChanJoinHook(std::string channel, std::string nick) {
+	bot->modChanJoinHook(serverName, channel, nick);
 }
 
-void Protocol::callChanPartHook(std::string client, std::string channel, std::string nick, std::string reason) {
-	bot->modChanPartHook(serverName, client, channel, nick, reason);
+void Protocol::callChanPartHook(std::string channel, std::string nick, std::string reason) {
+	bot->modChanPartHook(serverName, channel, nick, reason);
 }
 
-void Protocol::callChanKickHook(std::string client, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	bot->modChanKickHook(serverName, client, channel, kicker, kickee, reason);
+void Protocol::callChanKickHook(std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	bot->modChanKickHook(serverName, channel, kicker, kickee, reason);
 }
 
 void Protocol::callUserConnectHook(std::string nick) {
 	bot->modUserConnectHook(serverName, nick);
 }
 
-void Protocol::callUserQuitHook(std::string client, std::string nick, std::string reason) {
-	bot->modUserQuitHook(serverName, client, nick, reason);
+void Protocol::callUserQuitHook(std::string nick, std::string reason) {
+	bot->modUserQuitHook(serverName, nick, reason);
 }
 
-void Protocol::callUserNickHook(std::string client, std::string oldNick, std::string newNick) {
-	bot->modUserNickHook(serverName, client, oldNick, newNick);
+void Protocol::callUserNickHook(std::string oldNick, std::string newNick) {
+	bot->modUserNickHook(serverName, oldNick, newNick);
 }
 
 void Protocol::callNumericHook(std::string client, std::string numeric, std::vector<std::string> data) {
