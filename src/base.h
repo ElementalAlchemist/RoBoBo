@@ -852,7 +852,7 @@ class Base {
 		 * serverConfig: holds server configuration
 		 * moduleConfig: holds module configuration
 		 */
-		std::unordered_map<std::string, std::unordered_map<std::string, std::string>> serverConfig, moduleConfig;
+		std::map<std::string, std::map<std::string, std::string>> serverConfig, moduleConfig;
 		/** Startup variables
 		 * startupServers: holds a list of servers to connect on startup
 		 * startupModules: holds a list of modules to load on startup
