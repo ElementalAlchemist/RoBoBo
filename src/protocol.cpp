@@ -36,13 +36,13 @@ void Protocol::partChannel(std::string client, std::string channel, std::string 
 
 void Protocol::kickUser(std::string client, std::string channel, std::string nick, std::string reason) {}
 
+void Protocol::changeNick(std::string client, std::string newNick) {}
+
 std::string Protocol::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
 	return "";
 }
 
 void Protocol::removeClient(std::string client) {}
-
-void Protocol::changeNick(std::string client, std::string newNick) {}
 
 void Protocol::oper(std::string client, std::string username, std::string password) {}
 
@@ -156,16 +156,16 @@ void Protocol::callChanKickHook(std::string channel, std::string kicker, std::st
 	bot->modChanKickHook(serverName, channel, kicker, kickee, reason);
 }
 
+void Protocol::callUserNickHook(std::string oldNick, std::string newNick) {
+	bot->modUserNickHook(serverName, oldNick, newNick);
+}
+
 void Protocol::callUserConnectHook(std::string nick) {
 	bot->modUserConnectHook(serverName, nick);
 }
 
 void Protocol::callUserQuitHook(std::string nick, std::string reason) {
 	bot->modUserQuitHook(serverName, nick, reason);
-}
-
-void Protocol::callUserNickHook(std::string oldNick, std::string newNick) {
-	bot->modUserNickHook(serverName, oldNick, newNick);
 }
 
 void Protocol::callNumericHook(std::string client, std::string numeric, std::vector<std::string> data) {
