@@ -83,9 +83,16 @@ LoadResult Base::loadModule(std::string modName) {
 	}
 	// The spawn function of modules returns a module instance that we can use
 	module_spawn_t moduleSpawn = dlsym(modFile, "spawn");
+	const char* spawnError = dlerror();
+	if (spawnError != NULL) {
+		std::cerr << "Spawn not found in module " << modName << ": " << spawnError << std::endl;
+		dlclose(modFile);
+		return LOAD_OPEN_ERROR;
+	}
 	Module* newModule = moduleSpawn(modName, moduleConfig[modName], workingDir, debugLevel, this);
 	if (newModule->apiVersion() != 3000) {
 		std::cerr << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl;
+		dlclose(modFile);
 		return LOAD_INCOMPATIBLE;
 	}
 	// Add the module to the appropriate module list according to its priority
@@ -238,7 +245,58 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 }
 
 void Base::connectServer(std::string server) {
-	// TODO: basically everything
+	if (servers.find(server) != servers.end())
+		return; // We're already connected!
+	std::map<std::string, std::map<std::string, std::string>>::iterator confIter = serverConfig.find(server);
+	if (confIter == serverConfig.end())
+		return;
+	std::string protoType = confIter->second["protocol"];
+	if (protoType == "") {
+		std::cerr << "A protocol type was not specified for the server " << server << ".  Please check your configuration and try again." << std::endl;
+		return;
+	}
+	std::unordered_map<std::string, void*>::iterator fileIter = protocolFiles.find(protoType);
+	if (fileIter != protocolFiles.end()) {
+		protocol_spawn_t protoSpawn = dlsym(fileIter->second, "spawn");
+		const char* spawnError = dlerror();
+		if (spawnError != NULL) {
+			std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
+			return;
+		}
+		Protocol* newServer = protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
+		if (newServer->apiVersion() != 3000) {
+			std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
+			return;
+		}
+		protocolTypes[protoType].insert(server);
+		servers.insert(std::pair<std::string, Protocol*> (server, newServer));
+		newServer->connectServer();
+		return; // Success!  Return now while we're ahead (so the other stuff doesn't execute)
+	}
+	std::string filename = workingDir + "/modules/p_" + protoType + ".so";
+	void* protoFile = dlopen(filename.c_str(), RTLD_NOW);
+	const char* fileOpenError = dlerror();
+	if (fileOpenError != NULL) {
+		std::cerr << "The protocol module for server " << server << " could not be found: " << fileOpenError << std::endl;
+		return;
+	}
+	protocol_spawn_t protoSpawn = dlsym(protoFile, "spawn");
+	const char* spawnError = dlerror();
+	if (spawnError != NULL) {
+		std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
+		dlclose(protoFile);
+		return;
+	}
+	Protocol* newServer = protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
+	if (newServer->apiVersion() != 3000) {
+		std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
+		dlclose(protoFile);
+		return;
+	}
+	protocolFiles.insert(std::pair<std::string, void*> (protoType, protoFile));
+	protocolTypes[protoType].insert(server);
+	servers.insert(std::pair<std::string, Protocol*> (server, newServer));
+	newServer->connectServer();
 }
 
 void Base::disconnectServer(std::string server) {

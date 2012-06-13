@@ -873,8 +873,14 @@ class Base {
 		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
 		/// Holds a description for each module
 		std::map<std::string, std::string> moduleDescriptions;
+		/// The protocol file handles returned by dlopen() for each protocol type
+		std::unordered_map<std::string, void*> protocolFiles;
+		/// Which protocol modules are of which type
+		std::unordered_map<std::string, std::set<std::string>> protocolTypes;
 		/// The socket file handles returned by dlopen() for each socket type
 		std::unordered_map<std::string, void*> socketFiles;
+		/// The number of a given type of socket open
+		std::unordered_map<std::string, size_t> socketCounts;
 		/// The mutex ensuring that module hooks are called one at a time
 		std::mutex modHookMutex;
 		
