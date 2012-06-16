@@ -767,15 +767,6 @@ class Base {
 		 */
 		void removeClient(std::string server, std::string client);
 		
-		/** Change nick
-		 * Called when a module wants to change a client's nick, this function forwards the request to the
-		 * appropriate protocol module.
-		 * @param server The server on which to change a nick
-		 * @param client The identifier of the client whose nick we wish to change
-		 * @param newNick The new nick for the client
-		 */
-		void changeNick(std::string server, std::string client, std::string newNick);
-		
 		/** Oper
 		 * Called when a module wants a client to oper up on a server, this function forwards the request to
 		 * the appropriate protocol module.

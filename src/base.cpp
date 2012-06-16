@@ -263,7 +263,7 @@ void Base::connectServer(std::string server) {
 			std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
 			return;
 		}
-		Protocol* newServer = static_cast<Protocol*>(protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this)
+		Protocol* newServer = static_cast<Protocol*>(protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this));
 		if (newServer->apiVersion() != 3000) {
 			std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 			return;
@@ -574,19 +574,19 @@ void Base::partChannel(std::string server, std::string client, std::string chann
 	
 }
 
-std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
-	
-}
-
-void Base::removeClient(std::string server, std::string client) {
-	
-}
-
 void Base::changeNick(std::string server, std::string client, std::string newNick) {
 	
 }
 
 void Base::kickUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
+	
+}
+
+std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
+	
+}
+
+void Base::removeClient(std::string server, std::string client) {
 	
 }
 
