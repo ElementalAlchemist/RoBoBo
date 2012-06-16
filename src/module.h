@@ -37,9 +37,7 @@ class Module {
 		 */
 		virtual ~Module();
 		
-		/** The module's priority
-		 * @see enum Priority
-		 */
+		/// The module's priority
 		const Priority priority;
 		
 		/// The module API version with which the module is compatible
