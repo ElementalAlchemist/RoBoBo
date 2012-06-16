@@ -534,7 +534,7 @@ void Base::modUserCTCPReplyOutHook(std::string server, std::string client, std::
 }
 
 void Base::modUserCTCPReplySendHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	std::thread callHooks(ccallUserCTCPReplySendHooks, server, client, nick, ctcp, params);
+	std::thread callHooks(callUserCTCPReplySendHooks, server, client, nick, ctcp, params);
 	callHooks.detach();
 }
 
