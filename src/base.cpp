@@ -128,6 +128,7 @@ LoadResult Base::loadModule(std::string modName) {
 				unloadModule(modName, false);
 				return LOAD_NODEPENDS;
 			}
+			moduleRequires[requirement].push_back(modName);
 			moduleSupports[requirement].push_back(modName);
 		}
 		std::list<std::string> modSupports = newModule->supports();
@@ -208,6 +209,8 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 	}
 	for (std::pair<std::string, std::list<std::string>> service : moduleServices)
 		service.second.remove(modName);
+	for (std::pair<std::string, std::list<std::string>> service : moduleRequires)
+		service.second.remove(modName);
 	for (std::pair<std::string, std::list<std::string>> service : moduleSupports)
 		service.second.remove(modName);
 	std::map<std::string, Module*>::iterator modEntry;
@@ -242,6 +245,16 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 	moduleDescriptions.erase(moduleDescriptions.find(modName));
 	dlclose(moduleFiles[modName]);
 	moduleFiles.erase(moduleFiles.find(modName));
+	// Unload modules that require unsatisfied dependencies
+	std::list<std::string> unloadList; // Use an list of modules to unload in case another unload screws up the service loops
+	for (std::pair<std::string, std::list<std::string>> service : moduleServices) {
+		if (service.second.empty()) {
+			for (std::string modName : moduleRequires[service.first])
+				unloadList.push_back(modName);
+		}
+	}
+	for (std::string modName : unloadList)
+		unloadModule(modName);
 }
 
 void Base::connectServer(std::string server) {

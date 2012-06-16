@@ -861,7 +861,7 @@ class Base {
 		 * moduleServices: holds a list of modules providing each given service
 		 * moduleSupports: holds a list of modules using each given service
 		 */
-		std::map<std::string, std::list<std::string>> moduleServices, moduleSupports;
+		std::map<std::string, std::list<std::string>> moduleServices, moduleRequires, moduleSupports;
 		/// Holds a description for each module
 		std::map<std::string, std::string> moduleDescriptions;
 		/// The protocol file handles returned by dlopen() for each protocol type
