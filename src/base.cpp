@@ -556,79 +556,136 @@ void Base::modUserCTCPReplySendHook(std::string server, std::string client, std:
 }
 
 void Base::sendPrivMsg(std::string server, std::string client, std::string target, std::string message) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendPrivMsg(client, target, message);
 }
 
 void Base::sendNotice(std::string server, std::string client, std::string target, std::string message) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendNotice(client, target, message);
 }
 
 void Base::sendCTCP(std::string server, std::string client, std::string target, std::string ctcp, std::string params) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendCTCP(client, target, ctcp, params);
 }
 
 void Base::sendCTCPReply(std::string server, std::string client, std::string target, std::string ctcp, std::string params) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendCTCPReply(client, target, ctcp, param);
 }
 
 void Base::setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->setMode(client, target, setModes, delModes);
 }
 
 void Base::setSNOMask(std::string server, std::string client, char snomask, bool add) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->setSNOMask(client, snomask, add);
 }
 
 void Base::setChanTopic(std::string server, std::string client, std::string channel, std::string topic) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->setChanTopic(client, channel, topic);
 }
 
 void Base::joinChannel(std::string server, std::string client, std::string channel, std::string key) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->joinChannel(client, channel, key);
 }
 
 void Base::partChannel(std::string server, std::string client, std::string channel, std::string reason) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->partChannel(client, channel, reason);
 }
 
 void Base::changeNick(std::string server, std::string client, std::string newNick) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->changeNick(client, newNick);
 }
 
 void Base::kickUser(std::string server, std::string client, std::string channel, std::string nick, std::string reason) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->changeNick(client, channel, nick, reason);
 }
 
 std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	servIter->second->addClient(nick, ident, host, gecos);
 }
 
 void Base::removeClient(std::string server, std::string client) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->removeClient(client);
 }
 
 void Base::oper(std::string server, std::string client, std::string username, std::string password) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->oper(client, username, password);
 }
 
 void Base::sendSNotice(std::string server, char snomask, std::string message) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendSNotice(snomask, message);
 }
 
 void Base::setMetadata(std::string server, std::string target, std::string key, std::string value) {
-	
+	std::map<std:string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->setMetadata(target, key, value);
 }
 
 void Base::setXLine(std::string server, std::string client, std::string linetype, std::string mask, time_t duration, std::string reason) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->setXLine(client, linetype, mask, duration, reason);
 }
 
 void Base::delXLine(std::string server, std::string client, std::string linetype, std::string mask) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->delXLine(client, linetype, mask);
 }
 
 void Base::sendOtherData(std::string server, std::string client, std::string line) {
-	
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendOtherData(client, line);
 }
 
 std::list<std::string> Base::activeServers() {
