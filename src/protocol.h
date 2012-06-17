@@ -56,6 +56,12 @@ class Protocol {
 		 */
 		bool shouldReset();
 		
+		/** Client check
+		 * Checks whether this type of protocol module connects as a client.
+		 * @return true if it uses a client connection, false if it uses a server-to-server connection
+		 */
+		virtual bool isClient();
+		
 		
 		/** Send message
 		 * This function is called when something wants to send a message on this server.

@@ -16,6 +16,10 @@ bool Protocol::shouldReset() {
 	return resetConnection;
 }
 
+bool Protocol::isClient() {
+	return false;
+}
+
 void Protocol::sendPrivMsg(std::string client, std::string target, std::string message) {}
 
 void Protocol::sendNotice(std::string client, std::string target, std::string message) {}
