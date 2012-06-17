@@ -30,6 +30,7 @@ class Protocol {
 		 * This function must be defined by implementing modules.
 		 * It serves to check that the protocol module API for which the module in question was written is the
 		 * one in use by the bot core.  If not, the module is unloaded.
+		 * @return API version
 		 */
 		virtual unsigned int apiVersion() = 0;
 		

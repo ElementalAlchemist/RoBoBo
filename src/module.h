@@ -40,7 +40,11 @@ class Module {
 		/// The module's priority
 		const Priority priority;
 		
-		/// The module API version with which the module is compatible
+		/** Module API version
+		 * This function checks whether the module API version for which the module is written is compatible with
+		 * the existing API version.
+		 * @return API version
+		 */
 		virtual unsigned int apiVersion() = 0;
 		
 		/** Load completion hook

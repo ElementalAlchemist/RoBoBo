@@ -18,6 +18,13 @@ class Socket {
 		 */
 		virtual ~Socket();
 		
+		/** API version
+		 * This function checks that the socket module API for which the socket module was written matches
+		 * the current socket module API.
+		 * @return API version
+		 */
+		virtual unsigned int apiVersion() = 0;
+		
 		/** Connect to server
 		 * This function is called when a protocol module is ready to begin a connection to the IRC server.
 		 * @param server The server to which to connect
