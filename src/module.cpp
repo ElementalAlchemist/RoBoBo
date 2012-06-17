@@ -231,3 +231,182 @@ void Module::delXLine(std::string server, std::string client, std::string linety
 void Module::sendOtherData(std::string server, std::string client, std::string line) {
 	bot->sendOtherData(server, client, line);
 }
+
+std::list<std::string> Module::activeServers() {
+	return bot->activeServers();
+}
+
+std::list<std::string> Module::connectedServers() {
+	return bot->connectedServers();
+}
+
+bool Module::serverIsClient(std::string server) {
+	return bot->serverIsClient(server);
+}
+
+std::string Module::serverType(std::string server) {
+	return bot->serverType(server);
+}
+
+std::list<std::string> Module::serverListModes(std::string server) {
+	return bot->serverListModes(server);
+}
+
+std::list<std::string> Module::serverParamModes(std::string server) {
+	return bot->serverParamModes(server);
+}
+
+std::list<std::string> Module::serverModes(std::string server) {
+	return bot->serverModes(server);
+}
+
+std::list<std::pair<std::string, char>> Module::serverStatuses(std::string server) {
+	return bot->serverStatuses(server);
+}
+
+std::list<std::string> Module::channels(std::string server) {
+	return bot->channels(server);
+}
+
+std::list<std::string> Module::inChannels(std::string server, std::string client) {
+	return bot->inChannels(server, client);
+}
+
+std::list<std::string> Module::channelUsers(std::string server, std::string channel) {
+	return bot->channelUsers(server, channel);
+}
+
+bool Module::userInChannel(std::string server, std::string channel, std::string user) {
+	return bot->userInChannel(server, channel, user);
+}
+
+std::string Module::channelTopic(std::string server, std::string channel) {
+	return bot->channelTopic(server, channel);
+}
+
+std::list<std::string> Module::channelModes(std::string server, std::string channel) {
+	return bot->channelModes(server, channel);
+}
+
+bool Module::channelHasMode(std::string server, std::string channel, std::string mode) {
+	return bot->channelHasMode(server, channel, mode);
+}
+
+std::string Module::modeParam(std::string server, std::string channel, std::string mode) {
+	return bot->modeParam(server, channel, mode);
+}
+
+std::list<std::string> Module::channelListMode(std::string server, std::string channel, std::string mode) {
+	return bot->channelListMode(server, channel, mode);
+}
+
+bool Module::channelListHasEntry(std::string server, std::string channel, std::string listMode, std::string entry) {
+	return bot->channelListHasEntry(server, channel, listMode, entry);
+}
+
+std::pair<std::string, char> Module::userStatus(std::string server, std::string channel, std::string user) {
+	return bot->userStatus(server, channel, user);
+}
+
+std::pair<std::string, char> Module::compareStatus(std::string server, std::string status0, std::string status1) {
+	return bot->compareStatus(server, status0, status1);
+}
+
+std::pair<std::string, char> Module::compareStatus(std::string server, std::string status0, char status1) {
+	return bot->compareStatus(server, status0, status1);
+}
+
+std::pair<std::string, char> Module::compareStatus(std::string server, char status0, std::string status1) {
+	return bot->compareStatus(server, status0, status1);
+}
+
+std::pair<std::string, char> Module::compareStatus(std::string server, char status0, char status1) {
+	return bot->compareStatus(server, status0, status1);
+}
+
+bool Module::userHasStatus(std::string server, std::string channel, std::string user, std::string status) {
+	return bot->userHasStatus(server, channel, user, status);
+}
+
+bool Module::userHasStatus(std::string server, std::string channel, std::string user, char status) {
+	return bot->userHasStatus(server, channel, user, status);
+}
+
+bool Module::userHasStatusOrGreater(std::string server, std::string channel, std::string user, std::string status) {
+	return bot->userHasStatusOrGreater(server, channel, user, status);
+}
+
+bool Module::userHasStatusOrGreater(std::string server, std::string channel, std::string user, char status) {
+	return bot->userHasStatusOrGreater(server, channel, user, status);
+}
+
+std::list<std::string> Module::clients(std::string server) {
+	return bot->clients(server);
+}
+
+std::list<std::string> Module::userModes(std::string server, std::string client) {
+	return bot->userModes(server, client);
+}
+
+bool Module::hasUserMode(std::string server, std::string client, std::string mode) {
+	return bot->hasUserMode(server, client, mode);
+}
+
+std::list<char> Module::snomasks(std::string server, std::string client) {
+	return bot->snomasks(server, client);
+}
+
+bool Module::hasSNOMask(std::string server, std::string client, char snomask) {
+	return bot->hasSNOMask(server, client);
+}
+
+std::list<std::string> Module::userChannels(std::string server, std::string nick) {
+	return bot->userChannels(server, nick);
+}
+
+std::list<std::string> Module::modules() {
+	return bot->moduleList();
+}
+
+std::list<std::string> Module::providedServices() {
+	return bot->providedServices();
+}
+
+bool Module::serviceIsProvided(std::string service) {
+	return bot->serviceIsProvided(service);
+}
+
+std::list<std::string> Module::serviceProviders(std::string service) {
+	return bot->serviceProviders(service);
+}
+
+std::list<std::string> Module::serviceUsers(std::string service) {
+	return bot->serviceUsers(service);
+}
+
+void Module::refreshServices() {
+	bot->refreshServices(moduleName);
+}
+
+LoadResult Module::loadModule(std::string modName) {
+	return bot->loadModule(modName);
+}
+
+void Module::unloadModule(std::string modName) {
+	if (modName == moduleName)
+		std::thread(bot->unloadModule, modName).detach();
+	else
+		bot->unloadModule(modName);
+}
+
+Socket* Module::newSocket(std::string socktype) {
+	return bot->loadSocket(socktype);
+}
+
+void Module::destroySocket(std::string socktype, Socket* sockptr) {
+	bot->unloadSocket(socktype, sockptr);
+}
+
+void Module::rehash() {
+	bot->rehash();
+}

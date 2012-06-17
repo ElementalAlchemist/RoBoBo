@@ -325,6 +325,10 @@ void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
 	// TODO: take socket and unregister it
 }
 
+void Base::rehash() {
+	// TODO: this
+}
+
 /* Make the calls asynchronous
  * The goal of this section is to make sure module functions are called one at a time, but still in order.
  * The modHook functions start a thread and return.  This allows:
@@ -625,6 +629,313 @@ void Base::delXLine(std::string server, std::string client, std::string linetype
 
 void Base::sendOtherData(std::string server, std::string client, std::string line) {
 	
+}
+
+std::list<std::string> Base::activeServers() {
+	std::list<std::string> serverList;
+	for (std::pair<std::string, Protocol*> server : servers)
+		serverList.push_back(server.first);
+	return serverList;
+}
+
+std::list<std::string> Base::connectedServers() {
+	std::list<std::string> serverList;
+	for (std::pair<std::string, Protocol*> server : servers) {
+		if (server.second->isConnected())
+			serverList.push_back(server.first);
+	}
+	return serverList;
+}
+
+bool Base::serverIsClient(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->isClient();
+}
+
+std::string Base::serverType(std::string server) {
+	if (servers.find(server) == servers.end())
+		return "";
+	for (std::pair<std::string, std::set<std::string>> providers : protocolTypes) {
+		if (providers.second.find(server) != providers.second.end())
+			return providers.first;
+	}
+	return "";
+}
+
+std::list<std::string> Base::serverListModes(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->listModes();
+}
+
+std::list<std::string> Base::serverParamModes(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->paramModes();
+}
+
+std::list<std::string> Base::serverModes(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->modes();
+}
+
+std::list<std::pair<std::string, char>> Base::serverStatuses(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::pair<std::string, char>> ();
+	return servIter->second->statuses();
+}
+
+std::list<std::string> Base::channels(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->channels();
+}
+
+std::list<std::string> Base::inChannels(std::string server, std::string client) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->inChannels(client);
+}
+
+std::list<std::string> Base::channelUsers(std::string server, std::string channel) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->channelUsers(channel);
+}
+
+bool Base::userInChannel(std::string server, std::string channel, std::string user) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->userInChannel(channel, user);
+}
+
+std::string Base::channelTopic(std::string server, std::string channel) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->channelTopic(channel);
+}
+
+std::list<std::string> Base::channelModes(std::string server, std::string channel) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->channelModes(channel);
+}
+
+bool Base::channelHasMode(std::string server, std::string channel, std::string mode) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->channelHasMode(channel, mode);
+}
+
+std::string Base::modeParam(std::string server, std::string channel, std::string mode) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->modeParam(channel, mode);
+}
+
+std::list<std::string> Base::channelListMode(std::string server, std::string channel, std::string mode) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->channelListMode(channel, mode);
+}
+
+bool Base::channelListHasEntry(std::string server, std::string channel, std::string listMode, std::string entry) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->channelListHasEntry(channel, listMode, entry);
+}
+
+std::pair<std::string, char> Base::userStatus(std::string server, std::string channel, std::string user) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::pair<std::string, char> ("", ' ');
+	return servIter->second->userStatus(channel, user);
+}
+
+std::pair<std::string, char> Base::compareStatus(std::string server, std::string status0, std::string status1) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::pair<std::string, char> ("", ' ');
+	return servIter->second->compareStatus(status0, status1);
+}
+
+std::pair<std::string, char> Base::compareStatus(std::string server, std::string status0, char status1) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::pair<std::string, char> ("", ' ');
+	return servIter->second->compareStatus(status0, status1);
+}
+
+std::pair<std::string, char> Base::compareStatus(std::string server, char status0, std::string status1) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::pair<std::string, char> ("", ' ');
+	return servIter->second->compareStatus(status0, status1);
+}
+
+std::pair<std::string, char> Base::compareStatus(std::string server, char status0, char status1) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::pair<std::string, char> ("", ' ');
+	return servIter->second->compareStatus(status0, status1);
+}
+
+bool Base::userHasStatus(std::string server, std::string channel, std::string user, std::string status) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->userHasStatus(channel, user, status);
+}
+
+bool Base::userHasStatus(std::string server, std::string channel, std::string user, char status) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->userHasStatus(channel, user, status);
+}
+
+bool Base::userHasStatusOrGreater(std::string server, std::string channel, std::string user, std::string status) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->userHasStatusOrGreater(channel, user, status);
+}
+
+bool Base::userHasStatusOrGreater(std::string server, std::string channel, std::string user, char status) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->userHasStatusOrGreater(channel, user, status);
+}
+
+std::list<std::string> Base::clients(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->clients();
+}
+
+std::list<std::string> Base::userModes(std::string server, std::string client) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->userModes(client);
+}
+
+bool Base::hasUserMode(std::string server, std::string client, std::string mode) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->hasUserMode(client, mode);
+}
+
+std::list<char> Base::snomasks(std::string server, std::string client) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<char> ();
+	return servIter->second->snomasks(client);
+}
+
+bool Base::hasSNOMask(std::string server, std::string client, char snomask) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->hasSNOMask(client, snomask);
+}
+
+std::list<std::string> Base::userChannels(std::string server, std::string nick) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->userChannels(nick);
+}
+
+std::list<std::string> Base::moduleList() {
+	std::list<std::string> modList;
+	for (std::pair<std::string, Module*> module : highModules)
+		modList.push_back(module.first);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		modList.push_back(module.first);
+	for (std::pair<std::string, Module*> module : normalModules)
+		modList.push_back(module.first);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		modList.push_back(module.first);
+	for (std::pair<std::string, Module*> module : lowModules)
+		modList.push_back(module.first);
+	return modList;
+}
+
+std::list<std::string> Base::providedServices() {
+	std::list<std::string> services;
+	for (std::pair<std::string, std::list<std::string>> service : moduleServices) {
+		if (!service.second.empty())
+			services.push_back(service.first);
+	}
+	return services;
+}
+
+bool Base::serviceIsProvided(std::string service) {
+	return !moduleServices[service].empty();
+}
+
+std::list<std::string> Base::serviceProviders(std::string service) {
+	return moduleServices[service];
+}
+
+std::list<std::string> Base::serviceUsers(std::string service) {
+	return moduleSupports[service];
+}
+
+void Base::refreshServices(std::string module) {
+	std::map<std::string, Module*>::iterator modIter = highModules.find(module);
+	if (modIter == highModules.end()) {
+		modIter = mediumHighModules.find(module);
+		if (modIter == mediumHighModules.end()) {
+			modIter = normalModules.find(module);
+			if (modIter == normalModules.end()) {
+				modIter = mediumLowModules.find(module);
+				if (modIter == mediumLowModules.end()) {
+					modIter = lowModules.find(module);
+					if (modIter == lowModules.end())
+						return; // Some sort of serious error occurred!
+				}
+			}
+		}
+	}
+	for (std::pair<std::string, std::list<std::string>> service : moduleServices)
+		service.second.remove(module);
+	for (std::pair<std::string, std::list<std::string>> service : moduleRequires)
+		service.second.remove(module);
+	for (std::pair<std::string, std::list<std::string>> service : moduleSupports)
+		service.second.remove(module);
+	std::list<std::string> provides = modIter->second->provides();
+	for (std::string service : provides)
+		moduleServices[service].push_back(module);
+	std::list<std::string> requires = modIter->second->requires();
+	for (std::string services : requires) {
+		moduleRequires[service].push_back(module);
+		moduleSupports[service].push_back(module);
+	}
+	std::list<std::string> supports = modIter->second->supports();
+	for (std::string services : supports)
+		moduleSupports[service].push_back(module);
 }
 
 /* The callHooks functions are called as part of a thread

@@ -76,6 +76,122 @@ void Protocol::processedChanCTCPReply(std::string client, std::string target, ch
 
 void Protocol::processedUserCTCPReply(std::string client, std::string target, std::string ctcp) {}
 
+std::list<std::string> Protocol::listModes() {
+	return std::list<std::string> ();
+}
+
+std::list<std::string> Protocol::paramModes() {
+	return std::list<std::string> ();
+}
+
+std::list<std::string> Protocol::modes() {
+	return std::list<std::string> ();
+}
+
+std::list<std::pair<std::string, char>> Protocol::statuses() {
+	return std::list<std::pair<std::string, char>> ();
+}
+
+std::list<std::string> Protocol::channels() {
+	return std::list<std::string> ();
+}
+
+std::list<std::string> Protocol::inChannels(std::string client) {
+	return std::list<std::string> ();
+}
+
+std::list<std::string> Protocol::channelUsers(std::string channel) {
+	return std::list<std::string> ();
+}
+
+bool Protocol::userInChannel(std::string channel, std::string user) {
+	return false;
+}
+
+std::string Protocol::channelTopic(std::string channel) {
+	return "";
+}
+
+std::list<std::string> Protocol::channelModes(std::string channel) {
+	return std::list<std::string> ();
+}
+
+bool Protocol::channelHasMode(std::string channel, std::string mode) {
+	return false;
+}
+
+std::string Protocol::modeParam(std::string channel, std::string mode) {
+	return "";
+}
+
+std::list<std::string> Protocol::channelListMode(std::string channel, std::string mode) {
+	return std::list<std::string> ();
+}
+
+bool Protocol::channelListHasEntry(std::string channel, std::string listMode, std::string entry) {
+	return false;
+}
+
+std::pair<std::string, char> Protocol::userStatus(std::string channel, std::string user) {
+	return std::pair<std::string, char> ("", ' ');
+}
+
+std::pair<std::string, char> Protocol::compareStatus(std::string status0, std::string status1) {
+	return std::pair<std::string, char> ("", ' ');
+}
+
+std::pair<std::string, char> Protocol::compareStatus(std::string server, std::string status0, char status1) {
+	return std::pair<std::string, char> ("", ' ');
+}
+
+std::pair<std::string, char> Protocol::compareStatus(char status0, std::string status1) {
+	return std::pair<std::string, char> ("", ' ');
+}
+
+std::pair<std::string, char> Protocol::compareStatus(char status0, char status1) {
+	return std::pair<std::string, char> ("", ' ');
+}
+
+bool Protocol::userHasStatus(std::string channel, std::string user, std::string status) {
+	return false;
+}
+
+bool Protocol::userHasStatus(std::string channel, std::string user, char status) {
+	return false;
+}
+
+bool Protocol::userHasStatusOrGreater(std::string channel, std::string user, std::string status) {
+	return false;
+}
+
+bool Protocol::userHasStatusOrGreater(std::string channel, std::string user, char status) {
+	return false;
+}
+
+std::list<std::string> Protocol::clients() {
+	return std::list<std::string> ();
+}
+
+std::list<std::string> Protocol::userModes(std::string client) {
+	return std::list<std::string> ();
+}
+
+bool Protocol::hasUserMode(std::string client, std::string mode) {
+	return false;
+}
+
+std::list<char> Protocol::snomasks(std::string client) {
+	return std::list<char> ();
+}
+
+bool Protocol::hasSNOMask(std::string client, char snomask) {
+	return false;
+}
+
+std::list<std::string> Protocol::userChannels(std::string nick) {
+	return std::list<std::string> ();
+}
+
 Socket* Protocol::assignSocket(std::string socketType) {
 	return bot->loadSocket(socketType);
 }

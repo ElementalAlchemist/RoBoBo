@@ -284,6 +284,188 @@ class Protocol {
 		 * @param ctcp The CTCP type and any associated data
 		 */
 		virtual void processedUserCTCPReply(std::string client, std::string target, std::string ctcp);
+		
+		
+		/** List mode list
+		 * Lists list modes available on this server.
+		 * @return a list of long-name modes
+		 */
+		virtual std::list<std::string> listModes();
+		
+		/** Parameter mode list
+		 * Lists modes that take parameters that are available on this server.
+		 * @return a list of long-name modes
+		 */
+		virtual std::list<std::string> paramModes();
+		
+		/** Mode list
+		 * Lists parameterless modes available on this server.
+		 * @return a list of long-name modes
+		 */
+		virtual std::list<std::string> modes();
+		
+		/** Statuses list
+		 * Lists status ranks available on this server.
+		 * @return a list of long-name modes and status chars
+		 */
+		virtual std::list<std::pair<std::string, char>> statuses();
+		
+		/** Channel list
+		 * Lists channels on this server.
+		 * @return a list of channels
+		 */
+		virtual std::list<std::string> channels();
+		
+		/** Client channel list
+		 * Lists channels in which the given client is.
+		 * @param client The client of which we're checking the channel list
+		 * @return a list of channels
+		 */
+		virtual std::list<std::string> inChannels(std::string client);
+		
+		/** Channel user list
+		 * Lists users in the given channel
+		 * @param channel The channel whose users to list
+		 * @return a list of nicks
+		 */
+		virtual std::list<std::string> channelUsers(std::string channel);
+		
+		/** Channel user check
+		 * Checks whether the given user is in the given channel.
+		 * @param channel The channel in which to check for the user
+		 * @param user The user for whom to check
+		 * @return true if the user is in the channel, false otherwise
+		 */
+		virtual bool userInChannel(std::string channel, std::string user);
+		
+		/** Channel topic
+		 * Shows the topic of the given channel.
+		 * @param channel The channel whose topic to show
+		 * @return channel topic
+		 */
+		virtual std::string channelTopic(std::string channel);
+		
+		/** Channel mode list
+		 * Lists all non-list modes set in a channel.
+		 * @param channel The channel whose modes to list
+		 * @return a list of modes
+		 */
+		virtual std::list<std::string> channelModes(std::string channel);
+		
+		/** Channel mode check
+		 * Checks whether the given non-list mode is set in the given channel.
+		 * @param channel The channel in which to check for the mode
+		 * @param mode The mode for which to check
+		 * @return true if the mode is set, false otherwise
+		 */
+		virtual bool channelHasMode(std::string channel, std::string mode);
+		
+		/** Mode param
+		 * Shows the parameter of the given mode on the given channel.
+		 * @param channel The channel in which to check for the mode
+		 * @param mode The mode of which to read the parameter
+		 * @return the mode parameter, or an empty string if the mode is not set
+		 */
+		virtual std::string modeParam(std::string channel, std::string mode);
+		
+		/** Channel list mode list
+		 * Shows the list for a given list mode on a given channel.
+		 * @param channel The channel whose list mode list to show
+		 * @param mode The list mode whose list to show
+		 * @return a list of list mode entries
+		 */
+		virtual std::list<std::string> channelListMode(std::string channel, std::string mode);
+		
+		/** Channel list mode entry check
+		 * Checks whether a channel list mode has a given entry.
+		 * @param channel The channel whose lists to check
+		 * @param listMode The list mode whose lists to check
+		 * @param entry The entry for which to check
+		 * @return true if the list has the entry, false otherwise
+		 */
+		virtual bool channelListHasEntry(std::string channel, std::string listMode, std::string entry);
+		
+		/** User status
+		 * Shows the status rank of a given user on a given channel
+		 * @param channel The channel to check for a status
+		 * @param user The user whose status to check
+		 * @return the long-name mode and status char of the user
+		 */
+		virtual std::pair<std::string, char> userStatus(std::string channel, std::string user);
+		
+		/** Compare status
+		 * Compare the two status levels given.
+		 * @param status0 A long-name mode or status char to compare
+		 * @param status1 The other long-name mode or status char to compare
+		 * @return The long-name mode and status char of the higher ranked status
+		 */
+		virtual std::pair<std::string, char> compareStatus(std::string status0, std::string status1);
+		virtual std::pair<std::string, char> compareStatus(std::string server, std::string status0, char status1);
+		virtual std::pair<std::string, char> compareStatus(char status0, std::string status1);
+		virtual std::pair<std::string, char> compareStatus(char status0, char status1);
+		
+		/** User status check
+		 * Checks whether the given user has the given status on the given channel.
+		 * @param channel The channel to check
+		 * @param user The user to check
+		 * @param status The status to check
+		 * @return true if the user has the status, false otherwise
+		 */
+		virtual bool userHasStatus(std::string channel, std::string user, std::string status);
+		virtual bool userHasStatus(std::string channel, std::string user, char status);
+		
+		/** User minimum status check
+		 * Checks whether the given user has the given status or any higher status rank on the given channel.
+		 * @param channel The channel to check
+		 * @param user The user to check
+		 * @param status The status to check
+		 * @return true if the user has the status or any higher-ranking status, false otherwise
+		 */
+		virtual bool userHasStatusOrGreater(std::string channel, std::string user, std::string status);
+		virtual bool userHasStatusOrGreater(std::string channel, std::string user, char status);
+		
+		/** Client list
+		 * Shows which clients this protocol module is running
+		 * @return a list of client identifiers
+		 */
+		virtual std::list<std::string> clients();
+		
+		/** User mode list
+		 * Shows which user modes are set on the given client.
+		 * @param client The client whose modes to check
+		 * @return a list of long name modes
+		 */
+		virtual std::list<std::string> userModes(std::string client);
+		
+		/** User mode check
+		 * Checks whether a given user mode is set on a given client.
+		 * @param client The client to check
+		 * @param mode The mode for which to check
+		 * @return true if the mode is set, false otherwise
+		 */
+		virtual bool hasUserMode(std::string client, std::string mode);
+		
+		/** SNOmask list
+		 * Lists SNOmasks set on a given client.
+		 * @param client The client to check
+		 * @return a list of SNOmask chars
+		 */
+		virtual std::list<char> snomasks(std::string client);
+		
+		/** SNOmask check
+		 * Checks whether a given SNOmask is set on a given client.
+		 * @param client The client to check
+		 * @param snomask The SNOmask char for which to check
+		 * @return true if the client has a given SNOmask, false otherwise
+		 */
+		virtual bool hasSNOMask(std::string client, char snomask);
+		
+		/** User channels list
+		 * Lists channels in which the given user is.
+		 * @param nick The nick of the user
+		 * @return a list of channel names
+		 */
+		virtual std::list<std::string> userChannels(std::string nick);
 	protected:
 		/** Utility variables
 		 * serverName: The name of the protocol module as used internally, and the server address

@@ -114,6 +114,11 @@ class Base {
 		 */
 		void unloadSocket(std::string sockettype, Socket* socketptr);
 		
+		/** Rehash
+		 * This function reloads the configuration and distributes the information as necessary.
+		 */
+		void rehash();
+		
 		
 		/** Channel message hook thread
 		 * This function makes channel message hook calls "nonblocking" by calling the function that actually makes
@@ -826,6 +831,280 @@ class Base {
 		 * @param line The data to send
 		 */
 		void sendOtherData(std::string server, std::string client, std::string line);
+		
+		/** Active server list
+		 * Lists the server names for all currently loaded protocol modules.
+		 * @return list of loaded servers
+		 */
+		std::list<std::string> activeServers();
+		
+		/** Connected server list
+		 * Lists the server names for all currently connected servers.  This is usually the same as activeServers, but omits servers that have
+		 * disconnected and are waiting to be either unloaded or reloaded.
+		 * @return list of connected servers
+		 */
+		std::list<std::string> connectedServers();
+		
+		/** Client connection check
+		 * Checks whether the specified server is connected as a client.
+		 * @param server The server we're checking
+		 * @return true if it is connected as a client, false otherwise
+		 */
+		bool serverIsClient(std::string server);
+		
+		/** Server type
+		 * Allows modules to see the type of protocol module used to connect the given server.
+		 * @param server The server we're checking
+		 * @return the type of protocol module
+		 */
+		std::string serverType(std::string server);
+		
+		/** Server list modes
+		 * Allows modules to see all available list modes on a server.
+		 * @param server The server we're checking
+		 * @return A list of long-name modes
+		 */
+		std::list<std::string> serverListModes(std::string server);
+		
+		/** Server parameter modes
+		 * Allows modules to see all available parameter-taking modes on a server.
+		 * @param server The server we're checking
+		 * @return A list of long-name modes
+		 */
+		std::list<std::string> serverParamModes(std::string server);
+		
+		/** Server parameterless modes
+		 * Allows modules to see all available parameterless modes on a server.
+		 * @param server The server we're checking
+		 * @return A list of long-name modes
+		 */
+		std::list<std::string> serverModes(std::string server);
+		
+		/** Server status modes
+		 * Allows modules to see all available status prefix modes on a server.
+		 * @param server The server we're checking
+		 * @return A list of long-name modes and status chars
+		 */
+		std::list<std::pair<std::string, char>> serverStatuses(std::string server);
+		
+		/** Channel list
+		 * A list of channels on a server.
+		 * @param server The server whose channels to list
+		 * @return A list of channel names
+		 */
+		std::list<std::string> channels(std::string server);
+		
+		/** In channel list
+		 * A list of channels a given client is in.
+		 * @param server The server to which the client is connected
+		 * @param client The client we're checking
+		 * @return A list of channel names
+		 */
+		std::list<std::string> inChannels(std::string server, std::string client);
+		
+		/** Channel user list
+		 * List all users in a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @return A list of nicks
+		 */
+		std::list<std::string> channelUsers(std::string server, std::string channel);
+		
+		/** Channel user check
+		 * Checks whether a given user is in a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param user The nick of the user for whom we are looking
+		 * @return true if the user is in the channel, false otherwise
+		 */
+		bool userInChannel(std::string server, std::string channel, std::string user);
+		
+		/** Channel topic
+		 * Allows modules to see the channel topic.
+		 * @param server The server on which the channel is
+		 * @param channel The channel whose topic we're seeing
+		 * @return the channel topic
+		 */
+		std::string channelTopic(std::string server, std::string channel);
+		
+		/** Channel mode list
+		 * Allows modules to see modes set on a channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel whose modes we're viewing
+		 * @return A list of long-name modes
+		 */
+		std::list<std::string> channelModes(std::string server, std::string channel);
+		
+		/** Channel mode check
+		 * Checks whether a given non-list mode is set on a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param mode The long name of the mode for which we're checking
+		 * @return true if the mode is set, false otherwise
+		 */
+		bool channelHasMode(std::string server, std::string channel, std::string mode);
+		
+		/** Mode param check
+		 * Allows modules to see the parameter of a given mode on a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param mode The mode we're checking
+		 * @return the mode parameter if set, an empty string if not
+		 */
+		std::string modeParam(std::string server, std::string channel, std::string mode);
+		
+		/** Channel list mode list
+		 * Allows modules to see the list of entries for a given list mode on a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param mode The long name of the list mode we're checking
+		 * @return a list of entries for the list mode
+		 */
+		std::list<std::string> channelListMode(std::string server, std::string channel, std::string mode);
+		
+		/** Channel list mode entry check
+		 * Checks whether a channel list mode has a given entry.
+		 * @param server The server on which the channel is
+		 * @param channel The channel whose mode we're checking
+		 * @param mode The list mode of which we're checking the entries
+		 * @param entry The entry for which to check
+		 * @return true if the entry is present, false otherwise
+		 */
+		bool channelListHasEntry(std::string server, std::string channel, std::string listMode, std::string entry);
+		
+		/** User status
+		 * Gets the channel status of the given user in the given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param user The nick of the user we're checking
+		 * @return the long name and status char of the user's status, or an empty string and a blank space (' ') if
+		 * the user does not hold a special status
+		 */
+		std::pair<std::string, char> userStatus(std::string server, std::string channel, std::string user);
+		
+		/** Compare status
+		 * Compares the statuses provided.
+		 * @param server The server to which the statuses apply
+		 * @param status0 The long-name mode or status char of a status to check
+		 * @param status1 The long-name mode or status char of the other status to check
+		 * @return The long-name mode and status char of the higher-ranked of the two statuses
+		 */
+		std::pair<std::string, char> compareStatus(std::string server, std::string status0, std::string status1);
+		std::pair<std::string, char> compareStatus(std::string server, std::string status0, char status1);
+		std::pair<std::string, char> compareStatus(std::string server, char status0, std::string status1);
+		std::pair<std::string, char> compareStatus(std::string server, char status0, char status1);
+		
+		/** User status check
+		 * Checks whether a given user has a given status on a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param user The user whose status we're checking
+		 * @param status The long-name mode or status char of the status we're checking
+		 * @return true if the user has the given status, false otherwise
+		 */
+		bool userHasStatus(std::string server, std::string channel, std::string user, std::string status);
+		bool userHasStatus(std::string server, std::string channel, std::string user, char status);
+		
+		/** User status minimum check
+		 * Checks whether a given user has a given status or any higher-ranking status on a given channel.
+		 * @param server The server on which the channel is
+		 * @param channel The channel we're checking
+		 * @param user The user whose status we're checking
+		 * @param status The long-name mode or status char of the status we're checking
+		 * @return true if the user has the given status or higher, false otherwise
+		 */
+		bool userHasStatusOrGreater(std::string server, std::string channel, std::string user, std::string status);
+		bool userHasStatusOrGreater(std::string server, std::string channel, std::string user, char status);
+		
+		/** Client list
+		 * Lists clients connected to the given server.
+		 * @param server The server for which we want the client list
+		 * @return a list of client identifiers
+		 */
+		std::list<std::string> clients(std::string server);
+		
+		/** User mode list
+		 * Lists user modes for a given client.
+		 * @param server The server for which we want a client's user modes
+		 * @param client The client whose user modes we want
+		 * @return a list of long-name user modes
+		 */
+		std::list<std::string> userModes(std::string server, std::string client);
+		
+		/** User mode check
+		 * Checks whether a given client has a given user mode.
+		 * @param server The server for which we want to check the user mode
+		 * @param client The client whose user modes we're checking
+		 * @param mode The mode for which we are checking
+		 * @return true if the mode is set, false if it is not
+		 */
+		bool hasUserMode(std::string server, std::string client, std::string mode);
+		
+		/** SNOmask list
+		 * Lists SNOmask chars set on the given client
+		 * @param server The server to which the client is connected
+		 * @param client The client whose SNOmasks we're checking
+		 * @return a list of SNOmask chars
+		 */
+		std::list<char> snomasks(std::string server, std::string client);
+		
+		/** SNOmask check
+		 * Checks whether a given client has a given SNOmask char
+		 * @param server The server to which the client is connected
+		 * @param client The client whose SNOmasks we're checking
+		 * @param snomask The SNOmask char for which we're looking
+		 * @return true if the SNOmask is set, false otherwise
+		 */
+		bool hasSNOMask(std::string server, std::string client, char snomask);
+		
+		/** User channel list
+		 * Lists the channels in which a given user is
+		 * @param server The server to which the user is connected
+		 * @param nick The nick of the user
+		 * @return A list of channel names
+		 */
+		std::list<std::string> userChannels(std::string server, std::string nick);
+		
+		
+		/** Module list
+		 * Lists loaded modules.
+		 * @return a list of module names
+		 */
+		std::list<std::string> moduleList();
+		
+		/** Provided services
+		 * Lists services provided by modules.
+		 * @return a list of services
+		 */
+		std::list<std::string> providedServices();
+		
+		/** Provided service check
+		 * Checks whether a given service is provided by a module.
+		 * @param service The service for which to check
+		 * @return true if the service is provided by a module, false otherwise
+		 */
+		bool serviceIsProvided(std::string service);
+		
+		/** Service provider list
+		 * Lists modules that provide a given service.
+		 * @param service The service for which we want providers
+		 * @return a list of module names
+		 */
+		std::list<std::string> serviceProviders(std::string service);
+		
+		/** Service user list
+		 * Lists services that use a given service.
+		 * @param service The service for which we want users
+		 * @return a list of module names
+		 */
+		std::list<std::string> serviceUsers(std::string service);
+		
+		/** Refresh services
+		 * Instructs the bot core that the module's requirements have changed and that the core should reload the list of
+		 * services it provides/requires/supports.
+		 * @param module The module requesting the rescan
+		 */
+		void refreshServices(std::string module);
 	private:
 		/** Directory variables
 		 * workingDir: The directory of the executable relative to the directory from which robobo was started
@@ -859,6 +1138,7 @@ class Base {
 		std::map<std::string, Priority> modulePriority;
 		/** Service variables
 		 * moduleServices: holds a list of modules providing each given service
+		 * moduleRequires: holds a list of modules requiring each given service
 		 * moduleSupports: holds a list of modules using each given service
 		 */
 		std::map<std::string, std::list<std::string>> moduleServices, moduleRequires, moduleSupports;
