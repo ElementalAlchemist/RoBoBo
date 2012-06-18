@@ -580,7 +580,7 @@ void Base::sendCTCPReply(std::string server, std::string client, std::string tar
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->sendCTCPReply(client, target, ctcp, param);
+	servIter->second->sendCTCPReply(client, target, ctcp, params);
 }
 
 void Base::setMode(std::string server, std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {
