@@ -26,7 +26,7 @@ debugmodules:
 	@DEBUG="-g -O0" make -C src/modules
 
 clean:
-	@test -f robobo && rm robobo
-	@test -f modules/* && rm modules/*
+	@rm -f robobo
+	@rm -f modules/*
 	@make -C src clean
 	@echo "Clean has been made."
