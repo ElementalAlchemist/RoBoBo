@@ -313,7 +313,27 @@ void Base::connectServer(std::string server) {
 }
 
 void Base::disconnectServer(std::string server) {
-	// TODO: pretty much, what did you expect?
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	Protocol* unloadingServer = servIter->second;
+	servers.erase(servIter);
+	unloadingServer->disconnectServer();
+	delete unloadingServer;
+	std::string protoType = "";
+	for (std::pair<std::string, std::set<std::string>> typeList : protocolTypes) {
+		if (typeList.second.find(server) != typeList.second.end()) {
+			protoType = typeList.first;
+			break;
+		}
+	}
+	std::unordered_map<std::string, std::set<std::string>>::iterator typeIter = protocolTypes.find(protoType);
+	if (typeIter->second.empty()) {
+		std::unordered_map<std::string, std::set<std::string>>::iterator fileIter = protocolFiles.find(protoType);
+		dlclose(fileIter->second);
+		protocolFiles.erase(fileIter);
+		protocolTypes.erase(typeIter);
+	}
 }
 
 Socket* Base::loadSocket(std::string sockettype) {
