@@ -341,217 +341,217 @@ void Base::rehash() {
  */
 
 void Base::modChanMsgHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
-	std::thread callHooks(callChanMsgHooks, server, client, channel, status, nick, message);
+	std::thread callHooks(&Base::callChanMsgHooks, server, client, channel, status, nick, message);
 	callHooks.detach();
 }
 
 void Base::modUserMsgHook(std::string server, std::string client, std::string nick, std::string message) {
-	std::thread callHooks(callUserMsgHooks, server, client, nick, message);
+	std::thread callHooks(&Base::callUserMsgHooks, server, client, nick, message);
 	callHooks.detach();
 }
 
 void Base::modChanNoticeHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
-	std::thread callHooks(callChanNoticeHooks, server, client, channel, status, nick, message);
+	std::thread callHooks(&Base::callChanNoticeHooks, server, client, channel, status, nick, message);
 	callHooks.detach();
 }
 
 void Base::modUserNoticeHook(std::string server, std::string client, std::string nick, std::string message) {
-	std::thread callHooks(callUserNoticeHooks, server, client, nick, message);
+	std::thread callHooks(&Base::callUserNoticeHooks, server, client, nick, message);
 	callHooks.detach();
 }
 
 void Base::modChanCTCPHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data) {
-	std::thread callHooks(callChanCTCPHooks, server, client, channel, status, nick, ctcp, data);
+	std::thread callHooks(&Base::callChanCTCPHooks, server, client, channel, status, nick, ctcp, data);
 	callHooks.detach();
 }
 
 void Base::modUserCTCPHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string data) {
-	std::thread callHooks(callUserCTCPHooks, server, client, nick, ctcp, data);
+	std::thread callHooks(&Base::callUserCTCPHooks, server, client, nick, ctcp, data);
 	callHooks.detach();
 }
 
 void Base::modChanCTCPReplyHook(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string data) {
-	std::thread callHooks(callChanCTCPReplyHooks, server, client, channel, status, nick, ctcp, data);
+	std::thread callHooks(&Base::callChanCTCPReplyHooks, server, client, channel, status, nick, ctcp, data);
 	callHooks.detach();
 }
 
 void Base::modUserCTCPReplyHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string data) {
-	std::thread callHooks(callUserCTCPReplyHooks, server, client, nick, ctcp, data);
+	std::thread callHooks(&Base::callUserCTCPReplyHooks, server, client, nick, ctcp, data);
 	callHooks.detach();
 }
 
 void Base::modChanModeHook(std::string server, std::string channel, std::string setter, bool add, std::string mode, std::string param) {
-	std::thread callHooks(callChanModeHooks, server, channel, setter, add, mode, param);
+	std::thread callHooks(&Base::callChanModeHooks, server, channel, setter, add, mode, param);
 	callHooks.detach();
 }
 
 void Base::modUserModeHook(std::string server, std::string nick, bool add, std::string mode) {
-	std::thread callHooks(callUserModeHooks, server, nick, add, mode);
+	std::thread callHooks(&Base::callUserModeHooks, server, nick, add, mode);
 	callHooks.detach();
 }
 
 void Base::modUserSNOMaskHook(std::string server, std::string nick, bool add, char snomask) {
-	std::thread callHooks(callUserSNOMaskHooks, server, nick, add, snomask);
+	std::thread callHooks(&Base::callUserSNOMaskHooks, server, nick, add, snomask);
 	callHooks.detach();
 }
 
 void Base::modChanTopicHook(std::string server, std::string channel, std::string setter, std::string topic) {
-	std::thread callHooks(callChanTopicHooks, server, channel, setter, topic);
+	std::thread callHooks(&Base::callChanTopicHooks, server, channel, setter, topic);
 	callHooks.detach();
 }
 
 void Base::modChanJoinHook(std::string server, std::string channel, std::string nick) {
-	std::thread callHooks(callChanJoinHooks, server, channel, nick);
+	std::thread callHooks(&Base::callChanJoinHooks, server, channel, nick);
 	callHooks.detach();
 }
 
 void Base::modChanPartHook(std::string server, std::string channel, std::string nick, std::string reason) {
-	std::thread callHooks(callChanPartHooks, server, channel, nick, reason);
+	std::thread callHooks(&Base::callChanPartHooks, server, channel, nick, reason);
 	callHooks.detach();
 }
 
 void Base::modChanKickHook(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	std::thread callHooks(callChanKickHooks, server, channel, kicker, kickee, reason);
+	std::thread callHooks(&Base::callChanKickHooks, server, channel, kicker, kickee, reason);
 	callHooks.detach();
 }
 
 void Base::modUserConnectHook(std::string server, std::string nick) {
-	std::thread callHooks(callUserConnectHooks, server, nick);
+	std::thread callHooks(&Base::callUserConnectHooks, server, nick);
 	callHooks.detach();
 }
 
 void Base::modUserQuitHook(std::string server, std::string nick, std::string reason) {
-	std::thread callHooks(callUserQuitHooks, server, nick, reason);
+	std::thread callHooks(&Base::callUserQuitHooks, server, nick, reason);
 	callHooks.detach();
 }
 
 void Base::modUserNickHook(std::string server, std::string oldNick, std::string newNick) {
-	std::thread callHooks(callUserNickHooks, server, oldNick, newNick);
+	std::thread callHooks(&Base::callUserNickHooks, server, oldNick, newNick);
 	callHooks.detach();
 }
 
 void Base::modNumericHook(std::string server, std::string client, std::string numeric, std::vector<std::string> data) {
-	std::thread callHooks(callNumericHooks, server, client, numeric, data);
+	std::thread callHooks(&Base::callNumericHooks, server, client, numeric, data);
 	callHooks.detach();
 }
 
 void Base::modOperHook(std::string server, std::string nick, std::string operType) {
-	std::thread callHooks(callOperHooks, server, nick, operType);
+	std::thread callHooks(&Base::callOperHooks, server, nick, operType);
 	callHooks.detach();
 }
 
 void Base::modSNoticeHook(std::string server, char snotype, std::string message) {
-	std::thread callHooks(callSNoticeHooks, server, snotype, message);
+	std::thread callHooks(&Base::callSNoticeHooks, server, snotype, message);
 	callHooks.detach();
 }
 
 void Base::modMetadataHook(std::string server, std::string target, std::string dataKey, std::string dataValue) {
-	std::thread callHooks(callMetadataHooks, server, target, dataKey, dataValue);
+	std::thread callHooks(&Base::callMetadataHooks, server, target, dataKey, dataValue);
 	callHooks.detach();
 }
 
 void Base::modXLineAddHook(std::string server, std::string lineType, std::string mask, std::string setter, time_t expiry, std::string reason) {
-	std::thread callHooks(callXLineAddHooks, server, lineType, mask, setter, expiry, reason);
+	std::thread callHooks(&Base::callXLineAddHooks, server, lineType, mask, setter, expiry, reason);
 	callHooks.detach();
 }
 
 void Base::modXLineRemoveHook(std::string server, std::string lineType, std::string mask) {
-	std::thread callHooks(callXLineRemoveHooks, server, lineType, mask);
+	std::thread callHooks(&Base::callXLineRemoveHooks, server, lineType, mask);
 	callHooks.detach();
 }
 
 void Base::modServerConnectHook(std::string server, std::string newServerName) {
-	std::thread callHooks(callServerConnectHooks, server, newServerName);
+	std::thread callHooks(&Base::callServerConnectHooks, server, newServerName);
 	callHooks.detach();
 }
 
 void Base::modServerQuitHook(std::string server, std::string quitServerName, std::string reason) {
-	std::thread callHooks(callServerQuitHooks, server, quitServerName, reason);
+	std::thread callHooks(&Base::callServerQuitHooks, server, quitServerName, reason);
 	callHooks.detach();
 }
 
 void Base::modOtherDataHook(std::string server, std::string client, std::vector<std::string> lineTokens) {
-	std::thread callHooks(callOtherDataHooks, server, client, lineTokens);
+	std::thread callHooks(&Base::callOtherDataHooks, server, client, lineTokens);
 	callHooks.detach();
 }
 
 void Base::modChanMsgOutHook(std::string server, std::string client, std::string channel, char status, std::string message) {
-	std::thread callHooks(callChanMsgOutHooks, server, client, channel, status, message);
+	std::thread callHooks(&Base::callChanMsgOutHooks, server, client, channel, status, message);
 	callHooks.detach();
 }
 
 void Base::modChanMsgSendHook(std::string server, std::string client, std::string channel, char status, std::string message) {
-	std::thread callHooks(callChanMsgSendHooks, server, client, channel, status, message);
+	std::thread callHooks(&Base::callChanMsgSendHooks, server, client, channel, status, message);
 	callHooks.detach();
 }
 
 void Base::modUserMsgOutHook(std::string server, std::string client, std::string nick, std::string message) {
-	std::thread callHooks(callUserMsgOutHooks, server, client, nick, message);
+	std::thread callHooks(&Base::callUserMsgOutHooks, server, client, nick, message);
 	callHooks.detach();
 }
 
 void Base::modUserMsgSendHook(std::string server, std::string client, std::string nick, std::string message) {
-	std::thread callHooks(callUserMsgSendHooks, server, client, nick, message);
+	std::thread callHooks(&Base::callUserMsgSendHooks, server, client, nick, message);
 	callHooks.detach();
 }
 
 void Base::modChanNoticeOutHook(std::string server, std::string client, std::string channel, char status, std::string message) {
-	std::thread callHooks(callChanNoticeOutHooks, server, client, channel, status, message);
+	std::thread callHooks(&Base::callChanNoticeOutHooks, server, client, channel, status, message);
 	callHooks.detach();
 }
 
 void Base::modChanNoticeSendHook(std::string server, std::string client, std::string channel, char status, std::string message) {
-	std::thread callHooks(callChanNoticeSendHooks, server, client, channel, status, message);
+	std::thread callHooks(&Base::callChanNoticeSendHooks, server, client, channel, status, message);
 	callHooks.detach();
 }
 
 void Base::modUserNoticeOutHook(std::string server, std::string client, std::string nick, std::string message) {
-	std::thread callHooks(callUserNoticeOutHooks, server, client, nick, message);
+	std::thread callHooks(&Base::callUserNoticeOutHooks, server, client, nick, message);
 	callHooks.detach();
 }
 
 void Base::modUserNoticeSendHook(std::string server, std::string client, std::string nick, std::string message) {
-	std::thread callHooks(callUserNoticeSendHooks, server, client, nick, message);
+	std::thread callHooks(&Base::callUserNoticeSendHooks, server, client, nick, message);
 	callHooks.detach();
 }
 
 void Base::modChanCTCPOutHook(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
-	std::thread callHooks(callChanCTCPOutHooks, server, client, channel, status, ctcp, params);
+	std::thread callHooks(&Base::callChanCTCPOutHooks, server, client, channel, status, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modChanCTCPSendHook(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
-	std::thread callHooks(callChanCTCPSendHooks, server, client, channel, status, ctcp, params);
+	std::thread callHooks(&Base::callChanCTCPSendHooks, server, client, channel, status, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modUserCTCPOutHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	std::thread callHooks(callUserCTCPOutHooks, server, client, nick, ctcp, params);
+	std::thread callHooks(&Base::callUserCTCPOutHooks, server, client, nick, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modUserCTCPSendHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	std::thread callHooks(callUserCTCPSendHooks, server, client, nick, ctcp, params);
+	std::thread callHooks(&Base::callUserCTCPSendHooks, server, client, nick, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modChanCTCPReplyOutHook(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
-	std::thread callHooks(callChanCTCPReplyOutHooks, server, client, channel, status, ctcp, params);
+	std::thread callHooks(&Base::callChanCTCPReplyOutHooks, server, client, channel, status, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modChanCTCPReplySendHook(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
-	std::thread callHooks(callChanCTCPReplySendHooks, server, client, channel, status, ctcp, params);
+	std::thread callHooks(&Base::callChanCTCPReplySendHooks, server, client, channel, status, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modUserCTCPReplyOutHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	std::thread callHooks(callUserCTCPReplyOutHooks, server, client, nick, ctcp, params);
+	std::thread callHooks(&Base::callUserCTCPReplyOutHooks, server, client, nick, ctcp, params);
 	callHooks.detach();
 }
 
 void Base::modUserCTCPReplySendHook(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	std::thread callHooks(callUserCTCPReplySendHooks, server, client, nick, ctcp, params);
+	std::thread callHooks(&Base::callUserCTCPReplySendHooks, server, client, nick, ctcp, params);
 	callHooks.detach();
 }
 
