@@ -394,9 +394,9 @@ LoadResult Module::loadModule(std::string modName) {
 
 void Module::unloadModule(std::string modName) {
 	if (modName == moduleName)
-		std::thread(bot->unloadModule, modName).detach();
+		std::thread(&Base::unloadModule, bot, modName, true).detach();
 	else
-		bot->unloadModule(modName);
+		bot->unloadModule(modName, true);
 }
 
 Socket* Module::newSocket(std::string socktype) {
