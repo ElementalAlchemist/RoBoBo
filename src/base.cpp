@@ -82,7 +82,7 @@ LoadResult Base::loadModule(std::string modName) {
 		return LOAD_OPEN_ERROR;
 	}
 	// The spawn function of modules returns a module instance that we can use
-	module_spawn_t moduleSpawn = static_cast<module_spawn_t>(dlsym(modFile, "spawn"));
+	module_spawn_t* moduleSpawn = (module_spawn_t*) dlsym(modFile, "spawn"));
 	const char* spawnError = dlerror();
 	if (spawnError != NULL) {
 		std::cerr << "Spawn not found in module " << modName << ": " << spawnError << std::endl;
@@ -270,7 +270,7 @@ void Base::connectServer(std::string server) {
 	}
 	std::unordered_map<std::string, void*>::iterator fileIter = protocolFiles.find(protoType);
 	if (fileIter != protocolFiles.end()) {
-		protocol_spawn_t protoSpawn = static_cast<protocol_spawn_t>(dlsym(fileIter->second, "spawn"));
+		protocol_spawn_t* protoSpawn = (protocol_spawn_t*) dlsym(fileIter->second, "spawn");
 		const char* spawnError = dlerror();
 		if (spawnError != NULL) {
 			std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
@@ -293,7 +293,7 @@ void Base::connectServer(std::string server) {
 		std::cerr << "The protocol module for server " << server << " could not be found: " << fileOpenError << std::endl;
 		return;
 	}
-	protocol_spawn_t protoSpawn = static_cast<protocol_spawn_t>(dlsym(protoFile, "spawn"));
+	protocol_spawn_t* protoSpawn = (protocol_spawn_t*) dlsym(protoFile, "spawn");
 	const char* spawnError = dlerror();
 	if (spawnError != NULL) {
 		std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
