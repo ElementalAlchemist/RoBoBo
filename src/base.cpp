@@ -661,7 +661,7 @@ void Base::sendSNotice(std::string server, char snomask, std::string message) {
 }
 
 void Base::setMetadata(std::string server, std::string target, std::string key, std::string value) {
-	std::map<std:string, Protocol*>::iterator servIter = servers.find(server);
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
 	servIter->second->setMetadata(target, key, value);
