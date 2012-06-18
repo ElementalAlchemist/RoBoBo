@@ -1,6 +1,8 @@
 #pragma once
 #include "main.h"
 
+#include "socket.h"
+
 class Base;
 
 /// Define the spawn function for protocol module files
