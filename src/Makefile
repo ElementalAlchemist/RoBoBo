@@ -8,20 +8,20 @@ LDFLAGS=-ldl
 .PHONY: default clean
 
 default: base.o module.o protocol.o socket.o
-	$(CC) $(CXXFLAGS) $(LDFLAGS) $(DEBUG) $(SOURCES:.cpp=.o) robobo.cpp -o ../robobo
+	@$(CC) $(CXXFLAGS) $(LDFLAGS) $(DEBUG) $(SOURCES:.cpp=.o) robobo.cpp -o ../robobo
 
 clean:
 	rm *.o
 
 # include g++-generated dependencies
 $(shell ${CC} -std=c++0x -E -MM base.cpp)
-	@${CC} ${CXXFLAGS} ${LDFLAGS} ${DEBUG} -o base.o base.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} base.cpp ${LDFLAGS} -o base.o 
 
 $(shell ${CC} -std=c++0x -E -MM module.cpp)
-	@${CC} ${CXXFLAGS} ${LDFLAGS} ${DEBUG} -o module.o module.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} module.cpp ${LDFLAGS} -o module.o
 
 $(shell ${CC} -std=c++0x -E -MM protocol.cpp)
-	@${CC} ${CXXFLAGS} ${LDFLAGS} ${DEBUG} -o protocol.o protocol.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} protocol.cpp ${LDFLAGS} -o protocol.o
 
 $(shell ${CC} -std=c++0x -E -MM socket.cpp)
-	@${CC} ${CXXFLAGS} ${LDFLAGS} ${DEBUG} -o socket.o socket.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} socket.cpp ${LDFLAGS} -o socket.o
