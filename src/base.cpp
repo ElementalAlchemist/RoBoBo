@@ -629,7 +629,7 @@ void Base::kickUser(std::string server, std::string client, std::string channel,
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
-	servIter->second->changeNick(client, channel, nick, reason);
+	servIter->second->kickUser(client, channel, nick, reason);
 }
 
 std::string Base::addClient(std::string server, std::string nick, std::string ident, std::string host, std::string gecos) {
