@@ -15,13 +15,13 @@ clean:
 
 # include g++-generated dependencies
 $(shell ${CC} -std=c++0x -E -MM base.cpp)
-	@${CC} ${CXXFLAGS} ${DEBUG} base.cpp ${LDFLAGS} -o base.o 
+	@${CC} ${CXXFLAGS} ${DEBUG} base.cpp ${LDFLAGS} -c -o base.o 
 
 $(shell ${CC} -std=c++0x -E -MM module.cpp)
-	@${CC} ${CXXFLAGS} ${DEBUG} module.cpp ${LDFLAGS} -o module.o
+	@${CC} ${CXXFLAGS} ${DEBUG} module.cpp ${LDFLAGS} -c -o module.o
 
 $(shell ${CC} -std=c++0x -E -MM protocol.cpp)
-	@${CC} ${CXXFLAGS} ${DEBUG} protocol.cpp ${LDFLAGS} -o protocol.o
+	@${CC} ${CXXFLAGS} ${DEBUG} protocol.cpp ${LDFLAGS} -c -o protocol.o
 
 $(shell ${CC} -std=c++0x -E -MM socket.cpp)
-	@${CC} ${CXXFLAGS} ${DEBUG} socket.cpp ${LDFLAGS} -o socket.o
+	@${CC} ${CXXFLAGS} ${DEBUG} socket.cpp ${LDFLAGS} -c -o socket.o

@@ -13,4 +13,4 @@ default: $(SOURCES:.cpp=.so)
 	@mv *.so ../../modules/
 
 $(SOURCES:.cpp=.so):
-	@${CC} ${CXXFLAGS} ${SOFLAGS} $(@:.so=.cpp) ${LDFLAGS} $(shell grep '^\s*// COMPILE_FLAGS ' $(@:.so=.cpp) | awk -F'[ ]' '{$$1=$$2=""; print $0}') -o $@
+	@${CC} ${CXXFLAGS} ${SOFLAGS} $(@:.so=.cpp) ${LDFLAGS} $(shell grep '^\s*// COMPILE_FLAGS ' $(@:.so=.cpp) | awk -F'[ ]' '{$$1=$$2=""; print $0}') -c -o $@
