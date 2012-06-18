@@ -400,7 +400,7 @@ class Protocol {
 		 * @return The long-name mode and status char of the higher ranked status
 		 */
 		virtual std::pair<std::string, char> compareStatus(std::string status0, std::string status1);
-		virtual std::pair<std::string, char> compareStatus(std::string server, std::string status0, char status1);
+		virtual std::pair<std::string, char> compareStatus(std::string status0, char status1);
 		virtual std::pair<std::string, char> compareStatus(char status0, std::string status1);
 		virtual std::pair<std::string, char> compareStatus(char status0, char status1);
 		

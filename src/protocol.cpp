@@ -140,7 +140,7 @@ std::pair<std::string, char> Protocol::compareStatus(std::string status0, std::s
 	return std::pair<std::string, char> ("", ' ');
 }
 
-std::pair<std::string, char> Protocol::compareStatus(std::string server, std::string status0, char status1) {
+std::pair<std::string, char> Protocol::compareStatus(std::string status0, char status1) {
 	return std::pair<std::string, char> ("", ' ');
 }
 
