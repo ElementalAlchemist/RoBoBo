@@ -254,7 +254,7 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 		}
 	}
 	for (std::string modName : unloadList)
-		unloadModule(modName);
+		unloadModule(modName, true);
 }
 
 void Base::connectServer(std::string server) {
