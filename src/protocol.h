@@ -585,7 +585,7 @@ class Protocol {
 		 * @param mode The long name of the mode set or unset
 		 * @param param The mode parameter, or an empty string if no parameter was given
 		 */
-		void callChanModeHook(std::string channel, bool add, std::string mode, std::string param);
+		void callChanModeHook(std::string channel, std::string setter, bool add, std::string mode, std::string param);
 		
 		/** Call user mode hook
 		 * This function lets modules know that a user's modes have been changed on the server.
@@ -608,7 +608,7 @@ class Protocol {
 		 * @param channel The channel whose topic changed
 		 * @param topic The new channel topic
 		 */
-		void callChanTopicHook(std::string channel, std::string topic);
+		void callChanTopicHook(std::string channel, std::string setter, std::string topic);
 		
 		/** Call channel join hook
 		 * This function lets modules know that a channel has been joined by a user on the server.

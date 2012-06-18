@@ -248,8 +248,8 @@ void Protocol::callUserCTCPReplyHook(std::string client, std::string nick, std::
 		bot->modUserCTCPReplyHook(serverName, client, nick, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
 }
 
-void Protocol::callChanModeHook(std::string channel, bool add, std::string mode, std::string param) {
-	bot->modChanModeHook(serverName, channel, add, mode, param);
+void Protocol::callChanModeHook(std::string channel, std::string setter, bool add, std::string mode, std::string param) {
+	bot->modChanModeHook(serverName, channel, setter, add, mode, param);
 }
 
 void Protocol::callUserModeHook(std::string nick, bool add, std::string mode) {
@@ -260,8 +260,8 @@ void Protocol::callUserSNOMaskHook(std::string nick, bool add, char snomask) {
 	bot->modUserSNOMaskHook(serverName, nick, add, snomask);
 }
 
-void Protocol::callChanTopicHook(std::string channel, std::string topic) {
-	bot->modChanTopicHook(serverName, channel, topic);
+void Protocol::callChanTopicHook(std::string channel, std::string setter, std::string topic) {
+	bot->modChanTopicHook(serverName, channel, setter, topic);
 }
 
 void Protocol::callChanJoinHook(std::string channel, std::string nick) {
