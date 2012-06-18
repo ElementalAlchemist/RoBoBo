@@ -986,12 +986,12 @@ void Base::refreshServices(std::string module) {
 	for (std::string service : provides)
 		moduleServices[service].push_back(module);
 	std::list<std::string> requires = modIter->second->requires();
-	for (std::string services : requires) {
+	for (std::string service : requires) {
 		moduleRequires[service].push_back(module);
 		moduleSupports[service].push_back(module);
 	}
 	std::list<std::string> supports = modIter->second->supports();
-	for (std::string services : supports)
+	for (std::string service : supports)
 		moduleSupports[service].push_back(module);
 }
 
