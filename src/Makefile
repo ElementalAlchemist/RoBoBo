@@ -8,7 +8,7 @@ LDFLAGS=-ldl
 .PHONY: default clean
 
 default: base.o module.o protocol.o socket.o
-	@$(CC) $(CXXFLAGS) $(LDFLAGS) $(DEBUG) $(SOURCES:.cpp=.o) robobo.cpp -o ../robobo
+	@$(CC) $(CXXFLAGS) $(LDFLAGS) $(DEBUG) base.cpp module.cpp protocol.cpp socket.cpp robobo.cpp -o ../robobo
 
 clean:
 	@rm -f *.o
