@@ -815,7 +815,7 @@ std::list<std::string> Base::channelListMode(std::string server, std::string cha
 bool Base::channelListHasEntry(std::string server, std::string channel, std::string listMode, std::string entry) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::list<std::string> ();
+		return false;
 	return servIter->second->channelListHasEntry(channel, listMode, entry);
 }
 
