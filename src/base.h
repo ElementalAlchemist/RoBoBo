@@ -6,8 +6,6 @@
  * A set of flags, one of which is returned by loadModule to show either that the module was loaded successfully
  * or why the module could not be loaded.
  */
-enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_OPEN_ERROR, LOAD_INCOMPATIBLE, LOAD_NODEPENDS, LOAD_FAILURE };
-class Base;
 
 #include "socket.h"
 #include "protocol.h"

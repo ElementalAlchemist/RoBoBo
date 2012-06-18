@@ -1,7 +1,7 @@
 #pragma once
 #include "main.h"
 
-#include "base.h"
+class Base;
 
 /// Define the spawn function for protocol module files
 #define PROTOCOL_SPAWN(modName) extern "C" Protocol* spawn(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) {\
@@ -866,3 +866,5 @@ class Protocol {
 		/// A pointer to the bot base which allows communication with bot modules
 		Base* bot;
 };
+
+#include "base.h"

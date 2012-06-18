@@ -1,7 +1,8 @@
 #pragma once
 #include "main.h"
 
-#include "base.h"
+class Base; // This needs to be forward-declared for the Base* pointer in Module; the Base class is included below.
+enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_OPEN_ERROR, LOAD_INCOMPATIBLE, LOAD_NODEPENDS, LOAD_FAILURE };
 
 /** Module priority
  * A flag used by modules to help determine the order in which module hooks are called.
@@ -1064,3 +1065,5 @@ class Module {
 		/// Holds a pointer to the bot base for communication with protocol modules and other normal modules
 		Base* bot;
 };
+
+#include "base.h"
