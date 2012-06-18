@@ -357,7 +357,7 @@ std::list<char> Module::snomasks(std::string server, std::string client) {
 }
 
 bool Module::hasSNOMask(std::string server, std::string client, char snomask) {
-	return bot->hasSNOMask(server, client);
+	return bot->hasSNOMask(server, client, snomask);
 }
 
 std::list<std::string> Module::userChannels(std::string server, std::string nick) {
