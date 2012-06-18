@@ -24,9 +24,9 @@ void Protocol::sendPrivMsg(std::string client, std::string target, std::string m
 
 void Protocol::sendNotice(std::string client, std::string target, std::string message) {}
 
-void Protocol::sendCTCP(std::string client, std::string target, std::string ctcp) {}
+void Protocol::sendCTCP(std::string client, std::string target, std::string ctcp, std::string params) {}
 
-void Protocol::sendCTCPReply(std::string client, std::string target, std::string ctcp) {}
+void Protocol::sendCTCPReply(std::string client, std::string target, std::string ctcp, std::string params) {}
 
 void Protocol::setMode(std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {}
 

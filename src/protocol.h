@@ -85,7 +85,7 @@ class Protocol {
 		 * @param target Where to send the CTCP request
 		 * @param ctcp The CTCP request body, including the type and any parameters
 		 */
-		virtual void sendCTCP(std::string client, std::string target, std::string ctcp);
+		virtual void sendCTCP(std::string client, std::string target, std::string ctcp, std::string params);
 		
 		/** Send CTCP reply
 		 * This function is called when something wants to send a CTCP reply on this server.
@@ -93,7 +93,7 @@ class Protocol {
 		 * @param target Where to send the CTCP reply
 		 * @param ctcp The CTCP reply body, including the type and any data
 		 */
-		virtual void sendCTCPReply(std::string client, std::string target, std::string ctcp);
+		virtual void sendCTCPReply(std::string client, std::string target, std::string ctcp, std::string params);
 		
 		/** Set modes
 		 * This function is called when something wants to set modes on this server.
