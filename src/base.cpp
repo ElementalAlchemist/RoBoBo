@@ -89,7 +89,7 @@ LoadResult Base::loadModule(std::string modName) {
 		dlclose(modFile);
 		return LOAD_OPEN_ERROR;
 	}
-	Module* newModule = moduleSpawn(modName, moduleConfig[modName], workingDir, debugLevel, this);
+	Module* newModule = (Module*) moduleSpawn(modName, moduleConfig[modName], workingDir, debugLevel, this);
 	if (newModule->apiVersion() != 3000) {
 		std::cerr << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl;
 		dlclose(modFile);
@@ -276,7 +276,7 @@ void Base::connectServer(std::string server) {
 			std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
 			return;
 		}
-		Protocol* newServer = protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
+		Protocol* newServer = (Protocol*) protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
 		if (newServer->apiVersion() != 3000) {
 			std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 			return;
@@ -300,7 +300,7 @@ void Base::connectServer(std::string server) {
 		dlclose(protoFile);
 		return;
 	}
-	Protocol* newServer = protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
+	Protocol* newServer = (Protocol*) protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
 	if (newServer->apiVersion() != 3000) {
 		std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 		dlclose(protoFile);
