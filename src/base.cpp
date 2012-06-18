@@ -82,7 +82,7 @@ LoadResult Base::loadModule(std::string modName) {
 		return LOAD_OPEN_ERROR;
 	}
 	// The spawn function of modules returns a module instance that we can use
-	module_spawn_t* moduleSpawn = (module_spawn_t*) dlsym(modFile, "spawn"));
+	module_spawn_t* moduleSpawn = (module_spawn_t*) dlsym(modFile, "spawn");
 	const char* spawnError = dlerror();
 	if (spawnError != NULL) {
 		std::cerr << "Spawn not found in module " << modName << ": " << spawnError << std::endl;
