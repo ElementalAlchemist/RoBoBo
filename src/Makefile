@@ -11,7 +11,7 @@ default: base.o module.o protocol.o socket.o
 	@$(CC) $(CXXFLAGS) $(LDFLAGS) $(DEBUG) $(SOURCES:.cpp=.o) robobo.cpp -o ../robobo
 
 clean:
-	rm *.o
+	@test -f *.o && rm *.o
 
 # include g++-generated dependencies
 $(shell ${CC} -std=c++0x -E -MM base.cpp)
