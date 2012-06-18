@@ -593,7 +593,7 @@ std::string Base::addClient(std::string server, std::string nick, std::string id
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return "";
-	servIter->second->addClient(nick, ident, host, gecos);
+	return servIter->second->addClient(nick, ident, host, gecos);
 }
 
 void Base::removeClient(std::string server, std::string client) {
