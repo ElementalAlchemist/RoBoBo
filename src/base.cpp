@@ -385,7 +385,13 @@ Socket* Base::loadSocket(std::string sockettype) {
 }
 
 void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
-	// TODO: take socket and unregister it
+	delete socketptr;
+	socketCounts[sockettype]--;
+	if (socketCounts[sockettype] == 0) {
+		std::unordered_map<std::string, void*>::iterator fileIter = socketFiles.find(sockettype);
+		dlclose(fileIter->second);
+		socketFiles.erase(fileIter);
+	}
 }
 
 void Base::rehash() {
