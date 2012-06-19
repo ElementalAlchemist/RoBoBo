@@ -15,6 +15,7 @@
 // This typedef is used to cast the result of dlsym so that it can be used. (see Base::loadModule)
 typedef void* (module_spawn_t)(std::string, std::map<std::string, std::string>, std::string, unsigned short, Base*);
 typedef void* (protocol_spawn_t)(std::string, std::map<std::string, std::string>, std::string, bool, unsigned short, Base*);
+typedef void* (socket_spawn_t)();
 
 class Base {
 	public:

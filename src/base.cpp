@@ -340,8 +340,48 @@ void Base::disconnectServer(std::string server) {
 }
 
 Socket* Base::loadSocket(std::string sockettype) {
-	// TODO: load and return a socket
-	return NULL;
+	std::unordered_map<std::string, void*>::iterator fileIter = socketFiles.find(sockettype);
+	if (fileIter == socketFiles.end()) {
+		std::string fileName = workingDir + "/modules/s_" + sockettype + ".so";
+		void* socketFile = dlopen(fileName.c_str(), RTLD_NOW);
+		const char* fileOpenError = dlerror();
+		if (fileOpenError != NULL) {
+			std::cerr << "The socket module s_" << sockettype << " could not be loaded: " << fileOpenError << std::endl;
+			return NULL;
+		}
+		socket_spawn_t* socketSpawn = (socket_spawn_t*) dlsym(socketFile, "spawn");
+		const char* spawnError = dlerror();
+		if (spawnError != NULL) {
+			std::cerr << "Spawn not found in socket module s_" << sockettype << ": " << spawnError << std::endl;
+			dlclose(socketFile);
+			return NULL;
+		}
+		Socket* newSocket = (Socket*) socketSpawn();
+		if (newSocket->apiVersion() != 3000) {
+			std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
+			delete newSocket;
+			dlclose(socketFile);
+			return NULL;
+		}
+		socketFiles.insert(std::pair<std::string, void*> (sockettype, socketFile));
+		socketCounts[sockettype]++;
+		return newSocket;
+	}
+	void* socketFile = socketFiles[sockettype];
+	socket_spawn_t* socketSpawn = (socket_spawn_t*) dlsym(socketFile, "spawn");
+	const char* spawnError = dlerror();
+	if (spawnError != NULL) {
+		std::cerr << "Spawn not found in socket module s_" << sockettype << ": " << spawnError << std::endl;
+		return NULL;
+	}
+	Socket* newSocket = (Socket*) socketSpawn();
+	if (newSocket->apiVersion() != 3000) {
+		std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
+		delete newSocket;
+		return NULL;
+	}
+	socketCounts[sockettype]++;
+	return newSocket;
 }
 
 void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
