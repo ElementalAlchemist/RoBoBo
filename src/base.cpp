@@ -92,6 +92,7 @@ LoadResult Base::loadModule(std::string modName) {
 	Module* newModule = (Module*) moduleSpawn(modName, moduleConfig[modName], workingDir, debugLevel, this);
 	if (newModule->apiVersion() != 3000) {
 		std::cerr << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl;
+		delete newModule;
 		dlclose(modFile);
 		return LOAD_INCOMPATIBLE;
 	}
@@ -279,6 +280,7 @@ void Base::connectServer(std::string server) {
 		Protocol* newServer = (Protocol*) protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
 		if (newServer->apiVersion() != 3000) {
 			std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
+			delete newServer;
 			return;
 		}
 		protocolTypes[protoType].insert(server);
@@ -303,6 +305,7 @@ void Base::connectServer(std::string server) {
 	Protocol* newServer = (Protocol*) protoSpawn(server, confIter->second, workingDir, logDump, debugLevel, this);
 	if (newServer->apiVersion() != 3000) {
 		std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
+		delete newServer;
 		dlclose(protoFile);
 		return;
 	}
