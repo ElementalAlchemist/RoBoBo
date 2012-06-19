@@ -395,7 +395,31 @@ void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
 }
 
 void Base::rehash() {
-	// TODO: this
+	serverConfig.clear();
+	moduleConfig.clear();
+	readConfiguration();
+	modHookMutex.lock();
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	modHookMutex.unlock();
 }
 
 /* Make the calls asynchronous
