@@ -397,6 +397,8 @@ void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
 void Base::rehash() {
 	serverConfig.clear();
 	moduleConfig.clear();
+	startupServers.clear();
+	startupModules.clear();
 	readConfiguration();
 	modHookMutex.lock();
 	for (std::pair<std::string, Module*> module : highModules) {
