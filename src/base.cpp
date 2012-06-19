@@ -221,7 +221,59 @@ void Base::connectServers() {
 }
 
 void Base::checkServers() {
-	// TODO: server check
+	while (true) {
+		sleep(60);
+		std::list<std::string> removeServers;
+		for (std::pair<std::string, Protocol*> server : servers) {
+			if (!server.second->isConnected())
+				removeServers.push_back(server.first);
+		}
+		for (std::string server : removeServers)
+			disconnectServer(removeServers);
+		if (servers.empty()) {
+			bool keepAlive = false;
+			for (std::pair<std::string, Module*> module : highModules) {
+				if (module.second->forceKeepAlive()) {
+					keepAlive = true;
+					break;
+				}
+			}
+			if (!keepAlive) {
+				for (std::pair<std::string, Module*> module : mediumHighModules) {
+					if (module.second->forceKeepAlive()) {
+						keepAlive = true;
+						break;
+					}
+				}
+				if (!keepAlive) {
+					for (std::pair<std::string, Module*> module : normalModules) {
+						if (module.second->forceKeepAlive()) {
+							keepAlive = true;
+							break;
+						}
+					}
+					if (!keepAlive) {
+						for (std::pair<std::string, Module*> module : mediumLowModules) {
+							if (module.second->forceKeepAlive()) {
+								keepAlive = true;
+								break;
+							}
+						}
+						if (!keepAlive) {
+							for (std::pair<std::string, Module*> module : lowModules) {
+								if (module.second->forceKeepAlive()) {
+									keepAlive = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+			if (!keepAlive)
+				return;
+		}
+	}
 }
 
 void Base::unloadEverything() {
