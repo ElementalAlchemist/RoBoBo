@@ -3,7 +3,169 @@
 Base::Base(std::string working, std::string config, std::string configFileName, unsigned short debug, bool log) : workingDir(working), configDir(config), configName(configFileName), debugLevel(debug), logDump(log), startup(true) {}
 
 void Base::readConfiguration() {
-	// TODO: parse config file
+	std::string fileName = configDir + "/" + configName;
+	std::ifstream configFile (fileName.c_str());
+	bool readingType, readingName, readingBlock, readingKey, readingValue, valueInQuotes, valueConcatted, valueVar, escapedValue;
+	std::string currentBlockType, currentBlockName, currentKey, currentValue, currentValueVar;
+	std::list<std::string> includeFiles;
+	std::map<std::string, std::string> currentBlock;
+	size_t lineNum = 1;
+	while (configFile.good()) {
+		char confChar = configFile.get();
+		if (confChar == '\n')
+			lineNum++;
+		if (confChar == '#' && !valueInQuotes) {
+			while (configFile.good() && confChar != '\n')
+				confChar = configFile.get();
+			lineNum++;
+			continue;
+		}
+		if (confChar == ' ' || confChar == '\t' || confChar == '\r' || confChar == '\n') {
+			if (readingType) {
+				readingType = false;
+				if (currentBlockType != "server" && currentBlockType != "serverconf" && currentBlockType != "module" && currentBlockType != "moduleconf" && currentBlockType != "include")
+					std::cerr << "An invalid block type of " << currentBlockType << " was found on line " << lineNum << "." << std::endl;
+			}
+			if (readingName)
+				readingName = false;
+			else if (readingKey)
+				readingKey = false;
+			else if (valueVar) {
+				valueVar = false;
+				valueConcatted = false;
+			} else if (valueInQuotes)
+				currentValue += confChar;
+			continue;
+		}
+		if (confChar == ';') {
+			if (!readingBlock && currentBlockType == "include") {
+				includeFiles.push_back(currentBlockName);
+				currentBlockType = "";
+				currentBlockName = "";
+				readingName = false;
+			} else if (readingValue && !valueInQuotes && !valueConcatted) {
+				if (valueVar || currentValueVar != "") {
+					currentValue += currentBlock[currentValueVar];
+					currentValueVar = "";
+				}
+				currentBlock.insert(std::pair<std::string, std::string> (currentKey, currentValue));
+				currentKey = "";
+				currentValue = "";
+			} else if (valueInQuotes)
+				currentValue += ";";
+			else
+				std::cerr << "Invalid semicolon found on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		if (confChar == '{') {
+			if (!readingName && currentBlockName == "") {
+				std::cerr << "A block name was not given for the block starting on line " << lineNum << "." << std::endl;
+				currentBlockType = "";
+			} else if (readingName || (currentBlockName != "" && !readingBlock)) {
+				readingName = false;
+				readingBlock = true;
+			} else if (valueInQuotes)
+				currentValue += "{";
+			else
+				std::cerr << "Unexpected opening brace ('{') encountered on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		if (confChar == '}') {
+			if (valueInQuotes)
+				currentValue += "}";
+			else if (readingBlock && !readingKey && !readingValue) {
+				if (currentBlockType == "server") {
+					serverConfig.insert(std::pair<std::string, std::map<std::string, std::string>> (currentBlockName, currentBlock));
+					startupServers.push_back(currentBlockName);
+				} else if (currentBlockType == "serverconf")
+					serverConfig.insert(std::pair<std::string, std::map<std::string, std::string>> (currentBlockName, currentBlock));
+				else if (currentBlockType == "module") {
+					moduleConfig.insert(std::pair<std::string, std::map<std::string, std::string>> (currentBlockName, currentBlock));
+					startupModules.push_back(currentBlockName);
+				} else if (currentBlockType == "moduleconf")
+					moduleConfig.insert(std::pair<std::string, std::map<std::string, std::string>> (currentBlockName, currentBlock));
+				else // Throw up another error about the incorrectly typed block to make sure they absolutely know what it is.
+					std::cerr << "The invalid block ends on line " << lineNum << "." << std::endl;
+				readingBlock = false;
+				currentBlock.clear();
+				currentBlockType = "";
+				currentBlockName = "";
+			} else
+				std::cerr << "Unexpected closing brace ('}') encountered on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		if (confChar == '\\') {
+			if (valueInQuotes && escapedValue)
+				currentValue += "\\";
+			else if (valueInQuotes)
+				escapedValue = true;
+			else
+				std::cerr << "Unexpected backslash encountered on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		if (confChar == '"') {
+			if (readingValue && !valueInQuotes && valueConcatted) {
+				valueInQuotes = true;
+				valueConcatted = false;
+			} else if (valueInQuotes) {
+				if (escapedValue)
+					currentValue += "\"";
+				else
+					valueInQuotes = false;
+			} else
+				std::cerr << "Unexpected quote mark encountered on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		if (confChar == '=') {
+			if (readingBlock && (readingKey || (currentValue == "" && currentKey != ""))) {
+				readingKey = false;
+				readingValue = true;
+				valueConcatted = true;
+			} else if (valueInQuotes)
+				currentValue += "=";
+			else
+				std::cerr << "Unexpected equals sign encountered on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		if (confChar == '+') {
+			if (readingValue && !valueInQuotes && !valueConcatted) {
+				if (valueVar || currentValueVar != "")
+					currentValue += currentBlock[currentValueVar];
+				valueConcatted = true;
+			} else if (valueInQuotes)
+				currentValue += "+";
+			else
+				std::cerr << "Unexpected plus sign encountered on line " << lineNum << "." << std::endl;
+			continue;
+		}
+		escapedValue = false;
+		if (!readingBlock && !readingType && !readingName) {
+			if (currentBlockType == "") {
+				readingType = true;
+				currentBlockType += confChar;
+			} else if (currentBlockName == "") {
+				readingName = true;
+				currentBlockName += confChar;
+			} else
+				std::cerr << "Unexpected character ('" << confChar << "') encountered on line " << lineNum << "." << std::endl;
+		} else if (readingType)
+			currentBlockType += confChar;
+		else if (readingName)
+			currentBlockName += confChar;
+		else if (readingBlock) {
+			if (!readingKey && !readingValue) {
+				readingKey = true;
+				currentKey += confChar;
+			} else if (readingKey)
+				currentKey += confChar;
+			else if (valueInQuotes)
+				currentValue += confChar;
+			else if (valueVar)
+				currentValueVar += confChar;
+		}
+	}
+	if (readingBlock)
+		std::cerr << "End of file reached in the middle of a block." << std::endl;
 }
 
 void Base::loadModules() {
