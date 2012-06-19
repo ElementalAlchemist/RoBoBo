@@ -52,12 +52,6 @@ class Protocol {
 		 */
 		virtual bool isConnected();
 		
-		/** Connection reset check
-		 * This function is used to determine if the connection to the server should be reestablished.
-		 * @return the value of a variable settable by the module; true if the connection should be reestablished
-		 */
-		bool shouldReset();
-		
 		/** Client check
 		 * Checks whether this type of protocol module connects as a client.
 		 * @return true if it uses a client connection, false if it uses a server-to-server connection
@@ -497,9 +491,6 @@ class Protocol {
 		 * @param sockptr A pointer to the socket
 		 */
 		void killSocket(std::string socketType, Socket* sockptr);
-		
-		/// Whether to reconnect to the server after a disconnection; settable by the protocol module
-		bool resetConnection;
 		
 		
 		/** Call channel message hook
