@@ -7,7 +7,7 @@ class Base;
 
 /// Define the spawn function for protocol module files
 #define PROTOCOL_SPAWN(modName) extern "C" Protocol* spawn(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) {\
-	return new Protocol (server, conf, workDir, dumpLogs, debug, botptr);\
+	return new modName (server, conf, workDir, dumpLogs, debug, botptr);\
 }
 
 class Protocol {
