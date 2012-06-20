@@ -52,6 +52,12 @@ class Protocol {
 		 */
 		virtual bool isConnected();
 		
+		/** Dead server check
+		 * This function is used by the server check thread to determine if the server should be unloaded.
+		 * @return true to unload the server
+		 */
+		virtual bool deadServer();
+		
 		/** Client check
 		 * Checks whether this type of protocol module connects as a client.
 		 * @return true if it uses a client connection, false if it uses a server-to-server connection

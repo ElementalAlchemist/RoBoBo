@@ -225,7 +225,7 @@ void Base::checkServers() {
 		sleep(60);
 		std::list<std::string> removeServers;
 		for (std::pair<std::string, Protocol*> server : servers) {
-			if (!server.second->isConnected())
+			if (server.second->deadServer())
 				removeServers.push_back(server.first);
 		}
 		for (std::string server : removeServers)

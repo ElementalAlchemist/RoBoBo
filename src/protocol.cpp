@@ -12,6 +12,10 @@ bool Protocol::isConnected() {
 	return false;
 }
 
+bool Protocol::deadServer() {
+	return true;
+}
+
 bool Protocol::isClient() {
 	return false;
 }
