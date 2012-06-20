@@ -546,7 +546,7 @@ void Base::disconnectServer(std::string server) {
 	}
 	std::unordered_map<std::string, std::set<std::string>>::iterator typeIter = protocolTypes.find(protoType);
 	if (typeIter->second.empty()) {
-		std::unordered_map<std::string, std::set<std::string>>::iterator fileIter = protocolFiles.find(protoType);
+		std::unordered_map<std::string, void*>::iterator fileIter = protocolFiles.find(protoType);
 		dlclose(fileIter->second);
 		protocolFiles.erase(fileIter);
 		protocolTypes.erase(typeIter);
