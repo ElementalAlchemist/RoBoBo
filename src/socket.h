@@ -6,6 +6,10 @@
 #include <netdb.h>
 #include <errno.h>
 
+#define SOCKET_SPAWN(modName) extern "C" Socket* spawn() {\
+	return new modName;\
+}
+
 class Socket {
 	public:
 		/** Socket constructor
