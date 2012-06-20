@@ -229,7 +229,7 @@ void Base::checkServers() {
 				removeServers.push_back(server.first);
 		}
 		for (std::string server : removeServers)
-			disconnectServer(removeServers);
+			disconnectServer(server);
 		if (servers.empty()) {
 			bool keepAlive = false;
 			for (std::pair<std::string, Module*> module : highModules) {
