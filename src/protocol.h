@@ -546,7 +546,7 @@ class Protocol {
 		 * @param nick The nick of the user who sent the request
 		 * @param ctcp The CTCP type with any parameters
 		 */
-		void callChanCTCPHook(std::string client, std::string channel, char status, std::string nick, std::string ctcp);
+		void callChanCTCPHook(std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call user CTCP hook
 		 * This function lets modules know that we've received a user CTCP request from the server.
@@ -554,7 +554,7 @@ class Protocol {
 		 * @param nick The nick of the user who sent the request
 		 * @param ctcp The CTCP type with any parameters
 		 */
-		void callUserCTCPHook(std::string client, std::string nick, std::string ctcp);
+		void callUserCTCPHook(std::string client, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call channel CTCP reply hook
 		 * This function lets modules know that we've received a channel CTCP reply from the server.
@@ -565,7 +565,7 @@ class Protocol {
 		 * @param nick The nick of the user who sent the reply
 		 * @param ctcp The CTCP type with any data
 		 */
-		void callChanCTCPReplyHook(std::string client, std::string channel, char status, std::string nick, std::string ctcp);
+		void callChanCTCPReplyHook(std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call user CTCP reply hook
 		 * This function lets modules know that we've received a user CTCP reply from the server.
@@ -573,7 +573,7 @@ class Protocol {
 		 * @param nick The nick of the user who sent the reply
 		 * @param ctcp The CTCP type with any data
 		 */
-		void callUserCTCPReplyHook(std::string client, std::string nick, std::string ctcp);
+		void callUserCTCPReplyHook(std::string client, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call channel mode hook
 		 * This function lets modules know that a channel's modes have been changed on the server.
