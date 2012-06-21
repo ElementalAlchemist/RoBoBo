@@ -20,6 +20,10 @@ bool Protocol::isClient() {
 	return false;
 }
 
+void Protocol::endDebug() {
+	debugLevel = 0;
+}
+
 void Protocol::sendPrivMsg(std::string client, std::string target, std::string message) {}
 
 void Protocol::sendNotice(std::string client, std::string target, std::string message) {}

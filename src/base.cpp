@@ -638,6 +638,21 @@ void Base::rehash() {
 	modHookMutex.unlock();
 }
 
+void Base::endDebug() {
+	for (std::pair<std::string, Protocol*> server : servers)
+		server.second->endDebug();
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->endDebug();
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->endDebug();
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->endDebug();
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->endDebug();
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->endDebug();
+}
+
 /* Make the calls asynchronous
  * The goal of this section is to make sure module functions are called one at a time, but still in order.
  * The modHook functions start a thread and return.  This allows:

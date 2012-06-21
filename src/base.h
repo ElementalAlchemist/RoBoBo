@@ -118,6 +118,12 @@ class Base {
 		 */
 		void rehash();
 		
+		/** End debug
+		 * This function is called when the signal is received and the bot is daemonized in debug mode, so that it can stop being
+		 * in debug mode.
+		 */
+		void endDebug();
+		
 		
 		/** Channel message hook thread
 		 * This function makes channel message hook calls "nonblocking" by calling the function that actually makes

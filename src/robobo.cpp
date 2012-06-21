@@ -1,5 +1,16 @@
 #include "robobo.h"
 
+Base* botInstance;
+
+void sigHandler(int signum) {
+	// Signal calls 
+	if (signum == SIGHUP) {
+		daemon(1, 0);
+		botInstance->endDebug();
+	} else if (signum == SIGUSR1)
+		botInstance->rehash();
+}
+
 int main(int argc, char** argv) {
 	std::string workingDir = argv[0];
 	workingDir = workingDir.substr(0, workingDir.find_last_of('/'));
@@ -55,12 +66,27 @@ int main(int argc, char** argv) {
 			}
 		}
 	}
+	// Add signal handlers
+	sigset_t signalSet;
+	sigemptyset(&signalSet);
+	sigaddset(&signalSet, SIGHUP);
+	sigaddset(&signalSet, SIGUSR1);
+	struct sigaction sigHandle;
+	sigHandle.sa_handler = sigHandler;
+	sigHandle.sa_mask = signalSet;
+	sigHandle.sa_flags = 0;
+	const struct sigaction* sigPtr = &sigHandle;
+	sigaction(SIGHUP, sigPtr, NULL);
+	sigaction(SIGUSR1, sigPtr, NULL);
 	// We're done parsing command line arguments; it's time to start!
-	Base botInstance (workingDir, confDir, confName, debugLevel, logDump);
-	botInstance.readConfiguration();
-	botInstance.loadModules();
-	botInstance.connectServers();
-	botInstance.checkServers();
+	botInstance = new Base (workingDir, confDir, confName, debugLevel, logDump);
+	botInstance->readConfiguration();
+	botInstance->loadModules();
+	botInstance->connectServers();
+	if (debugLevel == 0)
+		daemon(1, 0);
+	botInstance->checkServers();
 	// If checkModules returns, the bot is shutting down, so kill all the things
-	botInstance.unloadEverything();
+	botInstance->unloadEverything();
+	delete botInstance;
 }

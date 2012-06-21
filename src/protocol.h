@@ -64,6 +64,12 @@ class Protocol {
 		 */
 		virtual bool isClient();
 		
+		/** End debug
+		 * If, at any time, the bot leaves debug mode, this function resets the debug level to 0.
+		 * @see debugLevel
+		 */
+		void endDebug();
+		
 		
 		/** Send message
 		 * This function is called when something wants to send a message on this server.
