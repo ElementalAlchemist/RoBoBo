@@ -69,7 +69,7 @@ std::string Plaintext::receive(bool* reset) {
 	while (true) {
 		shouldSleep = false;
 		do {
-			if (reset)
+			if (*reset)
 				return "";
 			if (shouldSleep)
 				usleep(50000);
