@@ -6,7 +6,7 @@ Socket::~Socket() {}
 
 void Socket::connectServer(std::string server, std::string port, std::string bindAddr) {}
 
-std::string Socket::receive() {
+std::string Socket::receive(bool* reset) {
 	return "";
 }
 

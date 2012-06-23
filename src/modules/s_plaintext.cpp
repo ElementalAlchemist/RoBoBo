@@ -6,7 +6,7 @@ class Plaintext : public Socket {
 		~Plaintext();
 		unsigned int apiVersion();
 		void connectServer(std::string server, std::string port, std::string bindAddr = "");
-		std::string receive();
+		std::string receive(bool* reset);
 		void sendData(std::string line);
 		void closeConnection();
 };
@@ -61,7 +61,7 @@ void Plaintext::connectServer(std::string server, std::string port, std::string 
 	connected = true;
 }
 
-std::string Plaintext::receive() {
+std::string Plaintext::receive(bool* reset) {
 	char inputBuffer[2];
 	std::string incomingMsg = "";
 	bool shouldSleep;
@@ -69,6 +69,8 @@ std::string Plaintext::receive() {
 	while (true) {
 		shouldSleep = false;
 		do {
+			if (reset)
+				return "";
 			if (shouldSleep)
 				usleep(50000);
 			status = recv(socketfd, &inputBuffer, 1, 0);
