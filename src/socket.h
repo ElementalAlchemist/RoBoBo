@@ -41,7 +41,7 @@ class Socket {
 		 * This function returns a line of data from the server, or an empty string if the connection is broken.
 		 * @return An IRC line from the server
 		 */
-		virtual std::string receive(bool* reset);
+		virtual std::string receive();
 		
 		/** Send data
 		 * This function is used to send data to the server.  It must append the line end (\r\n) to any IRC lines before sending.
