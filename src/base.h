@@ -96,6 +96,7 @@ class Base {
 		 * This function disconnects from the specified server and, if necessary, unloads the appropriate
 		 * protocol module.
 		 * @param server The name of the server to disconnect
+		 * @param reason The reason to disconnect
 		 */
 		void disconnectServer(std::string server, std::string reason = "");
 		
