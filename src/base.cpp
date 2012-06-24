@@ -222,7 +222,7 @@ void Base::connectServers() {
 
 void Base::checkServers() {
 	while (true) {
-		sleep(60);
+		std::this_thread::sleep_for(std::chrono::seconds(60));
 		std::list<std::string> removeServers;
 		for (std::pair<std::string, Protocol*> server : servers) {
 			if (server.second->deadServer())

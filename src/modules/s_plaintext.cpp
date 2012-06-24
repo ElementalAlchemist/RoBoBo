@@ -70,7 +70,7 @@ std::string Plaintext::receive() {
 		shouldSleep = false;
 		do {
 			if (shouldSleep)
-				usleep(50000);
+				std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Give some (although brief) wait to prevent eating the entire CPU
 			status = recv(socketfd, &inputBuffer, 1, 0);
 			shouldSleep = true;
 		} while (status < 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
