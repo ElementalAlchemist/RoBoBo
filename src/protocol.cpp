@@ -6,7 +6,7 @@ Protocol::~Protocol() {}
 
 void Protocol::connectServer() {}
 
-void Protocol::disconnectServer() {}
+void Protocol::disconnectServer(std::string reason) {}
 
 bool Protocol::isConnected() {
 	return false;

@@ -700,8 +700,9 @@ class Module {
 		/** Quit server
 		 * Used by modules to entirely disconnect from a server.
 		 * @param server The server from which to disconnect
+		 * @param reason The reason to give for disconnecting
 		 */
-		void quitServer(std::string server);
+		void quitServer(std::string server, std::string reason);
 		
 		/** Oper
 		 * Used by modules to oper up

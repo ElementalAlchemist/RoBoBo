@@ -529,13 +529,13 @@ void Base::connectServer(std::string server) {
 	newServer->connectServer();
 }
 
-void Base::disconnectServer(std::string server) {
+void Base::disconnectServer(std::string server, std::string reason) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
 	Protocol* unloadingServer = servIter->second;
 	servers.erase(servIter);
-	unloadingServer->disconnectServer();
+	unloadingServer->disconnectServer(reason);
 	delete unloadingServer;
 	std::string protoType = "";
 	for (std::pair<std::string, std::set<std::string>> typeList : protocolTypes) {

@@ -97,7 +97,7 @@ class Base {
 		 * protocol module.
 		 * @param server The name of the server to disconnect
 		 */
-		void disconnectServer(std::string server);
+		void disconnectServer(std::string server, std::string reason = "");
 		
 		/** Socket module loader
 		 * This function loads a socket module requested by a protocol module and returns the socket.

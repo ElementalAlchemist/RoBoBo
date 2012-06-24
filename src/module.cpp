@@ -204,8 +204,8 @@ void Module::removeClient(std::string server, std::string client) {
 	bot->removeClient(server, client);
 }
 
-void Module::quitServer(std::string server) {
-	bot->disconnectServer(server);
+void Module::quitServer(std::string server, std::string reason) {
+	bot->disconnectServer(server, reason);
 }
 
 void Module::oper(std::string server, std::string client, std::string username, std::string password) {

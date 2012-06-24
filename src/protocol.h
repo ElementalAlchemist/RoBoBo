@@ -44,7 +44,7 @@ class Protocol {
 		/** Disconnect from server
 		 * This function is called by the core if, for some reason, the bot needs to disconnect from the server.
 		 */
-		virtual void disconnectServer();
+		virtual void disconnectServer(std::string reason);
 		
 		/** Connection check
 		 * This function is used to determine if the connection to the server is still active.
