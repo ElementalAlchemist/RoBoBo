@@ -898,7 +898,7 @@ class Base {
 		 * @param server The server whose channel types to list
 		 * @return A list of channel type chars
 		 */
-		std::list<char> channelTypes(std::string server);
+		std::set<char> channelTypes(std::string server);
 		
 		/** Channel list
 		 * A list of channels on a server.

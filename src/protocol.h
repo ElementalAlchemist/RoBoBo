@@ -323,7 +323,7 @@ class Protocol {
 		 * Lists valid types of channels on this server.
 		 * @return a list of channel type characters
 		 */
-		virtual std::list<char> channelTypes();
+		virtual std::set<char> channelTypes();
 		
 		/** Channel list
 		 * Lists channels on this server.

@@ -96,8 +96,8 @@ std::list<std::pair<std::string, char>> Protocol::statuses() {
 	return std::list<std::pair<std::string, char>> ();
 }
 
-std::list<char> Protocol::channelTypes() {
-	return std::list<char> ();
+std::set<char> Protocol::channelTypes() {
+	return std::set<char> ();
 }
 
 std::list<std::string> Protocol::channels() {

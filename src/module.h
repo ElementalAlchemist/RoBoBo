@@ -819,7 +819,7 @@ class Module {
 		 * @param server The server whose channel types to list
 		 * @return A list of channel type chars
 		 */
-		std::list<char> channelTypes(std::string server);
+		std::set<char> channelTypes(std::string server);
 		
 		/** Server channel list
 		 * Allows modules to get a list of channels on the server as seen by the bot.
