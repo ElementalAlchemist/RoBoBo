@@ -47,10 +47,11 @@ class LocalClient : public User {
 LocalClient::LocalClient(Client* clientptr) : protoptr(clientptr) {}
 
 void LocalClient::receiveData() {
-	connection->sendData("NICK " + nick);
-	connection->sendData("USER " + ident + " localhost " + server + " :" + gecos);
+	// Send the initial data here because the send queue may not always be called, depending on whether flood throttle is active.
 	if (password != "")
 		connection->sendData("PASS " + password);
+	connection->sendData("NICK " + nick);
+	connection->sendData("USER " + ident + " localhost " + server + " :" + gecos);
 	while (true) {
 		
 	}
