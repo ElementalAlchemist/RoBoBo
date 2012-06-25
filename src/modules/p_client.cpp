@@ -68,9 +68,7 @@ void LocalClient::sendData() {
 }
 
 void LocalClient::decreaseSeconds() {
-	while (true) {
-		if (connection == NULL || !connection->isConnected())
-			break;
+	while (connection != NULL && connection->isConnected()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		if (seconds > 0)
 			seconds--;
