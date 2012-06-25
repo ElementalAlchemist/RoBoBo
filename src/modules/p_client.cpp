@@ -560,7 +560,7 @@ void Client::saveMode(std::string longName, char shortChar, bool chan) {
 	std::map<std::string, std::string>::iterator confIter = config.find("mode-" + longName);
 	if (confIter != config.end()) {
 		if (confIter->second == "disabled")
-			return;
+			return; // Don't add the mode if it's disabled by the user.
 		if (confIter->second != "")
 			shortChar = confIter->second[0];
 	}
