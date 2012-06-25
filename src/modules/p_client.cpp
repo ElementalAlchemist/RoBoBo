@@ -48,12 +48,16 @@ LocalClient::LocalClient(Client* clientptr) : protoptr(clientptr) {}
 
 void LocalClient::receiveData() {
 	// Send the initial data here because the send queue may not always be called, depending on whether flood throttle is active.
+	connection->sendData("CAP LS");
 	if (password != "")
 		connection->sendData("PASS " + password);
 	connection->sendData("NICK " + nick);
 	connection->sendData("USER " + ident + " localhost " + server + " :" + gecos);
-	while (true) {
-		
+	while (connection != NULL && connection->isConnected()) {
+		std::string message = connection->receive();
+		if (message == "")
+			break;
+		protoptr->processIncoming(identifier, message);
 	}
 }
 
