@@ -319,6 +319,12 @@ class Protocol {
 		 */
 		virtual std::list<std::pair<std::string, char>> statuses();
 		
+		/** Channel types list
+		 * Lists valid types of channels on this server.
+		 * @return a list of channel type characters
+		 */
+		virtual std::list<char> channelTypes();
+		
 		/** Channel list
 		 * Lists channels on this server.
 		 * @return a list of channels

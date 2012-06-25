@@ -814,6 +814,13 @@ class Module {
 		 */
 		std::list<std::pair<std::string, char>> serverStatuses(std::string server);
 		
+		/** Channel type list
+		 * Allows modules to get a list of channel type characters on the server.
+		 * @param server The server whose channel types to list
+		 * @return A list of channel type chars
+		 */
+		std::list<char> channelTypes(std::string server);
+		
 		/** Server channel list
 		 * Allows modules to get a list of channels on the server as seen by the bot.
 		 * @param server The server whose channels we are viewing

@@ -893,6 +893,13 @@ class Base {
 		 */
 		std::list<std::pair<std::string, char>> serverStatuses(std::string server);
 		
+		/** Channel types list
+		 * A list of valid channel type chars on a server.
+		 * @param server The server whose channel types to list
+		 * @return A list of channel type chars
+		 */
+		std::list<char> channelTypes(std::string server);
+		
 		/** Channel list
 		 * A list of channels on a server.
 		 * @param server The server whose channels to list

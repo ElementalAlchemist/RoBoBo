@@ -1030,6 +1030,13 @@ std::list<std::pair<std::string, char>> Base::serverStatuses(std::string server)
 	return servIter->second->statuses();
 }
 
+std::list<char> Base::channelTypes(std::string server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<char> ();
+	return servIter->second->channelTypes();
+}
+
 std::list<std::string> Base::channels(std::string server) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())

@@ -264,6 +264,10 @@ std::list<std::pair<std::string, char>> Module::serverStatuses(std::string serve
 	return bot->serverStatuses(server);
 }
 
+std::list<char> Module::channelTypes(std::string server) {
+	return bot->channelTypes(server);
+}
+
 std::list<std::string> Module::channels(std::string server) {
 	return bot->channels(server);
 }
