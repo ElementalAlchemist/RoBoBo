@@ -348,66 +348,34 @@ void Protocol::callUserNoticeSendHook(std::string client, std::string nick, std:
 	bot->modUserNoticeSendHook(serverName, client, nick, message);
 }
 
-void Protocol::callChanCTCPOutHook(std::string client, std::string channel, char status, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modChanCTCPOutHook(serverName, client, channel, status, ctcp, "");
-	else
-		bot->modChanCTCPOutHook(serverName, client, channel, status, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callChanCTCPOutHook(std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	bot->modChanCTCPOutHook(serverName, client, channel, status, ctcp, params);
 }
 
-void Protocol::callChanCTCPSendHook(std::string client, std::string channel, char status, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modChanCTCPSendHook(serverName, client, channel, status, ctcp, "");
-	else
-		bot->modChanCTCPSendHook(serverName, client, channel, status, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callChanCTCPSendHook(std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	bot->modChanCTCPSendHook(serverName, client, channel, status, ctcp, params);
 }
 
-void Protocol::callUserCTCPOutHook(std::string client, std::string nick, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modUserCTCPOutHook(serverName, client, nick, ctcp, "");
-	else
-		bot->modUserCTCPOutHook(serverName, client, nick, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callUserCTCPOutHook(std::string client, std::string nick, std::string ctcp, std::string params) {
+	bot->modUserCTCPOutHook(serverName, client, nick, ctcp, params);
 }
 
-void Protocol::callUserCTCPSendHook(std::string client, std::string nick, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modUserCTCPSendHook(serverName, client, nick, ctcp, "");
-	else
-		bot->modUserCTCPSendHook(serverName, client, nick, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callUserCTCPSendHook(std::string client, std::string nick, std::string ctcp, std::string params) {
+	bot->modUserCTCPSendHook(serverName, client, nick, ctcp, params);
 }
 
-void Protocol::callChanCTCPReplyOutHook(std::string client, std::string channel, char status, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modChanCTCPReplyOutHook(serverName, client, channel, status, ctcp, "");
-	else
-		bot->modChanCTCPReplyOutHook(serverName, client, channel, status, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callChanCTCPReplyOutHook(std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	bot->modChanCTCPReplyOutHook(serverName, client, channel, status, ctcp, params);
 }
 
-void Protocol::callChanCTCPReplySendHook(std::string client, std::string channel, char status, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modChanCTCPReplySendHook(serverName, client, channel, status, ctcp, "");
-	else
-		bot->modChanCTCPReplySendHook(serverName, client, channel, status, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callChanCTCPReplySendHook(std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	bot->modChanCTCPReplySendHook(serverName, client, channel, status, ctcp, params);
 }
 
-void Protocol::callUserCTCPReplyOutHook(std::string client, std::string nick, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modUserCTCPReplyOutHook(serverName, client, nick, ctcp, "");
-	else
-		bot->modUserCTCPReplyOutHook(serverName, client, nick, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callUserCTCPReplyOutHook(std::string client, std::string nick, std::string ctcp, std::string params) {
+	bot->modUserCTCPReplyOutHook(serverName, client, nick, ctcp, params);
 }
 
-void Protocol::callUserCTCPReplySendHook(std::string client, std::string nick, std::string ctcp) {
-	size_t spacePos = ctcp.find_first_of(' ');
-	if (spacePos == std::string::npos)
-		bot->modUserCTCPReplySendHook(serverName, client, nick, ctcp, "");
-	else
-		bot->modUserCTCPReplySendHook(serverName, client, nick, ctcp.substr(0, spacePos), ctcp.substr(spacePos + 1));
+void Protocol::callUserCTCPReplySendHook(std::string client, std::string nick, std::string ctcp, std::string params) {
+	bot->modUserCTCPReplySendHook(serverName, client, nick, ctcp, params);
 }

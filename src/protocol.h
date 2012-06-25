@@ -809,9 +809,10 @@ class Protocol {
 		 * @param channel The channel to which the CTCP request will be sent
 		 * @param status The status char to which the CTCP request will be sent, e.g. '@' if it will be sent to @#channel; it should be a blank
 		 * space (' ') if it will be sent to the entire channel
-		 * @param ctcp The CTCP type and any associated parameters
+		 * @param ctcp The CTCP type
+		 * @param params Any associated parameters
 		 */
-		void callChanCTCPOutHook(std::string client, std::string channel, char status, std::string ctcp);
+		void callChanCTCPOutHook(std::string client, std::string channel, char status, std::string ctcp, std::string params);
 		
 		/** Call sent channel CTCP hook
 		 * This function lets modules know that you have sent out a channel CTCP request.
@@ -819,25 +820,28 @@ class Protocol {
 		 * @param channel The channel to which the CTCP request was sent
 		 * @param status The status char to which the CTCP request was sent, e.g. '@' if it was sent to @#channel; it should be a blank space
 		 * (' ') if it was sent to the entire channel
-		 * @param ctcp The CTCP type and any associated parameters
+		 * @param ctcp The CTCP type
+		 * @param params Any associated parameters
 		 */
-		void callChanCTCPSendHook(std::string client, std::string channel, char status, std::string ctcp);
+		void callChanCTCPSendHook(std::string client, std::string channel, char status, std::string ctcp, std::string params);
 		
 		/** Call outgoing user CTCP hook
 		 * This function lets modules know that you are ready to send out a user CTCP request.
 		 * @param client The identifier of the client that will send the CTCP request
 		 * @param nick The nick of the user to whom the CTCP request will be sent
 		 * @param ctcp The CTCP type and any associated parameters
+		 * @param params Any associated parameters
 		 */
-		void callUserCTCPOutHook(std::string client, std::string nick, std::string ctcp);
+		void callUserCTCPOutHook(std::string client, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call sent user CTCP hook
 		 * This function lets modules know that you have sent out a user CTCP request.
 		 * @param client The identifier of the client that sent the CTCP request
 		 * @param nick The nick of the user to whom the CTCP request was sent
 		 * @param ctcp The CTCP type and any associated parameters
+		 * @param params Any associated parameters
 		 */
-		void callUserCTCPSendHook(std::string client, std::string nick, std::string ctcp);
+		void callUserCTCPSendHook(std::string client, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call outgoing channel CTCP reply hook
 		 * This function lets modules know that you are ready to send out a channel CTCP reply.
@@ -845,9 +849,10 @@ class Protocol {
 		 * @param channel The channel to which the CTCP reply will be sent
 		 * @param status The status char to which the CTCP reply will be sent, e.g. '@' if it will be sent to @#channel; it should be a blank
 		 * space (' ') if it will be sent to the entire channel
-		 * @param ctcp The CTCP type and any associated data
+		 * @param ctcp The CTCP type
+		 * @param params Any associated data
 		 */
-		void callChanCTCPReplyOutHook(std::string client, std::string channel, char status, std::string ctcp);
+		void callChanCTCPReplyOutHook(std::string client, std::string channel, char status, std::string ctcp, std::string params);
 		
 		/** Call sent channel CTCP reply hook
 		 * This function lets modules know that you have sent out a channel CTCP reply.
@@ -855,25 +860,28 @@ class Protocol {
 		 * @param channel The channel to which the CTCP reply was sent
 		 * @param status The status char to which the CTCP reply was sent, e.g. '@' if it was sent to @#channel; it should be a blank space (' ')
 		 * if it was sent to the entire channel
-		 * @param ctcp The CTCP type and any associated data
+		 * @param ctcp The CTCP type
+		 * @param params Any associated data
 		 */
-		void callChanCTCPReplySendHook(std::string client, std::string channel, char status, std::string ctcp);
+		void callChanCTCPReplySendHook(std::string client, std::string channel, char status, std::string ctcp, std::string params);
 		
 		/** Call outgoing user CTCP reply hook
 		 * This function lets modules know that you are ready to send out a user CTCP reply
 		 * @param client The identifier of the client that will send the CTCP reply
 		 * @param nick The nick of the user to whom the CTCP reply will be sent
-		 * @param ctcp The CTCP type and any associated data
+		 * @param ctcp The CTCP type
+		 * @param params Any associated data
 		 */
-		void callUserCTCPReplyOutHook(std::string client, std::string nick, std::string ctcp);
+		void callUserCTCPReplyOutHook(std::string client, std::string nick, std::string ctcp, std::string params);
 		
 		/** Call sent user CTCP reply hook
 		 * This function lets modules know that you have sent out a user CTCP reply
 		 * @param client The identifier of the client that sent the CTCP reply
 		 * @param nick The nick of the user to whom the CTCP reply was sent
 		 * @param ctcp The CTCP type and any associated data
+		 * @param params Any associated data
 		 */
-		void callUserCTCPReplySendHook(std::string client, std::string nick, std::string ctcp);
+		void callUserCTCPReplySendHook(std::string client, std::string nick, std::string ctcp, std::string params);
 	private:
 		/// A pointer to the bot base which allows communication with bot modules
 		Base* bot;
