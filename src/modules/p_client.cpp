@@ -62,8 +62,35 @@ void LocalClient::receiveData() {
 }
 
 void LocalClient::sendData() {
-	while (true) {
-		
+	while (connection != NULL && connection->isConnected()) {
+		if (messageQueue.empty()) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			continue;
+		}
+		std::string outgoingMsg = messageQueue.front();
+		messageQueue.pop_front();
+		std::vector<std::string> splitMsg = protoptr->parseIRC(outgoingMsg);
+		unsigned int secondsToAdd = 1;
+		protoptr->callSendHooks(splitMsg);
+		std::string command = splitMsg[0];
+		// These values were borrowed and mapped as well as possible to a simple mapping of command -> penalty
+		// Some commands have values that vary depending on output or other things (e.g. WHO by number of lines of output)
+		// so they were mapped to the most common value or best approximation.
+		if (command == "GLINE" || command == "KLINE" || command == "OJOIN" || command == "PING" || command == "PONG" || command == "QLINE" || command == "SAJOIN" || command == "SAKICK" || command == "SAMODE" || command == "SANICK" || command == "SAPART" || command == "SAQUIT" || command == "SATOPIC" || command == "ZLINE")
+			secondsToAdd = 0;
+		else if (command == "JOIN" || command == "MAP" || command == "REHASH" || command == "TOPIC" || command == "WHO" || command == "WHOIS" || command == "WHOWAS")
+			secondsToAdd = 2;
+		else if (command == "CYCLE")
+			secondsToAdd = 3;
+		else if (command == "INVITE" || command == "NICK")
+			secondsToAdd = 4;
+		else if (command == "KNOCK" || command == "LIST" || command == "PART")
+			secondsToAdd = 5;
+		if (seconds + secondsToAdd > 10)
+			std::this_thread::sleep_for(std::chrono::seconds(seconds + secondsToAdd - 10));
+		seconds += secondsToAdd;
+		// TODO: Split the line if it's too long
+		connection->sendData(outgoingMsg);
 	}
 }
 
@@ -144,6 +171,8 @@ class Client : public Protocol {
 		std::list<std::string> userChannels(std::string nick);
 		
 		void processIncoming(std::string client, std::string line);
+		std::vector<std::string> parseIRC(std::string line);
+		void callSendHooks(std::vector<std::string> parsedLine);
 		bool floodThrottle;
 	private:
 		std::unordered_map<std::string, User*> users;
@@ -554,6 +583,30 @@ void Client::processIncoming(std::string client, std::string line) {
 	dataProcess.lock();
 	
 	dataProcess.unlock();
+}
+
+std::vector<std::string> Client::parseIRC(std::string line) {
+	std::vector<std::string> parsedLine;
+	std::string currentToken = "";
+	for (std::string::iterator lineIter = line.begin(); lineIter != line.end(); ++lineIter) {
+		if (currentToken == "" && *lineIter == ':') {
+			for (; lineIter != line.end(); ++lineIter)
+				currentToken += *lineIter;
+			parsedLine.push_back(currentToken);
+			currentToken = "";
+		} else if (*lineIter == ' ') {
+			parsedLine.push_back(currentToken);
+			currentToken = "";
+		} else
+			currentToken += *lineIter;
+	}
+	if (currentToken != "")
+		parsedLine.push_back(currentToken);
+	return parsedLine;
+}
+
+void Client::callSendHooks(std::vector<std::string> parsedLine) {
+	
 }
 
 void Client::saveMode(std::string longName, char shortChar, bool chan) {
