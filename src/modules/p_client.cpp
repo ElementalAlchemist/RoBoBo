@@ -71,7 +71,7 @@ void LocalClient::sendData() {
 		messageQueue.pop_front();
 		std::vector<std::string> splitMsg = protoptr->parseIRC(outgoingMsg);
 		unsigned int secondsToAdd = 1;
-		protoptr->callSendHooks(splitMsg);
+		protoptr->callSendHooks(identifier, splitMsg);
 		std::string command = splitMsg[0];
 		// These values were borrowed and mapped as well as possible to a simple mapping of command -> penalty
 		// Some commands have values that vary depending on output or other things (e.g. WHO by number of lines of output)
@@ -172,7 +172,7 @@ class Client : public Protocol {
 		
 		void processIncoming(std::string client, std::string line);
 		std::vector<std::string> parseIRC(std::string line);
-		void callSendHooks(std::vector<std::string> parsedLine);
+		void callSendHooks(std::string client, std::vector<std::string> parsedLine);
 		bool floodThrottle;
 	private:
 		std::unordered_map<std::string, User*> users;
@@ -605,8 +605,96 @@ std::vector<std::string> Client::parseIRC(std::string line) {
 	return parsedLine;
 }
 
-void Client::callSendHooks(std::vector<std::string> parsedLine) {
-	
+void Client::callSendHooks(std::string client, std::vector<std::string> parsedLine) {
+	if (parsedLine[0] == "PRIVMSG") {
+		if (parsedLine[2][0] == (char)1) {
+			std::string ctcp = parsedLine[2], params = "";
+			if (ctcp[ctcp.size() - 1] == (char)1)
+				ctcp = ctcp.substr(1, ctcp.size() - 2);
+			else
+				ctcp = ctcp.substr(1);
+			size_t spacePos = ctcp.find_first_of(' ');
+			if (spacePos != std::string::npos) {
+				params = ctcp.substr(spacePos + 1);
+				ctcp = ctcp.substr(0, spacePos);
+			}
+			if (chanTypes.find(parsedLine[1][0]) == chanTypes.end()) {
+				bool isChannel = false;
+				if (chanTypes.find(parsedLine[1][1]) != chanTypes.end()) {
+					for (std::pair<std::string, char> prefix : chanPrefixes) {
+						if (prefix.second == parsedLine[1][0]) {
+							isChannel = true;
+							callChanCTCPSendHook(client, parsedLine[1].substr(1), parsedLine[1][0], ctcp, params);
+							break;
+						}
+					}
+				}
+				if (!isChannel)
+					callUserCTCPSendHook(client, parsedLine[1], ctcp, params);
+			} else
+				callChanCTCPSendHook(client, parsedLine[1], ' ', ctcp, params);
+		} else {
+			if (chanTypes.find(parsedLine[1][0]) == chanTypes.end()) {
+				bool isChannel = false;
+				if (chanTypes.find(parsedLine[1][1]) != chanTypes.end()) {
+					for (std::pair<std::string, char> prefix : chanPrefixes) {
+						if (prefix.second == parsedLine[1][0]) {
+							isChannel = true;
+							callChanMsgSendHook(client, parsedLine[1].substr(1), parsedLine[1][0], parsedLine[2]);
+							break;
+						}
+					}
+				}
+				if (!isChannel)
+					callUserMsgSendHook(client, parsedLine[1], parsedLine[2]);
+			} else
+				callUserMsgSendHook(client, parsedLine[1], ' ', parsedLine[2]);
+		}
+	} else if (parsedLine[0] == "NOTICE") {
+		if (parsedLine[2][0] == (char)1) {
+			std::string ctcp = parsedLine[2], params = "";
+			if (ctcp[ctcp.size() - 1] == (char)1)
+				ctcp = ctcp.substr(1, ctcp.size() - 2);
+			else
+				ctcp = ctcp.substr(1);
+			size_t spacePos = ctcp.find_first_of(' ');
+			if (spacePos != std::string::npos) {
+				params = ctcp.substr(spacePos + 1);
+				ctcp = ctcp.substr(0, spacePos);
+			}
+			if (chanTypes.find(parsedLine[1][0]) == chanTypes.end()) {
+				bool isChannel = false;
+				if (chanTypes.find(parsedLine[1][1] != chanTypes.end())) {
+					for (std::pair<std::string, char> prefix : chanPrefixes) {
+						if (prefix.second == parsedLine[1][0]) {
+							isChannel = true;
+							callChanCTCPReplySendHook(client, parsedLine[1].substr(1), parsedLine[1][0], ctcp, params);
+							break;
+						}
+					}
+				}
+				if (!isChannel)
+					callUserCTCPReplySendHook(client, parsedLine[1], ctcp, params);
+			} else
+				callChanCTCPReplySendHook(client, parsedLine[1], ' ', ctcp, params);
+		} else {
+			if (chanTypes.find(parsedLine[1][0]) == chanTypes.end()) {
+				bool isChannel = false;
+				if (chanTypes.find(parsedLine[1][1] != chanTypes.end())) {
+					for (std::pair<std::string, char> prefix : chanPrefixes) {
+						if (prefix.second == parsedLine[1][0]) {
+							isChannel = true;
+							callChanNoticeSendHook(client, parsedLine[1].substr(1), parsedLine[1][0], parsedLine[2]);
+							break;
+						}
+					}
+				}
+				if (!isChannel)
+					callUserNoticeSendHook(client, parsedLine[1], parsedLine[2]);
+			} else
+				callChanNoticeSendHook(client, parsedLine[1], ' ', parsedLine[2]);
+		}
+	}
 }
 
 void Client::saveMode(std::string longName, char shortChar, bool chan) {
