@@ -10,7 +10,7 @@ class User {
 		std::string ident;
 		std::string host;
 		std::string gecos;
-		std::set<std::string> channels;
+		std::list<std::string> channels;
 };
 
 class Channel {
@@ -19,8 +19,8 @@ class Channel {
 		std::string topic;
 		std::set<std::string> modes;
 		std::unordered_map<std::string, std::list<std::string>> listModes;
-		std::set<std::string> users;
-		std::unordered_map<std::string, std::list<std::string>> prefixes;
+		std::list<std::string> users;
+		std::unordered_map<std::string, std::set<std::string>> prefixes;
 };
 
 class LocalClient : public User {
@@ -176,7 +176,7 @@ class Client : public Protocol {
 		bool floodThrottle;
 	private:
 		std::unordered_map<std::string, User*> users;
-		std::unordered_map<std::string, Channel*> channels;
+		std::unordered_map<std::string, Channel*> channelList;
 		std::unordered_map<std::string, LocalClient*> clients;
 		std::mutex dataProcess;
 		std::string defaultSocket;
@@ -729,36 +729,48 @@ void Client::processedUserCTCPReply(std::string client, std::string target, std:
 	}
 }
 
-std::list<std::string> Client::listModes() {
-	
+std::set<std::string> Client::listModes() {
+	return chanListModes;
 }
 
-std::list<std::string> Client::paramModes() {
-	
+std::set<std::string> Client::paramModes() {
+	std::set allParamModes (chanParamModes); // Copy chanParamModes for this exercise.
+	for (std::string mode : chanParamParamModes)
+		allParamModes.insert(mode);
+	return allParamModes;
 }
 
-std::list<std::string> Client::modes() {
-	
+std::set<std::string> Client::modes() {
+	return chanOtherModes;
 }
 
 std::list<std::pair<std::string, char>> Client::statuses() {
-	
+	return chanPrefixes;
 }
 
 std::set<char> Client::channelTypes() {
-	
+	return chanTypes;
 }
 
 std::list<std::string> Client::channels() {
-	
+	std::list<std::string> chanList;
+	for (std::pair<std::string, Channel*> channel : channelList)
+		chanList.push_back(channel.first);
+	return chanList;
 }
 
 std::list<std::string> Client::inChannels(std::string client) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return std::list<std::string> ();
+	return clientIter->second->channels;
 }
 
 std::list<std::string> Client::channelUsers(std::string channel) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channelList.find(channel);
+	if (chanIter == channelList.end())
+		return std::list<std::string> ();
+	return chanIter->second->users;
 }
 
 bool Client::userInChannel(std::string channel, std::string user) {
