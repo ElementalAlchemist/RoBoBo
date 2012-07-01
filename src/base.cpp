@@ -2114,10 +2114,7 @@ void Base::callChanCTCPOutHooks(std::string server, std::string client, std::str
 			return;
 		}
 	}
-	if (params == "")
-		servers.find(server)->second->processedChanCTCP(client, channel, status, ctcp);
-	else
-		servers.find(server)->second->processedChanCTCP(client, channel, status, ctcp + " " + params);
+	servers.find(server)->second->processedChanCTCP(client, channel, status, ctcp, params);
 	modHookMutex.unlock();
 }
 
@@ -2173,10 +2170,7 @@ void Base::callUserCTCPOutHooks(std::string server, std::string client, std::str
 			return;
 		}
 	}
-	if (params == "")
-		servers.find(server)->second->processedUserCTCP(client, nick, ctcp);
-	else
-		servers.find(server)->second->processedUserCTCP(client, nick, ctcp + " " + params);
+	servers.find(server)->second->processedUserCTCP(client, nick, ctcp, params);
 	modHookMutex.unlock();
 }
 
@@ -2232,10 +2226,7 @@ void Base::callChanCTCPReplyOutHooks(std::string server, std::string client, std
 			return;
 		}
 	}
-	if (params == "")
-		servers.find(server)->second->processedChanCTCPReply(client, channel, status, ctcp);
-	else
-		servers.find(server)->second->processedChanCTCPReply(client, channel, status, ctcp + " " + params);
+	servers.find(server)->second->processedChanCTCPReply(client, channel, status, ctcp, params);
 	modHookMutex.unlock();
 }
 
@@ -2291,10 +2282,7 @@ void Base::callUserCTCPReplyOutHooks(std::string server, std::string client, std
 			return;
 		}
 	}
-	if (params == "")
-		servers.find(server)->second->processedUserCTCPReply(client, nick, ctcp);
-	else
-		servers.find(server)->second->processedUserCTCPReply(client, nick, ctcp + " " + params);
+	servers.find(server)->second->processedUserCTCPReply(client, nick, ctcp, params);
 	modHookMutex.unlock();
 }
 

@@ -267,7 +267,7 @@ class Protocol {
 		 * @param status The status char to which to send the request, e.g. '@' if it is to go to @#channel
 		 * @param ctcp The CTCP type and any associated parameters
 		 */
-		virtual void processedChanCTCP(std::string client, std::string target, char status, std::string ctcp);
+		virtual void processedChanCTCP(std::string client, std::string target, char status, std::string ctcp, std::string params);
 		
 		/** Processed user CTCP request hook
 		 * This function is called when the outgoing user CTCP request hooks have all been called.
@@ -275,7 +275,7 @@ class Protocol {
 		 * @param target The nick of the user to whom to send the request
 		 * @param ctcp The CTCP type and any associated parameters
 		 */
-		virtual void processedUserCTCP(std::string client, std::string target, std::string ctcp);
+		virtual void processedUserCTCP(std::string client, std::string target, std::string ctcp, std::string params);
 		
 		/** Processed channel CTCP reply hook
 		 * This function is called when the outgoing channel CTCP reply hooks have all been called.
@@ -284,7 +284,7 @@ class Protocol {
 		 * @param status The status char to which to send the reply, e.g. '@' if it is to go to @#channel
 		 * @param ctcp The CTCP type and any associated data
 		 */
-		virtual void processedChanCTCPReply(std::string client, std::string target, char status, std::string ctcp);
+		virtual void processedChanCTCPReply(std::string client, std::string target, char status, std::string ctcp, std::string params);
 		
 		/** Processed user CTCP reply hook
 		 * This function is called when the outgoing user CTCP reply hooks have all been called.
@@ -292,7 +292,7 @@ class Protocol {
 		 * @param target The nick of the user to whom to send the reply
 		 * @param ctcp The CTCP type and any associated data
 		 */
-		virtual void processedUserCTCPReply(std::string client, std::string target, std::string ctcp);
+		virtual void processedUserCTCPReply(std::string client, std::string target, std::string ctcp, std::string params);
 		
 		
 		/** List mode list
