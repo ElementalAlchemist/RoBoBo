@@ -134,10 +134,10 @@ class Client : public Protocol {
 		void processedUserMsg(std::string client, std::string target, std::string message);
 		void processedChanNotice(std::string client, std::string target, char status, std::string message);
 		void processedUserNotice(std::string client, std::string target, std::string message);
-		void processedChanCTCP(std::string client, std::string target, char status, std::string ctcp);
-		void processedUserCTCP(std::string client, std::string target, std::string ctcp);
-		void processedChanCTCPReply(std::string client, std::string target, char status, std::string ctcp);
-		void processedUserCTCPReply(std::string client, std::string target, std::string ctcp);
+		void processedChanCTCP(std::string client, std::string target, char status, std::string ctcp, std::string params);
+		void processedUserCTCP(std::string client, std::string target, std::string ctcp, std::string params);
+		void processedChanCTCPReply(std::string client, std::string target, char status, std::string ctcp, std::string params);
+		void processedUserCTCPReply(std::string client, std::string target, std::string ctcp, std::string params);
 		
 		std::list<std::string> listModes();
 		std::list<std::string> paramModes();
@@ -179,6 +179,9 @@ class Client : public Protocol {
 		std::unordered_map<std::string, Channel*> channels;
 		std::unordered_map<std::string, LocalClient*> clients;
 		std::mutex dataProcess;
+		std::string defaultSocket;
+		std::string defaultPort;
+		std::string defaultBind;
 		
 		std::set<char> chanTypes;
 		std::set<std::string> chanListModes;
@@ -191,6 +194,7 @@ class Client : public Protocol {
 		size_t maxModes;
 		
 		void saveMode(std::string longName, char shortChar, bool chan);
+		std::string getNextID();
 };
 
 Client::Client(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr) {}
@@ -208,9 +212,12 @@ void Client::connectServer() {
 	std::ostringstream entryNum;
 	entryNum << i;
 	std::map<std::string, std::string>::iterator confIter = config.find(entryNum.str() + "/id");
+	defaultSocket = config["sockettype"];
+	defaultPort = config["port"];
+	defaultBind = config["bind"];
 	while (confIter != config.end()) {
 		std::map<std::string, std::string>::iterator confNickIter = config.find(entryNum.str() + "/nick"), confIdentIter = config.find(entryNum.str() + "/ident"), confGecosIter = config.find(entryNum.str() + "/gecos"), confPortIter = config.find(entryNum.str() + "/port"), confSockIter = config.find(entryNum.str() + "/sockettype");
-		if (confNickIter == config.end() || confIdentIter == config.end() || confGecosIter == config.end() || confPortIter == config.end() || confSockIter == config.end()) {
+		if (confNickIter == config.end() || confIdentIter == config.end() || confGecosIter == config.end() || (confPortIter == config.end() && defaultPort.empty()) || (confSockIter == config.end() && defaultSocket.empty()) {
 			i++;
 			entryNum.str("");
 			entryNum << i;
@@ -223,7 +230,12 @@ void Client::connectServer() {
 		newClient->ident = confIdentIter->second;
 		newClient->gecos = confGecosIter->second;
 		newClient->seconds = 0;
-		newClient->socketType = config[entryNum.str() + "/sockettype"];
+		newClient->socketType = confSockIter->second;
+		if (newClient->socketType == "")
+			newClient->socketType = defaultSocket;
+		std::string bindAddr = config[entryNum.str() + "/bind"];
+		if (bindAddr == "")
+			bindAddr = defaultBind; // This may also be an empty string if we are not to bind to anything in particular.
 		newClient->connection = assignSocket(newClient->socketType);
 		if (newClient->connection == NULL) {
 			delete newClient;
@@ -233,7 +245,10 @@ void Client::connectServer() {
 			confIter = config.find(entryNum.str() + "/id");
 			continue;
 		}
-		newClient->connection->connectServer(serverName, confPortIter->second);
+		std::string port = confPortIter->second;
+		if (port.empty())
+			port = defaultPort;
+		newClient->connection->connectServer(serverName, port, bindAddr);
 		if (!newClient->connection->isConnected()) {
 			killSocket(newClient->socketType, newClient->connection);
 			delete newClient;
@@ -376,87 +391,342 @@ void Client::sendCTCPReply(std::string client, std::string target, std::string c
 }
 
 void Client::setMode(std::string client, std::string target, std::list<std::string> setModes, std::list<std::string> delModes) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	bool channel = true;
+	if (chanTypes.find(target[0]) == chanTypes.end())
+		channel = false;
+	std::string modeString = "", params = "";
+	if (!setModes.empty()) {
+		modeString += '+';
+		for (std::string mode : setModes) {
+			size_t equals = mode.find_first_of('=');
+			if (equals == std::string::npos) {
+				if (chanOtherModes.find(mode) == chanOtherModes.end())
+					continue;
+				modeString += modeConvertLong(mode);
+			} else {
+				std::string modeName = mode.substr(0, equals), param = mode.substr(equals + 1);
+				if (chanOtherModes.find(modeName) != chanOtherModes.end()) {
+					modeString += modeConvertLong(modeName);
+					continue;
+				}
+				if (chanListModes.find(modeName) == chanListModes.end() && chanParamModes.find(modeName) == chanParamModes.end() && chanParamParamModes.find(modeName) == chanParamParamModes.end()) {
+					bool statusChar = false;
+					for (std::pair<std::string, char> status : chanPrefixes) {
+						if (status.first == modeName)
+							statusChar = true;
+					}
+					if (statusChar) {
+						modeString += modeConvertLong(modeName);
+						params += " " + param;
+					}
+					continue;
+				}
+				modeString += modeConvertLong(modeName);
+				params += " " + param;
+			}
+		}
+	}
+	if (!delModes.empty()) {
+		modeString += '-';
+		for (std::string mode : delModes) {
+			size_t equals = mode.find_first_of('=');
+			if (equals == std::string::npos) {
+				if (chanOtherModes.find(mode) == chanOtherModes.end() && chanParamModes.find(mode) == chanParamModes.end())
+					continue;
+				modeString += modeConvertLong(mode);
+			} else {
+				std::string modeName = mode.substr(0, equals), param = mode.substr(equals + 1);
+				if (chanOtherModes.find(modeName) != chanOtherModes.end() || chanParamModes.find(modeName) != chanParamModes.end()) {
+					modeString += modeConvertLong(modeName);
+					continue;
+				}
+				if (chanListModes.find(modeName) == chanListModes.end() && chanParamParamModes.find(modeName) == chanParamParamModes.end()) {
+					bool statusChar = false;
+					for (std::pair<std::string, char> status : chanPrefixes) {
+						if (status.first == modeName)
+							statusChar = true;
+					}
+					if (statusChar) {
+						modeString += modeConvertLong(modeName);
+						params += " " + param;
+					}
+					continue;
+				}
+				modeString += modeConvertLong(modeName);
+				params += " " + param;
+			}
+		}
+	}
+	if (modeString != "") { // The mode string could be empty if we were passed entirely invalid modes or no modes
+		if (floodThrottle)
+			clientIter->second->messageQueue.push_back("MODE " + target + " " + modeString + params);
+		else
+			clientIter->second->connection->sendData("MODE " + target + " " + modeString + params);
+	}
 }
 
 void Client::setSNOMask(std::string client, char snomask, bool add) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	char snomode = modeConvertLong("snomask");
+	if (snomode == ' ')
+		return; // this server does not have snomasks
+	std::ostringstream modeStr;
+	modeStr << "MODE " << clientIter->second->nick << " +" << snomode << " " << (add ? '+' : '-') << snomask;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back(modeStr.str());
+	else
+		clientIter->second->connection->sendData(modeStr.str());
 }
 
 void Client::setChanTopic(std::string client, std::string channel, std::string topic) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back("TOPIC " + channel + " :" + topic);
+	else
+		clientIter->second->connection->sendData("TOPIC " + channel + " :" + topic);
 }
 
 void Client::joinChannel(std::string client, std::string channel, std::string key = "") {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back("JOIN " + channel + (key ? " " + key : ""));
+	else
+		clientIter->second->connection->sendData("JOIN " + channel + (key ? " " + key : ""));
 }
 
 void Client::partChannel(std::string client, std::string channel, std::string reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back("PART " + channel + " :" + reason);
+	else
+		clientIter->second->connection->sendData("PART " + channel + " :" + reason);
 }
 
 void Client::kickUser(std::string client, std::string channel, std::string nick, std::string reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back("KICK " + channel + " " + nick + " :" + reason);
+	else
+		clientIter->second->connection->sendData("KICK " + channel + " " + nick + " :" + reason);
 }
 
 void Client::changeNick(std::string client, std::string newNick) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back("NICK " + newNick);
+	else
+		clientIter->second->connection->sendData("NICK " + newNick);
 }
 
 std::string Client::addClient(std::string nick, std::string ident, std::string host, std::string gecos) {
-	
+	Socket* newConnection = assignSocket(defaultSocket);
+	if (newConnection == NULL)
+		return "";
+	LocalClient* newClient = new LocalClient (this);
+	newClient->nick = nick;
+	newClient->ident = ident;
+	newClient->gecos = gecos;
+	newClient->connection = newConnection;
+	newClient->server = serverName;
+	newClient->seconds = 0;
+	newConnection->connectServer(serverName, defaultPort, defaultBind);
+	if (!newConnection->isConnected()) {
+		delete newConnection;
+		delete newClient;
+		return "";
+	}
+	std::string id = getNextID();
+	clients.insert(std::pair<std::string, LocalClient*> (id, newClient));
+	return id;
 }
 
 void Client::removeClient(std::string client) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	clientIter->second->connection->closeConnection();
+	// Wait for the threads to end
+	if (clientIter->second->receiveThread.joinable())
+		clientIter->second->receiveThread.join();
+	if (clientIter->second->sendThread.joinable())
+		clientIter->second->sendThread.join();
+	if (clientIter->second->secondsThread.joinable())
+		clientIter->second->secondsThread.join();
+	delete clientIter->second->connection;
+	delete clientIter->second;
 }
 
 void Client::oper(std::string client, std::string username, std::string password) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back("OPER " + username + " " + password);
+	else
+		clientIter->second->connection->sendData("OPER " + username + " " + password);
 }
 
+// TODO: Figure out how to have users set up the x:line format in configure
 void Client::setXLine(std::string client, std::string linetype, std::string mask, time_t duration, std::string reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	std::ostringstream lineStr;
+	if (linetype.size() == 1) {
+		lineStr << linetype << "LINE " << mask << " " << duration << " :" << reason;
+		if (floodThrottle)
+			clientIter->second->messageQueue.push_back(lineStr.str());
+		else
+			clientIter->second->connection->sendData(lineStr.str());
+	} else {
+		lineStr << linetype << " " << mask << " " << duration << " :" << reason;
+		if (floodThrottle)
+			clientIter->second->messageQueue.push_back(lineStr.str());
+		else
+			clientIter->second->connection->sendData(lineStr.str());
+	}
 }
 
 void Client::delXLine(std::string client, std::string linetype, std::string mask) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (linetype.size() == 1) {
+		if (floodThrottle)
+			clientIter->second->messageQueue.push_back(linetype + "LINE " + mask);
+		else
+			clientIter->second->connection->sendData(linetype + "LINE " + mask);
+	} else {
+		if (floodThrottle)
+			clientIter->second->messageQueue.push_back(linetype + " " + mask);
+		else
+			clientIter->second->connection->sendData(linetype + " " + mask);
+	}
 }
 
 void Client::sendOtherData(std::string client, std::string line) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	if (floodThrottle)
+		clientIter->second->messageQueue.push_back(line);
+	else
+		clientIter->second->connection->sendData(line);
 }
 
 void Client::processedChanMsg(std::string client, std::string target, char status, std::string message) {
-	
+	std::ostringstream outStr;
+	outStr << "PRIVMSG " << (status == ' ' ? "" : status) << target << " :" << message;
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back(outStr.str());
+	else {
+		clients.find(client)->second->connection->sendData(outStr.str());
+		callChanMsgSendHook(client, target, status, message);
+	}
 }
 
 void Client::processedUserMsg(std::string client, std::string target, std::string message) {
-	
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back("PRIVMSG " + target + " :" + message);
+	else {
+		clients.find(client)->second->connection->sendData("PRIVMSG " + target + " :" + message);
+		callUserMsgSendHook(client, target, message);
+	}
 }
 
 void Client::processedChanNotice(std::string client, std::string target, char status, std::string message) {
-	
+	std::ostringstream outStr;
+	outStr << "NOTICE " << (status == ' ' ? "" : status) << target << " :" << message;
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back(outStr.str());
+	else {
+		clients.find(client)->second->connection->sendData(outStr.str());
+		callChanNoticeSendHook(client, target, status, message);
+	}
 }
 
 void Client::processedUserNotice(std::string client, std::string target, std::string message) {
-	
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back("NOTICE " + target + " :" + message);
+	else {
+		clients.find(client)->second->connection->sendData("NOTICE " + target + " :" + message);
+		callUserNoticeSendHook(client, target, message);
+	}
 }
 
-void Client::processedChanCTCP(std::string client, std::string target, char status, std::string ctcp) {
-	
+void Client::processedChanCTCP(std::string client, std::string target, char status, std::string ctcp, std::string params) {
+	std::ostringstream outStr;
+	if (status == ' ') {
+		if (params == "")
+			outStr << "PRIVMSG " << target << " :" << (char)1 << ctcp << (char)1;
+		else
+			outStr << "PRIVMSG " << target << " :" << (char)1 << ctcp << " " << params << (char)1;
+	} else {
+		if (params == "")
+			outStr << "PRIVMSG " << status << target << " :" << (char)1 << ctcp << (char)1;
+		else
+			outStr << "PRIVMSG " << status << target << " :" << (char)1 << ctcp << " " << params << (char)1;
+	}
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back(outStr.str());
+	else {
+		clients.find(client)->second->connection->sendData(outStr.str());
+		callChanCTCPSendHook(client, target, status, ctcp, params);
+	}
 }
 
-void Client::processedUserCTCP(std::string client, std::string target, std::string ctcp) {
-	
+void Client::processedUserCTCP(std::string client, std::string target, std::string ctcp, std::string params) {
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back("PRIVMSG " + target + " :\x01" + ctcp + (params == "" ? "" : " " + params) + "\x01");
+	else {
+		clients.find(client)->second->connection->sendData("PRIVMSG " + target + " :\x01" + ctcp + (params == "" ? "" : " " + params) + "\x01");
+		callUserCTCPSendHook(client, target, ctcp, params);
+	}
 }
 
-void Client::processedChanCTCPReply(std::string client, std::string target, char status, std::string ctcp) {
-	
+void Client::processedChanCTCPReply(std::string client, std::string target, char status, std::string ctcp, std::string params) {
+	std::ostringstream outStr;
+	if (status == ' ') {
+		if (params == "")
+			outStr << "NOTICE " << target << " :" << (char)1 << ctcp << (char)1;
+		else
+			outStr << "NOTICE " << target << " :" << (char)1 << ctcp << " " << params << (char)1;
+	} else {
+		if (params == "")
+			outStr << "NOTICE " << status << target << " :" << (char)1 << ctcp << (char)1;
+		else
+			outStr << "NOTICE " << status << target << " :" << (char)1 << ctcp << " " << params << (char)1;
+	}
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back(outStr.str());
+	else {
+		clients.find(client)->second->connection->sendData(outStr.str());
+		callChanCTCPReplySendHook(client, target, status, ctcp, params);
+	}
 }
 
-void Client::processedUserCTCPReply(std::string client, std::string target, std::string ctcp) {
-	
+void Client::processedUserCTCPReply(std::string client, std::string target, std::string ctcp, std::string params) {
+	if (floodThrottle)
+		clients.find(client)->second->messageQueue.push_back("NOTICE " + target + " :\x01" + ctcp + (params == "" ? "" : " " + params) + "\x01");
+	else {
+		clients.find(client)->second->connection->sendData("NOTICE " + target + " :\x01" + ctcp + (params == "" ? "" : " " + params) + "\x01");
+		callUserCTCPReplySendHook(client, target, ctcp, params);
+	}
 }
 
 std::list<std::string> Client::listModes() {
@@ -710,6 +980,10 @@ void Client::saveMode(std::string longName, char shortChar, bool chan) {
 		modeConvertChan[shortChar] = longName;
 	else
 		modeConvertUser[shortChar] = longName;
+}
+
+std::string Client::getNextID() {
+	
 }
 
 PROTOCOL_SPAWN(Client)
