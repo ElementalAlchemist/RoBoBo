@@ -299,19 +299,19 @@ class Protocol {
 		 * Lists list modes available on this server.
 		 * @return a list of long-name modes
 		 */
-		virtual std::list<std::string> listModes();
+		virtual std::set<std::string> listModes();
 		
 		/** Parameter mode list
 		 * Lists modes that take parameters that are available on this server.
 		 * @return a list of long-name modes
 		 */
-		virtual std::list<std::string> paramModes();
+		virtual std::set<std::string> paramModes();
 		
 		/** Mode list
 		 * Lists parameterless modes available on this server.
 		 * @return a list of long-name modes
 		 */
-		virtual std::list<std::string> modes();
+		virtual std::set<std::string> modes();
 		
 		/** Statuses list
 		 * Lists status ranks available on this server.
@@ -321,7 +321,7 @@ class Protocol {
 		
 		/** Channel types list
 		 * Lists valid types of channels on this server.
-		 * @return a list of channel type characters
+		 * @return a set of channel type characters
 		 */
 		virtual std::set<char> channelTypes();
 		

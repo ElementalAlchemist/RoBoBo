@@ -248,15 +248,15 @@ std::string Module::serverType(std::string server) {
 	return bot->serverType(server);
 }
 
-std::list<std::string> Module::serverListModes(std::string server) {
+std::set<std::string> Module::serverListModes(std::string server) {
 	return bot->serverListModes(server);
 }
 
-std::list<std::string> Module::serverParamModes(std::string server) {
+std::set<std::string> Module::serverParamModes(std::string server) {
 	return bot->serverParamModes(server);
 }
 
-std::list<std::string> Module::serverModes(std::string server) {
+std::set<std::string> Module::serverModes(std::string server) {
 	return bot->serverModes(server);
 }
 

@@ -80,15 +80,15 @@ void Protocol::processedChanCTCPReply(std::string client, std::string target, ch
 
 void Protocol::processedUserCTCPReply(std::string client, std::string target, std::string ctcp) {}
 
-std::list<std::string> Protocol::listModes() {
+std::set<std::string> Protocol::listModes() {
 	return std::list<std::string> ();
 }
 
-std::list<std::string> Protocol::paramModes() {
+std::set<std::string> Protocol::paramModes() {
 	return std::list<std::string> ();
 }
 
-std::list<std::string> Protocol::modes() {
+std::set<std::string> Protocol::modes() {
 	return std::list<std::string> ();
 }
 

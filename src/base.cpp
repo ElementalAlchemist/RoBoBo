@@ -1002,21 +1002,21 @@ std::string Base::serverType(std::string server) {
 	return "";
 }
 
-std::list<std::string> Base::serverListModes(std::string server) {
+std::set<std::string> Base::serverListModes(std::string server) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> ();
 	return servIter->second->listModes();
 }
 
-std::list<std::string> Base::serverParamModes(std::string server) {
+std::set<std::string> Base::serverParamModes(std::string server) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> ();
 	return servIter->second->paramModes();
 }
 
-std::list<std::string> Base::serverModes(std::string server) {
+std::set<std::string> Base::serverModes(std::string server) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return std::list<std::string> ();

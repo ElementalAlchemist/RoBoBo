@@ -791,21 +791,21 @@ class Module {
 		 * @param server The server whose list modes we're viewing
 		 * @return A list of long-name modes
 		 */
-		std::list<std::string> serverListModes(std::string server);
+		std::set<std::string> serverListModes(std::string server);
 		
 		/** Server param mode list
 		 * Used to view all modes that take parameters on a server.
 		 * @param server The server whose param modes we're viewing
 		 * @return A list of long-name modes
 		 */
-		std::list<std::string> serverParamModes(std::string server);
+		std::set<std::string> serverParamModes(std::string server);
 		
 		/** Server mode list
 		 * Used to view all parameterless modes available on a server.
 		 * @param server The server whose modes we're viewing
 		 * @return A list of long-name modes
 		 */
-		std::list<std::string> serverModes(std::string server);
+		std::set<std::string> serverModes(std::string server);
 		
 		/** Server status list
 		 * Used to view all available user prefixes in channels.

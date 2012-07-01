@@ -870,21 +870,21 @@ class Base {
 		 * @param server The server we're checking
 		 * @return A list of long-name modes
 		 */
-		std::list<std::string> serverListModes(std::string server);
+		std::set<std::string> serverListModes(std::string server);
 		
 		/** Server parameter modes
 		 * Allows modules to see all available parameter-taking modes on a server.
 		 * @param server The server we're checking
 		 * @return A list of long-name modes
 		 */
-		std::list<std::string> serverParamModes(std::string server);
+		std::set<std::string> serverParamModes(std::string server);
 		
 		/** Server parameterless modes
 		 * Allows modules to see all available parameterless modes on a server.
 		 * @param server The server we're checking
 		 * @return A list of long-name modes
 		 */
-		std::list<std::string> serverModes(std::string server);
+		std::set<std::string> serverModes(std::string server);
 		
 		/** Server status modes
 		 * Allows modules to see all available status prefix modes on a server.
