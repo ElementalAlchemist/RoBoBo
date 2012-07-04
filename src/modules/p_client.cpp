@@ -192,12 +192,13 @@ class Client : public Protocol {
 		std::map<std::string, char> modeConvertLong;
 		std::map<char, std::string> modeConvertChan, modeConvertUser;
 		size_t maxModes;
+		unsigned int currID;
 		
 		void saveMode(std::string longName, char shortChar, bool chan);
 		std::string getNextID();
 };
 
-Client::Client(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr) {}
+Client::Client(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr), currID(0) {}
 
 Client::~Client() {
 	
@@ -1136,7 +1137,15 @@ void Client::saveMode(std::string longName, char shortChar, bool chan) {
 }
 
 std::string Client::getNextID() {
-	
+	std::ostringstream nextID;
+	nextID << currID;
+	while (clientList.find(nextID.str()) != clientList.end()) { // Try the next one until we find one that's not taken
+		currID++;
+		nextID.str("");
+		nextID << currID;
+	}
+	currID++;
+	return nextID.str();
 }
 
 PROTOCOL_SPAWN(Client)
