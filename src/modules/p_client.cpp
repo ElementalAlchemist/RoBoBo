@@ -979,15 +979,27 @@ bool Client::hasUserMode(std::string client, std::string mode) {
 }
 
 std::list<char> Client::snomasks(std::string client) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clientList.find(client);
+	if (clientIter == clientList.end())
+		return std::list<char> ();
+	std::list<char> snoList;
+	for (std::string snomask : clientIter->second->snomasks)
+		snoList.push_back(snomask);
+	return snoList;
 }
 
 bool Client::hasSNOMask(std::string client, char snomask) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = clientList.find(client);
+	if (clientIter == clientList.end())
+		return false;
+	return (clientIter->second->snomasks.find(snomask) != clientIter->second->snomasks.end());
 }
 
 std::list<std::string> Client::userChannels(std::string nick) {
-	
+	std::unordered_map<std::string, User*>::iterator userIter = users.find(nick);
+	if (userIter == users.end())
+		return std::list<std::string> ();
+	return userIter->second->channels;
 }
 
 void Client::processIncoming(std::string client, std::string line) {
