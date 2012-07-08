@@ -33,6 +33,7 @@ class LocalClient : public User {
 		std::string socketType;
 		std::string password;
 		std::string server;
+		bool registered;
 		Socket* connection;
 		void receiveData();
 		void sendData();
@@ -44,7 +45,7 @@ class LocalClient : public User {
 		Client* protoptr;
 };
 
-LocalClient::LocalClient(Client* clientptr) : protoptr(clientptr) {}
+LocalClient::LocalClient(Client* clientptr) : registered(false), protoptr(clientptr) {}
 
 void LocalClient::receiveData() {
 	// Send the initial data here because the send queue may not always be called, depending on whether flood throttle is active.
@@ -1005,7 +1006,48 @@ std::list<std::string> Client::userChannels(std::string nick) {
 
 void Client::processIncoming(std::string client, std::string line) {
 	dataProcess.lock();
-	
+	std::vector<std::string> parsedLine = parseIRC(line);
+	if (parsedLine[0] == "PING")
+		clientList.find(client)->second->connection->sendData("PONG :" + parsedLine[1]);
+	else if (parsedLine[1] == "CAP") {
+		LocalClient* thisClient = clients.find(client)->second;
+		if (parsedLine[3] == "LS") {
+			std::string capList = parsedLine[4];
+			size_t spacePos = capList.find_first_of(' ');
+			std::vector<std::string> serverCap;
+			while (spacePos != std::string::npos) {
+				serverCap.push_back(capList.substr(0, spacePos));
+				capList = capList.substr(spacePos + 1);
+				spacePos = capList.find_first_of(' ');
+			}
+			if (capList != "")
+				serverCap.push_back(capList);
+			std::string supportedCap = "";
+			for (std::string supported : serverCap) {
+				if (supported == "multi-prefix" || supported == "userhost-in-names")
+					supportedCap += " " + supported;
+			}
+			if (floodThrottle)
+				thisClient->messageQueue.push_back("CAP REQ :" + supportedCap.substr(1));
+			else
+				thisClient->connection->sendData("CAP REQ :" + supportedCap.substr(1));
+		} else if ((parsedLine[3] == "ACK" || parsedLine[3] == "NAK") && !thisClient->registered) {
+			if (floodThrottle)
+				thisClient->messageQueue.push_back("CAP END");
+			else
+				thisClient->connection->sendData("CAP END");
+		}
+	} else if (parsedLine[1] == "001") {
+		
+	} else if (parsedLine[1] == "005") {
+		
+	} else if (parsedLine[1] == "PRIVMSG") {
+		
+	} else if (parsedLine[1] == "NOTICE") {
+		
+	} else if (parsedLine[1]) == "MODE") {
+		
+	}
 	dataProcess.unlock();
 }
 
