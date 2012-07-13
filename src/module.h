@@ -41,7 +41,7 @@ class Module {
 		virtual ~Module();
 		
 		/// The module's priority
-		const Priority priority;
+		virtual Priority priority();
 		
 		/** Module API version
 		 * This function checks whether the module API version for which the module is written is compatible with

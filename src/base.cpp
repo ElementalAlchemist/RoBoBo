@@ -311,8 +311,8 @@ LoadResult Base::loadModule(std::string modName) {
 		return LOAD_INCOMPATIBLE;
 	}
 	// Add the module to the appropriate module list according to its priority
-	modulePriority.insert(std::pair<std::string, Priority> (modName, newModule->priority));
-	switch (newModule->priority) {
+	modulePriority.insert(std::pair<std::string, Priority> (modName, newModule->priority()));
+	switch (newModule->priority()) {
 		case PRI_HIGH:
 			highModules.insert(std::pair<std::string, Module*> (modName, newModule));
 			break;
