@@ -7,10 +7,6 @@ class Base; // This needs to be forward-declared for the Base* pointer in Module
 enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_OPEN_ERROR, LOAD_INCOMPATIBLE, LOAD_NODEPENDS, LOAD_FAILURE };
 enum Priority { PRI_HIGH, PRI_MEDIUM_HIGH, PRI_NORMAL, PRI_MEDIUM_LOW, PRI_LOW };
 
-#define MODULE_SPAWN(modName) extern "C" Module* spawn(std::string moduleName, std::map<std::string, std::string> config, std::string workingDir, unsigned short debugLevel, Base* botptr) {\
-		return new modName (moduleName, config, workingDir, debugLevel, botptr);\
-	}
-
 typedef bool MsgAction;
 const bool MSG_CONTINUE = true;
 const bool MSG_IGNORE = false;
