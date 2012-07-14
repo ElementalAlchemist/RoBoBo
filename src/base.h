@@ -61,4 +61,15 @@ class Base {
 		std::unordered_map<std::string, void*> socketFiles;
 		std::unordered_map<std::string, size_t> socketCounts;
 		std::mutex modHookMutex;
+		
+		// A manager class to automatically release mutexes makes mutex handling easier and more reliable
+		class MutexManager {
+			public:
+				MutexManager(std::mutex* mutexPtr);
+				~MutexManager();
+				MutexManager(const MutexManager&) = delete;
+				MutexManager& operator=(MutexManager const&) = delete;
+			private:
+				std::mutex* mutex;
+		};
 };

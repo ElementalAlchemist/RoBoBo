@@ -740,3 +740,13 @@ void Base::refreshServices(std::string module) {
  * This prevents unnecessary blocking of the protocol modules as they continue to communicate with the server
  *  and also tries to keep in-order calling of module hooks
  */
+
+
+
+Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr) {
+	mutex->lock();
+}
+
+Base::MutexManager::~MutexManager() {
+	mutex->unlock();
+}
