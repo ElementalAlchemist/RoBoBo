@@ -614,10 +614,10 @@ void Base::rehash() {
 	startupServers.clear();
 	startupModules.clear();
 	readConfiguration();
-	/* Because rehash is almost always initiated from a module, it's a bad idea to specify the mutex here (WILL result in deadlock).
-	 * Instead, have modules expect config data (and any other data changed in onRehash) to change during the call to rehash.
-	 * The use of the hook mutex in the other functions guarantees that nothing else is called during this time, so only the module
-	 * calling rehash can expect things to change suddenly, and only during the (blocking) call to rehash.
+	/* Because rehash is almost always initiated from a module (and this version always is), it's a bad idea to specify the mutex
+	 * here (WILL result in deadlock).  Instead, have modules expect config data (and any other data changed in onRehash) to change
+	 * during the call to rehash.  The use of the hook mutex in the other functions guarantees that nothing else is called during
+	 * this time, so only the module calling rehash can expect things to change suddenly, and only during the (blocking) call to rehash.
 	 */
 	for (std::pair<std::string, Module*> module : highModules) {
 		module.second->rehash(moduleConfig[module.first]);
