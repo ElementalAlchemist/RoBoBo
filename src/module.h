@@ -97,7 +97,7 @@ class Module {
 		void sendNotice(const std::string& server, const std::string& client, const std::string& target, const std::string& message) { bot->sendNotice(server, client, target, message); }
 		void sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "") { bot->sendCTCP(server, client, target, ctcp, params); }
 		void sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "") { bot->sendCTCPReply(server, client, target, ctcp, params); }
-		void setMode(const std::string& server, const std::string& client, const std::string& target, const std::list<std::string>& setMode, const std::list<std::string>& remMode) { bot->setMode(server, client, target, setMode, remMode); }
+		void setMode(const std::string& server, const std::string& client, const std::string& target, const std::list<std::string>& setModes, const std::list<std::string>& remModes) { bot->setMode(server, client, target, setModes, remModes); }
 		void setSNOmask(const std::string& server, const std::string& client, bool add, char snomask) { bot->setSNOmask(server, client, add, snomask); }
 		void joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key = "") { bot->joinChan(server, client, channel, key); }
 		void partChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason) { bot->partChan(server, client, channel, reason); }
@@ -172,9 +172,11 @@ class Module {
 		std::string userIdent(const std::string& server, const std::string& user) { return bot->userIdent(server, user); }
 		std::string userHost(const std::string& server, const std::string& user) { return bot->userHost(server, user); }
 		std::string userGecos(const std::string& server, const std::string& user) { return bot->userGecos(server, user); }
-		std::list<std::string> userModes(const std::string& server, const std::string& user) { return bot->userModes(server, user); }
-		std::list<char> userSNOmasks(const std::string& server, const std::string& user) { return bot->userSNOmasks(server, user); }
-		std::list<std::string> userChans(const std::string& server, const std::string& user) { return bot->userChans(server, user); }
+		std::set<std::string> userModes(const std::string& server, const std::string& user) { return bot->userModes(server, user); }
+		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode) { return bot->userHasMode(server, user, mode); }
+		std::set<char> userSNOmasks(const std::string& server, const std::string& user) { return bot->userSNOmasks(server, user); }
+		bool userHasSNOmask(const std::string& server, const std::string& user, const std::string& mode) { return bot->userHasSNOmask(server, user, mode); }
+		std::set<std::string> userChans(const std::string& server, const std::string& user) { return bot->userChans(server, user); }
 		time_t userTimestamp(const std::string& server, const std::string& user) { return bot->userTimestamp(server, user); }
 		time_t userNickTimestamp(const std::string& server, const std::string& user) { return bot->userNickTimestamp(server, user); }
 	private:
