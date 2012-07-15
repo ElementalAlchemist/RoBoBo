@@ -699,41 +699,8 @@ void Base::endDebug() {
  */
 
 
-std::list<std::string> Base::moduleList() {
-	std::list<std::string> modList;
-	for (std::pair<std::string, Module*> module : highModules)
-		modList.push_back(module.first);
-	for (std::pair<std::string, Module*> module : mediumHighModules)
-		modList.push_back(module.first);
-	for (std::pair<std::string, Module*> module : normalModules)
-		modList.push_back(module.first);
-	for (std::pair<std::string, Module*> module : mediumLowModules)
-		modList.push_back(module.first);
-	for (std::pair<std::string, Module*> module : lowModules)
-		modList.push_back(module.first);
-	return modList;
-}
 
-std::list<std::string> Base::providedServices() {
-	std::list<std::string> services;
-	for (std::pair<std::string, std::list<std::string>> service : moduleServices) {
-		if (!service.second.empty())
-			services.push_back(service.first);
-	}
-	return services;
-}
 
-bool Base::serviceIsProvided(std::string service) {
-	return !moduleServices[service].empty();
-}
-
-std::list<std::string> Base::serviceProviders(std::string service) {
-	return moduleServices[service];
-}
-
-std::list<std::string> Base::serviceUsers(std::string service) {
-	return moduleSupports[service];
-}
 
 void Base::refreshServices(std::string module) {
 	std::map<std::string, Module*>::iterator modIter = highModules.find(module);

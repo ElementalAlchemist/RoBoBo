@@ -31,14 +31,81 @@ class Base {
 		void sigRehash(); // This version is called when we receive the signal to rehash rather than when requested by a module
 		void endDebug();
 		
+		void sendPrivMsg(const std::string& server, const std::string& client, const std::string& target, const std::string& message);
+		void sendNotice(const std::string& server, const std::string& client, const std::string& target, const std::string& message);
+		void sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "");
+		void sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "");
+		void setMode(const std::string& server, const std::string& client, const std::string& target, const std::list<std::string>& setMode, const std::list<std::string>& remMode);
+		void setSNOmask(const std::string& server, const std::string& client, bool add, char snomask);
+		void joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key = "");
+		void partChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason);
+		void kickUser(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::string& reason);
+		std::string addClient(const std::string& server, std::string& nick, std::string& ident, std::string& host, std::string& gecos);
+		void removeClient(const std::string& server, const std::string& client);
+		void setTopic(const std::string& server, const std::string& client, const std::string& channel, const std::string& topic);
+		void inviteUser(const std::string& server, const std::string& client, const std::string& channel, const std::string& user);
+		void knockOnChannel(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason);
+		void changeNick(const std::string& server, const std::string& user, const std::string& newNick);
+		void sendPing(const std::string& server, const std::string& remoteServer);
+		void operUp(const std::string& server, const std::string& client, const std::string& usernameOrType, const std::string& password);
+		void sendServerNotice(const std::string& server, char snomask, const std::string& message);
+		void setMetadata(const std::string& server, const std::string& target, const std::string& key, const std::string& value);
+		void setXLine(const std::string& server, const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason);
+		void remXLine(const std::string& server, const std::string& client, const std::stirng& lineType, const std::string& mask);
+		void changeIdent(const std::string& server, const std::string& user, const std::string& newIdent);
+		void changeHost(const std::string& server, const std::string& user, const std::string& newHost);
+		void changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos);
+		void sendWallops(const std::string& server, const std::string& client, const std::string& message);
 		
+		std::list<std::string> activeServers();
+		std::list<std::string> connectedServers();
+		std::list<std::string> loadedModules();
+		std::string serverType(const std::string& server);
+		bool serverIsClient(const std::string& server);
+		std::set<std::string> providedServices();
+		bool serviceIsProvided(const std::string& service);
+		std::list<std::string> serviceProviders(const std::string& service);
+		std::list<std::string> serviceUsers(const std::string& service);
+		void refreshServices(const std::string& modName, Module* modptr);
 		
-		std::list<std::string> moduleList();
-		std::list<std::string> providedServices();
-		bool serviceIsProvided(std::string service);
-		std::list<std::string> serviceProviders(std::string service);
-		std::list<std::string> serviceUsers(std::string service);
-		void refreshServices(std::string module);
+		std::list<std::string> networkServerList(const std::string& server);
+		std::list<std::string> xLineTypes(const std::string& server);
+		std::list<std::string> xLineList(const std::string& server, const std::string& lineType);
+		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask);
+		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask);
+		std::list<std::string> chanListModes(const std::string& server);
+		std::list<std::string> chanParamParamModes(const std::string& server);
+		std::list<std::string> chanParamModes(const std::string& server);
+		std::list<std::string> chanNoParamModes(const std::string& server);
+		std::list<std::pair<std::string, char>> chanPrefixes(const std::string& server);
+		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, const std::string& status1);
+		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, char status1);
+		std::pair<std::string, char> compareStatus(const std::string& server, char status0, char status1);
+		
+		std::string chanTopic(const std::string& server, const std::string& channel);
+		time_t chanTimestamp(const std::string& server, const std::string& channel);
+		std::set<std::string> chanUsers(const std::string& server, const std::string& channel);
+		bool userInChan(const std::string& server, const std::string& channel, const std::string& user);
+		std::pair<std::string, char> userStatus(const std::string& server, const std::string& channel, const std::string& user);
+		bool userHasStatus(const std::string& server, const std::string& channel, const std::string& user, const std::string& status);
+		bool userHasStatus(const std::string& server, const std::string& channel, const std::string& user, char status);
+		bool userHasStatusOrGreater(const std::string& server, const std::string& channel, const std::string& user, const std::string& status);
+		bool userHasStatusOrGreater(const std::string& server, const std::string& channel, const std::string& user, char status);
+		std::list<std::string> chanModes(const std::string& server, const std::string& channel);
+		std::list<std::string> chanListModeList(const std::string& server, const std::string& channel, const std::string& listMode);
+		bool chanHasMode(const std::string& server, const std::string& channel, const std::string& mode);
+		std::string chanModeParam(const std::string& server, const std::string& channel, const std::string& mode);
+		
+		std::list<std::string> clientList(const std::string& server);
+		std::string clientNick(const std::string& server, const std::string& client);
+		std::string userIdent(const std::string& server, const std::string& user);
+		std::string userHost(const std::string& server, const std::string& user);
+		std::string userGecos(const std::string& server, const std::string& user);
+		std::list<std::string> userModes(const std::string& server, const std::string& user);
+		std::list<char> userSNOmasks(const std::string& server, const std::string& user);
+		std::list<std::string> userChans(const std::string& server, const std::string& user);
+		time_t userTimestamp(const std::string& server, const std::string& user);
+		time_t userNickTimestamp(const std::string& server, const std::string& user);
 	private:
 		const std::string workingDir, configDir, configName;
 		const unsigned short debugLevel;
