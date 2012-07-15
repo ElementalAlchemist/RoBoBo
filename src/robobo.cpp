@@ -1,14 +1,14 @@
 #include "robobo.h"
 
-Base* botInstance;
+Base* bot;
 
 void sigHandler(int signum) {
 	// Signal calls 
 	if (signum == SIGHUP) {
 		daemon(1, 0);
-		botInstance->endDebug();
+		bot->endDebug();
 	} else if (signum == SIGUSR1)
-		botInstance->rehash();
+		bot->rehash();
 }
 
 int main(int argc, char** argv) {
@@ -79,14 +79,14 @@ int main(int argc, char** argv) {
 	sigaction(SIGHUP, sigPtr, NULL);
 	sigaction(SIGUSR1, sigPtr, NULL);
 	// We're done parsing command line arguments; it's time to start!
-	botInstance = new Base (workingDir, confDir, confName, debugLevel, logDump);
-	botInstance->readConfiguration();
-	botInstance->loadModules();
-	botInstance->connectServers();
+	bot = new Base (workingDir, confDir, confName, debugLevel, logDump);
+	bot->readConfiguration();
+	bot->loadModules();
+	bot->connectServers();
 	if (debugLevel == 0)
 		daemon(1, 0);
-	botInstance->checkServers();
+	bot->checkServers();
 	// If checkModules returns, the bot is shutting down, so kill all the things
-	botInstance->unloadEverything();
-	delete botInstance;
+	bot->unloadEverything();
+	delete bot;
 }
