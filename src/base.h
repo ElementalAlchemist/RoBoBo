@@ -2,11 +2,6 @@
 #include "main.h"
 #include <dlfcn.h>
 
-/** Load result flags
- * A set of flags, one of which is returned by loadModule to show either that the module was loaded successfully
- * or why the module could not be loaded.
- */
-
 #include "socket.h"
 #include "protocol.h"
 #include "module.h"
@@ -30,7 +25,7 @@ class Base {
 		void unloadModule(std::string modName, bool wasLoaded);
 		void connectServer(std::string server);
 		void disconnectServer(std::string server, std::string reason = "");
-		Socket* loadSocket(std::string sockettype);
+		std::shared_ptr<Socket> loadSocket(std::string sockettype);
 		void unloadSocket(std::string sockettype, Socket* socketptr);
 		void rehash();
 		void sigRehash(); // This version is called when we receive the signal to rehash rather than when requested by a module

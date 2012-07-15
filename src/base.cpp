@@ -588,10 +588,9 @@ Socket* Base::loadSocket(std::string sockettype) {
 		std::cerr << "Spawn not found in socket module s_" << sockettype << ": " << spawnError << std::endl;
 		return NULL;
 	}
-	Socket* newSocket = (Socket*) socketSpawn();
+	std::shared_ptr<Socket> newSocket ((Socket*) socketSpawn(), std::bind(&Base::unloadSocket, this, sockettype, std::placeholders::_1));
 	if (newSocket->apiVersion() != 3000) {
 		std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
-		delete newSocket;
 		return NULL;
 	}
 	socketCounts[sockettype]++;

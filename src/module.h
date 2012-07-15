@@ -122,7 +122,7 @@ class Module {
 		void disconnectServer(const std::string& server) { bot->disconnectServer(server); }
 		LoadResult loadModule(const std::string& modName) { return bot->loadModule(modName); }
 		void unloadModule(const std::string& modName) { if (modName == moduleName) std::thread(&Base::unloadModule, bot, modName, true).detach(); else bot->unloadModule(modName, true); }
-		SocketHandle assignSocket(const std::string& socketType) { return bot->assignSocket(socketType); }
+		std::shared_ptr<Socket> assignSocket(const std::string& socketType) { return bot->loadSocket(socketType); }
 		void rehash() { bot->rehash(); }
 	private:
 		Base* bot;
