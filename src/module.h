@@ -43,6 +43,8 @@ class Module {
 		virtual void onUserConnect(const std::string& server, const std::string& nick) {}
 		virtual void onUserQuit(const std::string& server, const std::string& nick, const std::string& reason) {}
 		virtual void onChanTopic(const std::string& server, const std::string& channel, const std::string& nick, const std::string& topic) {}
+		virtual void onChanInvite(const std::string& server, const std::string& channel, const std::string& inviter, const std::string& invitee) {}
+		virtual void onChanKnock(const std::string& server, const std::string& channel, const std::string& nick, const std::string& reason) {}
 		virtual void onUserNick(const std::string& server, const std::string& oldNick, const std::string& newNick) {}
 		virtual void onServerPing(const std::string& server, const std::string& sourceServer) {}
 		virtual void onServerPong(const std::string& server, const std::string& sourceServer) {}
@@ -55,8 +57,6 @@ class Module {
 		virtual void onUserIdentChange(const std::string& server, const std::string& nick, const std::string& oldIdent, const std::string& newIdent) {}
 		virtual void onUserHostChange(const std::string& server, const std::string& nick, const std::string& oldHost, const std::string& newHost) {}
 		virtual void onUserGecosChange(const std::string& server, const std::string& nick, const std::string& oldGecos, const std::string& newGecos) {}
-		virtual void onChanInvite(const std::string& server, const std::string& channel, const std::string& inviter, const std::string& invitee) {}
-		virtual void onChanKnock(const std::string& server, const std::string& channel, const std::string& nick, const std::string& reason) {}
 		virtual void onServerWallops(const std::string& server, const std::string& nick, const std::string& message) {}
 		virtual void onServerConnect(const std::string& server, const std::string& serverName) {}
 		virtual void onServerDisconnect(const std::string& server, const std::string& serverName, const std::string& reason) {}
@@ -93,7 +93,37 @@ class Module {
 		std::map<std::string, std::string> config;
 		unsigned short debugLevel;
 		
+		void sendPrivMsg(const std::string& server, const std::string& client, const std::string& target, const std::string& message) { bot->sendPrivMsg(server, client, target, message); }
+		void sendNotice(const std::string& server, const std::string& client, const std::string& target, const std::string& message) { bot->sendNotice(server, client, target, message); }
+		void sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "") { bot->sendCTCP(server, client, target, ctcp, params); }
+		void sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "") { bot->sendCTCPReply(server, client, target, ctcp, params); }
+		void setMode(const std::string& server, const std::string& client, const std::string& target, const std::list<std::string>& setMode, const std::list<std::string>& remMode) { bot->setMode(server, client, target, setMode, remMode); }
+		void joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key = "") { bot->joinChan(server, client, channel, key); }
+		void partChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason) { bot->partChan(server, client, channel, reason); }
+		void kickUser(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::string& reason) { bot->kickUser(server, client, channel, user, reason); }
+		std::string addClient(const std::string& server, std::string& nick, std::string& ident, std::string& host, std::string& gecos) { return bot->addClient(server, nick, ident, host, gecos); }
+		void removeClient(const std::string& server, const std::string& client) { bot->removeClient(server, client); }
+		void setTopic(const std::string& server, const std::string& client, const std::string& channel, const std::string& topic) { bot->setTopic(server, client, channel, topic); }
+		void inviteUser(const std::string& server, const std::string& client, const std::string& channel, const std::string& user) { bot->inviteUser(server, client, channel, user); }
+		void knockOnChannel(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason) { bot->knockOnChannel(server, client, channel, reason); }
+		void changeNick(const std::string& server, const std::string& user, const std::string& newNick) { bot->changeNick(server, user, newNick); }
+		void sendPing(const std::string& server, const std::string& remoteServer) { bot->sendPing(server, remoteServer); }
+		void operUp(const std::string& server, const std::string& client, const std::string& usernameOrType, const std::string& password) { bot->operUp(server, client, usernameOrType, password); }
+		void sendServerNotice(const std::string& server, char snomask, const std::string& message) { bot->sendServerNotice(server, snomask, message); }
+		void setMetadata(const std::string& server, const std::string& target, const std::string& key, const std::string& value) { bot->setMetadata(server, target, key, value); }
+		void setXLine(const std::string& server, const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason) { bot->setXLine(server, client, lineType, mask, duration, reason); }
+		void remXLine(const std::string& server, const std::string& client, const std::stirng& lineType, const std::string& mask) { bot->remXLine(server, client, lineType, mask); }
+		void changeIdent(const std::string& server, const std::string& user, const std::string& newIdent) { bot->changeIdent(server, user, newIdent); }
+		void changeHost(const std::string& server, const std::string& user, const std::string& newHost) { bot->changeHost(server, user, newHost); }
+		void changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos) { bot->changeGecos(server, user, newGecos); }
+		void sendWallops(const std::string& server, const std::string& client, const std::string& message) { bot->sendWallops(server, client, message); }
 		
+		void connectServer(const std::string& server) { bot->connectServer(server); }
+		void disconnectServer(const std::string& server) { bot->disconnectServer(server); }
+		LoadResult loadModule(const std::string& modName) { return bot->loadModule(modName); }
+		void unloadModule(const std::string& modName) { if (modName == moduleName) std::thread(&Base::unloadModule, bot, modName, true).detach(); else bot->unloadModule(modName, true); }
+		SocketHandle assignSocket(const std::string& socketType) { return bot->assignSocket(socketType); }
+		void rehash() { bot->rehash(); }
 	private:
 		Base* bot;
 };
