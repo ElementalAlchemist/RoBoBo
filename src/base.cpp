@@ -641,6 +641,38 @@ void Base::rehash() {
 	}
 }
 
+void Base::sigRehash() {
+	// This function is pretty much the same as rehash() above, except it activates the module hook mutex.
+	// This prevents the rehash signal from changing things in the middle of other calls
+	serverConfig.clear();
+	moduleConfig.clear();
+	startupServers.clear();
+	startupModules.clear();
+	readConfiguration();
+	// This mutex manager automatically releases the mutex on function exit
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->rehash(moduleConfig[module.first]);
+		module.second->onRehash();
+	}
+}
+
 void Base::endDebug() {
 	for (std::pair<std::string, Protocol*> server : servers)
 		server.second->endDebug();

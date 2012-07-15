@@ -33,6 +33,7 @@ class Base {
 		Socket* loadSocket(std::string sockettype);
 		void unloadSocket(std::string sockettype, Socket* socketptr);
 		void rehash();
+		void sigRehash(); // This version is called when we receive the signal to rehash rather than when requested by a module
 		void endDebug();
 		
 		

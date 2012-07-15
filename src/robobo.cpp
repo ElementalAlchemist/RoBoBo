@@ -8,7 +8,7 @@ void sigHandler(int signum) {
 		daemon(1, 0);
 		bot->endDebug();
 	} else if (signum == SIGUSR1)
-		bot->rehash();
+		bot->sigRehash();
 }
 
 int main(int argc, char** argv) {
