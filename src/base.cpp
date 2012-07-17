@@ -1226,10 +1226,16 @@ time_t Base::userNickTimestamp(const std::string& server, const std::string& use
 	return servIter->second->userNickTimestamp(user);
 }
 
-Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr) {
+Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr), active(true) {
 	mutex->lock();
 }
 
 Base::MutexManager::~MutexManager() {
+	if (active)
+		mutex->unlock();
+}
+
+void Base::MutexManager::release() {
 	mutex->unlock();
+	active = false;
 }
