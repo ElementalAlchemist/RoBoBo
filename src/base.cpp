@@ -351,6 +351,7 @@ LoadResult Base::loadModule(std::string modName) {
 			moduleSupports[supporting].push_back(modName);
 		if (newModule->onLoadComplete()) {
 			// Since it's successful, call the hook in other modules for this module being loaded
+			MutexManager hookManage (&modHookMutex);
 			for (std::pair<std::string, Module*> module : highModules) {
 				if (module.first != modName)
 					module.second->onModuleLoad(modName);
@@ -384,6 +385,7 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 		return; // Do not try to unload the module if it's not currently loaded
 	if (wasLoaded) {
 		// Call the onUnload hook so this module can clean up after itself
+		MutexManager hookManage (&modHookMutex);
 		switch (modulePriority[modName]) {
 			case PRI_HIGH:
 				highModules.find(modName)->second->onUnload();
@@ -1226,16 +1228,10 @@ time_t Base::userNickTimestamp(const std::string& server, const std::string& use
 	return servIter->second->userNickTimestamp(user);
 }
 
-Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr), active(true) {
+Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr) {
 	mutex->lock();
 }
 
 Base::MutexManager::~MutexManager() {
-	if (active)
-		mutex->unlock();
-}
-
-void Base::MutexManager::release() {
 	mutex->unlock();
-	active = false;
 }
