@@ -46,7 +46,7 @@ class Module {
 		virtual void onUserNick(const std::string& server, const std::string& oldNick, const std::string& newNick) {}
 		virtual void onServerPing(const std::string& server, const std::string& sourceServer) {}
 		virtual void onServerPong(const std::string& server, const std::string& sourceServer) {}
-		virtual void onNumeric(const std::string& server, const std::string& numeric, const std::string& data) {}
+		virtual void onNumeric(const std::string& server, const std::string& numeric, const std::vector<std::string>& data) {}
 		virtual void onUserOper(const std::string& server, const std::string& nick, const std::string& operType) {}
 		virtual void onServerNotice(const std::string& server, char snomask, const std::string& message) {}
 		virtual void onMetadata(const std::string& server, const std::string& target, const std::string& key, const std::string& value) {}
