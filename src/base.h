@@ -33,11 +33,11 @@ class Base {
 		
 		void sendPrivMsg(const std::string& server, const std::string& client, const std::string& target, const std::string& message);
 		void sendNotice(const std::string& server, const std::string& client, const std::string& target, const std::string& message);
-		void sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "");
-		void sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "");
-		void setMode(const std::string& server, const std::string& client, const std::string& target, const std::list<std::string>& setMode, const std::list<std::string>& remMode);
+		void sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params);
+		void sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params);
+		void setMode(const std::string& server, const std::string& client, const std::string& target, const std::list<std::string>& setModes, const std::list<std::string>& remModes);
 		void setSNOmask(const std::string& server, const std::string& client, bool add, char snomask);
-		void joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key = "");
+		void joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key);
 		void partChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason);
 		void kickUser(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::string& reason);
 		std::string addClient(const std::string& server, std::string& nick, std::string& ident, std::string& host, std::string& gecos);
@@ -74,7 +74,6 @@ class Base {
 		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask);
 		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask);
 		std::list<std::string> chanListModes(const std::string& server);
-		std::list<std::string> chanParamParamModes(const std::string& server);
 		std::list<std::string> chanParamModes(const std::string& server);
 		std::list<std::string> chanNoParamModes(const std::string& server);
 		std::list<std::pair<std::string, char>> chanPrefixes(const std::string& server);
