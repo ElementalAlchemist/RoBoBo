@@ -40,8 +40,6 @@ class Module {
 		virtual void onChanJoin(const std::string& server, const std::string& channel, const std::string& user) {}
 		virtual void onChanPart(const std::string& server, const std::string& channel, const std::string& user, const std::string& reason) {}
 		virtual void onChanKick(const std::string& server, const std::string& channel, const std::string& kicker, const std::string& kickee, const std::string& reason) {}
-		virtual void onUserConnect(const std::string& server, const std::string& nick) {}
-		virtual void onUserQuit(const std::string& server, const std::string& nick, const std::string& reason) {}
 		virtual void onChanTopic(const std::string& server, const std::string& channel, const std::string& nick, const std::string& topic) {}
 		virtual void onChanInvite(const std::string& server, const std::string& channel, const std::string& inviter, const std::string& invitee) {}
 		virtual void onChanKnock(const std::string& server, const std::string& channel, const std::string& nick, const std::string& reason) {}
@@ -54,6 +52,8 @@ class Module {
 		virtual void onMetadata(const std::string& server, const std::string& target, const std::string& key, const std::string& value) {}
 		virtual void onXLineAdd(const std::string& server, const std::string& lineType, const std::string& mask) {}
 		virtual void onXLineRemove(const std::string& server, const std::string& lineType, const std::string& mask) {}
+		virtual void onUserConnect(const std::string& server, const std::string& nick) {}
+		virtual void onUserQuit(const std::string& server, const std::string& nick, const std::string& reason) {}
 		virtual void onUserIdentChange(const std::string& server, const std::string& nick, const std::string& oldIdent, const std::string& newIdent) {}
 		virtual void onUserHostChange(const std::string& server, const std::string& nick, const std::string& oldHost, const std::string& newHost) {}
 		virtual void onUserGecosChange(const std::string& server, const std::string& nick, const std::string& oldGecos, const std::string& newGecos) {}
