@@ -527,6 +527,17 @@ void Base::connectServer(std::string server) {
 	protocolTypes[protoType].insert(server);
 	servers.insert(std::pair<std::string, Protocol*> (server, newServer));
 	newServer->connectServer();
+	MutexManager hookManage(&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onConnect(server);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onConnect(server);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onConnect(server);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onConnect(server);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onConnect(server);
 }
 
 void Base::disconnectServer(std::string server, std::string reason) {
@@ -551,6 +562,17 @@ void Base::disconnectServer(std::string server, std::string reason) {
 		protocolFiles.erase(fileIter);
 		protocolTypes.erase(typeIter);
 	}
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onDisconnect(server);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onDisconnect(server);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onDisconnect(server);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onDisconnect(server);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onDisconnect(server);
 }
 
 Socket* Base::loadSocket(std::string sockettype) {
