@@ -144,7 +144,6 @@ class Module {
 		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask) { return bot->xLineExpiry(server, lineType, mask); }
 		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask) { return bot->xLineReason(server, lineType, mask); }
 		std::list<std::string> chanListModes(const std::string& server) { return bot->chanListModes(server); }
-		std::list<std::string> chanParamParamModes(const std::string& server) { return bot->chanParamParamModes(server); }
 		std::list<std::string> chanParamModes(const std::string& server) { return bot->chanParamModes(server); }
 		std::list<std::string> chanNoParamModes(const std::string& server) { return bot->chanNoParamModes(server); }
 		std::list<std::pair<std::string, char>> chanPrefixes(const std::string& server) { return bot->chanPrefixes(server); }
