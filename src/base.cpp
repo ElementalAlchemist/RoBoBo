@@ -907,7 +907,7 @@ bool Base::serverIsClient(const std::string& server) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return false;
-	return servIter->second->serverIsClient();
+	return servIter->second->isClient();
 }
 
 std::set<std::string> Base::providedServices() {
