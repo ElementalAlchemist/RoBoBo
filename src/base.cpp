@@ -314,7 +314,7 @@ LoadResult Base::loadModule(std::string modName) {
 	modulePriority.insert(std::pair<std::string, Priority> (modName, newModule->priority()));
 	/* Due to the possibility of other threads calling functions in this module before onLoadComplete is called
 	 * once the module is added to the appropriate modules map, we should lock the mutex here.
-	 * This mostly matters after startup, but it doesn't hurt anything to do it anyway.
+	 * This mostly matters only after startup, but it doesn't hurt anything to do it anyway.
 	 */
 	MutexManager hookManage (&modHookMutex);
 	switch (newModule->priority()) {
