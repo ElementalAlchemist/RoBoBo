@@ -66,6 +66,7 @@ class Module {
 		virtual void onServerBurstEnd(const std::string& server) {}
 		virtual void onConnect(const std::string& server) {}
 		virtual void onDisconnect(const std::string& server) {}
+		virtual void onOtherData(const std::string& server, const std::vector<std::string>& parsedLine) {}
 		
 		virtual void onChanMsgOut(const std::string& server, const std::string& client, const std::string& channel, char status, std::string& message) {}
 		virtual void onChanMsgSend(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& message) {}
@@ -118,6 +119,7 @@ class Module {
 		void changeHost(const std::string& server, const std::string& user, const std::string& newHost) { bot->changeHost(server, user, newHost); }
 		void changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos) { bot->changeGecos(server, user, newGecos); }
 		void sendWallops(const std::string& server, const std::string& client, const std::string& message) { bot->sendWallops(server, client, message); }
+		void sendOtherData(const std::string& server, const std::string& client, const std::string& line) { bot->sendOtherData(server, client, line); }
 		
 		void connectServer(const std::string& server) { bot->connectServer(server); }
 		void disconnectServer(const std::string& server) { bot->disconnectServer(server); }

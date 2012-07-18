@@ -56,6 +56,7 @@ class Base {
 		void changeHost(const std::string& server, const std::string& user, const std::string& newHost);
 		void changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos);
 		void sendWallops(const std::string& server, const std::string& client, const std::string& message);
+		void sendOtherData(const std::string& server, const std::string& client, const std::string& line);
 		
 		std::list<std::string> activeServers();
 		std::list<std::string> connectedServers();

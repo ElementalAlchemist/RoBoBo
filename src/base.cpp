@@ -886,6 +886,13 @@ void Base::sendWallops(const std::string& server, const std::string& client, con
 	servIter->second->sendWallops(client, message);
 }
 
+void Base::sendOtherData(const std::string& server, const std::string& client, const std::string& line) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return;
+	servIter->second->sendOtherData(client, line);
+}
+
 std::list<std::string> Base::activeServers() {
 	std::list<std::string> serverNames;
 	for (std::pair<std::string, Protocol*> server : servers)

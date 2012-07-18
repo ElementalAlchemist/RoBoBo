@@ -42,6 +42,7 @@ class Protocol {
 		virtual void changeHost(const std::string& user, const std::string& newHost) {}
 		virtual void changeGecos(const std::stirng& user, const std::string& newGecos) {}
 		virtual void sendWallops(const std::string& client, const std::string& message) {}
+		virtual void sendOtherData(const std::string& client, const std::string& line) {}
 		
 		virtual std::list<std::string> networkServerList() { return std::list<std::string> (); }
 		virtual std::list<std::string> xLineTypes() { return std::list<std::string> (); }
@@ -134,6 +135,7 @@ class Protocol {
 		void callServerCapabHook(const std::vector<std::string>& capabList) { bot->modServerCapabHook(serverName, capabList); }
 		void callServerBurstHook() { bot->modServerBurstHook(serverName); }
 		void callServerBurstEndHook() { bot->modServerBurstEndHook(serverName); }
+		void callOtherDataHook(const std::string& client, const std::vector<std::string>& parsedLine) { bot->modOtherDataHook(serverName, client, parsedLine); }
 		
 		void callChanMsgOutHook(const std::string& client, const std::string& channel, char status, const std::string& message) { bot->modChanMsgOutHook(serverName, client, channel, status, message, this); }
 		void callChanMsgSendHook(const std::string& client, const std::string& channel, char status, const std::string& message) { bot->modChanMsgSendHook(serverName, client, channel, status, message); }
