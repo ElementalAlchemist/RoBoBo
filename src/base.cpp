@@ -1455,10 +1455,16 @@ void Base::callUserCTCPReplySendHooks(std::string server, std::string client, st
 	
 }
 
-Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr) {
+Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr), active(true) {
 	mutex->lock();
 }
 
 Base::MutexManager::~MutexManager() {
+	if (active)
+		mutex->unlock();
+}
+
+void Base::MutexManager::release() {
 	mutex->unlock();
+	active = false;
 }

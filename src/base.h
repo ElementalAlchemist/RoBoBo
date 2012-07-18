@@ -248,7 +248,9 @@ class Base {
 				~MutexManager();
 				MutexManager(const MutexManager&) = delete;
 				MutexManager& operator=(MutexManager const&) = delete;
+				void release();
 			private:
 				std::mutex* mutex;
+				bool active;
 		};
 };
