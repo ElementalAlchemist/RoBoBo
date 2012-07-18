@@ -1235,6 +1235,226 @@ time_t Base::userNickTimestamp(const std::string& server, const std::string& use
 	return servIter->second->userNickTimestamp(user);
 }
 
+void Base::callChanMsgHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
+	
+}
+
+void Base::callUserMsgHooks(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::callChanNoticeHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
+	
+}
+
+void Base::callUserNoticeHooks(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::callChanCTCPHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
+void Base::callUserCTCPHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
+void Base::callChanCTCPReplyHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
+void Base::callUserCTCPReplyHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
+void Base::callChanModeHooks(std::string server, std::string channel, bool add, std::string mode) {
+	
+}
+
+void Base::callUserModeHooks(std::string server, std::string nick, bool add, std::string mode) {
+	
+}
+
+void Base::callUserSNOmaskHooks(std::string server, std::string nick, bool add, char snomask) {
+	
+}
+
+void Base::callChanJoinHooks(std::string server, std::string channel, std::string user) {
+	
+}
+
+void Base::callChanPartHooks(std::string server, std::string channel, std::string user, std::string reason) {
+	
+}
+
+void Base::callChanKickHooks(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
+	
+}
+
+void Base::callChanTopicHooks(std::string server, std::string channel, std::string nick, std::string topic) {
+	
+}
+
+void Base::callChanInviteHooks(std::string server, std::string channel, std::string inviter, std::string invitee) {
+	
+}
+
+void Base::callChanKnockHooks(std::string server, std::string channel, std::string nick, std::string reason) {
+	
+}
+
+void Base::callUserNickHooks(std::string server, std::string oldNick, std::string newNick) {
+	
+}
+
+void Base::callServerPingHooks(std::string server, std::string sourceServer) {
+	
+}
+
+void Base::callServerPongHooks(std::string server, std::string sourceServer) {
+	
+}
+
+void Base::callNumericHooks(std::string server, std::string numeric, std::vector<std::string> data) {
+	
+}
+
+void Base::callUserOperHooks(std::string server, std::string nick, std::string operType) {
+	
+}
+
+void Base::callServerNoticeHooks(std::string server, char snomask, std::string message) {
+	
+}
+
+void Base::callMetadataHooks(std::string server, std::string target, std::string key, std::string value) {
+	
+}
+
+void Base::callXLineAddHooks(std::string server, std::string lineType, std::string mask) {
+	
+}
+
+void Base::callXLineRemoveHooks(std::string server, std::string lineType, std::string mask) {
+	
+}
+
+void Base::callUserConnectHooks(std::string server, std::string nick) {
+	
+}
+
+void Base::callUserQuitHooks(std::string server, std::string nick, std::string reason) {
+	
+}
+
+void Base::callUserIdentChangeHooks(std::string server, std::string nick, std::string oldIdent, std::string newIdent) {
+	
+}
+
+void Base::callUserHostChangeHooks(std::string server, std::string nick, std::string oldHost, std::string newHost) {
+	
+}
+
+void Base::callUserGecosChangeHooks(std::string server, std::string nick, std::string oldGecos, std::string newGecos) {
+	
+}
+
+void Base::callServerWallopsHooks(std::string server, std::string nick, std::string message) {
+	
+}
+
+void Base::callServerConnectHooks(std::string server, std::string serverName) {
+	
+}
+
+void Base::callServerDisconnectHooks(std::string server, std::string serverName, std::string reason) {
+	
+}
+
+void Base::callServerCapHooks(std::string server, std::string subcmd, std::string list) {
+	
+}
+
+void Base::callServerCapabHooks(std::string server, std::vector<std::string> capabList) {
+	
+}
+
+void Base::callServerBurstHooks(std::string server) {
+	
+}
+
+void Base::callServerBurstEndHooks(std::string server) {
+	
+}
+
+void Base::callOtherDataHooks(std::string server) {
+	
+}
+
+void Base::callChanMsgOutHooks(std::string server, std::string client, std::string channel, char status, std::string message, Protocol* protoptr) {
+	
+}
+
+void Base::callChanMsgSendHooks(std::string server, std::string client, std::string channel, char status, std::string message) {
+	
+}
+
+void Base::callUserMsgOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr) {
+	
+}
+
+void Base::callUserMsgSendHooks(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::callChanNoticeOutHooks(std::string server, std::string client, std::string channel, char status, std::string message, Protocol* protoptr) {
+	
+}
+
+void Base::callChanNoticeSendHooks(std::string server, std::string client, std::string channel, char status, std::string message) {
+	
+}
+
+void Base::callUserNoticeOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr) {
+	
+}
+
+void Base::callUserNoticeSendHooks(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::callChanCTCPOutHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params, Protocol* protoptr) {
+	
+}
+
+void Base::callChanCTCPSendHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	
+}
+
+void Base::callUserCTCPOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr) {
+	
+}
+
+void Base::callUserCTCPSendHooks(std::string server, std::string client, std::string nick, std::string message) {
+	
+}
+
+void Base::callChanCTCPReplyOutHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params, Protocol* protoptr) {
+	
+}
+
+void Base::callChanCTCPReplySendHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
+	
+}
+
+void Base::callUserCTCPReplyOutHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params, Protocol* protoptr) {
+	
+}
+
+void Base::callUserCTCPReplySendHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
+	
+}
+
 Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr) {
 	mutex->lock();
 }
