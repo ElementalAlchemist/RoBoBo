@@ -312,6 +312,11 @@ LoadResult Base::loadModule(std::string modName) {
 	}
 	// Add the module to the appropriate module list according to its priority
 	modulePriority.insert(std::pair<std::string, Priority> (modName, newModule->priority()));
+	/* Due to the possibility of other threads calling functions in this module before onLoadComplete is called
+	 * once the module is added to the appropriate modules map, we should lock the mutex here.
+	 * This mostly matters after startup, but it doesn't hurt anything to do it anyway.
+	 */
+	MutexManager hookManage (&modHookMutex);
 	switch (newModule->priority()) {
 		case PRI_HIGH:
 			highModules.insert(std::pair<std::string, Module*> (modName, newModule));
@@ -351,7 +356,6 @@ LoadResult Base::loadModule(std::string modName) {
 			moduleSupports[supporting].push_back(modName);
 		if (newModule->onLoadComplete()) {
 			// Since it's successful, call the hook in other modules for this module being loaded
-			MutexManager hookManage (&modHookMutex);
 			for (std::pair<std::string, Module*> module : highModules) {
 				if (module.first != modName)
 					module.second->onModuleLoad(modName);
@@ -373,6 +377,8 @@ LoadResult Base::loadModule(std::string modName) {
 					module.second->onModuleLoad(modName);
 			}
 		} else {
+			// The unload module function needs the mutex, so unlock it before we pass off
+			hookManage.release();
 			unloadModule(modName, false);
 			return LOAD_FAILURE;
 		}
