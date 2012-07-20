@@ -1242,223 +1242,901 @@ time_t Base::userNickTimestamp(const std::string& server, const std::string& use
 }
 
 void Base::callChanMsgHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanMsg(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanMsg(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanMsg(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanMsg(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanMsg(server, client, channel, status, nick, message);
 }
 
 void Base::callUserMsgHooks(std::string server, std::string client, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserMsg(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserMsg(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserMsg(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserMsg(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserMsg(server, client, nick, message);
 }
 
 void Base::callChanNoticeHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanNotice(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanNotice(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanNotice(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanNotice(server, client, channel, status, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanNotice(server, client, channel, status, nick, message);
 }
 
 void Base::callUserNoticeHooks(std::string server, std::string client, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserNotice(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserNotice(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserNotice(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserNotice(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserNotice(server, client, nick, message);
 }
 
 void Base::callChanCTCPHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanCTCP(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanCTCP(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanCTCP(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanCTCP(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanCTCP(server, client, channel, status, nick, ctcp, params);
 }
 
 void Base::callUserCTCPHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserCTCP(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserCTCP(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserCTCP(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserCTCP(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserCTCP(server, client, nick, ctcp, params);
 }
 
 void Base::callChanCTCPReplyHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanCTCPReply(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanCTCPReply(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanCTCPReply(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanCTCPReply(server, client, channel, status, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanCTCPReply(server, client, channel, status, nick, ctcp, params);
 }
 
 void Base::callUserCTCPReplyHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserCTCPReply(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserCTCPReply(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserCTCPReply(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserCTCPReply(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserCTCPReply(server, client, nick, ctcp, params);
 }
 
 void Base::callChanModeHooks(std::string server, std::string channel, bool add, std::string mode) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanMode(server, channel, add, mode);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanMode(server, channel, add, mode);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanMode(server, channel, add, mode);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanMode(server, channel, add, mode);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanMode(server, channel, add, mode);
 }
 
 void Base::callUserModeHooks(std::string server, std::string nick, bool add, std::string mode) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserMode(server, nick, add, mode);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserMode(server, nick, add, mode);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserMode(server, nick, add, mode);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserMode(server, nick, add, mode);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserMode(server, nick, add, mode);
 }
 
 void Base::callUserSNOmaskHooks(std::string server, std::string nick, bool add, char snomask) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserSNOmask(server, nick, add, snomask);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserSNOmask(server, nick, add, snomask);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserSNOmask(server, nick, add, snomask);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserSNOmask(server, nick, add, snomask);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserSNOmask(server, nick, add, snomask);
 }
 
 void Base::callChanJoinHooks(std::string server, std::string channel, std::string user) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanJoin(server, channel, user);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanJoin(server, channel, user);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanJoin(server, channel, user);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanJoin(server, channel, user);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanJoin(server, channel, user);
 }
 
 void Base::callChanPartHooks(std::string server, std::string channel, std::string user, std::string reason) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanPart(server, channel, user, reason);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanPart(server, channel, user, reason);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanPart(server, channel, user reason);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanPart(server, channel, user, reason);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanPart(server, channel, user, reason);
 }
 
 void Base::callChanKickHooks(std::string server, std::string channel, std::string kicker, std::string kickee, std::string reason) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanKick(server, channel, kicker, kickee, reason);
 }
 
 void Base::callChanTopicHooks(std::string server, std::string channel, std::string nick, std::string topic) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanTopic(server, channel, nick, topic);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanTopic(server, channel, nick, topic);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanTopic(server, channel, nick, topic);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanTopic(server, channel, nick, topic);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanTopic(server, channel, nick, topic);
 }
 
 void Base::callChanInviteHooks(std::string server, std::string channel, std::string inviter, std::string invitee) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanInvite(server, channel, inviter, invitee);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanInvite(server, channel, inviter, invitee);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanInvite(server, channel, inviter, invitee);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanInvite(server, channel, inviter, invitee);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanInvite(server, channel, inviter, invitee);
 }
 
 void Base::callChanKnockHooks(std::string server, std::string channel, std::string nick, std::string reason) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanKnock(server, channel, nick, reason);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanKnock(server, channel, nick, reason);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanKnock(server, channel, nick, reason);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanKnock(server, channel, nick, reason);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanKnock(server, channel, nick, reason);
 }
 
 void Base::callUserNickHooks(std::string server, std::string oldNick, std::string newNick) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserNick(server, oldNick, newNick);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserNick(server, oldNick, newNick);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserNick(server, oldNick, newNick);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserNick(server, oldNick, newNick);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserNick(server, oldNick, newNick);
 }
 
 void Base::callServerPingHooks(std::string server, std::string sourceServer) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerPing(server, sourceServer);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerPing(server, sourceServer);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerPing(server, sourceServer);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerPing(server, sourceServer);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerPing(server, sourceServer);
 }
 
 void Base::callServerPongHooks(std::string server, std::string sourceServer) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerPong(server, sourceServer);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerPong(server, sourceServer);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerPong(server, sourceServer);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerPong(server, sourceServer);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerPong(server, sourceServer);
 }
 
 void Base::callNumericHooks(std::string server, std::string numeric, std::vector<std::string> data) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onNumeric(server, numeric, data);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onNumeric(server, numeric, data);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onNumeric(server, numeric, data);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onNumeric(server, numeric, data);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onNumeric(server, numeric, data);
 }
 
 void Base::callUserOperHooks(std::string server, std::string nick, std::string operType) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserOper(server, nick, operType);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserOper(server, nick, operType);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserOper(server, nick, operType);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserOper(server, nick, operType);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserOper(server, nick, operType);
 }
 
 void Base::callServerNoticeHooks(std::string server, char snomask, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerNotice(server, snomask, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerNotice(server, snomask, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerNotice(server, snomask, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerNotice(server, snomask, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerNotice(server, snomask, message);
 }
 
 void Base::callMetadataHooks(std::string server, std::string target, std::string key, std::string value) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onMetadata(server, target, key, value);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onMetadata(server, target, key, value);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onMetadata(server, target, key, value);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onMetadata(server, target, key, value);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onMetadata(server, target, key, value);
 }
 
 void Base::callXLineAddHooks(std::string server, std::string lineType, std::string mask) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onXLineAdd(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onXLineAdd(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onXLineAdd(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onXLineAdd(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onXLineAdd(server, lineType, mask);
 }
 
 void Base::callXLineRemoveHooks(std::string server, std::string lineType, std::string mask) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onXLineRemove(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onXLineRemove(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onXLineRemove(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onXLineRemove(server, lineType, mask);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onXLineRemove(server, lineType, mask);
 }
 
 void Base::callUserConnectHooks(std::string server, std::string nick) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserConnect(server, nick);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserConnect(server, nick);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserConnect(server, nick);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserConnect(server, nick);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserConnect(server, nick);
 }
 
 void Base::callUserQuitHooks(std::string server, std::string nick, std::string reason) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserQuit(server, nick, reason);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserQuit(server, nick, reason);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserQuit(server, nick, reason);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserQuit(server, nick, reason);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserQuit(server, nick, reason);
 }
 
 void Base::callUserIdentChangeHooks(std::string server, std::string nick, std::string oldIdent, std::string newIdent) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserIdentChange(server, nick, oldIdent, newIdent);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserIdentChange(server, nick, oldIdent, newIdent);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserIdentChange(server, nick, oldIdent, newIdent);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserIdentChange(server, nick, oldIdent, newIdent);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserIdentChange(server, nick, oldIdent, newIdent);
 }
 
 void Base::callUserHostChangeHooks(std::string server, std::string nick, std::string oldHost, std::string newHost) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserHostChange(server, nick, oldHost, newHost);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserHostChange(server, nick, oldHost, newHost);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserHostChange(server, nick, oldHost, newHost);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserHostChange(server, nick, oldHost, newHost);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserHostChange(server, nick, oldHost, newHost);
 }
 
 void Base::callUserGecosChangeHooks(std::string server, std::string nick, std::string oldGecos, std::string newGecos) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserGecosChange(server, nick, oldGecos, newGecos);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserGecosChange(server, nick, oldGecos, newGecos);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserGecosChange(server, nick, oldGecos, newGecos);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserGecosChange(server, nick, oldGecos, newGecos);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserGecosChange(server, nick, oldGecos, newGecos);
 }
 
 void Base::callServerWallopsHooks(std::string server, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerWallops(server, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerWallops(server, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerWallops(server, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerWallops(server, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerWallops(server, nick, message);
 }
 
 void Base::callServerConnectHooks(std::string server, std::string serverName) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerConnect(server, serverName);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerConnect(server, serverName);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerConnect(server, serverName);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerConnect(server, serverName);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerConnect(server, serverName);
 }
 
 void Base::callServerDisconnectHooks(std::string server, std::string serverName, std::string reason) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerDisconnect(server, serverName, reason);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerDisconnect(server, serverName, reason);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerDisconnect(server, serverName, reason);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerDisconnect(server, serverName, reason);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerDisconnect(server, serverName, reason);
 }
 
 void Base::callServerCapHooks(std::string server, std::string subcmd, std::string list) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerCap(server, subcmd, list);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerCap(server, subcmd, list);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerCap(server, subcmd, list);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerCap(server, subcmd, list);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerCap(server, subcmd, list);
 }
 
 void Base::callServerCapabHooks(std::string server, std::vector<std::string> capabList) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerCapab(server, capabList);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerCapab(server, capabList);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerCapab(server, capabList);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerCapab(server, capabList);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerCapab(server, capabList);
 }
 
 void Base::callServerBurstHooks(std::string server) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerBurst(server);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerBurst(server);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerBurst(server);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerBurst(server);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerBurst(server);
 }
 
 void Base::callServerBurstEndHooks(std::string server) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onServerBurstEnd(server);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onServerBurstEnd(server);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onServerBurstEnd(server);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onServerBurstEnd(server);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onServerBurstEnd(server);
 }
 
-void Base::callOtherDataHooks(std::string server) {
-	
+void Base::callOtherDataHooks(std::string server, std::string client, std::vector<std::string> parsedLine) {
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onOtherData(server, client, parsedLine);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onOtherData(server, client, parsedLine);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onOtherData(server, client, parsedLine);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onOtherData(server, client, parsedLine);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onOtherData(server, client, parsedLine);
 }
 
 void Base::callChanMsgOutHooks(std::string server, std::string client, std::string channel, char status, std::string message, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onChanMsgOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onChanMsgOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onChanMsgOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onChanMsgOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onChanMsgOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	protoptr->processedOutChanMsg(client, channel, status, message);
 }
 
 void Base::callChanMsgSendHooks(std::string server, std::string client, std::string channel, char status, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanMsgSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanMsgSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanMsgSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanMsgSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanMsgSend(server, client, channel, status, message);
 }
 
 void Base::callUserMsgOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onUserMsgOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onUserMsgOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onUserMsgOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onUserMsgOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onUserMsgOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	protoptr->processedOutUserMsg(client, nick, message);
 }
 
 void Base::callUserMsgSendHooks(std::string server, std::string client, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserMsgSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserMsgSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserMsgSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserMsgSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserMsgSend(server, client, nick, message);
 }
 
 void Base::callChanNoticeOutHooks(std::string server, std::string client, std::string channel, char status, std::string message, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onChanNoticeOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onChanNoticeOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onChanNoticeOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onChanNoticeOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onChanNoticeOut(server, client, channel, status, message);
+		if (message == "")
+			return;
+	}
+	protoptr->processedOutChanNotice(client, channel, status, message);
 }
 
 void Base::callChanNoticeSendHooks(std::string server, std::string client, std::string channel, char status, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanNoticeSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanNoticeSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanNoticeSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanNoticeSend(server, client, channel, status, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanNoticeSend(server, client, channel, status, message);
 }
 
 void Base::callUserNoticeOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onUserNoticeOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onUserNoticeOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onUserNoticeOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onUserNoticeOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onUserNoticeOut(server, client, nick, message);
+		if (message == "")
+			return;
+	}
+	protoptr->processedOutUserNotice(client, nick, message);
 }
 
 void Base::callUserNoticeSendHooks(std::string server, std::string client, std::string nick, std::string message) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserNoticeSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserNoticeSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserNoticeSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserNoticeSend(server, client, nick, message);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserNoticeSend(server, client, nick, message);
 }
 
 void Base::callChanCTCPOutHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onChanCTCPOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onChanCTCPOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onChanCTCPOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onChanCTCPOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onChanCTCPOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	protoptr->processedOutChanCTCP(client, channel, status, ctcp, params);
 }
 
 void Base::callChanCTCPSendHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanCTCPSend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanCTCPSend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanCTCPSend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanCTCPSend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanCTCPSend(server, client, channel, status, ctcp, params);
 }
 
-void Base::callUserCTCPOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr) {
-	
+void Base::callUserCTCPOutHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params, Protocol* protoptr) {
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onUserCTCPOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onUserCTCPOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onUserCTCPOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onUserCTCPOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onUserCTCPOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	protoptr->processedOutUserCTCP(client, nick, ctcp, params);
 }
 
-void Base::callUserCTCPSendHooks(std::string server, std::string client, std::string nick, std::string message) {
-	
+void Base::callUserCTCPSendHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserCTCPSend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserCTCPSend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserCTCPSend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserCTCPSend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserCTCPSend(server, client, nick, ctcp, params);
 }
 
 void Base::callChanCTCPReplyOutHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onChanCTCPReplyOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onChanCTCPReplyOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onChanCTCPReplyOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onChanCTCPReplyOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onChanCTCPReplyOut(server, client, channel, status, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	protoptr->processedOutChanCTCPReply(client, channel, status, ctcp, params);
 }
 
 void Base::callChanCTCPReplySendHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanCTCPReplySend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanCTCPReplySend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanCTCPReplySend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanCTCPReplySend(server, client, channel, status, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanCTCPReplySend(server, client, channel, status, ctcp, params);
 }
 
 void Base::callUserCTCPReplyOutHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params, Protocol* protoptr) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules) {
+		module.second->onUserCTCPReplyOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumHighModules) {
+		module.second->onUserCTCPReplyOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : normalModules) {
+		module.second->onUserCTCPReplyOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : mediumLowModules) {
+		module.second->onUserCTCPReplyOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	for (std::pair<std::string, Module*> module : lowModules) {
+		module.second->onUserCTCPReplyOut(server, client, nick, ctcp, params);
+		if (ctcp == "")
+			return;
+	}
+	protoptr->processedOutUserCTCPReply(client, nick, ctcp, params);
 }
 
 void Base::callUserCTCPReplySendHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params) {
-	
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onUserCTCPReplySend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onUserCTCPReplySend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onUserCTCPReplySend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onUserCTCPReplySend(server, client, nick, ctcp, params);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onUserCTCPReplySend(server, client, nick, ctcp, params);
 }
 
 Base::MutexManager::MutexManager(std::mutex* mutexPtr) : mutex(mutexPtr), active(true) {

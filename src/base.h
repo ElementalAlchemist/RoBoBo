@@ -157,8 +157,8 @@ class Base {
 		void modUserNoticeSendHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& message) { std::thread(&Base::callUserNoticeSendHooks, this, server, client, nick, message).detach(); }
 		void modChanCTCPOutHook(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params, Protocol* protoptr) { std::thread(&Base::callChanCTCPOutHooks, this, server, client, channel, status, ctcp, params, protoptr).detach(); }
 		void modChanCTCPSendHook(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) { std::thread(&Base::callChanCTCPSendHooks, this, server, client, channel, status, ctcp, params).detach(); }
-		void modUserCTCPOutHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& message, Protocol* protoptr) { std::thread(&Base::callUserCTCPOutHooks, this, server, client, nick, message, protoptr).detach(); }
-		void modUserCTCPSendHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& message) { std::thread(&Base::callUserCTCPSendHooks, this, server, client, nick, message).detach(); }
+		void modUserCTCPOutHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params, Protocol* protoptr) { std::thread(&Base::callUserCTCPOutHooks, this, server, client, nick, ctcp, params, protoptr).detach(); }
+		void modUserCTCPSendHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { std::thread(&Base::callUserCTCPSendHooks, this, server, client, nick, ctcp, params).detach(); }
 		void modChanCTCPReplyOutHook(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params, Protocol* protoptr) { std::thread(&Base::callChanCTCPReplyOutHooks, this, server, client, channel, status, ctcp, params, protoptr).detach(); }
 		void modChanCTCPReplySendHook(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) { std::thread(&Base::callChanCTCPReplySendHooks, this, server, client, channel, status, ctcp, params).detach(); }
 		void modUserCTCPReplyOutHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params, Protocol* protoptr) { std::thread(&Base::callUserCTCPReplyOutHooks, this, server, client, nick, ctcp, params, protoptr).detach(); }
@@ -222,7 +222,7 @@ class Base {
 		void callServerCapabHooks(std::string server, std::vector<std::string> capabList);
 		void callServerBurstHooks(std::string server);
 		void callServerBurstEndHooks(std::string server);
-		void callOtherDataHooks(std::string server);
+		void callOtherDataHooks(std::string server, std::string client, std::vector<std::string> parsedLine);
 		
 		void callChanMsgOutHooks(std::string server, std::string client, std::string channel, char status, std::string message, Protocol* protoptr);
 		void callChanMsgSendHooks(std::string server, std::string client, std::string channel, char status, std::string message);
@@ -234,8 +234,8 @@ class Base {
 		void callUserNoticeSendHooks(std::string server, std::string client, std::string nick, std::string message);
 		void callChanCTCPOutHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params, Protocol* protoptr);
 		void callChanCTCPSendHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params);
-		void callUserCTCPOutHooks(std::string server, std::string client, std::string nick, std::string message, Protocol* protoptr);
-		void callUserCTCPSendHooks(std::string server, std::string client, std::string nick, std::string message);
+		void callUserCTCPOutHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params, Protocol* protoptr);
+		void callUserCTCPSendHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params);
 		void callChanCTCPReplyOutHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params, Protocol* protoptr);
 		void callChanCTCPReplySendHooks(std::string server, std::string client, std::string channel, char status, std::string ctcp, std::string params);
 		void callUserCTCPReplyOutHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params, Protocol* protoptr);
