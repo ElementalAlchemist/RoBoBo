@@ -857,7 +857,7 @@ void Base::setXLine(const std::string& server, const std::string& client, const 
 	servIter->second->setXLine(client, lineType, mask, duration, reason);
 }
 
-void Base::remXLine(const std::string& server, const std::string& client, const std::stirng& lineType, const std::string& mask) {
+void Base::remXLine(const std::string& server, const std::string& client, const std::string& lineType, const std::string& mask) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
