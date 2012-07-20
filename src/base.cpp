@@ -583,7 +583,7 @@ void Base::disconnectServer(std::string server, std::string reason) {
 		module.second->onDisconnect(server);
 }
 
-Socket* Base::loadSocket(std::string sockettype) {
+std::shared_ptr<Socket> Base::loadSocket(std::string sockettype) {
 	std::unordered_map<std::string, void*>::iterator fileIter = socketFiles.find(sockettype);
 	if (fileIter == socketFiles.end()) {
 		std::string fileName = workingDir + "/modules/s_" + sockettype + ".so";
