@@ -593,23 +593,7 @@ std::shared_ptr<Socket> Base::loadSocket(std::string sockettype) {
 			std::cerr << "The socket module s_" << sockettype << " could not be loaded: " << fileOpenError << std::endl;
 			return NULL;
 		}
-		socket_spawn_t* socketSpawn = (socket_spawn_t*) dlsym(socketFile, "spawn");
-		const char* spawnError = dlerror();
-		if (spawnError != NULL) {
-			std::cerr << "Spawn not found in socket module s_" << sockettype << ": " << spawnError << std::endl;
-			dlclose(socketFile);
-			return NULL;
-		}
-		std::shared_ptr<Socket> newSocket ((Socket*) socketSpawn(), std::bind(&Base::unloadSocket, this, sockettype, std::placeholders::_1));
-		if (newSocket->apiVersion() != 3000) {
-			std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
-			delete newSocket;
-			dlclose(socketFile);
-			return NULL;
-		}
 		socketFiles.insert(std::pair<std::string, void*> (sockettype, socketFile));
-		socketCounts[sockettype]++;
-		return newSocket;
 	}
 	void* socketFile = socketFiles[sockettype];
 	socket_spawn_t* socketSpawn = (socket_spawn_t*) dlsym(socketFile, "spawn");
@@ -619,11 +603,11 @@ std::shared_ptr<Socket> Base::loadSocket(std::string sockettype) {
 		return NULL;
 	}
 	std::shared_ptr<Socket> newSocket ((Socket*) socketSpawn(), std::bind(&Base::unloadSocket, this, sockettype, std::placeholders::_1));
+	socketCounts[sockettype]++;
 	if (newSocket->apiVersion() != 3000) {
 		std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
 		return NULL;
 	}
-	socketCounts[sockettype]++;
 	return newSocket;
 }
 
