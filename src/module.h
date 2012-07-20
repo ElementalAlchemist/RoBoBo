@@ -114,10 +114,10 @@ class Module {
 		void sendServerNotice(const std::string& server, char snomask, const std::string& message) { bot->sendServerNotice(server, snomask, message); }
 		void setMetadata(const std::string& server, const std::string& target, const std::string& key, const std::string& value) { bot->setMetadata(server, target, key, value); }
 		void setXLine(const std::string& server, const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason) { bot->setXLine(server, client, lineType, mask, duration, reason); }
-		void remXLine(const std::string& server, const std::string& client, const std::stirng& lineType, const std::string& mask) { bot->remXLine(server, client, lineType, mask); }
+		void remXLine(const std::string& server, const std::string& client, const std::string& lineType, const std::string& mask) { bot->remXLine(server, client, lineType, mask); }
 		void changeIdent(const std::string& server, const std::string& user, const std::string& newIdent) { bot->changeIdent(server, user, newIdent); }
 		void changeHost(const std::string& server, const std::string& user, const std::string& newHost) { bot->changeHost(server, user, newHost); }
-		void changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos) { bot->changeGecos(server, user, newGecos); }
+		void changeGecos(const std::string& server, const std::string& user, const std::string& newGecos) { bot->changeGecos(server, user, newGecos); }
 		void sendWallops(const std::string& server, const std::string& client, const std::string& message) { bot->sendWallops(server, client, message); }
 		void sendOtherData(const std::string& server, const std::string& client, const std::string& line) { bot->sendOtherData(server, client, line); }
 		
