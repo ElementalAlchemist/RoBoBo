@@ -878,7 +878,7 @@ void Base::changeHost(const std::string& server, const std::string& user, const 
 	servIter->second->changeHost(user, newHost);
 }
 
-void Base::changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos) {
+void Base::changeGecos(const std::string& server, const std::string& user, const std::string& newGecos) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
 		return;
@@ -980,11 +980,11 @@ std::list<std::string> Base::serviceUsers(const std::string& service) {
 
 void Base::refreshServices(const std::string& modName, Module* modptr) {
 	for (std::pair<std::string, std::list<std::string>> provIter : moduleServices)
-		provIter->second.remove(modName);
+		provIter.second.remove(modName);
 	for (std::pair<std::string, std::list<std::string>> reqIter : moduleRequires)
-		reqIter->second.remove(modName);
+		reqIter.second.remove(modName);
 	for (std::pair<std::string, std::list<std::string>> supIter : moduleSupports)
-		supIter->second.remove(modName);
+		supIter.second.remove(modName);
 	std::list<std::string> provided = modptr->provides();
 	for (std::string service : provided)
 		moduleServices[service].push_back(modName);
@@ -1020,7 +1020,7 @@ std::list<std::string> Base::xLineList(const std::string& server, const std::str
 time_t Base::xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::list<std::string> ();
+		return 0;
 	return servIter->second->xLineExpiry(lineType, mask);
 }
 
@@ -1416,7 +1416,7 @@ void Base::callChanPartHooks(std::string server, std::string channel, std::strin
 	for (std::pair<std::string, Module*> module : mediumHighModules)
 		module.second->onChanPart(server, channel, user, reason);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onChanPart(server, channel, user reason);
+		module.second->onChanPart(server, channel, user, reason);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
 		module.second->onChanPart(server, channel, user, reason);
 	for (std::pair<std::string, Module*> module : lowModules)

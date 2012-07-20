@@ -54,7 +54,7 @@ class Base {
 		void remXLine(const std::string& server, const std::string& client, const std::stirng& lineType, const std::string& mask);
 		void changeIdent(const std::string& server, const std::string& user, const std::string& newIdent);
 		void changeHost(const std::string& server, const std::string& user, const std::string& newHost);
-		void changeGecos(const std::string& server, const std::stirng& user, const std::string& newGecos);
+		void changeGecos(const std::string& server, const std::string& user, const std::string& newGecos);
 		void sendWallops(const std::string& server, const std::string& client, const std::string& message);
 		void sendOtherData(const std::string& server, const std::string& client, const std::string& line);
 		
