@@ -90,10 +90,10 @@ std::string Plaintext::receive() {
 
 void Plaintext::sendData(std::string line) {
 	line += "\r\n";
-	int status;
+	ssize_t status;
 	do
 		status = send(socketfd, line.c_str(), line.size(), 0);
-	while (status != line.size() && (errno == EAGAIN || errno == EWOULDBLOCK));
+	while (status <= 0 && (errno == EAGAIN || errno == EWOULDBLOCK));
 }
 
 void Plaintext::closeConnection() {
