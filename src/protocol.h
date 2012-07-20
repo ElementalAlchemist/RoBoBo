@@ -37,10 +37,10 @@ class Protocol {
 		virtual void sendServerNotice(char snomask, const std::string& message) {}
 		virtual void setMetadata(const std::string& target, const std::string& key, const std::string& value) {}
 		virtual void setXLine(const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason) {}
-		virtual void remXLine(const std::string& client, const std::stirng& lineType, const std::string& mask) {}
+		virtual void remXLine(const std::string& client, const std::string& lineType, const std::string& mask) {}
 		virtual void changeIdent(const std::string& user, const std::string& newIdent) {}
 		virtual void changeHost(const std::string& user, const std::string& newHost) {}
-		virtual void changeGecos(const std::stirng& user, const std::string& newGecos) {}
+		virtual void changeGecos(const std::string& user, const std::string& newGecos) {}
 		virtual void sendWallops(const std::string& client, const std::string& message) {}
 		virtual void sendOtherData(const std::string& client, const std::string& line) {}
 		
