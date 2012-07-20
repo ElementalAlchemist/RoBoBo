@@ -13,11 +13,11 @@ inline void Module::sendNotice(const std::string& server, const std::string& cli
 	bot->sendNotice(server, client, target, message);
 }
 
-inline void Module::sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "") {
+inline void Module::sendCTCP(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
 	bot->sendCTCP(server, client, target, ctcp, params);
 }
 
-inline void Module::sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params = "") {
+inline void Module::sendCTCPReply(const std::string& server, const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
 	bot->sendCTCPReply(server, client, target, ctcp, params);
 }
 
@@ -29,7 +29,7 @@ inline void Module::setSNOmask(const std::string& server, const std::string& cli
 	bot->setSNOmask(server, client, add, snomask);
 }
 
-inline void Module::joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key = "") {
+inline void Module::joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key) {
 	bot->joinChan(server, client, channel, key);
 }
 
