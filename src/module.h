@@ -66,7 +66,7 @@ class Module {
 		virtual void onServerBurstEnd(const std::string& server) {}
 		virtual void onConnect(const std::string& server) {}
 		virtual void onDisconnect(const std::string& server) {}
-		virtual void onOtherData(const std::string& server, const std::vector<std::string>& parsedLine) {}
+		virtual void onOtherData(const std::string& server, const std::string& client, const std::vector<std::string>& parsedLine) {}
 		
 		virtual void onChanMsgOut(const std::string& server, const std::string& client, const std::string& channel, char status, std::string& message) {}
 		virtual void onChanMsgSend(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& message) {}
