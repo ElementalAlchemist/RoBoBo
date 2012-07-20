@@ -1190,11 +1190,18 @@ std::string Base::userGecos(const std::string& server, const std::string& user) 
 	return servIter->second->userGecos(user);
 }
 
-std::list<std::string> Base::userModes(const std::string& server, const std::string& user) {
+std::set<std::string> Base::userModes(const std::string& server, const std::string& user) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::list<std::string> ();
+		return std::set<std::string> ();
 	return servIter->second->userModes(user);
+}
+
+bool Base::userHasMode(const std::string& server, const std::string& user, const std::string& mode) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return false;
+	return servIter->second->userHasMode(user, mode);
 }
 
 std::list<char> Base::userSNOmasks(const std::string& server, const std::string& user) {
@@ -1204,10 +1211,17 @@ std::list<char> Base::userSNOmasks(const std::string& server, const std::string&
 	return servIter->second->userSNOmasks(user);
 }
 
-std::list<std::string> Base::userChans(const std::string& server, const std::string& user) {
+bool Base::userHasSNOmask(const std::string& server, const std::string& user, char snomask) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::list<std::string> ();
+		return false;
+	return servIter->second->userHasSNOmask(user, snomask);
+}
+
+std::set<std::string> Base::userChans(const std::string& server, const std::string& user) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::set<std::string> ();
 	return servIter->second->userChans(user);
 }
 

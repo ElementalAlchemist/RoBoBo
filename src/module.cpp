@@ -316,8 +316,8 @@ inline std::set<char> Module::userSNOmasks(const std::string& server, const std:
 	return bot->userSNOmasks(server, user);
 }
 
-inline bool Module::userHasSNOmask(const std::string& server, const std::string& user, const std::string& mode) {
-	return bot->userHasSNOmask(server, user, mode);
+inline bool Module::userHasSNOmask(const std::string& server, const std::string& user, char snomask) {
+	return bot->userHasSNOmask(server, user, snomask);
 }
 
 inline std::set<std::string> Module::userChans(const std::string& server, const std::string& user) {

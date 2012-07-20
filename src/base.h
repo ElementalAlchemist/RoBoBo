@@ -101,9 +101,11 @@ class Base {
 		std::string userIdent(const std::string& server, const std::string& user);
 		std::string userHost(const std::string& server, const std::string& user);
 		std::string userGecos(const std::string& server, const std::string& user);
-		std::list<std::string> userModes(const std::string& server, const std::string& user);
+		std::set<std::string> userModes(const std::string& server, const std::string& user);
+		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode);
 		std::list<char> userSNOmasks(const std::string& server, const std::string& user);
-		std::list<std::string> userChans(const std::string& server, const std::string& user);
+		bool userHasSNOmask(const std::string& server, const std::string& user, const std::string& mode);
+		std::set<std::string> userChans(const std::string& server, const std::string& user);
 		time_t userTimestamp(const std::string& server, const std::string& user);
 		time_t userNickTimestamp(const std::string& server, const std::string& user);
 		
