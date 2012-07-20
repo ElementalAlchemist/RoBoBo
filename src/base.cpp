@@ -600,7 +600,7 @@ std::shared_ptr<Socket> Base::loadSocket(std::string sockettype) {
 			dlclose(socketFile);
 			return NULL;
 		}
-		Socket* newSocket = (Socket*) socketSpawn();
+		std::shared_ptr<Socket> newSocket ((Socket*) socketSpawn(), std::bind(&Base::unloadSocket, this, sockettype, std::placeholders::_1));
 		if (newSocket->apiVersion() != 3000) {
 			std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
 			delete newSocket;
