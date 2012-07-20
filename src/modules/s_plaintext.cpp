@@ -38,8 +38,21 @@ void Plaintext::connectServer(std::string server, std::string port, std::string 
 		if (socketfd == -1)
 			continue;
 		if (bindAddr != "") {
-			status = bind(socketfd, bindAddr.c_str(), bindAddr.size());
-			if (status == -1) {
+			addrinfo bindHints;
+			bindHints.ai_family = thisAddr->ai_family;
+			bindHints.ai_socktype = SOCK_STREAM;
+			bindHints.ai_protocol = IPPROTO_TCP;
+			bindHints.ai_flags = AI_ADDRCONFIG | AI_NUMERICHOST;
+			addrinfo* bindLoc;
+			for (addrinfo* currBind = bindLoc; currBind != NULL; currBind = currBind->ai_next) {
+				status = getaddrinfo(bindAddr.c_str(), "0", &bindHints, &bindLoc);
+				if (status != 0)
+					continue;
+				status = bind(socketfd, bindLoc->ai_addr, bindLoc->ai_addrlen);
+				if (status == -1)
+					continue;
+			}
+			if (status != 0) { // If the status still isn't 0, then the binding never worked
 				close(socketfd);
 				socketfd = -1;
 				continue;
