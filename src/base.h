@@ -103,7 +103,7 @@ class Base {
 		std::string userGecos(const std::string& server, const std::string& user);
 		std::set<std::string> userModes(const std::string& server, const std::string& user);
 		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode);
-		std::list<char> userSNOmasks(const std::string& server, const std::string& user);
+		std::set<char> userSNOmasks(const std::string& server, const std::string& user);
 		bool userHasSNOmask(const std::string& server, const std::string& user, char snomask);
 		std::set<std::string> userChans(const std::string& server, const std::string& user);
 		time_t userTimestamp(const std::string& server, const std::string& user);

@@ -1204,10 +1204,10 @@ bool Base::userHasMode(const std::string& server, const std::string& user, const
 	return servIter->second->userHasMode(user, mode);
 }
 
-std::list<char> Base::userSNOmasks(const std::string& server, const std::string& user) {
+std::set<char> Base::userSNOmasks(const std::string& server, const std::string& user) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())
-		return std::list<char> ();
+		return std::set<char> ();
 	return servIter->second->userSNOmasks(user);
 }
 

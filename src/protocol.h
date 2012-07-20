@@ -78,7 +78,7 @@ class Protocol {
 		virtual std::string userGecos(const std::string& user) { return ""; }
 		virtual std::set<std::string> userModes(const std::string& user) { return std::set<std::string> (); }
 		virtual bool userHasMode(const std::string& user, const std::string& mode) { return false; }
-		virtual std::list<char> userSNOmasks(const std::string& user) { return std::list<char> (); }
+		virtual std::set<char> userSNOmasks(const std::string& user) { return std::set<char> (); }
 		virtual bool userHasSNOmask(const std::string& user, char snomask) { return false; }
 		virtual std::set<std::string> userChans(const std::string& user) { return std::set<std::string> (); }
 		virtual time_t userTimestamp(const std::string& user) { return 0; }
