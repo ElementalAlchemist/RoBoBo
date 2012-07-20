@@ -97,62 +97,62 @@ class Protocol {
 		unsigned short debugLevel;
 		std::shared_ptr<Socket> assignSocket(std::string socketType);
 		
-		void callChanMsgHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& message) { bot->modChanMsgHook(serverName, client, channel, status, nick, message); }
-		void callUserMsgHook(const std::string& client, const std::string& nick, const std::string& message) { bot->modUserMsgHook(serverName, client, nick, message); }
-		void callChanNoticeHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& message) { bot->modChanNoticeHook(serverName, client, channel, status, nick, message); }
-		void callUserNoticeHook(const std::string& client, const std::string& nick, const std::string& message) { bot->modUserNoticeHook(serverName, client, nick, message); }
-		void callChanCTCPHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modChanCTCPHook(serverName, client, channel, status, nick, ctcp, params); }
-		void callUserCTCPHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modUserCTCPHook(serverName, client, nick, ctcp, params); }
-		void callChanCTCPReplyHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modChanCTCPReplyHook(serverName, client, channel, status, nick, ctcp, params); }
-		void callUserCTCPReplyHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modUserCTCPReplyHook(serverName, client, nick, ctcp, params); }
-		void callChanModeHook(const std::string& channel, bool add, const std::string& mode) { bot->modChanModeHook(serverName, channel, add, mode); }
-		void callUserModeHook(const std::string& nick, bool add, const std::string& mode) { bot->modUserModeHook(serverName, nick, add, mode); }
-		void callUserSNOmaskHook(const std::string& nick, bool add, char snomask) { bot->modUserSNOmaskHook(serverName, nick, add, snomask); }
-		void callChanJoinHook(const std::string& channel, const std::string& user) { bot->modChanJoinHook(serverName, channel, user); }
-		void callChanPartHook(const std::string& channel, const std::string& user, const std::string& reason) { bot->modChanPartHook(serverName, channel, user, reason); }
-		void callChanKickHook(const std::string& channel, const std::string& kicker, const std::string& kickee, const std::string& reason) { bot->modChanKickHook(serverName, channel, kicker, kickee, reason); }
-		void callChanTopicHook(const std::string& channel, const std::string& nick, const std::string& topic) { bot->modChanTopicHook(serverName, channel, nick, topic); }
-		void callChanInviteHook(const std::string& channel, const std::string& inviter, const std::string& invitee) { bot->modChanInviteHook(serverName, channel, inviter, invitee); }
-		void callChanKnockHook(const std::string& channel, const std::string& nick, const std::string& reason) { bot->modChanKnockHook(serverName, channel, nick, reason); }
-		void callUserNickHook(const std::string& oldNick, const std::string& newNick) { bot->modUserNickHook(serverName, oldNick, newNick); }
-		void callServerPingHook(const std::string& sourceServer) { bot->modServerPingHook(serverName, sourceServer); }
-		void callServerPongHook(const std::string& sourceServer) { bot->modServerPongHook(serverName, sourceServer); }
-		void callNumericHook(const std::string& numeric, const std::vector<std::string>& data) { bot->modNumericHook(serverName, numeric, data); }
-		void callUserOperHook(const std::string& nick, const std::string& operType) { bot->modUserOperHook(serverName, nick, operType); }
-		void callServerNoticeHook(char snomask, const std::string& message) { bot->modServerNoticeHook(serverName, snomask, message); }
-		void callMetadataHook(const std::string& target, const std::string& key, const std::string& value) { bot->modMetadataHook(serverName, target, key, value); }
-		void callXLineAddHook(const std::string& lineType, const std::string& mask) { bot->modXLineAddHook(serverName, lineType, mask); }
-		void callXLineRemoveHook(const std::string& lineType, const std::string& mask) { bot->modXLineRemoveHook(serverName, lineType, mask); }
-		void callUserConnectHook(const std::string& nick) { bot->modUserConnectHook(serverName, nick); }
-		void callUserQuitHook(const std::string& nick, const std::string& reason) { bot->modUserQuitHook(serverName, nick, reason); }
-		void callUserIdentChangeHook(const std::string& nick, const std::string& oldIdent, const std::string& newIdent) { bot->modUserIdentChangeHook(serverName, nick, oldIdent, newIdent); }
-		void callUserHostChangeHook(const std::string& nick, const std::string& oldHost, const std::string& newHost) { bot->modUserHostChangeHook(serverName, nick, oldHost, newHost); }
-		void callUserGecosChangeHook(const std::string& nick, const std::string& oldGecos, const std::string& newGecos) { bot->modUserGecosChangeHook(serverName, nick, oldGecos, newGecos); }
-		void callServerWallopsHook(const std::string& nick, const std::string& message) { bot->modServerWallopsHook(serverName, nick, message); }
-		void callServerConnectHook(const std::string& newServer) { bot->modServerConnectHook(serverName, newServer); }
-		void callServerDisconnectHook(const std::string& quitServer, const std::string& reason) { bot->modServerDisconnectHook(serverName, quitServer, reason); }
-		void callServerCapHook(const std::string& subcmd, const std::string& list) { bot->modServerCapHook(serverName, subcmd, list); }
-		void callServerCapabHook(const std::vector<std::string>& capabList) { bot->modServerCapabHook(serverName, capabList); }
-		void callServerBurstHook() { bot->modServerBurstHook(serverName); }
-		void callServerBurstEndHook() { bot->modServerBurstEndHook(serverName); }
-		void callOtherDataHook(const std::string& client, const std::vector<std::string>& parsedLine) { bot->modOtherDataHook(serverName, client, parsedLine); }
+		void callChanMsgHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& message);
+		void callUserMsgHook(const std::string& client, const std::string& nick, const std::string& message);
+		void callChanNoticeHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& message);
+		void callUserNoticeHook(const std::string& client, const std::string& nick, const std::string& message);
+		void callChanCTCPHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callUserCTCPHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callChanCTCPReplyHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callUserCTCPReplyHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callChanModeHook(const std::string& channel, bool add, const std::string& mode);
+		void callUserModeHook(const std::string& nick, bool add, const std::string& mode);
+		void callUserSNOmaskHook(const std::string& nick, bool add, char snomask);
+		void callChanJoinHook(const std::string& channel, const std::string& user);
+		void callChanPartHook(const std::string& channel, const std::string& user, const std::string& reason);
+		void callChanKickHook(const std::string& channel, const std::string& kicker, const std::string& kickee, const std::string& reason);
+		void callChanTopicHook(const std::string& channel, const std::string& nick, const std::string& topic);
+		void callChanInviteHook(const std::string& channel, const std::string& inviter, const std::string& invitee);
+		void callChanKnockHook(const std::string& channel, const std::string& nick, const std::string& reason);
+		void callUserNickHook(const std::string& oldNick, const std::string& newNick);
+		void callServerPingHook(const std::string& sourceServer);
+		void callServerPongHook(const std::string& sourceServer);
+		void callNumericHook(const std::string& numeric, const std::vector<std::string>& data);
+		void callUserOperHook(const std::string& nick, const std::string& operType);
+		void callServerNoticeHook(char snomask, const std::string& message);
+		void callMetadataHook(const std::string& target, const std::string& key, const std::string& value);
+		void callXLineAddHook(const std::string& lineType, const std::string& mask);
+		void callXLineRemoveHook(const std::string& lineType, const std::string& mask);
+		void callUserConnectHook(const std::string& nick);
+		void callUserQuitHook(const std::string& nick, const std::string& reason);
+		void callUserIdentChangeHook(const std::string& nick, const std::string& oldIdent, const std::string& newIdent);
+		void callUserHostChangeHook(const std::string& nick, const std::string& oldHost, const std::string& newHost);
+		void callUserGecosChangeHook(const std::string& nick, const std::string& oldGecos, const std::string& newGecos);
+		void callServerWallopsHook(const std::string& nick, const std::string& message);
+		void callServerConnectHook(const std::string& newServer);
+		void callServerDisconnectHook(const std::string& quitServer, const std::string& reason);
+		void callServerCapHook(const std::string& subcmd, const std::string& list);
+		void callServerCapabHook(const std::vector<std::string>& capabList);
+		void callServerBurstHook();
+		void callServerBurstEndHook();
+		void callOtherDataHook(const std::string& client, const std::vector<std::string>& parsedLine);
 		
-		void callChanMsgOutHook(const std::string& client, const std::string& channel, char status, const std::string& message) { bot->modChanMsgOutHook(serverName, client, channel, status, message, this); }
-		void callChanMsgSendHook(const std::string& client, const std::string& channel, char status, const std::string& message) { bot->modChanMsgSendHook(serverName, client, channel, status, message); }
-		void callUserMsgOutHook(const std::string& client, const std::string& nick, const std::string& message) { bot->modUserMsgOutHook(serverName, client, nick, message, this); }
-		void callUserMsgSendHook(const std::string& client, const std::string& nick, const std::string& message) { bot->modUserMsgSendHook(serverName, client, nick, message); }
-		void callChanNoticeOutHook(const std::string& client, const std::string& channel, char status, const std::string& message) { bot->modChanNoticeOutHook(serverName, client, channel, status, message, this); }
-		void callChanNoticeSendHook(const std::string& client, const std::string& channel, char status, const std::string& message) { bot->modChanNoticeSendHook(serverName, client, channel, status, message); }
-		void callUserNoticeOutHook(const std::string& client, const std::string& nick, const std::string& message) { bot->modUserNoticeOutHook(serverName, client, nick, message, this); }
-		void callUserNoticeSendHook(const std::string& client, const std::string& nick, const std::string& message) { bot->modUserNoticeSendHook(serverName, client, nick, message); }
-		void callChanCTCPOutHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) { bot->modChanCTCPOutHook(serverName, client, channel, status, ctcp, params, this); }
-		void callChanCTCPSendHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) { bot->modChanCTCPSendHook(serverName, client, channel, status, ctcp, params); }
-		void callUserCTCPOutHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modUserCTCPOutHook(serverName, client, nick, ctcp, params, this); }
-		void callUserCTCPSendHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modUserCTCPSendHook(serverName, client, nick, ctcp, params); }
-		void callChanCTCPReplyOutHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) { bot->modChanCTCPReplyOutHook(serverName, client, channel, status, ctcp, params, this); }
-		void callChanCTCPReplySendHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) { bot->modChanCTCPReplySendHook(serverName, client, channel, status, ctcp, params); }
-		void callUserCTCPReplyOutHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modUserCTCPReplyOutHook(serverName, client, nick, ctcp, params, this); }
-		void callUserCTCPReplySendHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { bot->modUserCTCPReplySendHook(serverName, client, nick, ctcp, params); }
+		void callChanMsgOutHook(const std::string& client, const std::string& channel, char status, const std::string& message);
+		void callChanMsgSendHook(const std::string& client, const std::string& channel, char status, const std::string& message);
+		void callUserMsgOutHook(const std::string& client, const std::string& nick, const std::string& message);
+		void callUserMsgSendHook(const std::string& client, const std::string& nick, const std::string& message);
+		void callChanNoticeOutHook(const std::string& client, const std::string& channel, char status, const std::string& message);
+		void callChanNoticeSendHook(const std::string& client, const std::string& channel, char status, const std::string& message);
+		void callUserNoticeOutHook(const std::string& client, const std::string& nick, const std::string& message);
+		void callUserNoticeSendHook(const std::string& client, const std::string& nick, const std::string& message);
+		void callChanCTCPOutHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
+		void callChanCTCPSendHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
+		void callUserCTCPOutHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callUserCTCPSendHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callChanCTCPReplyOutHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
+		void callChanCTCPReplySendHook(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
+		void callUserCTCPReplyOutHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
+		void callUserCTCPReplySendHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
 	private:
 		Base* bot;
 };
