@@ -11,11 +11,11 @@ class Socket {
 		Socket();
 		virtual ~Socket();
 		virtual unsigned int apiVersion() = 0;
-		virtual void connectServer(std::string server, std::string port, std::string bindAddr = "");
-		virtual std::string receive();
-		virtual void sendData(std::string line);
-		virtual void closeConnection();
-		bool isConnected();
+		virtual void connectServer(std::string server, std::string port, std::string bindAddr = "") {}
+		virtual std::string receive() { return ""; }
+		virtual void sendData(std::string line) {}
+		virtual void closeConnection() {}
+		bool isConnected() { return connected; }
 	protected:
 		int socketfd;
 		bool connected;
