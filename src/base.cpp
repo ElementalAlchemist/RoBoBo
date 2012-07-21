@@ -486,16 +486,16 @@ void Base::unloadModule(std::string modName, bool wasLoaded) {
 		unloadModule(modName, true);
 }
 
-void Base::connectServer(std::string server) {
+ProtoLoadResult Base::connectServer(std::string server) {
 	if (servers.find(server) != servers.end())
-		return; // We're already connected!
+		return PROTO_ALREADYLOADED;
 	std::map<std::string, std::map<std::string, std::string>>::iterator confIter = serverConfig.find(server);
 	if (confIter == serverConfig.end())
-		return;
+		return PROTO_NOCONFIG;
 	std::string protoType = confIter->second["protocol"];
 	if (protoType == "") {
 		std::cerr << "A protocol type was not specified for the server " << server << ".  Please check your configuration and try again." << std::endl;
-		return;
+		return PROTO_NOPROTOCOL;
 	}
 	std::unordered_map<std::string, void*>::iterator fileIter = protocolFiles.find(protoType);
 	if (fileIter != protocolFiles.end()) {
@@ -503,51 +503,51 @@ void Base::connectServer(std::string server) {
 		const char* spawnError = dlerror();
 		if (spawnError != NULL) {
 			std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
-			return;
+			return PROTO_OPEN_ERROR;
 		}
 		Protocol* newServer;
 		try {
 			newServer = static_cast<Protocol*> ((*protoSpawn)(server, confIter->second, workingDir, logDump, debugLevel, this));
 		} catch (const std::bad_alloc& e) {
 			std::cerr << "Could not load protocol module for server " << server << "; out of memory!" << std::endl << e.what() << std::endl;
-			return;
+			return PROTO_OUT_OF_MEMORY;
 		}
 		if (newServer->apiVersion() != 3000) {
 			std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 			delete newServer;
-			return;
+			return PROTO_INCOMPATIBLE;
 		}
 		protocolTypes[protoType].insert(server);
 		servers.insert(std::pair<std::string, Protocol*> (server, newServer));
 		newServer->connectServer();
-		return; // Success!  Return now while we're ahead (so the other stuff doesn't execute)
+		return PROTO_SUCCESS;
 	}
 	std::string filename = workingDir + "/modules/p_" + protoType + ".so";
 	void* protoFile = dlopen(filename.c_str(), RTLD_NOW);
 	const char* fileOpenError = dlerror();
 	if (fileOpenError != NULL) {
-		std::cerr << "The protocol module for server " << server << " could not be found: " << fileOpenError << std::endl;
-		return;
+		std::cerr << "The protocol module for server " << server << " could not be opened: " << fileOpenError << std::endl;
+		return PROTO_OPEN_ERROR;
 	}
 	protocol_spawn_t* protoSpawn = static_cast<protocol_spawn_t*> (dlsym(protoFile, "spawn"));
 	const char* spawnError = dlerror();
 	if (spawnError != NULL) {
 		std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
 		dlclose(protoFile);
-		return;
+		return PROTO_OPEN_ERROR;
 	}
 	Protocol* newServer;
 	try {
 		newServer = static_cast<Protocol*> ((*protoSpawn)(server, confIter->second, workingDir, logDump, debugLevel, this));
 	} catch (const std::bad_alloc& e) {
 		std::cerr << "Could not load protocol module for server " << server << "; out of memory!" << std::endl << e.what() << std::endl;
-		return;
+		return PROTO_OUT_OF_MEMORY;
 	}
 	if (newServer->apiVersion() != 3000) {
 		std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 		delete newServer;
 		dlclose(protoFile);
-		return;
+		return PROTO_INCOMPATIBLE;
 	}
 	protocolFiles.insert(std::pair<std::string, void*> (protoType, protoFile));
 	protocolTypes[protoType].insert(server);
@@ -564,6 +564,7 @@ void Base::connectServer(std::string server) {
 		module.second->onConnect(server);
 	for (std::pair<std::string, Module*> module : lowModules)
 		module.second->onConnect(server);
+	return PROTO_SUCCESS;
 }
 
 void Base::disconnectServer(std::string server, std::string reason) {

@@ -23,7 +23,7 @@ class Base {
 		void unloadEverything();
 		ModLoadResult loadModule(std::string modName);
 		void unloadModule(std::string modName, bool wasLoaded);
-		void connectServer(std::string server);
+		ProtoLoadResult connectServer(std::string server);
 		void disconnectServer(std::string server, std::string reason = "");
 		std::shared_ptr<Socket> loadSocket(std::string sockettype);
 		void unloadSocket(std::string sockettype, Socket* socketptr);
