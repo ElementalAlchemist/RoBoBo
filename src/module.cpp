@@ -108,7 +108,7 @@ inline void Module::sendOtherData(const std::string& server, const std::string& 
 	bot->sendOtherData(server, client, line);
 }
 
-inline void Module::connectServer(const std::string& server) {
+inline ProtoLoadResult Module::connectServer(const std::string& server) {
 	bot->connectServer(server);
 }
 
@@ -116,7 +116,7 @@ inline void Module::disconnectServer(const std::string& server) {
 	bot->disconnectServer(server);
 }
 
-inline LoadResult Module::loadModule(const std::string& modName) {
+inline ModLoadResult Module::loadModule(const std::string& modName) {
 	return bot->loadModule(modName);
 }
 
