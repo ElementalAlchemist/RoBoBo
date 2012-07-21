@@ -12,21 +12,21 @@ default: core modules
 debug: debugcore debugmodules
 
 core:
-	@make -C src
+	@make --no-print-directory -C src
 
 modules:
 	@test -d modules || mkdir modules
-	@make -C src/modules
+	@make --no-print-directory -C src/modules
 
 debugcore:
-	@DEBUG="-g -O0" make -C src
+	@DEBUG="-g -O0" make --no-print-directory -C src
 
 debugmodules:
 	@test -d modules || mkdir modules
-	@DEBUG="-g -O0" make -C src/modules
+	@DEBUG="-g -O0" make --no-print-directory -C src/modules
 
 clean:
 	@rm -f robobo
 	@rm -f modules/*
-	@make -C src clean
+	@make --no-print-directory -C src clean
 	@echo "Clean has been made."

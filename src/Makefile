@@ -28,5 +28,5 @@ $(shell ${CC} -std=c++0x -E -MM protocol.cpp)
 	@${CC} ${CXXFLAGS} ${DEBUG} protocol.cpp ${LDFLAGS} -c -o protocol.o
 
 $(shell ${CC} -std=c++0x -E -MM socket.cpp)
-	@echo "\033[1;32mBuild:\033[0m\tprotocol.cpp\033[0;33m"
+	@echo "\033[1;32mBuild:\033[0m\tsocket.cpp\033[0;33m"
 	@${CC} ${CXXFLAGS} ${DEBUG} socket.cpp ${LDFLAGS} -c -o socket.o
