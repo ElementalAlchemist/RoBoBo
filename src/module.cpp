@@ -109,7 +109,7 @@ inline void Module::sendOtherData(const std::string& server, const std::string& 
 }
 
 inline ProtoLoadResult Module::connectServer(const std::string& server) {
-	bot->connectServer(server);
+	return bot->connectServer(server);
 }
 
 inline void Module::disconnectServer(const std::string& server) {
