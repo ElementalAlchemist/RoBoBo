@@ -9,7 +9,7 @@ LDFLAGS=-ldl
 
 default: base.o module.o protocol.o socket.o
 	@echo "\033[1;32mLink:\033[0m\trobobo"
-	@$(CC) $(CXXFLAGS) $(DEBUG) base.cpp module.cpp protocol.cpp socket.cpp robobo.cpp -o ../robobo $(LDFLAGS)
+	@$(CC) $(CXXFLAGS) $(DEBUG) base.o module.o protocol.o socket.o robobo.cpp -o ../robobo $(LDFLAGS)
 
 clean:
 	@rm -f *.o
