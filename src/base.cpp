@@ -284,7 +284,7 @@ void Base::unloadEverything() {
 		unloadModule(moduleFiles.begin()->first, true);
 }
 
-LoadResult Base::loadModule(std::string modName) {
+ModLoadResult Base::loadModule(std::string modName) {
 	if (moduleFiles.find(modName) != moduleFiles.end())
 		return LOAD_ALREADYLOADED; // Do not attempt to load a module if it's already here
 	// Modules will be in the modules directory and have the m_ prefix
@@ -293,7 +293,7 @@ LoadResult Base::loadModule(std::string modName) {
 	const char* fileOpenError = dlerror();
 	if (fileOpenError != NULL) {
 		std::cerr << "Module " << modName << " could not be opened: " << fileOpenError << std::endl;
-		return LOAD_OPEN_ERROR;
+		return MOD_OPEN_ERROR;
 	}
 	// The spawn function of modules returns a module instance that we can use
 	module_spawn_t* moduleSpawn = static_cast<module_spawn_t*> (dlsym(modFile, "spawn"));
@@ -301,20 +301,20 @@ LoadResult Base::loadModule(std::string modName) {
 	if (spawnError != NULL) {
 		std::cerr << "Spawn not found in module " << modName << ": " << spawnError << std::endl;
 		dlclose(modFile);
-		return LOAD_OPEN_ERROR;
+		return MOD_OPEN_ERROR;
 	}
 	Module* newModule;
 	try {
 		newModule = static_cast<Module*> ((*moduleSpawn)(modName, moduleConfig[modName], workingDir, debugLevel, this));
 	} catch (const std::bad_alloc& e) {
 		std::cerr << "Module " << modName << " could not be loaded; out of memory!" << std::endl << e.what() << std::endl;
-		return LOAD_OUT_OF_MEMORY;
+		return MOD_OUT_OF_MEMORY;
 	}
 	if (newModule->apiVersion() != 3000) {
 		std::cerr << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl;
 		delete newModule;
 		dlclose(modFile);
-		return LOAD_INCOMPATIBLE;
+		return MOD_INCOMPATIBLE;
 	}
 	// Add the module to the appropriate module list according to its priority
 	modulePriority.insert(std::pair<std::string, Priority> (modName, newModule->priority()));
@@ -352,7 +352,7 @@ LoadResult Base::loadModule(std::string modName) {
 			if (moduleServices[requirement].empty()) {
 				std::cerr << "Module " << modName << " requires the service " << requirement << ", which is not provided by another module." << std::endl;
 				unloadModule(modName, false);
-				return LOAD_NODEPENDS;
+				return MOD_NODEPENDS;
 			}
 			moduleRequires[requirement].push_back(modName);
 			moduleSupports[requirement].push_back(modName);
@@ -386,10 +386,10 @@ LoadResult Base::loadModule(std::string modName) {
 			// The unload module function needs the mutex, so unlock it before we pass off
 			hookManage.release();
 			unloadModule(modName, false);
-			return LOAD_FAILURE;
+			return MOD_FAILURE;
 		}
 	}
-	return LOAD_SUCCESS;
+	return MOD_SUCCESS;
 }
 
 void Base::unloadModule(std::string modName, bool wasLoaded) {

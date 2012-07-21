@@ -21,7 +21,7 @@ class Base {
 		void connectServers();
 		void checkServers();
 		void unloadEverything();
-		LoadResult loadModule(std::string modName);
+		ModLoadResult loadModule(std::string modName);
 		void unloadModule(std::string modName, bool wasLoaded);
 		void connectServer(std::string server);
 		void disconnectServer(std::string server, std::string reason = "");

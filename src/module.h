@@ -4,8 +4,8 @@
 #include "socket.h"
 
 class Base; // This needs to be forward-declared for the Base* pointer in Module; the Base class is included below.
-enum LoadResult { LOAD_SUCCESS, LOAD_ALREADYLOADED, LOAD_OPEN_ERROR, LOAD_OUT_OF_MEMORY, LOAD_INCOMPATIBLE, LOAD_NODEPENDS, LOAD_FAILURE };
 enum Priority { PRI_HIGH, PRI_MEDIUM_HIGH, PRI_NORMAL, PRI_MEDIUM_LOW, PRI_LOW };
+enum ModLoadResult { MOD_SUCCESS, MOD_ALREADYLOADED, MOD_OPEN_ERROR, MOD_OUT_OF_MEMORY, MOD_INCOMPATIBLE, MOD_NODEPENDS, MOD_FAILURE };
 
 typedef bool MsgAction;
 const bool MSG_CONTINUE = true;
@@ -123,7 +123,7 @@ class Module {
 		
 		void connectServer(const std::string& server);
 		void disconnectServer(const std::string& server);
-		LoadResult loadModule(const std::string& modName);
+		ModLoadResult loadModule(const std::string& modName);
 		void unloadModule(const std::string& modName);
 		std::shared_ptr<Socket> assignSocket(const std::string& socketType);
 		void rehash();
