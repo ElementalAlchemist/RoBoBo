@@ -10,9 +10,8 @@ SOURCES=$(wildcard *.cpp)
 .PHONY: default
 
 default: $(SOURCES:.cpp=.so)
-	@echo "\033[0m"
 	@mv *.so ../../modules/
 
 $(SOURCES:.cpp=.so):
-	@echo "\033[1;32mBuild:\033[0m\t$@\033[0;33m"
+	@echo "\033[1;32mBuild:\033[0m\t$@"
 	@${CC} ${CXXFLAGS} ${SOFLAGS} $(@:.so=.cpp) ${LDFLAGS} $(shell grep '^\s*// COMPILE_FLAGS ' $(@:.so=.cpp) | awk -F'[ ]' '{$$1=$$2=""; print $0}') -c -o $@

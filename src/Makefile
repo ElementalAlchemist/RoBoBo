@@ -8,7 +8,7 @@ LDFLAGS=-ldl
 .PHONY: default clean
 
 default: base.o module.o protocol.o socket.o
-	@echo "\033[1;32mLink:\033[0m\trobobo\033[0;33m"
+	@echo "\033[1;32mLink:\033[0m\trobobo"
 	@$(CC) $(CXXFLAGS) $(DEBUG) base.cpp module.cpp protocol.cpp socket.cpp robobo.cpp -o ../robobo $(LDFLAGS)
 
 clean:
@@ -16,17 +16,17 @@ clean:
 
 # include g++-generated dependencies
 $(shell ${CC} -std=c++0x -E -MM base.cpp)
-	@echo "\033[1;32mBuild:\033[0m\tbase.cpp\033[0;33m"
+	@echo "\033[1;32mBuild:\033[0m\tbase.cpp"
 	@${CC} ${CXXFLAGS} ${DEBUG} base.cpp ${LDFLAGS} -c -o base.o 
 
 $(shell ${CC} -std=c++0x -E -MM module.cpp)
-	@echo "\033[1;32mBuild:\033[0m\tmodule.cpp\033[0;33m"
+	@echo "\033[1;32mBuild:\033[0m\tmodule.cpp"
 	@${CC} ${CXXFLAGS} ${DEBUG} module.cpp ${LDFLAGS} -c -o module.o
 
 $(shell ${CC} -std=c++0x -E -MM protocol.cpp)
-	@echo "\033[1;32mBuild:\033[0m\tprotocol.cpp\033[0;33m"
+	@echo "\033[1;32mBuild:\033[0m\tprotocol.cpp"
 	@${CC} ${CXXFLAGS} ${DEBUG} protocol.cpp ${LDFLAGS} -c -o protocol.o
 
 $(shell ${CC} -std=c++0x -E -MM socket.cpp)
-	@echo "\033[1;32mBuild:\033[0m\tsocket.cpp\033[0;33m"
+	@echo "\033[1;32mBuild:\033[0m\tsocket.cpp"
 	@${CC} ${CXXFLAGS} ${DEBUG} socket.cpp ${LDFLAGS} -c -o socket.o
