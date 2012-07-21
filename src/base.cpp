@@ -303,7 +303,13 @@ LoadResult Base::loadModule(std::string modName) {
 		dlclose(modFile);
 		return LOAD_OPEN_ERROR;
 	}
-	Module* newModule = static_cast<Module*> ((*moduleSpawn)(modName, moduleConfig[modName], workingDir, debugLevel, this));
+	Module* newModule;
+	try {
+		newModule = static_cast<Module*> ((*moduleSpawn)(modName, moduleConfig[modName], workingDir, debugLevel, this));
+	} catch (const std::bad_alloc& e) {
+		std::cerr << "Module " << modName << " could not be loaded; out of memory!" << std::endl << e.what() << std::endl;
+		return LOAD_OUT_OF_MEMORY;
+	}
 	if (newModule->apiVersion() != 3000) {
 		std::cerr << "Module " << modName << " is not compatible with this version of RoBoBo." << std::endl;
 		delete newModule;
@@ -499,7 +505,13 @@ void Base::connectServer(std::string server) {
 			std::cerr << "Spawn not found in protocol module for server " << server << ": " << spawnError << std::endl;
 			return;
 		}
-		Protocol* newServer = static_cast<Protocol*> ((*protoSpawn)(server, confIter->second, workingDir, logDump, debugLevel, this));
+		Protocol* newServer;
+		try {
+			newServer = static_cast<Protocol*> ((*protoSpawn)(server, confIter->second, workingDir, logDump, debugLevel, this));
+		} catch (const std::bad_alloc& e) {
+			std::cerr << "Could not load protocol module for server " << server << "; out of memory!" << std::endl << e.what() << std::endl;
+			return;
+		}
 		if (newServer->apiVersion() != 3000) {
 			std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 			delete newServer;
@@ -524,7 +536,13 @@ void Base::connectServer(std::string server) {
 		dlclose(protoFile);
 		return;
 	}
-	Protocol* newServer = static_cast<Protocol*> ((*protoSpawn)(server, confIter->second, workingDir, logDump, debugLevel, this));
+	Protocol* newServer;
+	try {
+		newServer = static_cast<Protocol*> ((*protoSpawn)(server, confIter->second, workingDir, logDump, debugLevel, this));
+	} catch (const std::bad_alloc& e) {
+		std::cerr << "Could not load protocol module for server " << server << "; out of memory!" << std::endl << e.what() << std::endl;
+		return;
+	}
 	if (newServer->apiVersion() != 3000) {
 		std::cerr << "The protocol module for server " << server << " is not compatible with this version of RoBoBo." << std::endl;
 		delete newServer;
@@ -602,13 +620,18 @@ std::shared_ptr<Socket> Base::loadSocket(std::string sockettype) {
 		std::cerr << "Spawn not found in socket module s_" << sockettype << ": " << spawnError << std::endl;
 		return NULL;
 	}
-	std::shared_ptr<Socket> newSocket (static_cast<Socket*> ((*socketSpawn)()), std::bind(&Base::unloadSocket, this, sockettype, std::placeholders::_1));
-	socketCounts[sockettype]++;
-	if (newSocket->apiVersion() != 3000) {
-		std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
+	try {
+		std::shared_ptr<Socket> newSocket (static_cast<Socket*> ((*socketSpawn)()), std::bind(&Base::unloadSocket, this, sockettype, std::placeholders::_1));
+		socketCounts[sockettype]++;
+		if (newSocket->apiVersion() != 3000) {
+			std::cerr << "The socket module s_" << sockettype << " is not compatible with this version of RoBoBo." << std::endl;
+			return NULL;
+		}
+		return newSocket;
+	} catch (const std::bad_alloc& e) {
+		std::cerr << "Could not load socket module of type " << sockettype << "; out of memory!" << std::endl << std::e.what() << std::endl;
 		return NULL;
 	}
-	return newSocket;
 }
 
 void Base::unloadSocket(std::string sockettype, Socket* socketptr) {
