@@ -286,7 +286,7 @@ void Base::unloadEverything() {
 
 ModLoadResult Base::loadModule(std::string modName) {
 	if (moduleFiles.find(modName) != moduleFiles.end())
-		return LOAD_ALREADYLOADED; // Do not attempt to load a module if it's already here
+		return MOD_ALREADYLOADED; // Do not attempt to load a module if it's already here
 	// Modules will be in the modules directory and have the m_ prefix
 	std::string fileName = workingDir + "/modules/m_" + modName + ".so";
 	void* modFile = dlopen(fileName.c_str(), RTLD_NOW);
