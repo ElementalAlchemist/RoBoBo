@@ -630,7 +630,7 @@ std::shared_ptr<Socket> Base::loadSocket(std::string sockettype) {
 		}
 		return newSocket;
 	} catch (const std::bad_alloc& e) {
-		std::cerr << "Could not load socket module of type " << sockettype << "; out of memory!" << std::endl << std::e.what() << std::endl;
+		std::cerr << "Could not load socket module of type " << sockettype << "; out of memory!" << std::endl << e.what() << std::endl;
 		return NULL;
 	}
 }
