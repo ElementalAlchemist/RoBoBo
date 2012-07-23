@@ -5,7 +5,7 @@ class Plaintext : public Socket {
 		Plaintext();
 		~Plaintext();
 		unsigned int apiVersion();
-		void connectServer(std::string server, std::string port, std::string bindAddr = "");
+		unsigned int connectServer(std::string server, std::string port, std::string bindAddr = "");
 		std::string receive();
 		void sendData(std::string line);
 		void closeConnection();
@@ -21,7 +21,7 @@ unsigned int Plaintext::apiVersion() {
 	return 3000;
 }
 
-void Plaintext::connectServer(std::string server, std::string port, std::string bindAddr) {
+unsigned int Plaintext::connectServer(std::string server, std::string port, std::string bindAddr) {
 	addrinfo* addrInfoList;
 	addrinfo hints;
 	hints.ai_family = PF_UNSPEC; // Don't specify either IPv4 or IPv6
@@ -31,12 +31,15 @@ void Plaintext::connectServer(std::string server, std::string port, std::string 
 	int status = getaddrinfo(server.c_str(), port.c_str(), &hints, &addrInfoList);
 	if (status != 0) {
 		std::cerr << "An error occurred getting hosts for the server " << server << " on port " << port << "." << std::endl;
-		return;
+		return SOCKCONN_HOST;
 	}
+	unsigned int errFlags = 0;
 	for (addrinfo* thisAddr = addrInfoList; thisAddr != NULL; thisAddr = thisAddr->ai_next) {
 		socketfd = socket(thisAddr->ai_family, thisAddr->ai_socktype | SOCK_NONBLOCK, thisAddr->ai_protocol);
-		if (socketfd == -1)
+		if (socketfd == -1) {
+			errFlags = errFlags | SOCKCONN_FD;
 			continue;
+		}
 		if (bindAddr != "") {
 			addrinfo bindHints;
 			bindHints.ai_family = thisAddr->ai_family;
@@ -55,6 +58,7 @@ void Plaintext::connectServer(std::string server, std::string port, std::string 
 			if (status != 0) { // If the status still isn't 0, then the binding never worked
 				close(socketfd);
 				socketfd = -1;
+				errFlags = errFlags | SOCKCONN_BIND;
 				continue;
 			}
 		}
@@ -62,6 +66,7 @@ void Plaintext::connectServer(std::string server, std::string port, std::string 
 		if (status != 0 && errno != EINPROGRESS) {
 			close(socketfd);
 			socketfd = -1;
+			errFlags = errFlags | SOCKCONN_CONNECT;
 			continue;
 		}
 		break; // If we haven't continued out yet, we're connected and the socket is suitable.
@@ -69,9 +74,10 @@ void Plaintext::connectServer(std::string server, std::string port, std::string 
 	freeaddrinfo(addrInfoList);
 	if (socketfd == -1) {
 		std::cerr << "No suitable host was found for the server " << server << " on port " << port << "." << std::endl;
-		return;
+		return errFlags;
 	}
 	connected = true;
+	return SOCKCONN_SUCCESS;
 }
 
 std::string Plaintext::receive() {
