@@ -9,7 +9,7 @@ LDFLAGS=-ldl
 
 default: ../robobo
 
-../robobo: base.o module.o protocol.o socket.o
+../robobo: base.o module.o protocol.o socket.o robobo.cpp
 	@echo "\033[1;32mLink:\033[0m\trobobo"
 	@${CC} ${CXXFLAGS} ${DEBUG} base.o module.o protocol.o socket.o robobo.cpp -o ../robobo ${LDFLAGS}
 
