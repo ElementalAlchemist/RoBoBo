@@ -3,15 +3,12 @@ CXXFLAGS=-std=c++0x -Wall -pedantic -pthread -rdynamic $(DEBUG)
 # CXXFLAGS includes -pthread because g++ still requires it for std::thread
 LDFLAGS=-ldl
 SOFLAGS=-pipe -fPIC -shared
-SOURCES=$(wildcard *.cpp)
+OBJECTS=$(shell for source in $(basename $(wildcard *.cpp)); do printf " ../../modules/$$source.so"; done)
 
 .DEFAULT: default
 
 .PHONY: default
 
-default: $(SOURCES:.cpp=.so)
-	@mv *.so ../../modules/
+default: ${OBJECTS}
 
-$(SOURCES:.cpp=.so):
-	@echo "\033[1;32mBuild:\033[0m\t$@"
-	@${CC} ${CXXFLAGS} ${SOFLAGS} $(@:.so=.cpp) ${LDFLAGS} $(shell grep '^\s*// COMPILE_FLAGS ' $(@:.so=.cpp) | awk -F'[ ]' '{$$1=$$2=""; print $0}') -c -o $@
+include modules.mk

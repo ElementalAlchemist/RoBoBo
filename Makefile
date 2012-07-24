@@ -2,6 +2,7 @@ CC=g++
 CXXFLAGS=-std=c++0x -Wall -pedantic -pthread -rdynamic $(DEBUG)
 # CXXFLAGS includes -pthread because g++ still requires it for std::thread
 LDFLAGS=-ldl
+SHELL:=/bin/bash
 
 .PHONY: default debug core modules debugcore debugmodules clean
 
@@ -16,6 +17,7 @@ core:
 
 modules:
 	@test -d modules || mkdir modules
+	@src/modules/module_make.sh > src/modules/modules.mk
 	@make --no-print-directory -C src/modules
 
 debugcore:
@@ -23,6 +25,7 @@ debugcore:
 
 debugmodules:
 	@test -d modules || mkdir modules
+	@DEBUG="-g -O0" src/modules/module_make.sh > src/modules/modules.mk
 	@DEBUG="-g -O0" make --no-print-directory -C src/modules
 
 clean:
