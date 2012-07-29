@@ -141,7 +141,7 @@ bool Client::deadServer() {
 }
 
 bool Client::isClient() {
-	
+	return true;
 }
 
 void Client::sendPrivMsg(const std::string& client, const std::string& target, const std::string& message) {
