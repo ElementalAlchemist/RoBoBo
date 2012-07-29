@@ -1,5 +1,34 @@
 #include "protocol.h"
 
+class User {
+	public:
+		User(std::string theNick, std::string theIdent, std::string theHost);
+		std::string nick;
+		std::string ident;
+		std::string host;
+		std::set<std::string> channels;
+};
+
+class Channel {
+	public:
+		std::string topic;
+		std::list<std::string> modes;
+		std::unordered_map<std::string, std::list<std::string>> listModes;
+		std::set<std::string> users;
+		std::unordered_map<char, std::set<std::string>> statuses;
+};
+
+class LocalClient : public User {
+	public:
+		LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos);
+		std::string gecos;
+		std::set<std::string> modes;
+};
+
+User::User(std::string theNick, std::string theIdent, std::string theHost) : nick(theNick), ident(theIdent), host(theHost) {}
+
+LocalClient::LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos) : User(theNick, theIdent, theHost), gecos(theGecos) {}
+
 class Client : public Protocol {
 	public:
 		Client(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr);
