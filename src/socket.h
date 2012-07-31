@@ -13,9 +13,9 @@ class Socket {
 		Socket();
 		virtual ~Socket();
 		virtual unsigned int apiVersion() = 0;
-		virtual unsigned int connectServer(std::string server, std::string port, std::string bindAddr = "") { return SOCKCONN_FD; } // default to an error with socket() for an undefined function
+		virtual unsigned int connectServer(cont std::string& server, const std::string& port, const std::string& bindAddr = "") { return SOCKCONN_FD; } // default to an error with socket() for an undefined function
 		virtual std::string receive() { return ""; }
-		virtual void sendData(std::string line) {}
+		virtual void sendData(const std::string& line) {}
 		virtual void closeConnection() {}
 		bool isConnected() { return connected; }
 	protected:

@@ -5,9 +5,9 @@ class Plaintext : public Socket {
 		Plaintext();
 		~Plaintext();
 		unsigned int apiVersion();
-		unsigned int connectServer(std::string server, std::string port, std::string bindAddr = "");
+		unsigned int connectServer(const std::string& server, const std::string& port, const std::string& bindAddr = "");
 		std::string receive();
-		void sendData(std::string line);
+		void sendData(const std::string& line);
 		void closeConnection();
 };
 
@@ -21,7 +21,7 @@ unsigned int Plaintext::apiVersion() {
 	return 3000;
 }
 
-unsigned int Plaintext::connectServer(std::string server, std::string port, std::string bindAddr) {
+unsigned int Plaintext::connectServer(const std::string& server, const std::string& port, const std::string& bindAddr) {
 	addrinfo* addrInfoList;
 	addrinfo hints;
 	hints.ai_family = PF_UNSPEC; // Don't specify either IPv4 or IPv6
@@ -107,7 +107,7 @@ std::string Plaintext::receive() {
 	return incomingMsg;
 }
 
-void Plaintext::sendData(std::string line) {
+void Plaintext::sendData(const std::string& line) {
 	line += "\r\n";
 	ssize_t status;
 	do
