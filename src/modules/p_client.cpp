@@ -79,6 +79,7 @@ class Client : public Protocol {
 		std::pair<std::string, char> compareStatus(const std::string& status0, char status1);
 		std::pair<std::string, char> compareStatus(char status0, char status1);
 		
+		std::list<std::string> chanList();
 		std::string chanTopic(const std::string& channel);
 		time_t chanTimestamp(const std::string& channel);
 		std::set<std::string> chanUsers(const std::string& channel);
@@ -293,6 +294,10 @@ std::pair<std::string, char> Client::compareStatus(const std::string& status0, c
 }
 
 std::pair<std::string, char> Client::compareStatus(char status0, char status1) {
+	
+}
+
+std::list<std::string> chanList() {
 	
 }
 

@@ -1088,6 +1088,13 @@ std::pair<std::string, char> Base::compareStatus(const std::string& server, char
 	return servIter->second->compareStatus(status0, status1);
 }
 
+std::list<std::string> Base::chanList(const std::string& server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::list<std::string> ();
+	return servIter->second->chanList();
+}
+
 std::string Base::chanTopic(const std::string& server, const std::string& channel) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())

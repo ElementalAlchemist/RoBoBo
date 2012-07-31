@@ -57,6 +57,7 @@ class Protocol {
 		virtual std::pair<std::string, char> compareStatus(const std::string& status0, char status1) { return std::pair<std::string, char> ("", ' '); }
 		virtual std::pair<std::string, char> compareStatus(char status0, char status1) { return std::pair<std::string, char> ("", ' '); }
 		
+		virtual std::list<std::string> chanList() { return std::list<std::string> (); }
 		virtual std::string chanTopic(const std::string& channel) { return ""; }
 		virtual time_t chanTimestamp(const std::string& channel) { return 0; }
 		virtual std::set<std::string> chanUsers(const std::string& channel) { return std::set<std::string> (); }

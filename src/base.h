@@ -82,6 +82,7 @@ class Base {
 		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, char status1);
 		std::pair<std::string, char> compareStatus(const std::string& server, char status0, char status1);
 		
+		std::list<std::string> chanList(const std::string& server);
 		std::string chanTopic(const std::string& server, const std::string& channel);
 		time_t chanTimestamp(const std::string& server, const std::string& channel);
 		std::set<std::string> chanUsers(const std::string& server, const std::string& channel);
