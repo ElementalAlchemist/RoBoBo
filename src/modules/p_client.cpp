@@ -116,7 +116,9 @@ class Client : public Protocol {
 		void processedOutChanCTCPReply(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
 		void processedOutUserCTCPReply(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
 	private:
-		
+		std::unordered_map<std::string, std::shared_ptr<User>> users;
+		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
+		std::unordered_map<std::string, std::shared_ptr<LocalClient>> connClients;
 };
 
 Client::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr) {}
