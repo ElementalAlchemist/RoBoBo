@@ -157,6 +157,11 @@ unsigned int Client::apiVersion() {
 }
 
 void Client::connectServer() {
+	char floodSwitch = config["floodcontrol"][0];
+	if (floodSwitch == 'n' || floodSwitch == 'N' || floodSwitch == '0' || floodSwitch == 'f' || floodSwitch == 'F')
+		floodControl = false;
+	else
+		floodControl = true;
 	
 }
 
