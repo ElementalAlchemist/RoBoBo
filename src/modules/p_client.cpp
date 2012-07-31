@@ -140,7 +140,7 @@ bool Client::isConnected() {
 }
 
 bool Client::deadServer() {
-	
+	return connClients.empty();
 }
 
 bool Client::isClient() {
