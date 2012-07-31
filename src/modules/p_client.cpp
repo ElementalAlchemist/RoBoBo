@@ -1,4 +1,5 @@
 #include "protocol.h"
+#include <deque>
 
 class User {
 	public:
@@ -20,14 +21,40 @@ class Channel {
 
 class LocalClient : public User {
 	public:
-		LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos);
+		LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass);
 		std::string gecos;
 		std::set<std::string> modes;
+		std::shared_ptr<Socket> connection;
+		std::deque<std::string> sendQueue;
+		std::thread receiveThread, sendThread, secondsThread;
+		void receive();
+		void send();
+		void decrementSeconds();
+		void sendLine(const std::string& line);
+		unsigned int seconds;
+	private:
+		Client* module;
 };
 
 User::User(std::string theNick, std::string theIdent, std::string theHost) : nick(theNick), ident(theIdent), host(theHost) {}
 
-LocalClient::LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos) : User(theNick, theIdent, theHost), gecos(theGecos) {}
+LocalClient::LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), gecos(theGecos), module(modClass) {}
+
+void LocalClient::receive() {
+	
+}
+
+void LocalClient::send() {
+	
+}
+
+void LocalClient::decrementSeconds() {
+	
+}
+
+void LocalClient::sendLine(const std::string& line) {
+	
+}
 
 class Client : public Protocol {
 	public:
@@ -115,6 +142,8 @@ class Client : public Protocol {
 		void processedOutUserCTCP(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
 		void processedOutChanCTCPReply(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
 		void processedOutUserCTCPReply(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
+		
+		bool floodControl;
 	private:
 		std::unordered_map<std::string, std::shared_ptr<User>> users;
 		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
