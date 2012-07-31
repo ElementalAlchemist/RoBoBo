@@ -165,7 +165,11 @@ void Client::disconnectServer(std::string reason) {
 }
 
 bool Client::isConnected() {
-	
+	for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients) {
+		if (!client.second->connection->isConnected())
+			return false;
+	}
+	return true;
 }
 
 bool Client::deadServer() {
