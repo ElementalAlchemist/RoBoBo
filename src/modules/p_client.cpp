@@ -148,7 +148,7 @@ class Client : public Protocol {
 		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
 		std::unordered_map<std::string, std::shared_ptr<LocalClient>> connClients;
 		bool floodControl;
-		void processIncoming(std::string client, std::string line);
+		void processIncoming(const std::string& client, const std::string& line);
 		
 		friend class LocalClient;
 };
@@ -473,5 +473,9 @@ void Client::processedOutChanCTCPReply(const std::string& client, const std::str
 }
 
 void Client::processedOutUserCTCPReply(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) {
+	
+}
+
+void Client::processIncoming(const std::string& client, const std::string& line) {
 	
 }
