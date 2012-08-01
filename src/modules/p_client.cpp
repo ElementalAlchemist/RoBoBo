@@ -21,7 +21,8 @@ class Channel {
 
 class LocalClient : public User {
 	public:
-		LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass);
+		LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass);
+		std::string id;
 		std::string gecos;
 		std::set<std::string> modes;
 		std::shared_ptr<Socket> connection;
@@ -38,7 +39,7 @@ class LocalClient : public User {
 
 User::User(std::string theNick, std::string theIdent, std::string theHost) : nick(theNick), ident(theIdent), host(theHost) {}
 
-LocalClient::LocalClient(std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), gecos(theGecos), module(modClass) {}
+LocalClient::LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), id(clientid), gecos(theGecos), module(modClass) {}
 
 void LocalClient::receive() {
 	
@@ -142,12 +143,14 @@ class Client : public Protocol {
 		void processedOutUserCTCP(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
 		void processedOutChanCTCPReply(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params);
 		void processedOutUserCTCPReply(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
-		
-		bool floodControl;
 	private:
 		std::unordered_map<std::string, std::shared_ptr<User>> users;
 		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
 		std::unordered_map<std::string, std::shared_ptr<LocalClient>> connClients;
+		bool floodControl;
+		void processIncoming(std::string client, std::string line);
+		
+		friend class LocalClient;
 };
 
 Client::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr) {}
