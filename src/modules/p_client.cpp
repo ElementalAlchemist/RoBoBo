@@ -150,6 +150,9 @@ class Client : public Protocol {
 		bool floodControl;
 		void processIncoming(const std::string& client, const std::string& line);
 		
+		std::unordered_map<std::string, char> convertMode;
+		std::unordered_map<char, std::string> convertChanMode, convertUserMode;
+		
 		friend class LocalClient;
 };
 
@@ -189,27 +192,95 @@ bool Client::isClient() {
 }
 
 void Client::sendPrivMsg(const std::string& client, const std::string& target, const std::string& message) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("PRIVMSG " + target + " :" + message);
 }
 
 void Client::sendNotice(const std::string& client, const std::string& target, const std::string& message) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("NOTICE " + target + " :" + message);
 }
 
 void Client::sendCTCP(const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (params == "")
+		clientIter->second->sendLine("PRIVMSG " + target + " :\x01" + ctcp + "\x01");
+	else
+		clientIter->second->sendLine("PRIVMSG " + target + " :\x01" + ctcp + " " + params + "\x01");
 }
 
 void Client::sendCTCPReply(const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (params == "")
+		clientIter->second->sendLine("NOTICE " + target + " :\x01" + ctcp + "\x01");
+	else
+		clientIter->second->sendLine("NOTICE " + target + " :\x01" + ctcp + " " + params + "\x01");
 }
 
 void Client::setMode(const std::string& client, const std::string& target, const std::list<std::string>& setModes, const std::list<std::string>& remModes) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	std::list<char> setModesChar, remModesChar;
+	std::string params = "";
+	for (std::string mode : setModes) {
+		size_t paramPos = mode.find('=');
+		std::string param ("");
+		if (paramPos != std::string::npos) {
+			param = mode.substr(paramPos + 1);
+			mode = mode.substr(0, paramPos);
+		}
+		std::unordered_map<std::string, char>::iterator convIter = convertMode.find(mode);
+		if (convIter != convertMode.end()) {
+			setModesChar.push_back(convIter);
+			params += " " + param;
+		}
+	}
+	for (std::string mode : remModes) {
+		size_t paramPos = mode.find('=');
+		std::string param ("");
+		if (paramPos != std::string::npos) {
+			param = mode.substr(paramPos + 1);
+			mode = mode.substr(0, paramPos);
+		}
+		std::unordered_map<std::string, char>::iterator convIter = convertMode.find(mode);
+		if (convIter != convertMode.end()) {
+			remModesChar.push_back(convIter);
+			params += " " + param;
+		}
+	}
+	std::string modesStr = "";
+	if (!setModesChar.empty()) {
+		modesStr += "+";
+		for (char modeChar : setModesChar)
+			modesStr += modeChar;
+	}
+	if (!remModesChar.empty()) {
+		modesStr += "-";
+		for (char modeChar : remModesChar)
+			modesStr += modeChar;
+	}
+	if (modesStr.empty())
+		return;
+	clientIter->second->sendLine("MODE " + target + " " + modesStr + params);
 }
 
 void Client::setSNOmask(const std::string& client, bool add, char snomask) {
-	
+	std::unordered_map<std::string, char>::iterator convIter = convertMode.find("snomask");
+	if (convIter == convertMode.end())
+		return;
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("MODE " + clientIter->second->nick + " +" + std::string(convIter->second) + " " + (add ? "+" : "-") + std::string(snomask));
 }
 
 void Client::joinChan(const std::string& client, const std::string& channel, const std::string& key) {
