@@ -336,7 +336,58 @@ inline time_t Module::userNickTimestamp(const std::string& server, const std::st
 }
 
 void Module::stripColors(std::string& line) {
-	
+	size_t charPos = line.find((char)2); // bold
+	while (charPos != std::string::npos) {
+		line.replace(charPos, 1, "");
+		charPos = line.find((char)2);
+	}
+	charPos = line.find((char)29); // italic
+	while (charPos != std::string::npos) {
+		line.replace(charPos, 1, "");
+		charPos = line.find((char)29);
+	}
+	charPos = line.find((char)31); // underline
+	while (charPos != std::string::npos) {
+		line.replace(charPos, 1, "");
+		charPos = line.find((char)31);
+	}
+	charPos = line.find((char)22); // reverse
+	while (charPos != std::string::npos) {
+		line.replace(charPos, 1, "");
+		charPos = line.find((char)22);
+	}
+	charPos = line.find((char)15); // plain
+	while (charPos != std::string::npos) {
+		line.replace(charPos, 1, "");
+		charPos = line.find((char)15);
+	}
+	charPos = line.find((char)3); // color
+	while (charPos != std::string::npos) {
+		size_t length = 1;
+		bool firstDigit = true, secondDigit = false, commaEncountered = false;
+		while (charPos + length < line.size() && length < 6) {
+			if (commaEncountered && line[charPos + length] == ',')
+				break;
+			if (!firstDigit && line[charPos + length] == ',') {
+				length++;
+				commaEncountered = true;
+			} else if ((firstDigit || secondDigit) && line[charPos + length] >= '0' && line[charPos + length] <= '9')
+				length++;
+			else
+				break;
+			if (firstDigit) {
+				firstDigit = false;
+				secondDigit = true;
+			} else if (secondDigit) {
+				secondDigit = false;
+				if (commaEncountered)
+					firstDigit = true;
+			} else
+				firstDigit = true;
+		}
+		line.replace(charPos, length, "");
+		charPos = line.find((char)3);
+	}
 }
 
 void Module::stripCTCP(std::string& line) {
