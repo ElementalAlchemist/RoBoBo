@@ -182,6 +182,9 @@ class Module {
 		std::set<std::string> userChans(const std::string& server, const std::string& user);
 		time_t userTimestamp(const std::string& server, const std::string& user);
 		time_t userNickTimestamp(const std::string& server, const std::string& user);
+		
+		void stripColors(std::string& line);
+		void stripCTCP(std::string& line);
 	private:
 		Base* bot;
 };

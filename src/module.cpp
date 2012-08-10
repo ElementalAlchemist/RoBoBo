@@ -334,3 +334,11 @@ inline time_t Module::userTimestamp(const std::string& server, const std::string
 inline time_t Module::userNickTimestamp(const std::string& server, const std::string& user) {
 	return bot->userNickTimestamp(server, user);
 }
+
+void Module::stripColors(std::string& line) {
+	
+}
+
+void Module::stripCTCP(std::string& line) {
+	
+}
