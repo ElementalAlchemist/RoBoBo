@@ -231,7 +231,7 @@ inline std::pair<std::string, char> Module::compareStatus(const std::string& ser
 	return bot->compareStatus(server, status0, status1);
 }
 
-inline std::list<std::string> chanList(const std::string& server) {
+inline std::list<std::string> Module::chanList(const std::string& server) {
 	return bot->chanList(server);
 }
 
