@@ -391,5 +391,13 @@ void Module::stripColors(std::string& line) {
 }
 
 void Module::stripCTCP(std::string& line) {
-	
+	size_t ctcpPos = line.find((char)1);
+	while (ctcpPos != std::string::npos) {
+		size_t secondPos = line.find((char)1, ctcpPos + 1);
+		if (secondPos == std::string::npos)
+			line = line.substr(0, ctcpPos);
+		else
+			line.replace(ctcpPos, secondPos - ctcpPos + 1, "");
+		ctcpPos = line.find((char)1);
+	}
 }
