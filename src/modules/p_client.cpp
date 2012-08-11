@@ -82,19 +82,12 @@ class Client : public Protocol {
 		void inviteUser(const std::string& client, const std::string& channel, const std::string& user);
 		void knockOnChannel(const std::string& client, const std::string& channel, const std::string& reason);
 		void changeNick(const std::string& user, const std::string& newNick);
-		void sendPing(const std::string& remoteServer);
 		void operUp(const std::string& client, const std::string& usernameOrType, const std::string& password);
-		void sendServerNotice(char snomask, const std::string& message);
-		void setMetadata(const std::string& target, const std::string& key, const std::string& value);
 		void setXLine(const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason);
 		void remXLine(const std::string& client, const std::string& lineType, const std::string& mask);
-		void changeIdent(const std::string& user, const std::string& newIdent);
-		void changeHost(const std::string& user, const std::string& newHost);
-		void changeGecos(const std::string& user, const std::string& newGecos);
 		void sendWallops(const std::string& client, const std::string& message);
 		void sendOtherData(const std::string& client, const std::string& line);
 		
-		std::list<std::string> networkServerList();
 		std::list<std::string> xLineTypes();
 		std::list<std::string> xLineList(const std::string& lineType);
 		time_t xLineExpiry(const std::string& lineType, const std::string& mask);
@@ -284,87 +277,107 @@ void Client::setSNOmask(const std::string& client, bool add, char snomask) {
 }
 
 void Client::joinChan(const std::string& client, const std::string& channel, const std::string& key) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	std::string joinLine = "JOIN " + channel;
+	if (!key.empty())
+		joinLine += " " + key;
+	clientIter->second->sendLine(joinLine);
 }
 
 void Client::partChan( const std::string& client, const std::string& channel, const std::string& reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("PART " + channel + " :" + reason);
 }
 
 void Client::kickUser(const std::string& client, const std::string& channel, const std::string& user, const std::string& reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("KICK " + channel + " " + user + " :" + reason);
 }
 
 std::string Client::addClient(std::string& nick, std::string& ident, std::string& host, std::string& gecos) {
-	
+	// TODO: this
 }
 
 void Client::removeClient(const std::string& client) {
-	
+	// TODO: this
 }
 
 void Client::setTopic(const std::string& client, const std::string& channel, const std::string& topic) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("TOPIC " + channel + " :" + topic);
 }
 
 void Client::inviteUser(const std::string& client, const std::string& channel, const std::string& user) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("INVITE " + user + " " + channel);
 }
 
 void Client::knockOnChannel(const std::string& client, const std::string& channel, const std::string& reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("KNOCK " + channel + " :" + reason);
 }
 
 void Client::changeNick(const std::string& user, const std::string& newNick) {
-	
-}
-
-void Client::sendPing(const std::string& remoteServer) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(user);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("NICK " + newNick);
 }
 
 void Client::operUp(const std::string& client, const std::string& usernameOrType, const std::string& password) {
-	
-}
-
-void Client::sendServerNotice(char snomask, const std::string& message) {
-	
-}
-
-void Client::setMetadata(const std::string& target, const std::string& key, const std::string& value) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("OPER " + usernameOrType + " " + password);
 }
 
 void Client::setXLine(const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	std::ostringstream lineToSend;
+	if (lineType.size() > 2)
+		lineToSend << lineType;
+	else
+		lineToSend << lineType << "LINE";
+	lineToSend << " " << mask << " " << duration << " :" << reason;
+	clientIter->second->sendLine(lineToSend.str());
 }
 
 void Client::remXLine(const std::string& client, const std::string& lineType, const std::string& mask) {
-	
-}
-
-void Client::changeIdent(const std::string& user, const std::string& newIdent) {
-	
-}
-
-void Client::changeHost(const std::string& user, const std::string& newHost) {
-	
-}
-
-void Client::changeGecos(const std::string& user, const std::string& newGecos) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (lineType.size() > 2)
+		clientIter->second->sendLine(lineType + " " + mask);
+	else
+		clientIter->second->sendLine(lineType + "LINE " + mask);
 }
 
 void Client::sendWallops(const std::string& client, const std::string& message) {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("WALLOPS :" + message);
 }
 
 void Client::sendOtherData(const std::string& client, const std::string& line) {
-	
-}
-
-std::list<std::string> Client::networkServerList() {
-	
+	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine(line);
 }
 
 std::list<std::string> Client::xLineTypes() {
