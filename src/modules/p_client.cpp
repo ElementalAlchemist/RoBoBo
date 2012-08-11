@@ -197,37 +197,19 @@ bool Client::isClient() {
 }
 
 void Client::sendPrivMsg(const std::string& client, const std::string& target, const std::string& message) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
-	if (clientIter == connClients.end())
-		return;
-	clientIter->second->sendLine("PRIVMSG " + target + " :" + message);
+	
 }
 
 void Client::sendNotice(const std::string& client, const std::string& target, const std::string& message) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
-	if (clientIter == connClients.end())
-		return;
-	clientIter->second->sendLine("NOTICE " + target + " :" + message);
+	
 }
 
 void Client::sendCTCP(const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
-	if (clientIter == connClients.end())
-		return;
-	if (params == "")
-		clientIter->second->sendLine("PRIVMSG " + target + " :\x01" + ctcp + "\x01");
-	else
-		clientIter->second->sendLine("PRIVMSG " + target + " :\x01" + ctcp + " " + params + "\x01");
+	
 }
 
 void Client::sendCTCPReply(const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
-	if (clientIter == connClients.end())
-		return;
-	if (params == "")
-		clientIter->second->sendLine("NOTICE " + target + " :\x01" + ctcp + "\x01");
-	else
-		clientIter->second->sendLine("NOTICE " + target + " :\x01" + ctcp + " " + params + "\x01");
+	
 }
 
 void Client::setMode(const std::string& client, const std::string& target, const std::list<std::string>& setModes, const std::list<std::string>& remModes) {
