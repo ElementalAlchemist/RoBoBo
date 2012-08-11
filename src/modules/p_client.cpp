@@ -26,6 +26,7 @@ class LocalClient : public User {
 		std::string id;
 		std::string gecos;
 		std::set<std::string> modes;
+		std::set<char> snomasks;
 		std::shared_ptr<Socket> connection;
 		std::deque<std::string> sendQueue;
 		std::thread receiveThread, sendThread, secondsThread;
@@ -124,14 +125,11 @@ class Client : public Protocol {
 		std::string clientNick(const std::string& client);
 		std::string userIdent(const std::string& user);
 		std::string userHost(const std::string& user);
-		std::string userGecos(const std::string& user);
 		std::set<std::string> userModes(const std::string& user);
 		bool userHasMode(const std::string& user, const std::string& mode);
 		std::set<char> userSNOmasks(const std::string& user);
 		bool userHasSNOmask(const std::string& user, char snomask);
 		std::set<std::string> userChans(const std::string& user);
-		time_t userTimestamp(const std::string& user);
-		time_t userNickTimestamp(const std::string& user);
 		
 		void processedOutChanMsg(const std::string& client, const std::string& channel, char status, const std::string& message);
 		void processedOutUserMsg(const std::string& client, const std::string& nick, const std::string& message);
@@ -213,7 +211,7 @@ void Client::sendCTCPReply(const std::string& client, const std::string& target,
 }
 
 void Client::setMode(const std::string& client, const std::string& target, const std::list<std::string>& setModes, const std::list<std::string>& remModes) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	std::list<char> setModesChar, remModesChar;
@@ -264,14 +262,14 @@ void Client::setSNOmask(const std::string& client, bool add, char snomask) {
 	std::unordered_map<std::string, char>::iterator convIter = convertMode.find("snomask");
 	if (convIter == convertMode.end())
 		return;
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("MODE " + clientIter->second->nick + " +" + std::string(convIter->second) + " " + (add ? "+" : "-") + std::string(snomask));
 }
 
 void Client::joinChan(const std::string& client, const std::string& channel, const std::string& key) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	std::string joinLine = "JOIN " + channel;
@@ -281,14 +279,14 @@ void Client::joinChan(const std::string& client, const std::string& channel, con
 }
 
 void Client::partChan( const std::string& client, const std::string& channel, const std::string& reason) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("PART " + channel + " :" + reason);
 }
 
 void Client::kickUser(const std::string& client, const std::string& channel, const std::string& user, const std::string& reason) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("KICK " + channel + " " + user + " :" + reason);
@@ -303,28 +301,28 @@ void Client::removeClient(const std::string& client) {
 }
 
 void Client::setTopic(const std::string& client, const std::string& channel, const std::string& topic) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("TOPIC " + channel + " :" + topic);
 }
 
 void Client::inviteUser(const std::string& client, const std::string& channel, const std::string& user) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("INVITE " + user + " " + channel);
 }
 
 void Client::knockOnChannel(const std::string& client, const std::string& channel, const std::string& reason) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("KNOCK " + channel + " :" + reason);
 }
 
 void Client::changeNick(const std::string& user, const std::string& newNick) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(user);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("NICK " + newNick);
@@ -337,14 +335,14 @@ void Client::sendPing(const std::string& remoteServer) {
 }
 
 void Client::operUp(const std::string& client, const std::string& usernameOrType, const std::string& password) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("OPER " + usernameOrType + " " + password);
 }
 
 void Client::setXLine(const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	std::ostringstream lineToSend;
@@ -357,7 +355,7 @@ void Client::setXLine(const std::string& client, const std::string& lineType, co
 }
 
 void Client::remXLine(const std::string& client, const std::string& lineType, const std::string& mask) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	if (lineType.size() > 2)
@@ -367,14 +365,14 @@ void Client::remXLine(const std::string& client, const std::string& lineType, co
 }
 
 void Client::sendWallops(const std::string& client, const std::string& message) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("WALLOPS :" + message);
 }
 
 void Client::sendOtherData(const std::string& client, const std::string& line) {
-	std::unordered_map<std::string, LocalClient*>::iterator clientIter = connClients.find(client);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine(line);
@@ -437,41 +435,41 @@ std::pair<std::string, char> Client::compareStatus(char status0, char status1) {
 
 std::list<std::string> chanList() {
 	std::list<std::string> inChans;
-	for (std::pair<std::string, Channel*> channel : channels)
+	for (std::pair<std::string, std::shared_ptr<Channel>> channel : channels)
 		inChans.push_back(channel.first);
 	return inChans;
 }
 
 std::string Client::chanTopic(const std::string& channel) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return "";
 	return chanIter->second->topic;
 }
 
 time_t Client::chanTimestamp(const std::string& channel) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return 0;
 	return chanIter->second->timestamp;
 }
 
 std::set<std::string> Client::chanUsers(const std::string& channel) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return std::set<std::string> ();
 	return chanIter->second->users;
 }
 
 bool Client::userInChan(const std::string& channel, const std::string& user) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return false;
 	return (chanIter->second->users.find(user) != chanIter->second->users.end());
 }
 
 std::pair<std::string, char> Client::userStatus(const std::string& channel, const std::string& user) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return std::pair<std::string, char> ("", ' ');
 	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
@@ -488,7 +486,7 @@ std::pair<std::string, char> Client::userStatus(const std::string& channel, cons
 }
 
 bool Client::userHasStatus(const std::string& channel, const std::string& user, const std::string& status) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return false;
 	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
@@ -502,7 +500,7 @@ bool Client::userHasStatus(const std::string& channel, const std::string& user, 
 }
 
 bool Client::userHasStatus(const std::string& channel, const std::string& user, char status) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return false;
 	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
@@ -512,7 +510,7 @@ bool Client::userHasStatus(const std::string& channel, const std::string& user, 
 }
 
 bool Client::userHasStatusOrGreater(const std::string& channel, const std::string& user, const std::string& status) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return false;
 	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
@@ -528,7 +526,7 @@ bool Client::userHasStatusOrGreater(const std::string& channel, const std::strin
 }
 
 bool Client::userHasStatusOrGreater(const std::string& channel, const std::string& user, char status) {
-	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
 	if (chanIter == channels.end())
 		return false;
 	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
@@ -544,67 +542,111 @@ bool Client::userHasStatusOrGreater(const std::string& channel, const std::strin
 }
 
 std::list<std::string> Client::chanModes(const std::string& channel) {
-	
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::list<std::string> ();
+	return chanIter->second->modes;
 }
 
 std::list<std::string> Client::chanListModeList(const std::string& channel, const std::string& listMode) {
-	
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::list<std::string> ();
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator listIter = chanIter->second->listModes.find(listMode);
+	if (listIter == chanIter->second->listModes.end())
+		return std::list<std::string> ();
+	return listIter->second;
 }
 
 bool Client::chanHasMode(const std::string& channel, const std::string& mode) {
-	
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return;
+	for (std::string chanMode : chanIter->second->modes) {
+		if (chanMode == mode)
+			return true;
+	}
+	return false;
 }
 
 std::string Client::chanModeParam(const std::string& channel, const std::string& mode) {
-	
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return;
+	for (std::string chanMode : chanIter->second->modes) {
+		size_t equals = chanMode.find('=');
+		if (equals == std::string::npos)
+			continue;
+		if (chanMode.substr(0, equals) == mode)
+			return chanMode.substr(equals + 1);
+	}
+	return "";
 }
 
 std::list<std::string> Client::clientList() {
-	
+	std::list<std::string> clients;
+	for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients)
+		clients.push_back(client.first);
+	return clients;
 }
 
 std::string Client::clientNick(const std::string& client) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return "";
+	return clientIter->second->nick;
 }
 
 std::string Client::userIdent(const std::string& user) {
-	
+	std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	// TODO: also accept client ID as user
+	return userIter->second->ident;
 }
 
 std::string Client::userHost(const std::string& user) {
-	
-}
-
-std::string Client::userGecos(const std::string& user) {
-	
+	std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	// TODO: also accept client ID as user
+	return userIter->second->host;
 }
 
 std::set<std::string> Client::userModes(const std::string& user) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+	if (clientIter == connClients.end())
+		return std::set<std::string> ();
+	return clientIter->second->modes;
 }
 
 bool Client::userHasMode(const std::string& user, const std::string& mode) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+	if (clientIter == connClients.end())
+		return false;
+	return (clientIter->second->modes.find(mode) != clientIter->second->modes.end());
 }
 
 std::set<char> Client::userSNOmasks(const std::string& user) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+	if (clientIter == connClients.end())
+		return std::set<char>();
+	return clientIter->second->snomasks;
 }
 
 bool Client::userHasSNOmask(const std::string& user, char snomask) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+	if (clientIter == connClients.end())
+		return false;
+	return (clientIter->second->snomasks.find(snomask) != clientIter->second->snomasks.end());
 }
 
 std::set<std::string> Client::userChans(const std::string& user) {
-	
-}
-
-time_t Client::userTimestamp(const std::string& user) {
-	
-}
-
-time_t Client::userNickTimestamp(const std::string& user) {
-	
+	std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(user);
+	if (userIter == users.end())
+		return std::set<std::string> ();
+	// TODO: also accept client ID as user
+	return userIter->second->channels;
 }
 
 void Client::processedOutChanMsg(const std::string& client, const std::string& channel, char status, const std::string& message) {
