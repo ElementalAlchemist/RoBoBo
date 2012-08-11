@@ -49,6 +49,7 @@ class Protocol {
 		virtual std::list<std::string> xLineList(const std::string& lineType) { return std::list<std::string> (); }
 		virtual time_t xLineExpiry(const std::string& lineType, const std::string& mask) { return 0; }
 		virtual std::string xLineReason(const std::string& lineType, const std::string& mask) { return ""; }
+		virtual std::set<std::string> chanTypes() { return std::set<std::string> (); }
 		virtual std::list<std::string> chanListModes() { return std::list<std::string> (); }
 		virtual std::list<std::string> chanParamModes() { return std::list<std::string> (); }
 		virtual std::list<std::string> chanNoParamModes() { return std::list<std::string> (); }

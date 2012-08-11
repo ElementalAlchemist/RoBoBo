@@ -1039,6 +1039,13 @@ std::string Base::xLineReason(const std::string& server, const std::string& line
 	return servIter->second->xLineReason(lineType, mask);
 }
 
+std::set<std::string> Base::chanTypes(const std::string& server) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return std::set<std::string> ();
+	return servIter->second->chanTypes();
+}
+
 std::list<std::string> Base::chanListModes(const std::string& server) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())

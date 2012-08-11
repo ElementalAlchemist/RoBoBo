@@ -199,6 +199,10 @@ inline std::string Module::xLineReason(const std::string& server, const std::str
 	return bot->xLineReason(server, lineType, mask);
 }
 
+inline std::set<std::string> Module::chanTypes(const std::string& server) {
+	return bot->chanTypes(server);
+}
+
 inline std::list<std::string> Module::chanListModes(const std::string& server) {
 	return bot->chanListModes(server);
 }

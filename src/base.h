@@ -74,6 +74,7 @@ class Base {
 		std::list<std::string> xLineList(const std::string& server, const std::string& lineType);
 		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask);
 		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask);
+		std::set<std::string> chanTypes(const std::string& server);
 		std::list<std::string> chanListModes(const std::string& server);
 		std::list<std::string> chanParamModes(const std::string& server);
 		std::list<std::string> chanNoParamModes(const std::string& server);
