@@ -48,7 +48,19 @@ void LocalClient::receive() {
 }
 
 void LocalClient::send() {
-	
+	while (true) {
+		if (!connection->isConnected())
+			return;
+		if (sendQueue.empty()) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			continue;
+		}
+		std::string message = sendQueue.front();
+		sendQueue.pop_front();
+		// TODO: line splitting
+		// TODO: call appropriate send hooks if appropriate
+		connection->sendData(message);
+	}
 }
 
 void LocalClient::decrementSeconds() {
