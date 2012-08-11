@@ -33,7 +33,7 @@ class LocalClient : public User {
 		void send();
 		void decrementSeconds();
 		void sendLine(const std::string& line);
-		unsigned int seconds;
+		std::atomic<unsigned int> seconds;
 	private:
 		Client* module;
 };
@@ -51,7 +51,13 @@ void LocalClient::send() {
 }
 
 void LocalClient::decrementSeconds() {
-	
+	while (true) {
+		if (!connection->isConnected())
+			return;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		if (seconds > 0)
+			seconds--;
+	}
 }
 
 void LocalClient::sendLine(const std::string& line) {
