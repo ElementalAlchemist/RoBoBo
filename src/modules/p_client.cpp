@@ -500,19 +500,59 @@ std::pair<std::string, char> Client::userStatus(const std::string& channel, cons
 }
 
 bool Client::userHasStatus(const std::string& channel, const std::string& user, const std::string& status) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
+	if (statusIter == chanIter->second->statuses.end())
+		return false;
+	for (std::pair<std::string, char> prefix : prefixes) {
+		if (prefix.first == status)
+			return (statusIter->second == prefix.second);
+	}
+	return false;
 }
 
 bool Client::userHasStatus(const std::string& channel, const std::string& user, char status) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
+	if (statusIter == chanIter->second->statuses.end())
+		return false;
+	return (statusIter->second == status);
 }
 
 bool Client::userHasStatusOrGreater(const std::string& channel, const std::string& user, const std::string& status) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
+	if (statusIter == chanIter->second->statuses.end())
+		return false;
+	for (std::pair<std::string, char> prefix : prefixes) {
+		if (statusIter->second == prefix.second)
+			return true;
+		if (prefix.first == status)
+			return false;
+	}
+	return false;
 }
 
 bool Client::userHasStatusOrGreater(const std::string& channel, const std::string& user, char status) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
+	if (statusIter == chanIter->second->statuses.end())
+		return false;
+	for (std::pair<std::string, char> prefix : prefixes) {
+		if (statusIter->second == prefix.second)
+			return true;
+		if (prefix.second == status)
+			return false;
+	}
+	return false;
 }
 
 std::list<std::string> Client::chanModes(const std::string& channel) {
