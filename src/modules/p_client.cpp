@@ -83,6 +83,7 @@ class Client : public Protocol {
 		void inviteUser(const std::string& client, const std::string& channel, const std::string& user);
 		void knockOnChannel(const std::string& client, const std::string& channel, const std::string& reason);
 		void changeNick(const std::string& user, const std::string& newNick);
+		void sendPing(const std::string& remoteServer);
 		void operUp(const std::string& client, const std::string& usernameOrType, const std::string& password);
 		void setXLine(const std::string& client, const std::string& lineType, const std::string& mask, time_t duration, const std::string& reason);
 		void remXLine(const std::string& client, const std::string& lineType, const std::string& mask);
@@ -339,6 +340,12 @@ void Client::changeNick(const std::string& user, const std::string& newNick) {
 	if (clientIter == connClients.end())
 		return;
 	clientIter->second->sendLine("NICK " + newNick);
+}
+
+void Client::sendPing(const std::string& remoteServer) {
+	if (connClients.empty())
+		return;
+	connClients.begin()->second->sendLine("PING :" + remoteServer);
 }
 
 void Client::operUp(const std::string& client, const std::string& usernameOrType, const std::string& password) {
