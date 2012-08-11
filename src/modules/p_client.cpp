@@ -16,7 +16,8 @@ class Channel {
 		std::list<std::string> modes;
 		std::unordered_map<std::string, std::list<std::string>> listModes;
 		std::set<std::string> users;
-		std::unordered_map<char, std::set<std::string>> statuses;
+		std::unordered_map<std::string, char> statuses;
+		time_t timestamp;
 };
 
 class LocalClient : public User {
@@ -89,9 +90,6 @@ class Client : public Protocol {
 		void sendOtherData(const std::string& client, const std::string& line);
 		
 		std::list<std::string> xLineTypes();
-		std::list<std::string> xLineList(const std::string& lineType);
-		time_t xLineExpiry(const std::string& lineType, const std::string& mask);
-		std::string xLineReason(const std::string& lineType, const std::string& mask);
 		std::list<std::string> chanListModes();
 		std::list<std::string> chanParamModes();
 		std::list<std::string> chanNoParamModes();
@@ -141,10 +139,17 @@ class Client : public Protocol {
 		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
 		std::unordered_map<std::string, std::shared_ptr<LocalClient>> connClients;
 		bool floodControl;
-		void processIncoming(const std::string& client, const std::string& line);
+		
+		std::set<std::string> listModes;
+		std::set<std::string> paramParamModes;
+		std::set<std::string> paramModes;
+		std::set<std::string> normalModes;
+		std::list<std::pair<std::string, char>> prefixes;
 		
 		std::unordered_map<std::string, char> convertMode;
 		std::unordered_map<char, std::string> convertChanMode, convertUserMode;
+		
+		void processIncoming(const std::string& client, const std::string& line);
 		
 		friend class LocalClient;
 };
@@ -381,71 +386,110 @@ void Client::sendOtherData(const std::string& client, const std::string& line) {
 }
 
 std::list<std::string> Client::xLineTypes() {
-	
-}
-
-std::list<std::string> Client::xLineList(const std::string& lineType) {
-	
-}
-
-time_t Client::xLineExpiry(const std::string& lineType, const std::string& mask) {
-	
-}
-
-std::string Client::xLineReason(const std::string& lineType, const std::string& mask) {
-	
+	return std::list<std::string> { "G", "K", "Z", "E", "SHUN" };
 }
 
 std::list<std::string> Client::chanListModes() {
-	
+	std::list<std::string> modes;
+	for (std::string mode : listModes)
+		modes.push_back(mode);
+	return modes;
 }
 
 std::list<std::string> Client::chanParamModes() {
-	
+	std::list<std::string> modes;
+	for (std::string mode : paramModes)
+		modes.push_back(mode);
+	for (std::string mode : paramParamModes)
+		modes.push_back(mode);
+	return modes;
 }
 
 std::list<std::string> Client::chanNoParamModes() {
-	
+	std::list<std::string> modes;
+	for (std::string mode : normalModes)
+		modes.push_back(mode);
+	return modes;
 }
 
 std::list<std::pair<std::string, char>> Client::chanPrefixes() {
-	
+	return prefixes;
 }
 
 std::pair<std::string, char> Client::compareStatus(const std::string& status0, const std::string& status1) {
-	
+	for (std::pair<std::string, char> status : prefixes) {
+		if (status0 == status.first || status1 == status.first)
+			return status;
+	}
+	return std::pair<std::string, char> ("", ' ');
 }
 
 std::pair<std::string, char> Client::compareStatus(const std::string& status0, char status1) {
-	
+	for (std::pair<std::string, char> status : prefixes) {
+		if (status0 == status.first || status1 == status.second)
+			return status;
+	}
+	return std::pair<std::string, char> ("", ' ');
 }
 
 std::pair<std::string, char> Client::compareStatus(char status0, char status1) {
-	
+	for (std::pair<std::string, char> status : prefixes) {
+		if (status0 == status.second || status1 == status.second)
+			return status;
+	}
+	return std::pair<std::string, char> ("", ' ');
 }
 
 std::list<std::string> chanList() {
-	
+	std::list<std::string> inChans;
+	for (std::pair<std::string, Channel*> channel : channels)
+		inChans.push_back(channel.first);
+	return inChans;
 }
 
 std::string Client::chanTopic(const std::string& channel) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return "";
+	return chanIter->second->topic;
 }
 
 time_t Client::chanTimestamp(const std::string& channel) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return 0;
+	return chanIter->second->timestamp;
 }
 
 std::set<std::string> Client::chanUsers(const std::string& channel) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::set<std::string> ();
+	return chanIter->second->users;
 }
 
 bool Client::userInChan(const std::string& channel, const std::string& user) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	return (chanIter->second->users.find(user) != chanIter->second->users.end());
 }
 
 std::pair<std::string, char> Client::userStatus(const std::string& channel, const std::string& user) {
-	
+	std::unordered_map<std::string, Channel*>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::pair<std::string, char> ("", ' ');
+	std::unordered_map<std::string, char>::iterator statusIter = chanIter->second->statuses.find(user);
+	if (statusIter == chanIter->second->statuses.end())
+		return std::pair<std::string, char> ("", ' ');
+	for (std::pair<std::string, char> status : prefixes) {
+		if (status.second == statusIter->second)
+			return status;
+	}
+	// It should never be the case that we get down here, but...
+	//  1. it avoids compiler warnings, and
+	//  2. if some weird bug does happen, we do still have to return something.
+	return std::pair<std::string, char> ("", ' ');
 }
 
 bool Client::userHasStatus(const std::string& channel, const std::string& user, const std::string& status) {
