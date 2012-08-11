@@ -98,6 +98,7 @@ class Client : public Protocol {
 		void sendOtherData(const std::string& client, const std::string& line);
 		
 		std::list<std::string> xLineTypes();
+		std::set<std::string> chanTypes();
 		std::list<std::string> chanListModes();
 		std::list<std::string> chanParamModes();
 		std::list<std::string> chanNoParamModes();
@@ -144,6 +145,8 @@ class Client : public Protocol {
 		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
 		std::unordered_map<std::string, std::shared_ptr<LocalClient>> connClients;
 		bool floodControl;
+		
+		std::set<char> channelTypes;
 		
 		std::set<std::string> listModes;
 		std::set<std::string> paramParamModes;
@@ -195,19 +198,87 @@ bool Client::isClient() {
 }
 
 void Client::sendPrivMsg(const std::string& client, const std::string& target, const std::string& message) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (channelTypes.find(target[0]) != channelTypes.end())
+		callChanMsgOutHook(client, target, ' ', message);
+	else if (channelTypes.find(target[1]) != channelTypes.end()) {
+		bool chanMsg = false;
+		for (std::pair<std::string, char> status : prefixes) {
+			if (status.second == target[0]) {
+				callChanMsgOutHook(client, target.substr(1), target[0], message);
+				chanMsg = true;
+				break;
+			}
+		}
+		if (!chanMsg)
+			callUserMsgOutHook(client, target, message);
+	} else
+		callUserMsgOutHook(client, target, message);
 }
 
 void Client::sendNotice(const std::string& client, const std::string& target, const std::string& message) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (channelTypes.find(target[0]) != channelTypes.end())
+		callChanNoticeOutHook(client, target, ' ', message);
+	else if (channelTypes.find(target[1]) != channelTypes.end()) {
+		bool chanMsg = false;
+		for (std::pair<std::string, char> status : prefixes) {
+			if (status.second == target[0]) {
+				callChanNoticeOutHook(client, target.substr(1), target[0], message);
+				chanMsg = true;
+				break;
+			}
+		}
+		if (!chanMsg)
+			callUserNoticeOutHook(client, target, message);
+	} else
+		callUserNoticeOutHook(client, target, message);
 }
 
 void Client::sendCTCP(const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (channelTypes.find(target[0]) != channelTypes.end())
+		callChanCTCPOutHook(client, target, ' ', ctcp, params);
+	else if (channelTypes.find(target[1]) != channelTypes.end()) {
+		bool chanCTCP = false;
+		for (std::pair<std::string, char> status : prefixes) {
+			if (status.second == target[0]) {
+				callChanCTCPOutHook(client, target.substr(1), target[0], ctcp, params);
+				chanCTCP = true;
+				break;
+			}
+		}
+		if (!chanCTCP)
+			callUserCTCPOutHook(client, target, ctcp, params);
+	} else
+		callUserCTCPOutHook(client, target, ctcp, params);
 }
 
 void Client::sendCTCPReply(const std::string& client, const std::string& target, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	if (channelTypes.find(target[0]) != channelTypes.end())
+		callChanCTCPReplyOutHook(client, target, ' ', ctcp, params);
+	else if (channelTypes.find(target[1]) != channelTypes.end()) {
+		bool chanCTCP = false;
+		for (std::pair<std::string, char> status : prefixes) {
+			if (status.second == target[0]) {
+				callChanCTCPReplyOutHook(client, target.substr(1), target[0], ctcp, params);
+				chanCTCP = true;
+				break;
+			}
+		}
+		if (!chanCTCP)
+			callUserCTCPReplyOutHook(client, target, ctcp, params);
+	} else
+		callUserCTCPReplyOutHook(client, target, ctcp, params);
 }
 
 void Client::setMode(const std::string& client, const std::string& target, const std::list<std::string>& setModes, const std::list<std::string>& remModes) {
@@ -380,6 +451,10 @@ void Client::sendOtherData(const std::string& client, const std::string& line) {
 
 std::list<std::string> Client::xLineTypes() {
 	return std::list<std::string> { "G", "K", "Z", "E", "SHUN" };
+}
+
+std::set<std::string> Client::chanTypes() {
+	return channelTypes;
 }
 
 std::list<std::string> Client::chanListModes() {
@@ -650,35 +725,60 @@ std::set<std::string> Client::userChans(const std::string& user) {
 }
 
 void Client::processedOutChanMsg(const std::string& client, const std::string& channel, char status, const std::string& message) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	// Make sure the client in question is still around, in case the modules took forever or something and the client disconnected in the meantime
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("PRIVMSG " + (status == ' ' ? "" : std::string(status)) + channel + " :" + message);
 }
 
 void Client::processedOutUserMsg(const std::string& client, const std::string& nick, const std::string& message) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("PRIVMSG " + nick + " :" + message);
 }
 
 void Client::processedOutChanNotice(const std::string& client, const std::string& channel, char status, const std::string& message) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("NOTICE " + (status == ' ' ? "" : std::string(status)) + channel + " :" + message);
 }
 
 void Client::processedOutUserNotice(const std::string& client, const std::string& nick, const std::string& message) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("NOTICE " + nick + " :" + message);
 }
 
 void Client::processedOutChanCTCP(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("PRIVMSG " + (status == ' ' ? "" : std::string(status)) + channel + " :\x01" + ctcp + (params == "" ? "" : (" " + params)) + "\x01");
 }
 
 void Client::processedOutUserCTCP(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("PRIVMSG " + nick + " :\x01" + ctcp + (params == "" ? "" : (" " + params)) + "\x01");
 }
 
 void Client::processedOutChanCTCPReply(const std::string& client, const std::string& channel, char status, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("NOTICE " + (status == ' ' ? "" : std::string(status)) + channel + " :\x01" + ctcp + (params == "" ? "" : (" " = params)) + "\x01");
 }
 
 void Client::processedOutUserCTCPReply(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) {
-	
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("NOTICE " + nick + " :\x01" + ctcp + (params == "" ? "" : (" " + params)) + "\x01");
 }
 
 void Client::processIncoming(const std::string& client, const std::string& line) {
