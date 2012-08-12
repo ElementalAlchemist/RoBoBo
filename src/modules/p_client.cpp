@@ -44,7 +44,14 @@ User::User(std::string theNick, std::string theIdent, std::string theHost) : nic
 LocalClient::LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), id(clientid), gecos(theGecos), module(modClass) {}
 
 void LocalClient::receive() {
-	
+	while (true) {
+		if (!connection->isConnected())
+			return;
+		std::string line = connection->receive();
+		if (line == "")
+			return; // A connection error.
+		module->processIncoming(id, line);
+	}
 }
 
 void LocalClient::send() {
@@ -58,6 +65,7 @@ void LocalClient::send() {
 		std::string message = sendQueue.front();
 		sendQueue.pop_front();
 		// TODO: line splitting
+		// TODO: flood throttle
 		// TODO: call appropriate send hooks if appropriate
 		connection->sendData(message);
 	}
@@ -186,11 +194,11 @@ void Client::connectServer() {
 		floodControl = false;
 	else
 		floodControl = true;
-	
+	// TODO: this
 }
 
 void Client::disconnectServer(std::string reason) {
-	
+	// TODO: this
 }
 
 bool Client::isConnected() {
