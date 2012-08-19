@@ -36,6 +36,7 @@ class LocalClient : public User {
 		void sendLine(const std::string& line);
 		std::atomic<unsigned int> seconds;
 	private:
+		void processSend(const std::string& message);
 		Client* module;
 };
 
@@ -58,16 +59,13 @@ void LocalClient::send() {
 	while (true) {
 		if (!connection->isConnected())
 			return;
-		if (sendQueue.empty()) {
+		while (sendQueue.empty()) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			continue;
 		}
 		std::string message = sendQueue.front();
 		sendQueue.pop_front();
-		// TODO: line splitting
-		// TODO: flood throttle
-		// TODO: call appropriate send hooks if appropriate
-		connection->sendData(message);
+		processSend(message);
 	}
 }
 
@@ -82,7 +80,89 @@ void LocalClient::decrementSeconds() {
 }
 
 void LocalClient::sendLine(const std::string& line) {
-	
+	if (module->floodControl)
+		sendQueue.push_back(line);
+	else
+		processSend(line);
+}
+
+void LocalClient::processSend(const std::string& message) {
+	std::vector<std::string> parsedLine = module->parseLine(message);
+	std::string fullLine = ":" + nick + "!" + ident + "@" + host + " " + message + "\r\n";
+	if (fullLine.size() > 512) {
+		unsigned int currParam = 3;
+		if (parsedLine[0] == "MODE") {
+			std::list<std::string> modeLines;
+			bool channel = (module->channelTypes.find(parsedLine[1][0]) != module->channelTypes.end());
+			std::string modeStr, params;
+			bool adding = true, invalid = false;
+			for (char mode : parsedLine[2]) {
+				if (mode == '+')
+					adding = true;
+				else if (mode == '-')
+					adding = false;
+				else {
+					std::string newMode;
+					if (adding) {
+						if (channel)
+							newMode = module->convertChanMode.find(mode)->second;
+						else
+							newMode = module->convertUserMode.find(mode)->second;
+					} else {
+						if (channel)
+							newMode = module->convertChanMode.find(mode)->second;
+						else
+							newMode = module->convertUserMode.find(mode)->second;
+					}
+					bool takesParam = false;
+					for (std::pair<std::string, char> status : module->prefixes) {
+						if (status.first == newMode)
+							takesParam = true;
+					}
+					if (!takesParam && (module->listModes.find(newMode) != module->listModes.end() || module->paramParamModes.find(newMode) != module->paramParamModes.end() || (adding && module->paramModes.find(newMode) != module->paramModes.end())))
+						takesParam = true;
+					std::string newParam;
+					if (takesParam) {
+						if (currParam >= parsedLine.size()) {
+							invalid = true;
+							break;
+						}
+						newParam = " " + parsedLine[currParam++];
+					}
+					if (std::string(":" + nick + "!" + ident + "@" + host + " MODE " + parsedLine[1] + " " + modeStr + std::string(mode) + params + param + "\r\n").size() < 512) {
+						modeStr += mode;
+						params += newParam;
+					} else {
+						modeLines.push_back("MODE " + parsedLine[1] + " " + modeStr + params);
+						modeStr = (adding ? "+" : "-") + std::string(mode);
+						params = newParam;
+					}
+				}
+			}
+			if (invalid)
+				continue; // skip this mode line if it's invalid
+			message = modeLines.front();
+			modeLines.pop_front();
+			for (std::string line : modeLines)
+				sendQueue.push_front(line);
+		} else if (parsedLine[0] == "PRIVMSG" || parsedLine[0] == "NOTICE") { // Other types of messages probably shouldn't be so split.
+			std::string linePrefix = ":" + nick + "!" + ident + "@" + host + " " + parsedLine[0] + " " + parsedLine[1] + " :";
+			size_t prefixLen = linePrefix.size();
+			size_t trimmedSpacePos = parsedLine[2].rfind(' ', 510 - prefixLen);
+			if (trimmedSpacePos == std::string::npos) {
+				std::string trimmedMsg = parsedLine[2].substr(0, 510 - prefixLen);
+				message = parsedLine[0] + " " + parsedLine[1] + " :" + trimmedMsg;
+				sendQueue.push_front(parsedLine[0] + " " + parsedLine[1] + " :" + parsedLine[2].substr(510 - prefixLen));
+			} else {
+				std::string trimmedMsg = parsedLine[2].substr(0, trimmedSpacePos);
+				message = parsedLine[0] + " " + parsedLine[1] + " :" + trimmedMsg;
+				sendQueue.push_front(parsedLine[0] + " " + parsedLine[1] + " :" + parsedLine[2].substr(trimmedSpacePos));
+			}
+		}
+	}
+	// TODO: flood throttle
+	// TODO: call appropriate send hooks if appropriate
+	connection->sendData(message);
 }
 
 class Client : public Protocol {
@@ -176,8 +256,10 @@ class Client : public Protocol {
 		
 		std::unordered_map<std::string, char> convertMode;
 		std::unordered_map<char, std::string> convertChanMode, convertUserMode;
+		unsigned int maxModes;
 		
 		void processIncoming(const std::string& client, const std::string& line);
+		std::vector<std::string> parseLine(const std::string& line);
 		
 		friend class LocalClient;
 };
@@ -305,6 +387,7 @@ void Client::setMode(const std::string& client, const std::string& target, const
 	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
+	// TODO: Limit modes to maxModes
 	std::list<char> setModesChar, remModesChar;
 	std::string params = "";
 	for (std::string mode : setModes) {
@@ -803,4 +886,26 @@ void Client::processedOutUserCTCPReply(const std::string& client, const std::str
 
 void Client::processIncoming(const std::string& client, const std::string& line) {
 	
+}
+
+std::vector<std::string> parseLine(const std::string& line) {
+	std::vector<std::string> tokens;
+	std::string part;
+	bool lastToken = false;
+	for (char currChar : line) {
+		if (lastToken) {
+			part += currChar;
+			continue;
+		}
+		if (currChar == ' ') {
+			tokens.push_back(part);
+			part.clear();
+		} else if (currChar == ':' && part.empty() && !tokens.empty()) // If the colon is the first character in the word, but not the first character in the line
+			lastToken = true;
+		else
+			part += currChar;
+	}
+	if (!part.empty())
+		tokens.push_back(part);
+	return tokens;
 }
