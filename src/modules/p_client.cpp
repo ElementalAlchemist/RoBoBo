@@ -160,7 +160,22 @@ void LocalClient::processSend(const std::string& message) {
 			}
 		}
 	}
-	// TODO: flood throttle
+	if (module->floodControl) {
+		unsigned int secondsToAdd = 1;
+		if (parsedLine[0] == "GLINE" || parsedLine[0] == "KLINE" || parsedLine[0] == "OJOIN" || parsedLine[0] == "PASS" || parsedLine[0] == "PING" || parsedLine[0] == "PONG" || parsedLine[0] == "QLINE" || parsedLine[0] == "SAJOIN" || parsedLine[0] == "SAKICK" || parsedLine[0] == "SAMODE" || parsedLine[0] == "SANICK" || parsedLine[0] == "SAPART" || parsedLine[0] == "SAQUIT" || parsedLine[0] == "SATOPIC" || parsedLine[0] == "USER" || parsedLine[0] == "ZLINE")
+			secondsToAdd = 0;
+		else if (parsedLine[0] == "JOIN" || parsedLine[0] == "MAP" || parsedLine[0] == "REHASH" || parsedLine[0] == "TOPIC" || parsedLine[0] == "WHOIS" || parsedLine[0] == "WHOWAS")
+			secondsToAdd = 2;
+		else if (parsedLine[0] == "CYCLE" || parsedLine[0] == "WHO")
+			secondsToAdd = 3;
+		else if (parsedLine[0] == "INVITE" || parsedLine[0] == "NICK")
+			secondsToAdd = 4;
+		else if (parsedLine[0] == "KNOCK" || parsedLine[0] == "LIST" || parsedLine[0] == "MKPASSWD" || parsedLine[0] == "PART")
+			secondsToAdd = 5;
+		while (seconds + secondsToAdd > 10)
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		seconds += secondsToAdd;
+	}
 	// TODO: call appropriate send hooks if appropriate
 	connection->sendData(message);
 }
