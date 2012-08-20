@@ -182,7 +182,8 @@ void LocalClient::processSend(const std::string& message) {
 			if (msgChar == (char)1)
 				ctcpCount++;
 		}
-		if ((ctcpCount == 1 && parsedLine[2][0] == (char)1) || (ctcpCount == 2 && parsedLine[2][0] == (char)1 && parsedLine[2][parsedLine[2].size() - 1] == (char)1)) { // message is only a CTCP
+		// Detect whether the whole message is a CTCP
+		if ((ctcpCount == 1 && parsedLine[2][0] == (char)1) || (ctcpCount == 2 && parsedLine[2][0] == (char)1 && parsedLine[2][parsedLine[2].size() - 1] == (char)1)) {
 			std::string ctcpMsg = parsedLine[2].substr(1);
 			if (parsedLine[2][parsedLine[2].size() - 1] == (char)1)
 				ctcpMsg = ctcpMsg.substr(0, ctcpMsg.size() - 1);
@@ -191,6 +192,7 @@ void LocalClient::processSend(const std::string& message) {
 			std::string params;
 			if (ctcpSpace != std::string::npos)
 				params = ctcpMsg.substr(ctcpSpace + 1);
+			// Call the appropriate hook based on whether it's being sent to a channel or a user
 			if (module->chanTypes.find(parsedLine[1][0]) != module->chanTypes.end())
 				module->callChanCTCPSendHook(id, parsedLine[1], ' ', ctcp, params);
 			else if (module->chanTypes.find(parsedLine[1][1]) != module->chanTypes.end()) {
@@ -207,6 +209,7 @@ void LocalClient::processSend(const std::string& message) {
 			} else
 				module->callUserCTCPSendHook(id, parsedLine[1], ctcp, params);
 		} else {
+			// Either none or part of the message is CTCP; pick out the CTCP parts to make appropriate hook calls
 			std::list<std::pair<std::string, std::string>> ctcpBits;
 			size_t ctcpPos = 0;
 			ctcpPos = parsedLine[2].find((char)1);
@@ -223,6 +226,7 @@ void LocalClient::processSend(const std::string& message) {
 				}
 				ctcpPos = parsedLine[2].find((char)1, ctcpPos + 1);
 			}
+			// Call the appropriate hooks for the whole message and the CTCP bits based on whether it's being sent to a channel or to a user
 			if (module->chanTypes.find(parsedLine[1][0]) != module->chanTypes.end()) {
 				module->callChanMsgSendHook(id, parsedLine[1], ' ', parsedLine[2]);
 				for (std::pair<std::string, std::string> ctcp : ctcpBits)
@@ -255,6 +259,7 @@ void LocalClient::processSend(const std::string& message) {
 			if (msgChar == (char)1)
 				ctcpCount++;
 		}
+		// Detect whether the whole message is a CTCP
 		if ((ctcpCount == 1 && parsedLine[2][0] == (char)1) || (ctcpCount == 2 && parsedLine[2][0] == (char)1 && parsedLine[2][parsedLine[2].size() - 1] == (char)1)) { // message is only a CTCP
 			std::string ctcpMsg = parsedLine[2].substr(1);
 			if (parsedLine[2][parsedLine[2].size() - 1] == (char)1)
@@ -264,6 +269,7 @@ void LocalClient::processSend(const std::string& message) {
 			std::string params;
 			if (ctcpSpace != std::string::npos)
 				params = ctcpMsg.substr(ctcpSpace + 1);
+			// Call the appropriate hook based on whether it's being sent to a channel or a user
 			if (module->chanTypes.find(parsedLine[1][0]) != module->chanTypes.end())
 				module->callChanCTCPReplySendHook(id, parsedLine[1], ' ', ctcp, params);
 			else if (module->chanTypes.find(parsedLine[1][1]) != module->chanTypes.end()) {
@@ -280,6 +286,7 @@ void LocalClient::processSend(const std::string& message) {
 			} else
 				module->callUserCTCPReplySendHook(id, parsedLine[1], ctcp, params);
 		} else {
+			// Either none or part of the message is CTCP; pull out the CTCP bits to call the appropriate hooks
 			std::list<std::pair<std::string, std::string>> ctcpBits;
 			size_t ctcpPos = 0;
 			ctcpPos = parsedLine[2].find((char)1);
@@ -296,6 +303,7 @@ void LocalClient::processSend(const std::string& message) {
 				}
 				ctcpPos = parsedLine[2].find((char)1, ctcpPos + 1);
 			}
+			// Call the appropriate hooks for the whole message and for the CTCP bits based on whether it's being sent to a channel or to a user
 			if (module->chanTypes.find(parsedLine[1][0]) != module->chanTypes.end()) {
 				module->callChanNoticeSendHook(id, parsedLine[1], ' ', parsedLine[2]);
 				for (std::pair<std::string, std::string> ctcp : ctcpBits)
