@@ -176,7 +176,6 @@ void LocalClient::processSend(const std::string& message) {
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 		seconds += secondsToAdd;
 	}
-	// TODO: call appropriate send hooks if appropriate
 	if (parsedLine[0] == "PRIVMSG") {
 		size_t ctcpCount = 0;
 		for (char msgChar : parsedLine[2]) {
@@ -251,7 +250,78 @@ void LocalClient::processSend(const std::string& message) {
 			}
 		}
 	} else if (parsedLine[0] == "NOTICE") {
-		
+		size_t ctcpCount = 0;
+		for (char msgChar : parsedLine[2]) {
+			if (msgChar == (char)1)
+				ctcpCount++;
+		}
+		if ((ctcpCount == 1 && parsedLine[2][0] == (char)1) || (ctcpCount == 2 && parsedLine[2][0] == (char)1 && parsedLine[2][parsedLine[2].size() - 1] == (char)1)) { // message is only a CTCP
+			std::string ctcpMsg = parsedLine[2].substr(1);
+			if (parsedLine[2][parsedLine[2].size() - 1] == (char)1)
+				ctcpMsg = ctcpMsg.substr(0, ctcpMsg.size() - 1);
+			size_t ctcpSpace = ctcpMsg.find(' ');
+			std::string ctcp = ctcpMsg.substr(0, ctcpSpace);
+			std::string params;
+			if (ctcpSpace != std::string::npos)
+				params = ctcpMsg.substr(ctcpSpace + 1);
+			if (module->chanTypes.find(parsedLine[1][0]) != module->chanTypes.end())
+				module->callChanCTCPReplySendHook(id, parsedLine[1], ' ', ctcp, params);
+			else if (module->chanTypes.find(parsedLine[1][1]) != module->chanTypes.end()) {
+				bool chanCTCP = false;
+				for (std::pair<std::string, char> status : module->prefixes) {
+					if (status.second == parsedLine[1][0]) {
+						chanCTCP = true;
+						 module->callChanCTCPReplySendHook(id, parsedLine[1].substr(1), parsedLine[1][0], ctcp, params);
+						break;
+					}
+				}
+				if (!chanCTCP)
+					module->callUserCTCPReplySendHook(id, parsedLine[1], ctcp, params);
+			} else
+				module->callUserCTCPReplySendHook(id, parsedLine[1], ctcp, params);
+		} else {
+			std::list<std::pair<std::string, std::string>> ctcpBits;
+			size_t ctcpPos = 0;
+			ctcpPos = parsedLine[2].find((char)1);
+			while (ctcpPos != std::string::npos) {
+				size_t startCTCP = ctcpPos;
+				ctcpPos = parsedLine[2].find((char)1, ctcpPos + 1);
+				std::string ctcpSegment = parsedLine[2].substr(startCTCP + 1, ctcpPos - (startCTCP + 1));
+				if (!ctcpSegment.empty()) {
+					size_t spacePos = ctcpSegment.find(' ');
+					if (spacePos == std::string::npos)
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment, ""));
+					else
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1));
+				}
+				ctcpPos = parsedLine[2].find((char)1, ctcpPos + 1);
+			}
+			if (module->chanTypes.find(parsedLine[1][0]) != module->chanTypes.end()) {
+				module->callChanNoticeSendHook(id, parsedLine[1], ' ', parsedLine[2]);
+				for (std::pair<std::string, std::string> ctcp : ctcpBits)
+					module->callChanCTCPReplySendHook(id, parsedLine[1], ' ', ctcp.first, ctcp.second);
+			} else if (module->chanTypes.find(parsedLine[1][1]) != module->chanTypes.end()) {
+				bool chanCTCP = false;
+				for (std::pair<std::string, char> status : module->prefixes) {
+					if (status.second == parsedLine[1][0]) {
+						chanCTCP = true;
+						module->callChanNoticeSendHook(id, parsedLine[1].substr(1), parsedLine[1][0], parsedLine[2]);
+						for (std::pair<std::string, std::string> ctcp : ctcpBits)
+							module->callChanCTCPReplySendHook(id, parsedLine[1].substr(1), parsedLine[1][0], ctcp.first, ctcp.second);
+						break;
+					}
+				}
+				if (!chanCTCP) {
+					module->callUserNoticeSendHook(id, parsedLine[1], parsedLine[2]);
+					for (std::pair<std::string, std::string> ctcp : ctcpBits)
+						module->callUserCTCPReplySendHook(id, parsedLine[1], ctcp.first, ctcp.second);
+				}
+			} else {
+				module->callUserNoticeSendHook(id, parsedLine[1], parsedLine[2]);
+				for (std::pair<std::string, std::string> ctcp : ctcpBits)
+					module->callUserCTCPReplySendHook(id, parsedLine[1], ctcp.first, ctcp.second);
+			}
+		}
 	}
 	connection->sendData(message);
 }
