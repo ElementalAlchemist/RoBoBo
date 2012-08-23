@@ -429,6 +429,7 @@ class Client : public Protocol {
 		
 		void processIncoming(const std::string& client, const std::string& line);
 		std::vector<std::string> parseLine(const std::string& line);
+		unsigned int currID = 0;
 		
 		friend class LocalClient;
 };
@@ -445,11 +446,48 @@ void Client::connectServer() {
 		floodControl = false;
 	else
 		floodControl = true;
-	// TODO: this
+	size_t i = 0;
+	std::ostringstream clientNum;
+	clientNum << i;
+	while (!config[clientNum.str() + "/sockettype"].empty() && !config[clientNum.str() + "/id"].empty() && !config[clientNum.str() + "/nick"].empty() && !config[clientNum.str() + "/ident"].empty() && !config[clientNum.str() + "/gecos"].empty()) {
+		std::shared_ptr<Socket> clientSocket = assignSocket(config[clientNum.str() + "/sockettype"]);
+		if (clientSocket.get() == NULL)
+			std::cerr << "The socket type for client " << i << " of " << serverName << " is not valid." << std::endl;
+		else {
+			std::shared_ptr<LocalClient> newClient (new LocalClient (config[clientNum.str() + "/id"], config[clientNum.str() + "/nick"], config[clientNum.str() + "/ident", "", config[clientNum.str() + "/gecos"], this));
+			connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (config[clientNum.str() + "/id"], newClient));
+			newClient->connection = clientSocket;
+			if (!config[clientNum.str() + "/password"].empty())
+				newClient->sendLine("PASS " + config[clientNum.str() + "/password"]);
+			newClient->sendLine("NICK " + newClient->nick);
+			newClient->sendLine("USER " + newClient->ident + " localhost " + serverName + " :" + newClient->gecos);
+			newClient->receiveThread = std::thread(&LocalClient::receive, newClient.get());
+			if (floodControl) {
+				newClient->sendThread = std::thread(&LocalClient::send, newClient.get());
+				newClient->secondsThread = std::thread(&LocalClient::decrementSeconds, newClient.get());
+			}
+		}
+		i++;
+		clientNum.str("");
+		clientNum << i;
+	}
 }
 
 void Client::disconnectServer(std::string reason) {
-	// TODO: this
+	// First send QUIT to the server from all of the clients
+	for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients)
+		client.second->sendLine("QUIT :Disconnecting server");
+	// Then let all the clients' threads finish.
+	// This is done separately so that if more than one client takes a bit to flush, we're not waiting that much longer
+	// for both of them rather than just one.
+	for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients) {
+		if (client.second->receiveThread.joinable())
+			client.second->receiveThread.join();
+		if (client.second->sendThread.joinable())
+			client.second->sendThread.join();
+		if (client.second->secondsThread.joinable())
+			client.second->secondsThread.join();
+	}
 }
 
 bool Client::isConnected() {
