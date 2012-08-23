@@ -703,7 +703,26 @@ void Client::kickUser(const std::string& client, const std::string& channel, con
 }
 
 std::string Client::addClient(std::string& nick, std::string& ident, std::string& host, std::string& gecos) {
-	// TODO: this
+	std::shared_ptr<Socket> clientSocket = assignSocket(config["sockettype"]);
+	if (clientSocket.get() == NULL)
+		return ""; // NOPE
+	if (clientSocket->connectServer(serverName, config["port"], config["bind"]) == SOCKCONN_SUCCESS) {
+		std::string clientID = newID();
+		std::shared_ptr<LocalClient> newClient (new LocalClient (clientID, nick, ident, host, gecos, this));
+		connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (clientID, newClient));
+		newClient->connection = clientSocket;
+		if (!config["password"].empty())
+			newClient->sendLine("PASS " + config["password"]);
+		newClient->sendLine("NICK " + nick);
+		newClient->sendLine("USER " + ident + " localhost " + serverName + " :" + gecos);
+		newClient->receiveThread = std::thread(&LocalClient::receive, newClient);
+		if (floodControl) {
+			newClient->sendThread = std::thread(&LocalClient::send, newClient);
+			newClient->secondsThread = std::thread(&LocalClient::decrementSeconds, newClient);
+		}
+		return clientID;
+	} else
+		return "";
 }
 
 void Client::removeClient(const std::string& client) {
