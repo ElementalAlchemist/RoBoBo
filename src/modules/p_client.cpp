@@ -726,7 +726,17 @@ std::string Client::addClient(std::string& nick, std::string& ident, std::string
 }
 
 void Client::removeClient(const std::string& client) {
-	// TODO: this
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (clientIter == connClients.end())
+		return;
+	clientIter->second->sendLine("QUIT :Disconnecting client");
+	if (clientIter->second->receiveThread.joinable())
+		clientIter->second->receiveThread.join();
+	if (clientIter->second->sendThread.joinable())
+		clientIter->second->sendThread.join();
+	if (clientIter->second->secondsThread.joinable())
+		clientIter->second->secondsThread.join();
+	connClients.erase(clientIter);
 }
 
 void Client::setTopic(const std::string& client, const std::string& channel, const std::string& topic) {
