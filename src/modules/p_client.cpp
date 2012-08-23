@@ -430,13 +430,13 @@ class Client : public Protocol {
 		
 		void processIncoming(const std::string& client, const std::string& line);
 		static std::vector<std::string> parseLine(const std::string& line);
-		unsigned int currID = 0;
+		unsigned int currID;
 		std::string newID();
 		
 		friend class LocalClient;
 };
 
-Client::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr) {}
+Client::Protocol(std::string server, std::map<std::string, std::string> conf, std::string workDir, bool dumpLogs, unsigned short debug, Base* botptr) : Protocol(server, conf, workDir, dumpLogs, debug, botptr), floodControl(true), currID(0) {}
 
 unsigned int Client::apiVersion() {
 	return 3000;
