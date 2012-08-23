@@ -448,6 +448,11 @@ void Client::connectServer() {
 		floodControl = false;
 	else
 		floodControl = true;
+	if (config["sockettype"].empty())
+		config["sockettype"] = config["0/sockettype"]; // It works because otherwise deadServer is true on startup and this module will be cleaned up
+		// unless the type is there and invalid but valid in other clients, in which case, the user gets what he deserves.
+	if (config["port"].empty())
+		config["port"] = config["0/port"]; // Same as above.
 	size_t i = 0;
 	std::ostringstream clientNum;
 	clientNum << i;
