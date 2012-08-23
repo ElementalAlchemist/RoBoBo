@@ -223,7 +223,7 @@ void LocalClient::processSend(const std::string& message) {
 					if (spacePos == std::string::npos)
 						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment, ""));
 					else
-						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1));
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1)));
 				}
 				ctcpPos = parsedLine[2].find((char)1, ctcpPos + 1);
 			}
@@ -300,7 +300,7 @@ void LocalClient::processSend(const std::string& message) {
 					if (spacePos == std::string::npos)
 						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment, ""));
 					else
-						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1));
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1)));
 				}
 				ctcpPos = parsedLine[2].find((char)1, ctcpPos + 1);
 			}
