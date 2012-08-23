@@ -429,8 +429,9 @@ class Client : public Protocol {
 		unsigned int maxModes;
 		
 		void processIncoming(const std::string& client, const std::string& line);
-		std::vector<std::string> parseLine(const std::string& line);
+		static std::vector<std::string> parseLine(const std::string& line);
 		unsigned int currID = 0;
+		std::string newID();
 		
 		friend class LocalClient;
 };
@@ -1096,7 +1097,7 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 	
 }
 
-std::vector<std::string> parseLine(const std::string& line) {
+std::vector<std::string> Client::parseLine(const std::string& line) {
 	std::vector<std::string> tokens;
 	std::string part;
 	bool lastToken = false;
@@ -1116,4 +1117,14 @@ std::vector<std::string> parseLine(const std::string& line) {
 	if (!part.empty())
 		tokens.push_back(part);
 	return tokens;
+}
+
+std::string Client::newID() {
+	std::ostringstream strID;
+	strID << currID++;
+	while (connClients.find(strID.str()) != connClients.end()) {
+		strID.str("");
+		strID << currID++;
+	}
+	return strID.str();
 }
