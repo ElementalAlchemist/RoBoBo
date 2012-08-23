@@ -456,22 +456,44 @@ void Client::connectServer() {
 	size_t i = 0;
 	std::ostringstream clientNum;
 	clientNum << i;
-	while (!config[clientNum.str() + "/sockettype"].empty() && !config[clientNum.str() + "/id"].empty() && !config[clientNum.str() + "/nick"].empty() && !config[clientNum.str() + "/ident"].empty() && !config[clientNum.str() + "/gecos"].empty()) {
+	while (!config[clientNum.str() + "/sockettype"].empty() && !config[clientNum.str() + "/port"].empty() && !config[clientNum.str() + "/id"].empty() && !config[clientNum.str() + "/nick"].empty() && !config[clientNum.str() + "/ident"].empty() && !config[clientNum.str() + "/gecos"].empty()) {
 		std::shared_ptr<Socket> clientSocket = assignSocket(config[clientNum.str() + "/sockettype"]);
 		if (clientSocket.get() == NULL)
 			std::cerr << "The socket type for client " << i << " of " << serverName << " is not valid." << std::endl;
 		else {
-			std::shared_ptr<LocalClient> newClient (new LocalClient (config[clientNum.str() + "/id"], config[clientNum.str() + "/nick"], config[clientNum.str() + "/ident", "", config[clientNum.str() + "/gecos"], this));
-			connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (config[clientNum.str() + "/id"], newClient));
-			newClient->connection = clientSocket;
-			if (!config[clientNum.str() + "/password"].empty())
-				newClient->sendLine("PASS " + config[clientNum.str() + "/password"]);
-			newClient->sendLine("NICK " + newClient->nick);
-			newClient->sendLine("USER " + newClient->ident + " localhost " + serverName + " :" + newClient->gecos);
-			newClient->receiveThread = std::thread(&LocalClient::receive, newClient.get());
-			if (floodControl) {
-				newClient->sendThread = std::thread(&LocalClient::send, newClient.get());
-				newClient->secondsThread = std::thread(&LocalClient::decrementSeconds, newClient.get());
+			bool sockSuccess = false;
+			switch (clientSocket->connectServer(serverName, config[clientNum.str() + "/port"], config[clientNum.str() + "/bind"])) {
+				case SOCKCONN_SUCCESS:
+					sockSuccess = true;
+					break;
+				case SOCKCONN_HOST:
+					std::cerr << "An error occurred getting the host for client " << i << " of server " << serverName << "." << std::endl;
+					break;
+				case SOCKCONN_FD:
+					std::cerr << "An error occurred getting a file descriptor to establish a connection to server " << serverName << " for client " << i << "." << std::endl;
+					break;
+				case SOCKCONN_BIND:
+					std::cerr << "An error occurred binding to the given address for the client " << i << " of server " << serverName << "." << std::endl;
+					break;
+				case SOCKCONN_CONNECT:
+					std::cerr << "An error occurred establishing a connection for client " << i << " to server " << serverName << "." << std::endl;
+					break;
+				default:
+					std::cerr << "An unknown socket error occurred for client " << i << " to server " << serverName << "." << std::endl;
+			}
+			if (sockSuccess) {
+				std::shared_ptr<LocalClient> newClient (new LocalClient (config[clientNum.str() + "/id"], config[clientNum.str() + "/nick"], config[clientNum.str() + "/ident", "", config[clientNum.str() + "/gecos"], this));
+				connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (config[clientNum.str() + "/id"], newClient));
+				newClient->connection = clientSocket;
+				if (!config[clientNum.str() + "/password"].empty())
+					newClient->sendLine("PASS " + config[clientNum.str() + "/password"]);
+				newClient->sendLine("NICK " + newClient->nick);
+				newClient->sendLine("USER " + newClient->ident + " localhost " + serverName + " :" + newClient->gecos);
+				newClient->receiveThread = std::thread(&LocalClient::receive, newClient.get());
+				if (floodControl) {
+					newClient->sendThread = std::thread(&LocalClient::send, newClient.get());
+					newClient->secondsThread = std::thread(&LocalClient::decrementSeconds, newClient.get());
+				}
 			}
 		}
 		i++;
