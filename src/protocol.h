@@ -135,7 +135,7 @@ class Protocol {
 		void callServerWallopsHook(const std::string& nick, const std::string& message);
 		void callServerConnectHook(const std::string& newServer);
 		void callServerDisconnectHook(const std::string& quitServer, const std::string& reason);
-		void callServerCapHook(const std::string& subcmd, const std::string& list);
+		void callServerCapHook(const std::string& client, const std::string& subcmd, const std::string& list);
 		void callServerCapabHook(const std::vector<std::string>& capabList);
 		void callServerBurstHook();
 		void callServerBurstEndHook();

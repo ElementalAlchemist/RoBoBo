@@ -145,7 +145,7 @@ class Base {
 		void modServerWallopsHook(const std::string& server, const std::string& nick, const std::string& message) { std::thread(&Base::callServerWallopsHooks, this, server, nick, message).detach(); }
 		void modServerConnectHook(const std::string& server, const std::string& serverName) { std::thread(&Base::callServerConnectHooks, this, server, serverName).detach(); }
 		void modServerDisconnectHook(const std::string& server, const std::string& serverName, const std::string& reason) { std::thread(&Base::callServerDisconnectHooks, this, server, serverName, reason).detach(); }
-		void modServerCapHook(const std::string& server, const std::string& subcmd, const std::string& list) { std::thread(&Base::callServerCapHooks, this, server, subcmd, list).detach(); }
+		void modServerCapHook(const std::string& server, const std::string& client, const std::string& subcmd, const std::string& list) { std::thread(&Base::callServerCapHooks, this, server, client, subcmd, list).detach(); }
 		void modServerCapabHook(const std::string& server, std::vector<std::string> capabList) { std::thread(&Base::callServerCapabHooks, this, server, capabList).detach(); }
 		void modServerBurstHook(const std::string& server) { std::thread(&Base::callServerBurstHooks, this, server).detach(); }
 		void modServerBurstEndHook(const std::string& server) { std::thread(&Base::callServerBurstEndHooks, this, server).detach(); }
@@ -222,7 +222,7 @@ class Base {
 		void callServerWallopsHooks(std::string server, std::string nick, std::string message);
 		void callServerConnectHooks(std::string server, std::string serverName);
 		void callServerDisconnectHooks(std::string server, std::string serverName, std::string reason);
-		void callServerCapHooks(std::string server, std::string subcmd, std::string list);
+		void callServerCapHooks(std::string server, std::string client, std::string subcmd, std::string list);
 		void callServerCapabHooks(std::string server, std::vector<std::string> capabList);
 		void callServerBurstHooks(std::string server);
 		void callServerBurstEndHooks(std::string server);

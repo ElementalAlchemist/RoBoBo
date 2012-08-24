@@ -1753,18 +1753,18 @@ void Base::callServerDisconnectHooks(std::string server, std::string serverName,
 		module.second->onServerDisconnect(server, serverName, reason);
 }
 
-void Base::callServerCapHooks(std::string server, std::string subcmd, std::string list) {
+void Base::callServerCapHooks(std::string server, std::string client, std::string subcmd, std::string list) {
 	MutexManager hookManage (&modHookMutex);
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onServerCap(server, subcmd, list);
+		module.second->onServerCap(server, client, subcmd, list);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onServerCap(server, subcmd, list);
+		module.second->onServerCap(server, client, subcmd, list);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onServerCap(server, subcmd, list);
+		module.second->onServerCap(server, client, subcmd, list);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onServerCap(server, subcmd, list);
+		module.second->onServerCap(server, client, subcmd, list);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onServerCap(server, subcmd, list);
+		module.second->onServerCap(server, client, subcmd, list);
 }
 
 void Base::callServerCapabHooks(std::string server, std::vector<std::string> capabList) {

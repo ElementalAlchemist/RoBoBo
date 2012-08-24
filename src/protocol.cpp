@@ -144,8 +144,8 @@ inline void Protocol::callServerDisconnectHook(const std::string& quitServer, co
 	bot->modServerDisconnectHook(serverName, quitServer, reason);
 }
 
-inline void Protocol::callServerCapHook(const std::string& subcmd, const std::string& list) {
-	bot->modServerCapHook(serverName, subcmd, list);
+inline void Protocol::callServerCapHook(const std::string& client, const std::string& subcmd, const std::string& list) {
+	bot->modServerCapHook(serverName, client, subcmd, list);
 }
 
 inline void Protocol::callServerCapabHook(const std::vector<std::string>& capabList) {

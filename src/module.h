@@ -61,7 +61,7 @@ class Module {
 		virtual void onServerWallops(const std::string& server, const std::string& nick, const std::string& message) {}
 		virtual void onServerConnect(const std::string& server, const std::string& serverName) {}
 		virtual void onServerDisconnect(const std::string& server, const std::string& serverName, const std::string& reason) {}
-		virtual void onServerCap(const std::string& server, const std::string& subcmd, const std::string& list) {}
+		virtual void onServerCap(const std::string& server, const std::string& client, const std::string& subcmd, const std::string& list) {}
 		virtual void onServerCapab(const std::string& server, const std::vector<std::string>& capabList) {}
 		virtual void onServerBurst(const std::string& server) {}
 		virtual void onServerBurstEnd(const std::string& server) {}
