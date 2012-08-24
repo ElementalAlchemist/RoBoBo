@@ -81,10 +81,12 @@ void LocalClient::decrementSeconds() {
 }
 
 void LocalClient::sendLine(const std::string& line) {
-	if (module->floodControl)
-		sendQueue.push_back(line);
-	else
-		processSend(line);
+	if (connection->isConnected()) {
+		if (module->floodControl)
+			sendQueue.push_back(line);
+		else
+			processSend(line);
+	}
 }
 
 void LocalClient::processSend(const std::string& message) {
