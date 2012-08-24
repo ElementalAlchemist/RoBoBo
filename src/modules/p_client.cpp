@@ -623,10 +623,12 @@ void Client::setMode(const std::string& client, const std::string& target, const
 	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
 	if (clientIter == connClients.end())
 		return;
-	// TODO: Limit modes to maxModes
+	std::list<std::string> modesToSet = setModes, modesToRemove = remModes;
+	unsigned int modeCount = 0;
 	std::list<char> setModesChar, remModesChar;
 	std::string params = "";
-	for (std::string mode : setModes) {
+	while (!modesToSet.empty() && modeCount < maxModes) {
+		std::string mode = modesToSet.front();
 		size_t paramPos = mode.find('=');
 		std::string param ("");
 		if (paramPos != std::string::npos) {
@@ -638,8 +640,11 @@ void Client::setMode(const std::string& client, const std::string& target, const
 			setModesChar.push_back(convIter);
 			params += " " + param;
 		}
+		modesToSet.erase(modesToSet.begin());
+		modeCount++;
 	}
-	for (std::string mode : remModes) {
+	while (!modesToRemove.empty() && modeCount < maxModes) {
+		std::string mode = modesToRemove.front();
 		size_t paramPos = mode.find('=');
 		std::string param ("");
 		if (paramPos != std::string::npos) {
@@ -651,6 +656,8 @@ void Client::setMode(const std::string& client, const std::string& target, const
 			remModesChar.push_back(convIter);
 			params += " " + param;
 		}
+		modesToRemove.erase(modesToRemove.begin());
+		modeCount++;
 	}
 	std::string modesStr = "";
 	if (!setModesChar.empty()) {
@@ -666,6 +673,8 @@ void Client::setMode(const std::string& client, const std::string& target, const
 	if (modesStr.empty())
 		return;
 	clientIter->second->sendLine("MODE " + target + " " + modesStr + params);
+	if (modeCount >= maxModes)
+		setMode(client, target, modesToSet, modesToRemove); // Send the rest of the modes as another line
 }
 
 void Client::setSNOmask(const std::string& client, bool add, char snomask) {
