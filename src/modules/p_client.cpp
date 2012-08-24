@@ -150,7 +150,6 @@ void LocalClient::processSend(const std::string& message) {
 			std::string linePrefix = ":" + nick + "!" + ident + "@" + host + " " + parsedLine[0] + " " + parsedLine[1] + " :";
 			size_t prefixLen = linePrefix.size();
 			size_t trimmedSpacePos = parsedLine[2].rfind(' ', 510 - prefixLen);
-			// TODO: make the line splitter detect the current color state
 			if (trimmedSpacePos == std::string::npos) {
 				std::string trimmedMsg = parsedLine[2].substr(0, 510 - prefixLen);
 				message = parsedLine[0] + " " + parsedLine[1] + " :" + trimmedMsg;
