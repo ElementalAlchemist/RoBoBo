@@ -613,6 +613,7 @@ void Client::connectServer() {
 				std::shared_ptr<LocalClient> newClient (new LocalClient (config[clientNum.str() + "/id"], config[clientNum.str() + "/nick"], config[clientNum.str() + "/ident", "", config[clientNum.str() + "/gecos"], this));
 				connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (config[clientNum.str() + "/id"], newClient));
 				newClient->connection = clientSocket;
+				newClient->sendLine("CAP LS");
 				if (!config[clientNum.str() + "/password"].empty())
 					newClient->sendLine("PASS " + config[clientNum.str() + "/password"]);
 				newClient->sendLine("NICK " + newClient->nick);
@@ -848,6 +849,7 @@ std::string Client::addClient(std::string& nick, std::string& ident, std::string
 		std::shared_ptr<LocalClient> newClient (new LocalClient (clientID, nick, ident, host, gecos, this));
 		connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (clientID, newClient));
 		newClient->connection = clientSocket;
+		newClient->sendLine("CAP LS");
 		if (!config["password"].empty())
 			newClient->sendLine("PASS " + config["password"]);
 		newClient->sendLine("NICK " + nick);
