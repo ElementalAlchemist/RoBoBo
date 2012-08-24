@@ -1050,19 +1050,29 @@ std::string Client::clientNick(const std::string& client) {
 }
 
 std::string Client::userIdent(const std::string& user) {
+	User* theUser;
 	std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(user);
-	if (userIter == users.end())
-		return "";
-	// TODO: also accept client ID as user
-	return userIter->second->ident;
+	if (userIter == users.end()) {
+		std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+		if (clientIter == connClients.end())
+			return "";
+		theUser = static_cast<User*> clientIter->second.get();
+	} else
+		theUser = userIter->second.get();
+	return theUser->ident;
 }
 
 std::string Client::userHost(const std::string& user) {
+	User* theUser;
 	std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(user);
-	if (userIter == users.end())
-		return "";
-	// TODO: also accept client ID as user
-	return userIter->second->host;
+	if (userIter == users.end()) {
+		std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+		if (clientIter == connClients.end())
+			return "";
+		theUser = static_cast<User*> clientIter->second.get();
+	} else
+		theUser = userIter->second.get();
+	return theUser->host;
 }
 
 std::set<std::string> Client::userModes(const std::string& user) {
@@ -1094,11 +1104,16 @@ bool Client::userHasSNOmask(const std::string& user, char snomask) {
 }
 
 std::set<std::string> Client::userChans(const std::string& user) {
+	User* theUser;
 	std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(user);
-	if (userIter == users.end())
-		return std::set<std::string> ();
-	// TODO: also accept client ID as user
-	return userIter->second->channels;
+	if (userIter == users.end()) {
+		std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(user);
+		if (clientIter == connClients.end())
+			return std::set<std::string> ();
+		theUser = static_cast<User*> clientIter->second.get();
+	} else
+		theUser = userIter->second.get();
+	return theUser->channels;
 }
 
 void Client::processedOutChanMsg(const std::string& client, const std::string& channel, char status, const std::string& message) {
