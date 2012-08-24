@@ -121,7 +121,7 @@ class Protocol {
 		void callUserNickHook(const std::string& oldNick, const std::string& newNick);
 		void callServerPingHook(const std::string& sourceServer);
 		void callServerPongHook(const std::string& sourceServer);
-		void callNumericHook(const std::string& numeric, const std::vector<std::string>& data);
+		void callNumericHook(const std::string& client, const std::string& numeric, const std::vector<std::string>& data);
 		void callUserOperHook(const std::string& nick, const std::string& operType);
 		void callServerNoticeHook(char snomask, const std::string& message);
 		void callMetadataHook(const std::string& target, const std::string& key, const std::string& value);

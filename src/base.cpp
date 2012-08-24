@@ -1557,18 +1557,18 @@ void Base::callServerPongHooks(std::string server, std::string sourceServer) {
 		module.second->onServerPong(server, sourceServer);
 }
 
-void Base::callNumericHooks(std::string server, std::string numeric, std::vector<std::string> data) {
+void Base::callNumericHooks(std::string server, std::string client, std::string numeric, std::vector<std::string> data) {
 	MutexManager hookManage (&modHookMutex);
 	for (std::pair<std::string, Module*> module : highModules)
-		module.second->onNumeric(server, numeric, data);
+		module.second->onNumeric(server, client, numeric, data);
 	for (std::pair<std::string, Module*> module : mediumHighModules)
-		module.second->onNumeric(server, numeric, data);
+		module.second->onNumeric(server, client, numeric, data);
 	for (std::pair<std::string, Module*> module : normalModules)
-		module.second->onNumeric(server, numeric, data);
+		module.second->onNumeric(server, client, numeric, data);
 	for (std::pair<std::string, Module*> module : mediumLowModules)
-		module.second->onNumeric(server, numeric, data);
+		module.second->onNumeric(server, client, numeric, data);
 	for (std::pair<std::string, Module*> module : lowModules)
-		module.second->onNumeric(server, numeric, data);
+		module.second->onNumeric(server, client, numeric, data);
 }
 
 void Base::callUserOperHooks(std::string server, std::string nick, std::string operType) {

@@ -88,8 +88,8 @@ inline void Protocol::callServerPongHook(const std::string& sourceServer) {
 	bot->modServerPongHook(serverName, sourceServer);
 }
 
-inline void Protocol::callNumericHook(const std::string& numeric, const std::vector<std::string>& data) {
-	bot->modNumericHook(serverName, numeric, data);
+inline void Protocol::callNumericHook(const std::string& client, const std::string& numeric, const std::vector<std::string>& data) {
+	bot->modNumericHook(serverName, client, numeric, data);
 }
 
 inline void Protocol::callUserOperHook(const std::string& nick, const std::string& operType) {

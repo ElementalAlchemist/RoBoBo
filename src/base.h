@@ -131,7 +131,7 @@ class Base {
 		void modUserNickHook(const std::string& server, const std::string& oldNick, const std::string& newNick) { std::thread(&Base::callUserNickHooks, this, server, oldNick, newNick).detach(); }
 		void modServerPingHook(const std::string& server, const std::string& sourceServer) { std::thread(&Base::callServerPingHooks, this, server, sourceServer).detach(); }
 		void modServerPongHook(const std::string& server, const std::string& sourceServer) { std::thread(&Base::callServerPongHooks, this, server, sourceServer).detach(); }
-		void modNumericHook(const std::string& server, const std::string& numeric, std::vector<std::string> data) { std::thread(&Base::callNumericHooks, this, server, numeric, data).detach(); }
+		void modNumericHook(const std::string& server, const std::string& client, const std::string& numeric, std::vector<std::string> data) { std::thread(&Base::callNumericHooks, this, server, client, numeric, data).detach(); }
 		void modUserOperHook(const std::string& server, const std::string& nick, const std::string& operType) { std::thread(&Base::callUserOperHooks, this, server, nick, operType).detach(); }
 		void modServerNoticeHook(const std::string& server, char snomask, const std::string& message) { std::thread(&Base::callServerNoticeHooks, this, server, snomask, message).detach(); }
 		void modMetadataHook(const std::string& server, const std::string& target, const std::string& key, const std::string& value) { std::thread(&Base::callMetadataHooks, this, server, target, key, value).detach(); }
@@ -208,7 +208,7 @@ class Base {
 		void callUserNickHooks(std::string server, std::string oldNick, std::string newNick);
 		void callServerPingHooks(std::string server, std::string sourceServer);
 		void callServerPongHooks(std::string server, std::string sourceServer);
-		void callNumericHooks(std::string server, std::string numeric, std::vector<std::string> data);
+		void callNumericHooks(std::string server, std::string client, std::string numeric, std::vector<std::string> data);
 		void callUserOperHooks(std::string server, std::string nick, std::string operType);
 		void callServerNoticeHooks(std::string server, char snomask, std::string message);
 		void callMetadataHooks(std::string server, std::string target, std::string key, std::string value);
