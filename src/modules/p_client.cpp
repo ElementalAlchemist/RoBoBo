@@ -1,5 +1,6 @@
 #include "protocol.h"
 #include <deque>
+#include <utility>
 
 class User {
 	public:
@@ -153,11 +154,139 @@ void LocalClient::processSend(const std::string& message) {
 			if (trimmedSpacePos == std::string::npos) {
 				std::string trimmedMsg = parsedLine[2].substr(0, 510 - prefixLen);
 				message = parsedLine[0] + " " + parsedLine[1] + " :" + trimmedMsg;
-				sendQueue.push_front(parsedLine[0] + " " + parsedLine[1] + " :" + parsedLine[2].substr(510 - prefixLen));
+				std::stringstream colorPrefix;
+				bool bold = false, italic = false, underline = false;
+				unsigned int foregroundColor = 1, backgroundColor = 0;
+				bool inColor = false, firstDigit = false, secondDigit = false, commaEncountered = false;
+				for (char aChar : trimmedMsg) {
+					if (inColor) {
+						if (aChar == ',' && !commaEncountered) {
+							commaEncountered = true;
+							colorPrefix >> foregroundColor;
+							colorPrefix.str("");
+							firstDigit = false;
+							secondDigit = false;
+						} else if (aChar >= '0' && aChar <= '9' && !secondDigit) {
+							colorPrefix << aChar;
+							if (firstDigit)
+								secondDigit = true;
+							else
+								firstDigit = true;
+						} else {
+							inColor = false;
+							firstDigit = false;
+							secondDigit = false;
+							if (commaEncountered)
+								colorPrefix >> backgroundColor;
+							else
+								colorPrefix >> foregroundColor;
+							colorPrefix.str("");
+							commaEncountered = false;
+						}
+					}
+					if (aChar == (char)2)
+						bold = !bold;
+					else if (aChar == (char)29)
+						italic = !italic;
+					else if (aChar == (char)31)
+						underline = !underline;
+					else if (aChar == (char)22)
+						std::swap(foregroundColor, backgroundColor);
+					else if (aChar == (char)15) {
+						bold = false;
+						italic = false;
+						underline = false;
+						foregroundColor = 1;
+						backgroundColor = 0;
+						// Also set all of this stuff in case we encounter it in the middle of a color sequence.
+						inColor = false;
+						firstDigit = false;
+						secondDigit = false;
+						commaEncountered = false;
+					} else if (aChar == (char)3) {
+						backgroundColor = 0;
+						foregroundColor = 1;
+						inColor = true;
+					}
+				}
+				colorPrefix.str(""); // If there's something left over somehow, let's kill it.
+				if (bold)
+					colorPrefix << (char)2;
+				if (italic)
+					colorPrefix << (char)29;
+				if (underline)
+					colorPrefix << (char)31;
+				if (foregroundColor != 1 || backgroundColor != 0)
+					colorPrefix << (char)3 << foregroundColor << "," << backgroundColor;
+				sendQueue.push_front(parsedLine[0] + " " + parsedLine[1] + " :" + colorPrefix.str() + parsedLine[2].substr(510 - prefixLen));
 			} else {
 				std::string trimmedMsg = parsedLine[2].substr(0, trimmedSpacePos);
 				message = parsedLine[0] + " " + parsedLine[1] + " :" + trimmedMsg;
-				sendQueue.push_front(parsedLine[0] + " " + parsedLine[1] + " :" + parsedLine[2].substr(trimmedSpacePos));
+				std::stringstream colorPrefix;
+				bool bold = false, italic = false, underline = false;
+				unsigned int foregroundColor = 1, backgroundColor = 0;
+				bool inColor = false, firstDigit = false, secondDigit = false, commaEncountered = false;
+				for (char aChar : trimmedMsg) {
+					if (inColor) {
+						if (aChar == ',' && !commaEncountered) {
+							commaEncountered = true;
+							colorPrefix >> foregroundColor;
+							colorPrefix.str("");
+							firstDigit = false;
+							secondDigit = false;
+						} else if (aChar >= '0' && aChar <= '9' && !secondDigit) {
+							colorPrefix << aChar;
+							if (firstDigit)
+								secondDigit = true;
+							else
+								firstDigit = true;
+						} else {
+							inColor = false;
+							firstDigit = false;
+							secondDigit = false;
+							if (commaEncountered)
+								colorPrefix >> backgroundColor;
+							else
+								colorPrefix >> foregroundColor;
+							colorPrefix.str("");
+							commaEncountered = false;
+						}
+					}
+					if (aChar == (char)2)
+						bold = !bold;
+					else if (aChar == (char)29)
+						italic = !italic;
+					else if (aChar == (char)31)
+						underline = !underline;
+					else if (aChar == (char)22)
+						std::swap(foregroundColor, backgroundColor);
+					else if (aChar == (char)15) {
+						bold = false;
+						italic = false;
+						underline = false;
+						foregroundColor = 1;
+						backgroundColor = 0;
+						// Also set all of this stuff in case we encounter it in the middle of a color sequence.
+						inColor = false;
+						firstDigit = false;
+						secondDigit = false;
+						commaEncountered = false;
+					} else if (aChar == (char)3) {
+						backgroundColor = 0;
+						foregroundColor = 1;
+						inColor = true;
+					}
+				}
+				colorPrefix.str(""); // If there's something left over somehow, let's kill it.
+				if (bold)
+					colorPrefix << (char)2;
+				if (italic)
+					colorPrefix << (char)29;
+				if (underline)
+					colorPrefix << (char)31;
+				if (foregroundColor != 1 || backgroundColor != 0)
+					colorPrefix << (char)3 << foregroundColor << "," << backgroundColor;
+				sendQueue.push_front(parsedLine[0] + " " + parsedLine[1] + " :" + colorPrefix.str() + parsedLine[2].substr(trimmedSpacePos));
 			}
 		}
 	}
