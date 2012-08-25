@@ -1,4 +1,5 @@
 #include "protocol.h"
+#include <atomic>
 #include <deque>
 #include <utility>
 
