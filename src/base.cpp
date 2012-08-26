@@ -1109,6 +1109,13 @@ std::string Base::chanTopic(const std::string& server, const std::string& channe
 	return servIter->second->chanTopic(channel);
 }
 
+std::string Base::chanTopicSetter(const std::string& server, const std::string& channel) {
+	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
+	if (servIter == servers.end())
+		return "";
+	return servIter->second->chanTopicSetter(channel);
+}
+
 time_t Base::chanTimestamp(const std::string& server, const std::string& channel) {
 	std::map<std::string, Protocol*>::iterator servIter = servers.find(server);
 	if (servIter == servers.end())

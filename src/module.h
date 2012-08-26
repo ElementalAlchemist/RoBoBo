@@ -158,6 +158,7 @@ class Module {
 		
 		std::list<std::string> chanList(const std::string& server);
 		std::string chanTopic(const std::string& server, const std::string& channel);
+		std::string chanTopicSetter(const std::string& server, const std::string& channel);
 		time_t chanTimestamp(const std::string& server, const std::string& channel);
 		std::set<std::string> chanUsers(const std::string& server, const std::string& channel);
 		bool userInChan(const std::string& server, const std::string& channel, const std::string& user);

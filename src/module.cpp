@@ -243,6 +243,10 @@ inline std::string Module::chanTopic(const std::string& server, const std::strin
 	return bot->chanTopic(server, channel);
 }
 
+inline std::string Module::chanTopicSetter(const std::string& server, const std::string& channel) {
+	return bot->chanTopicSetter(server, channel);
+}
+
 inline time_t Module::chanTimestamp(const std::string& server, const std::string& channel) {
 	return bot->chanTimestamp(server, channel);
 }
