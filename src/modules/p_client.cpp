@@ -1,6 +1,7 @@
 #include "protocol.h"
 #include <atomic>
 #include <deque>
+#include <tuple>
 #include <utility>
 
 class User {
@@ -14,12 +15,17 @@ class User {
 
 class Channel {
 	public:
+		Channel();
 		std::string topic;
+		std::string topicSetter;
 		std::list<std::string> modes;
 		std::unordered_map<std::string, std::list<std::string>> listModes;
+		std::unordered_map<std::string, bool> listComplete;
 		std::set<std::string> users;
-		std::unordered_map<std::string, char> statuses;
+		std::unordered_map<std::string, std::list<char>> statuses;
 		time_t timestamp;
+		bool namesComplete;
+		bool whoCalled;
 };
 
 class LocalClient : public User {
@@ -29,6 +35,7 @@ class LocalClient : public User {
 		std::string gecos;
 		std::set<std::string> modes;
 		std::set<char> snomasks;
+		bool registered;
 		std::shared_ptr<Socket> connection;
 		std::deque<std::string> sendQueue;
 		std::thread receiveThread, sendThread, secondsThread;
@@ -44,7 +51,9 @@ class LocalClient : public User {
 
 User::User(std::string theNick, std::string theIdent, std::string theHost) : nick(theNick), ident(theIdent), host(theHost) {}
 
-LocalClient::LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), id(clientid), gecos(theGecos), module(modClass) {}
+Channel::Channel() : timestamp(0), namesComplete(false), whoCalled(false) {}
+
+LocalClient::LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), id(clientid), gecos(theGecos), registered(false), module(modClass) {}
 
 void LocalClient::receive() {
 	while (true) {
@@ -510,6 +519,7 @@ class Client : public Protocol {
 		
 		std::list<std::string> chanList();
 		std::string chanTopic(const std::string& channel);
+		std::string chanTopicSetter(const std::string& channel);
 		time_t chanTimestamp(const std::string& channel);
 		std::set<std::string> chanUsers(const std::string& channel);
 		bool userInChan(const std::string& channel, const std::string& user);
@@ -561,6 +571,7 @@ class Client : public Protocol {
 		
 		void processIncoming(const std::string& client, const std::string& line);
 		static std::vector<std::string> parseLine(const std::string& line);
+		static std::tuple<std::string, std::string, std::string> parseHostmask(const std::string& hostmask);
 		unsigned int currID;
 		std::string newID();
 		
@@ -613,7 +624,7 @@ void Client::connectServer() {
 					std::cerr << "An unknown socket error occurred for client " << i << " to server " << serverName << "." << std::endl;
 			}
 			if (sockSuccess) {
-				std::shared_ptr<LocalClient> newClient (new LocalClient (config[clientNum.str() + "/id"], config[clientNum.str() + "/nick"], config[clientNum.str() + "/ident", "", config[clientNum.str() + "/gecos"], this));
+				std::shared_ptr<LocalClient> newClient (new LocalClient (config[clientNum.str() + "/id"], config[clientNum.str() + "/nick"], config[clientNum.str() + "/ident"], "", config[clientNum.str() + "/gecos"], this));
 				connClients.insert(std::pair<std::string, std::shared_ptr<LocalClient>> (config[clientNum.str() + "/id"], newClient));
 				newClient->connection = clientSocket;
 				newClient->sendLine("CAP LS");
@@ -1018,7 +1029,7 @@ std::pair<std::string, char> Client::compareStatus(char status0, char status1) {
 	return std::pair<std::string, char> ("", ' ');
 }
 
-std::list<std::string> chanList() {
+std::list<std::string> Client::chanList() {
 	std::list<std::string> inChans;
 	for (std::pair<std::string, std::shared_ptr<Channel>> channel : channels)
 		inChans.push_back(channel.first);
@@ -1030,6 +1041,13 @@ std::string Client::chanTopic(const std::string& channel) {
 	if (chanIter == channels.end())
 		return "";
 	return chanIter->second->topic;
+}
+
+std::string Client::chanTopicSetter(const std::string& channel) {
+	std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return "";
+	return chanIter->second->topicSetter;
 }
 
 time_t Client::chanTimestamp(const std::string& channel) {
@@ -1307,7 +1325,328 @@ void Client::processedOutUserCTCPReply(const std::string& client, const std::str
 }
 
 void Client::processIncoming(const std::string& client, const std::string& line) {
-	
+	std::vector<std::string> parsedLine = parseLine(line);
+	std::unordered_map<std::string, std::shared_ptr<LocalClient>>::iterator clientIter = connClients.find(client);
+	if (parsedLine[0] == "PING") {
+		clientIter->second->sendLine("PONG :" + parsedLine[1]);
+		callServerPingHook(parsedLine[1]);
+	} else if (parsedLine[1] == "PONG")
+		callServerPongHook(parsedLine[2]);
+	else if (parsedLine[1] == "CAP") {
+		if (parsedLine[3] == "LS") {
+			std::list<std::string> capList;
+			std::string buffer;
+			for (char capChar : parsedLine[4]) {
+				if (capChar == ' ') {
+					capList.push_back(buffer);
+					buffer.clear();
+				} else
+					buffer += capChar;
+			}
+			if (!buffer.empty())
+				capList.push_back(buffer);
+			std::string capResponse;
+			for (std::string cap : capList) {
+				if (cap == "multi-prefix")
+					capResponse += " multi-prefix";
+				else if (cap == "userhost-in-names")
+					capResponse += " userhost-in-names";
+			}
+			callServerCapHook(client, "LS", parsedLine[4]);
+			std::this_thread::sleep_for(std::chrono::seconds(1)); // Give modules a chance to react before we process ACK, etc. which will send CAP END
+			if (!capResponse.empty())
+				clientIter->second->sendLine("CAP REQ :" + capResponse.substr(1));
+			else
+				clientIter->second->sendLine("CAP END");
+		} else if ((parsedLine[3] == "ACK" || parsedLine[3] == "NAK") && !clientIter->second->registered) {
+			callServerCapHook(client, parsedLine[3], parsedLine[4]);
+			clientIter->second->sendLine("CAP END");
+		} else
+			callServerCapHook(client, parsedLine[3], parsedLine[4]);
+	} else if (parsedLine[1] == "001") { // registered
+		clientIter->second->registered = true;
+		callNumericHook(client, "001", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "005") { // supports
+		for (std::vector<std::string>::iterator tokenIter = parsedLine.begin() + 3; tokenIter != parsedLine.end(); ++tokenIter) {
+			if ((*tokenIter).substr(0, 7) == "PREFIX=") {
+				std::string prefixes = (*tokenIter).substr(8);
+				std::string modes, symbols;
+				std::string::iterator prefixIter = prefixes.begin();
+				while ((*prefixIter) != ')') {
+					modes += *prefixIter;
+					++prefixIter;
+				}
+				++prefixIter; // Skip over the close-paren
+				while (prefixIter != prefixes.end()) {
+					symbols += prefixIter;
+					++prefixIter;
+				}
+				for (size_t i = 0; i < modes.size(); i++) {
+					std::unordered_map<char, std::string>::iterator convIter = convertChanMode.find(modes[i]);
+					if (convIter != convertChanMode.end())
+						prefixes.push_back(std::pair<std::string, char> (convertChanMode[modes[i]], symbols[i]));
+					else {
+						std::cerr << "Config error: mode " << modes[i] << " was not able to be converted to a long-name mode!  This may or may not be a major problem." << std::endl;
+						prefixes.push_back(std::pair<std::string, char> (std::string(modes[i]), symbols[i]));
+					}
+				}
+			} else if ((*tokenIter).substr(0, 6) == "MODES=") {
+				std::istringstream maxModesStr ((*tokenIter).substr(6));
+				maxModesStr >> maxModes;
+			} else if ((*tokenIter).substr(0, 10) == "CHANMODES=") {
+				unsigned int section = 0;
+				for (char mode : (*tokenIter).substr(10)) {
+					if (mode == ',')
+						section++;
+					else {
+						std::string addMode;
+						std::unordered_map<char, std::string>::iterator convIter = convertChanMode.find(mode);
+						if (convIter == convertChanMode.end())
+							addMode = mode;
+						else
+							addMode = convIter->second;
+						switch(section) {
+							case 0:
+								listModes.insert(addMode);
+								break;
+							case 1:
+								paramParamModes.insert(addMode);
+								break;
+							case 2:
+								paramModes.insert(addMode);
+								break;
+							case 3:
+								normalModes.insert(addMode);
+						}
+					}
+				}
+			} else if ((*tokenIter).substr(0, 10) == "CHANTYPES=") {
+				for (char type : (*tokenIter).substr(10))
+					chanTypes.insert(type);
+			}
+		}
+		callNumericHook(client, "005", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "352") { // WHO reply
+		std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(parsedLine[7]);
+		if (userIter != users.end()) { // If it is, it's probably a client, which can handle itself.
+			userIter->second->ident = parsedLine[4];
+			userIter->second->host = parsedLine[5];
+		}
+		callNumericHook(client, "352", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "353") { // NAMES reply
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[4]);
+		if (chanIter != channels.end()) { // If it's not in channels, it's possible a module requested NAMES on a channel we're not in
+			if (chanIter->second.namesComplete) {
+				chanIter->second->statuses.clear();
+				for (std::string user : chanIter->second->users)
+					users.find(user)->second->channels.erase(chanIter->first);
+				chanIter->second->users.clear();
+				chanIter->second->namesComplete = false;
+				chanIter->second->whoCalled = false;
+			}
+			std::list<std::string> names;
+			std::string buffer;
+			for (char nameChar : parsedLine[5]) {
+				if (nameChar == ' ') {
+					names.push_back(buffer);
+					buffer = "";
+				} else
+					buffer += nameChar;
+			}
+			if (!buffer.empty())
+				names.push_back(buffer);
+			for (std::string name : names) {
+				std::string nick, ident, host;
+				std::list<char> statuses;
+				for (std::pair<std::string, char> status : prefixes) {
+					if (name[0] == status.second) {
+						statuses.push_back(status.second);
+						name = name.substr(1);
+					}
+				}
+				std::tie(nick, ident, host) = parseHostmask(name);
+				if ((ident.empty() || host.empty()) && !chanIter->second->whoCalled) {
+					clientIter->second->sendLine("WHO " + chanIter->first);
+					chanIter->second->whoCalled = true;
+				}
+				std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(nick);
+				if (userIter == users.end())
+					userIter = users.insert(std::pair<std::string, std::shared_ptr<User>> (nick, new User (nick, ident, host))).first;
+				else {
+					userIter->second->ident = ident;
+					userIter->second->host = host;
+				}
+				userIter->second->channels.insert(chanIter->first);
+				chanIter->second->users.insert(nick);
+				if (!statuses.empty())
+					chanIter->second->statuses.insert(std::pair<std::string, std::list<char>> (nick, statuses));
+			}
+		}
+		callNumericHook(client, "353", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "366") { // end of NAMES reply
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->namesComplete = true;
+		callNumericHook(client, "366", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "332") { // channel topic
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->topic = parsedLine[4];
+		callNumericHook(client, "332", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "333") { // topic setter
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->topicSetter = parsedLine[4];
+		callNumericHook(client, "333", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "324") { // channel modes
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end()) {
+			chanIter->second->modes.clear();
+			size_t currParam = 5;
+			for (char mode : parsedLine[4]) {
+				if (mode == '+')
+					continue;
+				std::string longMode = mode;
+				std::unordered_map<char, std::string> convIter = convertChanMode.find(mode);
+				if (convIter != convertChanMode.end())
+					longMode = convIter->second;
+				if (normalModes.find(longMode) == normalModes.end())
+					longMode += ("=" + parsedLine[currParam++]);
+				chanIter->second->modes.push_back(longMode);
+			}
+		}
+		callNumericHook(client, "324", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "329") { // channel timestamp
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end()) {
+			std::istringstream tsStr (parsedLine[4]);
+			tsStr >> chanIter->second->timestamp;
+		}
+		callNumericHook(client, "329", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "367") { // ban list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end()) {
+			if (chanIter->second->listComplete["ban"]) {
+				chanIter->second->listComplete["ban"] = false;
+				chanIter->second->listModes["ban"].clear();
+			}
+			chanIter->second->listModes["ban"].push_back(parsedLine[4]);
+		}
+		callNumericHook(client, "367", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "368") { // end of ban list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->listComplete["ban"] = true;
+		callNumericHook(client, "368", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "348") { // ban exception list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end()) {
+			if (chanIter->second->listComplete["banexception"]) {
+				chanIter->second->listComplete["banexception"] = false;
+				chanIter->second->listModes["banexception"].clear();
+			}
+			chanIter->second->listModes["banexception"].push_back(parsedLine[4]);
+		}
+		callNumericHook(client, "348", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "349") { // end of ban exception list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->listComplete["banexception"] = true;
+		callNumericHook(client, "349", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "346") { // invite exception list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end()) {
+			if (chanIter->second->listComplete["invex"]) {
+				chanIter->second->listComplete["invex"] = false;
+				chanIter->second->listModes["invex"].clear();
+			}
+			chanIter->second->listModes["invex"].push_back(parsedLine[4]);
+		}
+		callNumericHook(client, "346", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "347") { // end of invite exception list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->listComplete["invex"] = true;
+		callNumericHook(client, "347", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "941") { // spamfilter list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end()) {
+			if (chanIter->second->listComplete["filter"]) {
+				chanIter->second->listComplete["filter"] = false;
+				chanIter->second->listModes["filter"].clear();
+			}
+			chanIter->second->listModes["filter"].push_back(parsedLine[4]);
+		}
+		callNumericHook(client, "941", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "940") { // end of spamfilter list
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[3]);
+		if (chanIter != channels.end())
+			chanIter->second->listComplete["filter"] = true;
+		callNumericHook(client, "940", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "710") { // user knocked on channel
+		std::string nick;
+		std::tie(nick, std::ignore, std::ignore) = parseHostmask(parsedLine[4]);
+		callChanKnockHook(parsedLine[3], parsedLine[4], parsedLine[5]);
+	} else if (parsedLine[1].size() == 3 && (parsedLine[1][0] >= '0' && parsedLine[1][0] <= '9') && (parsedLine[1][1] >= '0' && parsedLine[1][1] <= '9') && (parsedLine[1][2] >= '0' &7 parsedLine[1][0] <= '9'))
+		callNumericHook(client, parsedLine[1], std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	else if (parsedLine[1] == "PRIVMSG") {
+		
+	} else if (parsedLine[1] == "NOTICE") {
+		
+	} else if (parsedLine[1] == "MODE") {
+		std::string sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::string nick, ident, host;
+		std::tie(nick, ident, host) = parseHostmask(sourceHostmask);
+		if (nick == clientIter->second->nick) {
+			// Update the ident and the host of this client so that we're always fairly up-to-date even in the case of our ident/host being changed by opers or whatever.
+			clientIter->second->ident = ident;
+			clientIter->second->host = host;
+		}
+		// TODO: this
+	} else if (parsedLine[1] == "JOIN") {
+		std::string sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::string nick, ident, host;
+		std::tie(nick, ident, host) = parseHostmask(sourceHostmask);
+		if (nick == clientIter->second->nick) {
+			// Update the ident and the host of this client so that we're always fairly up-to-date even in the case of our ident/host being changed by opers or whatever.
+			clientIter->second->ident = ident;
+			clientIter->second->host = host;
+			// Also add the channel in question to the client's channels
+			std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
+			if (chanIter == channels.end())
+				channels.insert(std::pair<std::string, std::shared_ptr<Channel>> (parsedLine[2], new Channel));
+			clientIter->second->channels.insert(parsedLine[2]);
+			callChanJoinHook(parsedLine[2], nick);
+		} else {
+			std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(nick);
+			if (userIter == users.end())
+				userIter = users.insert(std::pair<std::string, std::shared_ptr<User>> (nick, new User (nick, ident, host))).first;
+			userIter->second->channels.insert(parsedLine[1]);
+			std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
+			if (chanIter->second->users.find(nick) == chanIter->second.users.end()) {
+				chanIter->second->users.insert(nick);
+				callChanJoinHook(chanIter->first, nick);
+			}
+		}
+	} else if (parsedLine[1] == "PART") {
+		
+	} else if (parsedLine[1] == "QUIT") {
+		
+	} else if (parsedLine[1] == "KICK") {
+		
+	} else if (parsedLine[1] == "TOPIC") {
+		
+	} else if (parsedLine[1] == "INVITE") {
+		
+	} else if (parsedLine[1] == "NICK") {
+		
+	} else {
+		
+	}
 }
 
 std::vector<std::string> Client::parseLine(const std::string& line) {
@@ -1330,6 +1669,19 @@ std::vector<std::string> Client::parseLine(const std::string& line) {
 	if (!part.empty())
 		tokens.push_back(part);
 	return tokens;
+}
+
+std::tuple<std::string, std::string, std::string> Client::parseHostmask(const std::string& hostmask) {
+	std::string nick (hostmask);
+	size_t identStart = nick.find('!');
+	if (identStart == std::string::npos)
+		return std::make_tuple(nick, "", "");
+	std::string ident (nick.substr(identStart + 1));
+	nick = nick.substr(0, identStart);
+	size_t hostStart = ident.find('@');
+	std::string host (ident.substr(hostStart + 1));
+	ident = ident.substr(0, hostStart);
+	return std::make_tuple(nick, ident, host);
 }
 
 std::string Client::newID() {
