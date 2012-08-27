@@ -32,10 +32,12 @@ class LocalClient : public User {
 	public:
 		LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass);
 		std::string id;
+		std::string altNick;
 		std::string gecos;
 		std::set<std::string> modes;
 		std::set<char> snomasks;
 		bool registered;
+		bool triedAlt;
 		std::shared_ptr<Socket> connection;
 		std::deque<std::string> sendQueue;
 		std::thread receiveThread, sendThread, secondsThread;
@@ -53,7 +55,7 @@ User::User(std::string theNick, std::string theIdent, std::string theHost) : nic
 
 Channel::Channel() : timestamp(0), namesComplete(false), whoCalled(false) {}
 
-LocalClient::LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), id(clientid), gecos(theGecos), registered(false), module(modClass) {}
+LocalClient::LocalClient(std::string clientid, std::string theNick, std::string theIdent, std::string theHost, std::string theGecos, Client* modClass) : User(theNick, theIdent, theHost), id(clientid), gecos(theGecos), registered(false), triedAlt(false), module(modClass) {}
 
 void LocalClient::receive() {
 	while (true) {
@@ -632,6 +634,7 @@ void Client::connectServer() {
 					newClient->sendLine("PASS " + config[clientNum.str() + "/password"]);
 				newClient->sendLine("NICK " + newClient->nick);
 				newClient->sendLine("USER " + newClient->ident + " localhost " + serverName + " :" + newClient->gecos);
+				newClient->altNick = config[clientNum.str() + "/altnick"];
 				newClient->receiveThread = std::thread(&LocalClient::receive, newClient.get());
 				if (floodControl) {
 					newClient->sendThread = std::thread(&LocalClient::send, newClient.get());
@@ -1426,6 +1429,10 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			}
 		}
 		callNumericHook(client, "005", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+	} else if (parsedLine[1] == "433" && !clientIter->second->registered && !clientIter->second->triedAlt) {
+		clientIter->second->sendLine("NICK " + clientIter->second->altNick);
+		clientIter->second->triedAlt = true;
+		callNumericHook(client, "433", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
 	} else if (parsedLine[1] == "352") { // WHO reply
 		std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(parsedLine[7]);
 		if (userIter != users.end()) { // If it is, it's probably a client, which can handle itself.
