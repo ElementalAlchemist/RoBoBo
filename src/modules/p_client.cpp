@@ -1853,3 +1853,5 @@ std::string Client::newID() {
 	}
 	return strID.str();
 }
+
+PROTOCOL_SPAWN(Client)
