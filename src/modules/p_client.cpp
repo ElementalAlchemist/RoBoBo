@@ -341,7 +341,7 @@ void LocalClient::processSend(const std::string& message) {
 				for (std::pair<std::string, char> status : module->prefixes) {
 					if (status.second == parsedLine[1][0]) {
 						chanCTCP = true;
-						 module->callChanCTCPSendHook(id, parsedLine[1].substr(1), parsedLine[1][0], ctcp, params);
+						module->callChanCTCPSendHook(id, parsedLine[1].substr(1), parsedLine[1][0], ctcp, params);
 						break;
 					}
 				}
@@ -1590,9 +1590,169 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 	} else if (parsedLine[1].size() == 3 && (parsedLine[1][0] >= '0' && parsedLine[1][0] <= '9') && (parsedLine[1][1] >= '0' && parsedLine[1][1] <= '9') && (parsedLine[1][2] >= '0' &7 parsedLine[1][0] <= '9'))
 		callNumericHook(client, parsedLine[1], std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
 	else if (parsedLine[1] == "PRIVMSG") {
-		
+		std::string hostmask = parsedLine[0];
+		if (hostmask[0] == ':')
+			hostmask = hostmask.substr(1);
+		std::string nick;
+		std::tie(nick, std::ignore, std::ignore) = parseHostmask(hostmask);
+		size_t ctcpCount = 0;
+		for (char msgChar : parsedLine[3]) {
+			if (msgChar == (char)1)
+				ctcpCount++;
+		}
+		// Detect whether the whole message is a CTCP
+		if ((ctcpCount == 1 && parsedLine[3][0] == (char)1) || (ctcpCount == 2 && parsedLine[3][0] == (char)1 && parsedLine[3][parsedLine[3].size() - 1] == (char)1)) {
+			std::string ctcpMsg = parsedLine[3].substr(1);
+			if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+				ctcpMsg = ctcpMsg.substr(0, ctcpMsg.size() - 1);
+			size_t ctcpSpace = ctcpMsg.find(' ');
+			std::string ctcp = ctcpMsg.substr(0, ctcpSpace);
+			std::string params;
+			if (ctcpSpace != std::string::npos)
+				params = ctcpMsg.substr(ctcpSpace + 1);
+			// Call the appropriate hook based on whether it's being sent to a channel or a user
+			if (chanTypes.find(parsedLine[2][0]) != chanTypes.end())
+				callChanCTCPHook(client, parsedLine[2], ' ', nick, ctcp, params);
+			else if (chanTypes.find(parsedLine[2][1]) != chanTypes.end()) {
+				bool chanCTCP = false;
+				for (std::pair<std::string, char> status : prefixes) {
+					if (status.second == parsedLine[2][0]) {
+						chanCTCP = true;
+						callChanCTCPHook(client, parsedLine[2].substr(1), parsedLine[2][0], nick, ctcp, params);
+						break;
+					}
+				}
+				if (!chanCTCP)
+					callUserCTCPHook(client, nick, ctcp, params);
+			} else
+				callUserCTCPHook(client, nick, ctcp, params);
+		} else {
+			// Either none or part of the message is CTCP; pick out the CTCP parts to make appropriate hook calls
+			std::list<std::pair<std::string, std::string>> ctcpBits;
+			size_t ctcpPos = 0;
+			ctcpPos = parsedLine[3].find((char)1);
+			while (ctcpPos != std::string::npos) {
+				size_t startCTCP = ctcpPos;
+				ctcpPos = parsedLine[3].find((char)1, ctcpPos + 1);
+				std::string ctcpSegment = parsedLine[3].substr(startCTCP + 1, ctcpPos - (startCTCP + 1));
+				if (!ctcpSegment.empty()) {
+					size_t spacePos = ctcpSegment.find(' ');
+					if (spacePos == std::string::npos)
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment, ""));
+					else
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1)));
+				}
+				ctcpPos = parsedLine[3].find((char)1, ctcpPos + 1);
+			}
+			// Call the appropriate hooks for the whole message and the CTCP bits based on whether it's being sent to a channel or to a user
+			if (chanTypes.find(parsedLine[2][0]) != chanTypes.end()) {
+				callChanMsgHook(client, parsedLine[2], ' ', nick, parsedLine[3]);
+				for (std::pair<std::string, std::string> ctcp : ctcpBits)
+					callChanCTCPHook(client, parsedLine[2], ' ', nick, ctcp.first, ctcp.second);
+			} else if (chanTypes.find(parsedLine[2][1]) != chanTypes.end()) {
+				bool chanCTCP = false;
+				for (std::pair<std::string, char> status : prefixes) {
+					if (status.second == parsedLine[2][0]) {
+						chanCTCP = true;
+						callChanMsgHook(client, parsedLine[2].substr(1), parsedLine[2][0], nick, parsedLine[3]);
+						for (std::pair<std::string, std::string> ctcp : ctcpBits)
+							callChanCTCPHook(client, parsedLine[2].substr(1), parsedLine[2][0], nick, ctcp.first, ctcp.second);
+						break;
+					}
+				}
+				if (!chanCTCP) {
+					callUserMsgHook(client, nick, parsedLine[3]);
+					for (std::pair<std::string, std::string> ctcp : ctcpBits)
+						callUserCTCPHook(client, nick, ctcp.first, ctcp.second);
+				}
+			} else {
+				callUserMsgHook(client, nick, parsedLine[3]);
+				for (std::pair<std::string, std::string> ctcp : ctcpBits)
+					callUserCTCPHook(client, nick, ctcp.first, ctcp.second);
+			}
+		}
 	} else if (parsedLine[1] == "NOTICE") {
-		
+		std::string hostmask = parsedLine[0];
+		if (hostmask[0] == ':')
+			hostmask = hostmask.substr(1);
+		std::string nick;
+		std::tie(nick, std::ignore, std::ignore) = parseHostmask(hostmask);
+		size_t ctcpCount = 0;
+		for (char msgChar : parsedLine[3]) {
+			if (msgChar == (char)1)
+				ctcpCount++;
+		}
+		// Detect whether the whole message is a CTCP
+		if ((ctcpCount == 1 && parsedLine[3][0] == (char)1) || (ctcpCount == 2 && parsedLine[3][0] == (char)1 && parsedLine[3][parsedLine[3].size() - 1] == (char)1)) {
+			std::string ctcpMsg = parsedLine[3].substr(1);
+			if (parsedLine[3][parsedLine[3].size() - 1] == (char)1)
+				ctcpMsg = ctcpMsg.substr(0, ctcpMsg.size() - 1);
+			size_t ctcpSpace = ctcpMsg.find(' ');
+			std::string ctcp = ctcpMsg.substr(0, ctcpSpace);
+			std::string params;
+			if (ctcpSpace != std::string::npos)
+				params = ctcpMsg.substr(ctcpSpace + 1);
+			// Call the appropriate hook based on whether it's being sent to a channel or a user
+			if (chanTypes.find(parsedLine[2][0]) != chanTypes.end())
+				callChanCTCPReplyHook(client, parsedLine[2], ' ', nick, ctcp, params);
+			else if (chanTypes.find(parsedLine[2][1]) != chanTypes.end()) {
+				bool chanCTCP = false;
+				for (std::pair<std::string, char> status : prefixes) {
+					if (status.second == parsedLine[2][0]) {
+						chanCTCP = true;
+						callChanCTCPReplyHook(client, parsedLine[2].substr(1), parsedLine[2][0], nick, ctcp, params);
+						break;
+					}
+				}
+				if (!chanCTCP)
+					callUserCTCPReplyHook(client, nick, ctcp, params);
+			} else
+				callUserCTCPReplyHook(client, nick, ctcp, params);
+		} else {
+			// Either none or part of the message is CTCP; pick out the CTCP parts to make appropriate hook calls
+			std::list<std::pair<std::string, std::string>> ctcpBits;
+			size_t ctcpPos = 0;
+			ctcpPos = parsedLine[3].find((char)1);
+			while (ctcpPos != std::string::npos) {
+				size_t startCTCP = ctcpPos;
+				ctcpPos = parsedLine[3].find((char)1, ctcpPos + 1);
+				std::string ctcpSegment = parsedLine[3].substr(startCTCP + 1, ctcpPos - (startCTCP + 1));
+				if (!ctcpSegment.empty()) {
+					size_t spacePos = ctcpSegment.find(' ');
+					if (spacePos == std::string::npos)
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment, ""));
+					else
+						ctcpBits.push_back(std::pair<std::string, std::string> (ctcpSegment.substr(0, spacePos), ctcpSegment.substr(spacePos + 1)));
+				}
+				ctcpPos = parsedLine[3].find((char)1, ctcpPos + 1);
+			}
+			// Call the appropriate hooks for the whole message and the CTCP bits based on whether it's being sent to a channel or to a user
+			if (chanTypes.find(parsedLine[2][0]) != chanTypes.end()) {
+				callChanNoticeHook(client, parsedLine[2], ' ', nick, parsedLine[3]);
+				for (std::pair<std::string, std::string> ctcp : ctcpBits)
+					callChanCTCPReplyHook(client, parsedLine[2], ' ', nick, ctcp.first, ctcp.second);
+			} else if (chanTypes.find(parsedLine[2][1]) != chanTypes.end()) {
+				bool chanCTCP = false;
+				for (std::pair<std::string, char> status : prefixes) {
+					if (status.second == parsedLine[2][0]) {
+						chanCTCP = true;
+						callChanNoticeHook(client, parsedLine[2].substr(1), parsedLine[2][0], nick, parsedLine[3]);
+						for (std::pair<std::string, std::string> ctcp : ctcpBits)
+							callChanCTCPReplyHook(client, parsedLine[2].substr(1), parsedLine[2][0], nick, ctcp.first, ctcp.second);
+						break;
+					}
+				}
+				if (!chanCTCP) {
+					callUserNoticeHook(client, nick, parsedLine[3]);
+					for (std::pair<std::string, std::string> ctcp : ctcpBits)
+						callUserCTCPReplyHook(client, nick, ctcp.first, ctcp.second);
+				}
+			} else {
+				callUserNoticeHook(client, nick, parsedLine[3]);
+				for (std::pair<std::string, std::string> ctcp : ctcpBits)
+					callUserCTCPReplyHook(client, nick, ctcp.first, ctcp.second);
+			}
+		}
 	} else if (parsedLine[1] == "MODE") {
 		std::string sourceHostmask (parsedLine[0]);
 		if (sourceHostmask[0] == ':')
