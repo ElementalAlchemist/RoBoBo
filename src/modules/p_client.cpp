@@ -1771,7 +1771,131 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			clientIter->second->ident = ident;
 			clientIter->second->host = host;
 		}
-		// TODO: this
+		if (parsedLine[2] == clientIter->second->nick) {
+			bool adding = true;
+			for (char mode : parsedLine[3]) {
+				if (mode == '+')
+					adding = true;
+				else if (mode == '-')
+					adding = false;
+				else {
+					std::string longMode;
+					std::unordered_map<char, std::string>::iterator convIter = convertUserMode.find(mode);
+					if (convIter == convertUserMode.end())
+						longMode = mode;
+					else
+						longMode = convIter->second;
+					if (longMode == "snomask") {
+						bool snoAdding = true;
+						for (char snomask : parsedLine[4]) {
+							if (snomask == '+')
+								adding = true;
+							else if (snomask == '-')
+								adding = false;
+							else if (adding)
+								clientIter->second->snomasks.insert(snomask);
+							else
+								clientIter->second->snomasks.erase(snomask);
+						}
+					} else {
+						if (adding)
+							clientIter->second->modes.insert(longMode);
+						else
+							clientIter->second->modes.erase(longMode);
+					}
+				}
+			}
+		} else { // channel
+			std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
+			size_t currParam = 4;
+			bool adding = true;
+			for (char mode : parsedLine[3]) {
+				if (mode == '+')
+					adding = true;
+				else if (mode == '-')
+					adding = false;
+				else {
+					std::string longMode;
+					std::unordered_map<char, std::string>::iterator convIter = convertChanMode.find(mode);
+					if (convIter == convertChanMode.end())
+						longMode = mode;
+					else
+						longMode = convIter->second;
+					if (paramParamModes.find(longMode) != paramParamModes.end() || paramModes.find(longMode) != paramModes.end()) {
+						std::list<std::string>::iterator modeIter = chanIter->second->modes.begin();
+						for (; modeIter != chanIter->second->modes.end(); ++modeIter) {
+							std::string chanMode = *modeIter;
+							chanMode = chanMode.substr(0, chanMode.find('='));
+							if (chanMode == longMode)
+								break;
+						}
+						if (modeIter != chanIter->second->modes.end())
+							chanIter->second->modes.remove(modeIter);
+						if (adding)
+							chanIter->second->modes.push_back(longMode + "=" + parsedLine[currParam++]);
+						else if (paramParamModes.find(longMode) != paramParamModes.end())
+							currParam++;
+					} else if (listModes.find(longMode) != listModes.end()) {
+						std::unordered_map<std::string, std::list<std::string>>::iterator listIter = chanIter->second->listModes[longMode].begin();
+						for (; listIter != chanIter->second->listModes[longMode].end(); ++listIter) {
+							if (listIter == parsedLine[currParam])
+								break;
+						}
+						if (adding && listIter == chanIter->second->listModes[longMode].end())
+							chanIter->second->listModes[longMode].push_back(parsedLine[currParam++]);
+						else if (!adding && listIter != chanIter->second->listModes[longMode].end()) {
+							chanIter->second->listModes[longMode].erase(listIter);
+							currParam++;
+						}
+					} else if (normalModes.find(longMode) != normalModes.end()) {
+						std::unordered_map<std::string, std::list<std::string>>::iterator modeIter = chanIter->second->modes.begin();
+						for (; modeIter != chanIter->second->modes.end(); ++modeIter) {
+							if (*modeIter == longMode)
+								break;
+						}
+						if (adding && modeIter == chanIter->second->modes.end())
+							chanIter->second->modes.push_back(longMode);
+						else if (!adding && modeIter != chanIter->second->modes.end())
+							chanIter->second->modes.erase(modeIter);
+					} else { // status
+						char symbol = ' ';
+						for (std::pair<std::string, char> status : prefixes) {
+							if (status.first == longMode) {
+								symbol = status.second;
+								break;
+							}
+						}
+						if (symbol != ' ') {
+							std::list<char>::iterator statusIter = chanIter->second->statuses[params[currParam]].begin();
+							for (; statusIter != chanIter->second->statuses[params[currParam]].end(); ++statusIter) {
+								if (*statusIter == symbol)
+									break;
+							}
+							if (adding && statusIter == chanIter->second->statuses[params[currParam]].end()) {
+								std::list<std::pair<std::string, char>>::iterator prefixIter = prefixes.begin();
+								bool success = false;
+								for (std::list<char>::iterator userStatusIter = chanIter->second->statuses[params[currParam]].begin(); userStatusIter != chanIter->second->statuses[params[currParam]].end(); ++userStatusIter) {
+									while (prefixIter != prefixes.end() && prefixIter->second != *userStatusIter) {
+										if (prefixIter->second == symbol) {
+											chanIter->second->statuses[params[currParam]].insert(userStatusIter, symbol);
+											success = true;
+											break;
+										}
+										++prefixIter;
+									}
+									if (success)
+										break;
+								}
+								if (!success && prefixIter == prefixes.end())
+									chanIter->second->statuses[params[currParam]].push_back(symbol);
+							} else if (!adding && statusIter != chanIter->second->statuses[params[currParam]].end())
+								chanIter->second->statuses[params[currParam]].erase(statusIter);
+						}
+						currParam++;
+					}
+				}
+			}
+		}
 	} else if (parsedLine[1] == "JOIN") {
 		std::string sourceHostmask (parsedLine[0]);
 		if (sourceHostmask[0] == ':')
