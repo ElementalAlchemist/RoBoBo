@@ -111,6 +111,7 @@ class Protocol {
 		void callChanCTCPReplyHook(const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params);
 		void callUserCTCPReplyHook(const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params);
 		void callChanModeHook(const std::string& channel, bool add, const std::string& mode);
+		void callChanStatusHook(const std::string& channel, bool add, const std::string& user, const std::string& rank);
 		void callUserModeHook(const std::string& nick, bool add, const std::string& mode);
 		void callUserSNOmaskHook(const std::string& nick, bool add, char snomask);
 		void callChanJoinHook(const std::string& channel, const std::string& user);

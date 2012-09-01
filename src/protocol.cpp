@@ -44,6 +44,10 @@ inline void Protocol::callChanModeHook(const std::string& channel, bool add, con
 	bot->modChanModeHook(serverName, channel, add, mode);
 }
 
+inline void Protocol::callChanStatusHook(const std::string& channel, bool add, const std::string& user, const std::string& rank) {
+	bot->modChanStatusHook(serverName, channel, add, user, rank);
+}
+
 inline void Protocol::callUserModeHook(const std::string& nick, bool add, const std::string& mode) {
 	bot->modUserModeHook(serverName, nick, add, mode);
 }

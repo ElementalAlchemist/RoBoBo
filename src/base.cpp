@@ -1410,6 +1410,20 @@ void Base::callChanModeHooks(std::string server, std::string channel, bool add, 
 		module.second->onChanMode(server, channel, add, mode);
 }
 
+void Base::callChanStatusHooks(std::string server, std::string channel, bool add, std::string user, std::string rank) {
+	MutexManager hookManage (&modHookMutex);
+	for (std::pair<std::string, Module*> module : highModules)
+		module.second->onChanStatus(server, channel, add, user, rank);
+	for (std::pair<std::string, Module*> module : mediumHighModules)
+		module.second->onChanStatus(server, channel, add, user, rank);
+	for (std::pair<std::string, Module*> module : normalModules)
+		module.second->onChanStatus(server, channel, add, user, rank);
+	for (std::pair<std::string, Module*> module : mediumLowModules)
+		module.second->onChanStatus(server, channel, add, user, rank);
+	for (std::pair<std::string, Module*> module : lowModules)
+		module.second->onChanStatus(server, channel, add, user, rank);
+}
+
 void Base::callUserModeHooks(std::string server, std::string nick, bool add, std::string mode) {
 	MutexManager hookManage (&modHookMutex);
 	for (std::pair<std::string, Module*> module : highModules)

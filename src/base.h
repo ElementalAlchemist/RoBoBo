@@ -121,6 +121,7 @@ class Base {
 		void modChanCTCPReplyHook(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params) { std::thread(&Base::callChanCTCPReplyHooks, this, server, client, channel, status, nick, ctcp, params).detach(); }
 		void modUserCTCPReplyHook(const std::string& server, const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { std::thread(&Base::callUserCTCPReplyHooks, this, server, client, nick, ctcp, params).detach(); }
 		void modChanModeHook(const std::string& server, const std::string& channel, bool add, const std::string& mode) { std::thread(&Base::callChanModeHooks, this, server, channel, add, mode).detach(); }
+		void modChanStatusHook(const std::string& server, const std::string& channel, bool add, const std::string& user, const std::string& rank) { std::thread(&Base::callChanStatusHooks, this, server, channel, add, user, rank).detach(); }
 		void modUserModeHook(const std::string& server, const std::string& nick, bool add, const std::string& mode) { std::thread(&Base::callUserModeHooks, this, server, nick, add, mode).detach(); }
 		void modUserSNOmaskHook(const std::string& server, const std::string& nick, bool add, char snomask) { std::thread(&Base::callUserSNOmaskHooks, this, server, nick, add, snomask).detach(); }
 		void modChanJoinHook(const std::string& server, const std::string& channel, const std::string& user) { std::thread(&Base::callChanJoinHooks, this, server, channel, user).detach(); }
@@ -198,6 +199,7 @@ class Base {
 		void callChanCTCPReplyHooks(std::string server, std::string client, std::string channel, char status, std::string nick, std::string ctcp, std::string params);
 		void callUserCTCPReplyHooks(std::string server, std::string client, std::string nick, std::string ctcp, std::string params);
 		void callChanModeHooks(std::string server, std::string channel, bool add, std::string mode);
+		void callChanStatusHooks(std::string server, std::string channel, bool add, std::string user, std::string rank);
 		void callUserModeHooks(std::string server, std::string nick, bool add, std::string mode);
 		void callUserSNOmaskHooks(std::string server, std::string nick, bool add, char snomask);
 		void callChanJoinHooks(std::string server, std::string channel, std::string user);

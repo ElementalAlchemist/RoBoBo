@@ -36,6 +36,7 @@ class Module {
 		virtual MsgAction onChanCTCPReply(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& nick, const std::string& ctcp, const std::string& params) { return MSG_CONTINUE; }
 		virtual MsgAction onUserCTCPReply(const std::string& server, const std::string& client, const std::string& nick, const std::string& ctcp, const std::string& params) { return MSG_CONTINUE; }
 		virtual void onChanMode(const std::string& server, const std::string& channel, bool add, const std::string& mode) {}
+		virtual void onChanStatus(const std::string& server, const std::string& channel, bool add, const std::string& user, const std::string& rank) {}
 		virtual void onUserMode(const std::string& server, const std::string& nick, bool add, const std::string& mode) {}
 		virtual void onUserSNOmask(const std::string& server, const std::string& nick, bool add, char snomask) {}
 		virtual void onChanJoin(const std::string& server, const std::string& channel, const std::string& user) {}
