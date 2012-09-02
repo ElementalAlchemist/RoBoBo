@@ -1949,7 +1949,35 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			}
 		}
 	} else if (parsedLine[1] == "PART") {
-		
+		std::string sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::string nick, ident, host;
+		std::tie(nick, ident, host) = parseHostmask(sourceHostmask);
+		if (nick == clientIter->second->nick) {
+			clientIter->second->ident;
+			clientIter->second->host;
+			clientIter->second->channels.erase(clientIter->second->channels.find(parsedLine[2]));
+			bool inChannel = false;
+			for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients) {
+				if (client.second->channels.find(parsedLine[2]) != client.second->channels.end()) {
+					inChannel = true;
+					break;
+				}
+			}
+			if (!inChannel)
+				channels.erase(channels.find(parsedLine[2]));
+			else
+				channels.find(parsedLine[2])->second->users.erase(nick);
+			callChanPartHook(parsedLine[2], nick, parsedLine[3]);
+		} else {
+			std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
+			std::set<std::string>::iterator usersIter = chanIter->second->users.find(nick);
+			if (usersIter != chanIter->second->users.end()) {
+				chanIter->second->users.erase(usersIter);
+				callChanPartHook(parsedLine[2], nick, parsedLine[3]);
+			}
+		}
 	} else if (parsedLine[1] == "QUIT") {
 		
 	} else if (parsedLine[1] == "KICK") {
