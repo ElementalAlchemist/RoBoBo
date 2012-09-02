@@ -1860,7 +1860,7 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 							std::string param (parsedLine[currParam++]);
 							chanIter->second->listModes[longMode].push_back(param);
 							callChanModeHook(chanIter->first, true, longMode + "=" + param);
-						else if (!adding && listIter != chanIter->second->listModes[longMode].end()) {
+						} else if (!adding && listIter != chanIter->second->listModes[longMode].end()) {
 							chanIter->second->listModes[longMode].erase(listIter);
 							callChanModeHook(chanIter->first, false, longMode + "=" + parsedLine[currParam++]);
 						}
