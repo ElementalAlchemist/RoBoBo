@@ -1792,16 +1792,22 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 								adding = true;
 							else if (snomask == '-')
 								adding = false;
-							else if (adding)
+							else if (adding && clientIter->second->snomasks.find(snomask) == clientIter->second->snomasks.end()) {
 								clientIter->second->snomasks.insert(snomask);
-							else
+								callUserSNOmaskHook(clientIter->second->nick, true, snomask);
+							} else if (!adding && clientIter->second->snomasks.find(snomask) != clientIter->second->snomasks.end()) {
 								clientIter->second->snomasks.erase(snomask);
+								callUserSNOmaskHook(clientIter->second->nick, false, snomask);
+							}
 						}
 					} else {
-						if (adding)
+						if (adding && clientIter->second->modes.find(longMode) == clientIter->second->modes.end()) {
 							clientIter->second->modes.insert(longMode);
-						else
+							callUserModeHook(clientIter->second->nick, true, longMode);
+						} else if (!adding && clientIter->second->modes.find(longMode) != clientIter->second->modes.end()) {
 							clientIter->second->modes.erase(longMode);
+							callUserModeHook(clientIter->second->nick, false, longMode);
+						}
 					}
 				}
 			}
@@ -1824,16 +1830,25 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 					if (paramParamModes.find(longMode) != paramParamModes.end() || paramModes.find(longMode) != paramModes.end()) {
 						std::list<std::string>::iterator modeIter = chanIter->second->modes.begin();
 						for (; modeIter != chanIter->second->modes.end(); ++modeIter) {
-							std::string chanMode = *modeIter;
+							std::string chanMode (*modeIter);
 							chanMode = chanMode.substr(0, chanMode.find('='));
 							if (chanMode == longMode)
 								break;
 						}
-						if (modeIter != chanIter->second->modes.end())
+						if (adding && modeIter != chanIter->second->modes.end() && *modeIter != (longMode + "=" + parsedLine[currParam])) {
+							std::string param (parsedLine[currParam++]);
 							chanIter->second->modes.remove(modeIter);
-						if (adding)
-							chanIter->second->modes.push_back(longMode + "=" + parsedLine[currParam++]);
-						else if (paramParamModes.find(longMode) != paramParamModes.end())
+							chanIter->second->modes.insert(longMode + "=" + param);
+							callChanModeHook(chanIter->first, true, longMode + "=" + param);
+						} else if (adding && modeIter == chanIter->second->modes.end()) {
+							chanIter->second->modes.insert(longMode + "=" + parsedLine[currParam++]);
+							callChanModeHook(chanIter->first, true, longMode + "=" + param);
+						} else if (!adding && modeIter != chanIter->second->modes.end()) {
+							std::string param ((*modeIter).substr((*modeIter).find_first_of('=') + 1));
+							chanIter->second->modes.remove(modeIter);
+							callChanModeHook(chanIter->first, false, longMode + "=" + param);
+						}
+						if (!adding && paramParamModes.find(longMode) != paramParamModes.end())
 							currParam++;
 					} else if (listModes.find(longMode) != listModes.end()) {
 						std::unordered_map<std::string, std::list<std::string>>::iterator listIter = chanIter->second->listModes[longMode].begin();
@@ -1841,11 +1856,13 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 							if (listIter == parsedLine[currParam])
 								break;
 						}
-						if (adding && listIter == chanIter->second->listModes[longMode].end())
-							chanIter->second->listModes[longMode].push_back(parsedLine[currParam++]);
+						if (adding && listIter == chanIter->second->listModes[longMode].end()) {
+							std::string param (parsedLine[currParam++]);
+							chanIter->second->listModes[longMode].push_back(param);
+							callChanModeHook(chanIter->first, true, longMode + "=" + param);
 						else if (!adding && listIter != chanIter->second->listModes[longMode].end()) {
 							chanIter->second->listModes[longMode].erase(listIter);
-							currParam++;
+							callChanModeHook(chanIter->first, false, longMode + "=" + parsedLine[currParam++]);
 						}
 					} else if (normalModes.find(longMode) != normalModes.end()) {
 						std::unordered_map<std::string, std::list<std::string>>::iterator modeIter = chanIter->second->modes.begin();
@@ -1853,10 +1870,13 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 							if (*modeIter == longMode)
 								break;
 						}
-						if (adding && modeIter == chanIter->second->modes.end())
+						if (adding && modeIter == chanIter->second->modes.end()) {
 							chanIter->second->modes.push_back(longMode);
-						else if (!adding && modeIter != chanIter->second->modes.end())
+							callChanModeHook(chanIter->first, true, longMode);
+						} else if (!adding && modeIter != chanIter->second->modes.end()) {
 							chanIter->second->modes.erase(modeIter);
+							callChanModeHook(chanIter->first, false, longMode);
+						}
 					} else { // status
 						char symbol = ' ';
 						for (std::pair<std::string, char> status : prefixes) {
@@ -1878,6 +1898,7 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 									while (prefixIter != prefixes.end() && prefixIter->second != *userStatusIter) {
 										if (prefixIter->second == symbol) {
 											chanIter->second->statuses[params[currParam]].insert(userStatusIter, symbol);
+											callChanStatusHook(chanIter->first, true, params[currParam], prefixIter->first);
 											success = true;
 											break;
 										}
@@ -1886,12 +1907,16 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 									if (success)
 										break;
 								}
-								if (!success && prefixIter == prefixes.end())
+								if (!success && prefixIter == prefixes.end()) {
 									chanIter->second->statuses[params[currParam]].push_back(symbol);
-							} else if (!adding && statusIter != chanIter->second->statuses[params[currParam]].end())
+									callChanStatusHook(chanIter->first, true, parsedLine[currParam], longMode);
+								}
+							} else if (!adding && statusIter != chanIter->second->statuses[params[currParam]].end()) {
 								chanIter->second->statuses[params[currParam]].erase(statusIter);
+								callChanStatusHook(chanIter->first, false, params[currParam], longMode);
+							}
+							currParam++;
 						}
-						currParam++;
 					}
 				}
 			}
