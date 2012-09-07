@@ -1985,7 +1985,18 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			}
 		}
 	} else if (parsedLine[1] == "QUIT") {
-		
+		std::string sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::string nick;
+		std::tie(nick, std::ignore, std::ignore) = parseHostmask(sourceHostmask);
+		std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(nick);
+		if (userIter != users.end()) {
+			callUserQuitHook(nick, parsedLine[2]);
+			for (std::string chanName : userIter->second->channels)
+				channels.find(chanName)->second->users.erase(nick);
+			users.erase(userIter);
+		}
 	} else if (parsedLine[1] == "KICK") {
 		
 	} else if (parsedLine[1] == "TOPIC") {
