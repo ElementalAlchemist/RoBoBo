@@ -1965,17 +1965,23 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 					break;
 				}
 			}
+			callChanPartHook(parsedLine[2], nick, parsedLine[3]);
 			if (!inChannel)
 				channels.erase(channels.find(parsedLine[2]));
 			else
 				channels.find(parsedLine[2])->second->users.erase(nick);
-			callChanPartHook(parsedLine[2], nick, parsedLine[3]);
 		} else {
 			std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
 			std::set<std::string>::iterator usersIter = chanIter->second->users.find(nick);
 			if (usersIter != chanIter->second->users.end()) {
-				chanIter->second->users.erase(usersIter);
 				callChanPartHook(parsedLine[2], nick, parsedLine[3]);
+				chanIter->second->users.erase(usersIter);
+			}
+			std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(nick);
+			if (userIter != users.end()) {
+				userIter->second->channels.erase(parsedLine[2]);
+				if (userIter->second->channels.empty())
+					users.erase(userIter);
 			}
 		}
 	} else if (parsedLine[1] == "QUIT") {
