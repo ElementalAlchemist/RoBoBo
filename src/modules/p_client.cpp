@@ -1369,6 +1369,9 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 	} else if (parsedLine[1] == "001") { // registered
 		clientIter->second->registered = true;
 		callNumericHook(client, "001", std::vector<std::string> (parsedLine.begin() + 2, parsedLine.end()));
+		std::unordered_map<std::string, char>::iterator convIter = convertMode.find("bot");
+		if (convIter != convertMode.end())
+			clientIter->second->sendLine("MODE " + clientIter->second->nick + " +" + std::string(convIter->second));
 	} else if (parsedLine[1] == "005") { // supports
 		for (std::vector<std::string>::iterator tokenIter = parsedLine.begin() + 3; tokenIter != parsedLine.end(); ++tokenIter) {
 			if ((*tokenIter).substr(0, 7) == "PREFIX=") {
