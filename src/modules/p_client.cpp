@@ -2071,9 +2071,8 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			users.insert(std::pair<std::string, std::shared_ptr<User>> (parsedLine[2], userPtr));
 			callUserNickHook(nick, userPtr->nick);
 		}
-	} else {
-		
-	}
+	} else
+		callOtherDataHook(client, parsedLine);
 }
 
 std::vector<std::string> Client::parseLine(const std::string& line) {
