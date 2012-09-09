@@ -1996,7 +1996,42 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			users.erase(userIter);
 		}
 	} else if (parsedLine[1] == "KICK") {
-		
+		if (parsedLine[3] == clientIter->second->nick) {
+			clientIter->second->channels.erase(parsedLine[2]);
+			bool clientInChannel = false;
+			for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients) {
+				if (client.second->channels.find(parsedLine[2]) != client.second->channels.end()) {
+					clientInChannel = true;
+					break;
+				}
+			}
+			std::string nick, sourceHostmask (parsedLine[0]);
+			if (sourceHostmask[0] == ':')
+				sourceHostmask = sourceHostmask.substr(1);
+			std::tie(nick, std::ignore, std::ignore) = parseHostmask(sourceHostmask);
+			callChanKickHook(parsedLine[2], nick, parsedLine[3], parsedLine[4]);
+			if (clientInChannel)
+				channels.find(parsedLine[2])->second->users.erase(parsedLine[3]);
+			else
+				channels.erase(channels.find(parsedLine[2]));
+		} else {
+			std::unordered_map<std::stirng, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
+			std::set<std::string>::iterator usersIter = chanIter->second->users.find(parsedLine[3]);
+			if (usersIter != chanIter->second->users.end()) {
+				std::string nick, sourceHostmask (parsedLine[0]);
+				if (sourceHostmask[0] == ':')
+					sourceHostmask = sourceHostmask.substr(1);
+				std::tie(nick, std::ignore, std::ignore) = parseHostmask(sourceHostmask);
+				callChanKickHook(parsedLine[2], nick, parsedLine[3], parsedLine[4]);
+				chanIter->second->users.erase(usersIter);
+			}
+			std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(parsedLine[3]);
+			if (userIter != users.end()) {
+				userIter->second->channels.erase(parsedLine[2]);
+				if (userIter->second->channels.empty())
+					users.erase(userIter);
+			}
+		}
 	} else if (parsedLine[1] == "TOPIC") {
 		
 	} else if (parsedLine[1] == "INVITE") {
