@@ -2048,7 +2048,29 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 		std::tie(inviter, std::ignore, std::ignore) = parseHostmask(sourceHostmask);
 		callChanInviteHook(parsedLine[3], inviter, parsedLine[2]);
 	} else if (parsedLine[1] == "NICK") {
-		
+		std::string nick, ident, host, sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::tie(nick, ident, host) = parseHostmask(sourceHostmask);
+		std::unordered_map<std::string, std::shared_ptr<User>>::iterator userIter = users.find(nick);
+		if (userIter == users.end()) {
+			for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients) {
+				if (client.second->nick == nick) {
+					client.second->nick = parsedLine[2];
+					// May as well resync the ident and host while we're updating things, eh?
+					client.second->ident = ident;
+					client.second->host = host;
+					callUserNickHook(nick, client.second->nick);
+					break;
+				}
+			}
+		} else {
+			std::shared_ptr<User> userPtr = userIter->second;
+			users.erase(userIter);
+			userPtr->nick = parsedLine[2];
+			users.insert(std::pair<std::string, std::shared_ptr<User>> (parsedLine[2], userPtr));
+			callUserNickHook(nick, userPtr->nick);
+		}
 	} else {
 		
 	}
