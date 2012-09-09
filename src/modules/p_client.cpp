@@ -2033,7 +2033,14 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 			}
 		}
 	} else if (parsedLine[1] == "TOPIC") {
-		
+		std::string setter, sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::tie(setter, std::ignore, std::ignore) = parseHostmask(sourceHostmask);
+		std::unordered_map<std::string, std::shared_ptr<Channel>>::iterator chanIter = channels.find(parsedLine[2]);
+		chanIter->second->topic = parsedLine[3];
+		chanIter->second->topicSetter = setter;
+		callChanTopicHook(parsedLine[2], setter, parsedLine[3]);
 	} else if (parsedLine[1] == "INVITE") {
 		
 	} else if (parsedLine[1] == "NICK") {
