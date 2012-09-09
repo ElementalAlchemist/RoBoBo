@@ -2042,7 +2042,11 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 		chanIter->second->topicSetter = setter;
 		callChanTopicHook(parsedLine[2], setter, parsedLine[3]);
 	} else if (parsedLine[1] == "INVITE") {
-		
+		std::string inviter, sourceHostmask (parsedLine[0]);
+		if (sourceHostmask[0] == ':')
+			sourceHostmask = sourceHostmask.substr(1);
+		std::tie(inviter, std::ignore, std::ignore) = parseHostmask(sourceHostmask);
+		callChanInviteHook(parsedLine[3], inviter, parsedLine[2]);
 	} else if (parsedLine[1] == "NICK") {
 		
 	} else {
