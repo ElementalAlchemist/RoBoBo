@@ -1955,8 +1955,6 @@ void Client::processIncoming(const std::string& client, const std::string& line)
 		std::string nick, ident, host;
 		std::tie(nick, ident, host) = parseHostmask(sourceHostmask);
 		if (nick == clientIter->second->nick) {
-			clientIter->second->ident;
-			clientIter->second->host;
 			clientIter->second->channels.erase(clientIter->second->channels.find(parsedLine[2]));
 			bool inChannel = false;
 			for (std::pair<std::string, std::shared_ptr<LocalClient>> client : connClients) {
