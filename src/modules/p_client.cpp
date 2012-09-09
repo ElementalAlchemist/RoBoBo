@@ -101,6 +101,10 @@ void LocalClient::sendLine(const std::string& line) {
 	}
 }
 
+/* TODO: fix up the reliance on the queue in this function
+ * Possibly make separate line splitters: one that uses the queue, and one that just keeps a list (maybe combine them?)
+ * May as well split the delay out while I'm splitting this function up anyway
+ */
 void LocalClient::processSend(const std::string& message) {
 	std::vector<std::string> parsedLine = module->parseLine(message);
 	std::string fullLine = ":" + nick + "!" + ident + "@" + host + " " + message + "\r\n";
@@ -574,6 +578,7 @@ class Client : public Protocol {
 		void processIncoming(const std::string& client, const std::string& line);
 		static std::vector<std::string> parseLine(const std::string& line);
 		static std::tuple<std::string, std::string, std::string> parseHostmask(const std::string& hostmask);
+		void registerLongMode(const std::string& modeName, char modeChar, bool chanMode);
 		unsigned int currID;
 		std::string newID();
 		
@@ -646,6 +651,74 @@ void Client::connectServer() {
 		clientNum.str("");
 		clientNum << i;
 	}
+	
+	// This mapping of mode names and corresponding letters is borrowed from InspIRCd 2.0.
+	registerLongMode("admin", 'a', true);
+	registerLongMode("allowinvite", 'A', true);
+	registerLongMode("antiredirect", 'L', false);
+	registerLongMode("auditorium", 'u', true);
+	registerLongMode("autoop", 'w', true);
+	registerLongMode("ban", 'b', true);
+	registerLongMode("banexception", 'e', true);
+	registerLongMode("blockcaps", 'B', true);
+	registerLongMode("blockcolor", 'c', true);
+	registerLongMode("bot", 'B', false);
+	registerLongMode("callerid", 'g', false);
+	registerLongMode("censor", 'G', true);
+	registerLongMode("cloak", 'x', false);
+	registerLongMode("c_registered", 'r', true);
+	registerLongMode("deaf", 'd', false);
+	registerLongMode("deaf_commonchan", 'c', false);
+	registerLongMode("delayjoin", 'D', true);
+	registerLongMode("delaymsg", 'd', true);
+	registerLongMode("exemptchanops", 'X', true);
+	registerLongMode("filter", 'g', true);
+	registerLongMode("flood", 'f', true);
+	registerLongMode("founder", 'q', true);
+	registerLongMode("halfop", 'h', true);
+	registerLongMode("helpop", 'h', false);
+	registerLongMode("hidechans", 'I', false);
+	registerLongMode("hideoper", 'H', false);
+	registerLongMode("history", 'H', true);
+	registerLongMode("invex", 'I', true);
+	registerLongMode("invisible", 'i', false);
+	registerLongMode("inviteonly", 'i', true);
+	registerLongMode("joinflood", 'j', true);
+	registerLongMode("key", 'k', true);
+	registerLongMode("kicknorejoin", 'J', true);
+	registerLongMode("limit", 'l', true);
+	registerLongMode("moderated", 'm', true);
+	registerLongMode("namebase", 'Z', true);
+	registerLongMode("nickflood", 'F', true);
+	registerLongMode("noctcp", 'C', true);
+	registerLongMode("noextmsg", 'n', true);
+	registerLongMode("nokick", 'Q', true);
+	registerLongMode("noknock", 'K', true);
+	registerLongMode("nonick", 'N', true);
+	registerLongMode("nonotice", 'T', true);
+	registerLongMode("official-join", 'Y', true);
+	registerLongMode("op", 'o', true);
+	registerLongMode("oper", 'o', false);
+	registerLongMode("operonly", 'O', true);
+	registerLongMode("operprefix", 'y', true);
+	registerLongMode("permanent", 'P', true);
+	registerLongMode("private", 'p', true);
+	registerLongMode("redirect", 'L', true);
+	registerLongMode("regdeaf", 'R', false);
+	registerLongMode("reginvite", 'R', true);
+	registerLongMode("regmoderated", 'M', true);
+	registerLongMode("secret", 's', true);
+	registerLongMode("servprotect", 'k', false);
+	registerLongMode("showwhois", 'W', false);
+	registerLongMode("snomask", 's', false);
+	registerLongMode("sslonly", 'z', true);
+	registerLongMode("stripcolor", 'S', true);
+	registerLongMode("topiclock", 't', true);
+	registerLongMode("u_censor", 'G', false);
+	registerLongMode("u_register", 'r', false);
+	registerLongMode("u_stripcolor", 'S', false);
+	registerLongMode("voice", 'v', true);
+	registerLongMode("wallops", 'w', false);
 }
 
 void Client::disconnectServer(std::string reason) {
@@ -2111,6 +2184,19 @@ std::tuple<std::string, std::string, std::string> Client::parseHostmask(const st
 	std::string host (ident.substr(hostStart + 1));
 	ident = ident.substr(0, hostStart);
 	return std::make_tuple(nick, ident, host);
+}
+
+void Client::registerLongMode(const std::string& modeName, char modeChar, bool chanMode) {
+	if (!config["mode/" + modeName].empty()) {
+		if (config["mode/" + modeName] == "disable" || config["mode/" + modeName] == "disabled")
+			return;
+		modeChar = config["mode/" + modeName][0];
+	}
+	convertMode.insert(std::pair<std::string, char> (modeName, modeChar));
+	if (chanMode)
+		convertChanMode.insert(std::pair<char, std::string> (modeChar, modeName));
+	else
+		convertUserMode.insert(std::pair<char, std::string> (modeChar, modeName));
 }
 
 std::string Client::newID() {
