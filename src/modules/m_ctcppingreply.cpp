@@ -16,6 +16,8 @@ int PingReply::botAPIversion() {
 }
 
 bool PingReply::onChannelCTCP(std::string server, std::string client, std::string channel, char target, std::string nick, std::string message) {
+	if (message.empty())
+		return true;
 	if (splitBySpace(message)[0] == "PING") {
 		if (message.size() > 4)
 			sendCTCPReply(server, client, nick, "PING", message.substr(message.find_first_of(' ')));
@@ -26,6 +28,8 @@ bool PingReply::onChannelCTCP(std::string server, std::string client, std::strin
 }
 
 bool PingReply::onUserCTCP(std::string server, std::string client, std::string nick, std::string message) {
+	if (message.empty())
+		return true;
 	if (splitBySpace(message)[0] == "PING") {
 		if (message.size() > 4)
 			sendCTCPReply(server, client, nick, "PING", message.substr(message.find_first_of(' ')));
