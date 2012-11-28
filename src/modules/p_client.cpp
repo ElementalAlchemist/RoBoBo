@@ -130,6 +130,7 @@ void User::status(std::string channel, std::string status, bool adding) {
 		std::set<std::string>::iterator statusIter = channels.find(channel)->second.find(status);
 		if (statusIter != channels.find(channel)->second.end())
 			channels.find(channel)->second.erase(statusIter);
+	}
 }
 
 std::string User::status(std::string channel) {
