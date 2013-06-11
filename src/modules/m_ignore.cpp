@@ -179,6 +179,7 @@ std::string Ignore::description() {
 std::vector<std::string> Ignore::supports() {
 	std::vector<std::string> supporting;
 	supporting.push_back("PATTERN_GLOB");
+	supporting.push_back("BOT_ADMIN");
 	return supporting;
 }
 
