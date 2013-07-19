@@ -79,6 +79,7 @@ int main(int argc, char** argv) {
 	sigaction(SIGHUP, sigPtr, NULL);
 	sigaction(SIGUSR1, sigPtr, NULL);
 	// We're done parsing command line arguments; it's time to start!
+	/*
 	bot = new Base (workingDir, confDir, confName, debugLevel, logDump);
 	bot->readConfiguration();
 	bot->loadModules();
@@ -89,4 +90,5 @@ int main(int argc, char** argv) {
 	// If checkModules returns, the bot is shutting down, so kill all the things
 	bot->unloadEverything();
 	delete bot;
+	*/
 }
