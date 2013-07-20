@@ -15,10 +15,6 @@ void Config::readConfig() {
 	readConfig(filename);
 }
 
-void Config::readConfig(const std::string& fileName) {
-	// TODO: a bunch of configuration file reading
-}
-
 size_t Config::blockCount(const std::string& block) const {
 	return configData.count(block);
 }
@@ -87,4 +83,8 @@ std::list<bool> Config::getAllBoolValues(const std::string& block, const std::st
 
 Config* Config::getHandle() {
 	return instance;
+}
+
+void Config::readConfig(const std::string& fileName) {
+	// TODO: a bunch of configuration file reading
 }
