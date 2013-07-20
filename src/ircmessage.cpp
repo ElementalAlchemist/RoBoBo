@@ -87,3 +87,33 @@ bool IRCMessage::tagExists(const std::string& tag) const {
 const std::unordered_map<std::string, std::string>& IRCMessage::tags() const {
 	return linetags;
 }
+
+void IRCMessage::setParam(size_t param, const std::string& value) {
+	lineparams[param] = value;
+}
+
+void IRCMessage::setParams(const std::vector<std::string>& params) {
+	lineparams = params;
+}
+
+void IRCMessage::setPrefix(const std::string& prefix) {
+	lineprefix = prefix;
+}
+
+void IRCMessage::removePrefix() {
+	lineprefix.clear();
+}
+
+void IRCMessage::setTag(const std::string& tag, const std::string& value) {
+	linetags[tag] = value;
+}
+
+void IRCMessage::removeTag(const std::string& tag) {
+	auto tagIter = linetags.find(tag);
+	if (tagIter != linetags.end())
+		linetags.erase(tagIter);
+}
+
+void IRCMessage::setTags(const std::unordered_map<std::string, std::string>& tags) {
+	linetags = tags;
+}
