@@ -55,6 +55,8 @@ int main(int argc, char** argv) {
 	configuration.setMainConfigFile(confName);
 	configuration.setWorkingDirectory(workingDir);
 	configuration.readConfig();
+	// TODO: init LogManager
+	// TODO: module manager and server manager
 	
 	// Add signal handlers
 	sigset_t signalSet;
