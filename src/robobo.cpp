@@ -8,13 +8,13 @@ int main(int argc, char** argv) {
 	if (argc > 1) {
 		opterr = 0;
 		option validOptions[] = {
-			{"help", 0, NULL, 'h'},
-			{"version", 0, NULL, 'v'},
-			{"debug", 2, NULL, 'd'},
-			{"confname", 1, NULL, 1}
+			{"help", 0, nullptr, 'h'},
+			{"version", 0, nullptr, 'v'},
+			{"debug", 2, nullptr, 'd'},
+			{"confname", 1, nullptr, 1}
 		};
 		int optCode;
-		while ((optCode = getopt_long(argc, argv, "h?vd::", validOptions, NULL)) != EOF) {
+		while ((optCode = getopt_long(argc, argv, "h?vd::", validOptions, nullptr)) != EOF) {
 			switch (optCode) {
 				case 'h':
 				case '?':
@@ -75,8 +75,8 @@ int main(int argc, char** argv) {
 	sigHandle.sa_mask = signalSet;
 	sigHandle.sa_flags = 0;
 	const struct sigaction* sigPtr = &sigHandle;
-	sigaction(SIGHUP, sigPtr, NULL);
-	sigaction(SIGUSR1, sigPtr, NULL);
+	sigaction(SIGHUP, sigPtr, nullptr);
+	sigaction(SIGUSR1, sigPtr, nullptr);
 	
 	/*
 	bot = new Base (workingDir, confDir, confName, debugLevel, logDump);
