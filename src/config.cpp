@@ -6,7 +6,15 @@ void Config::setMainConfigFile(const std::string& configFileName) {
 	filename = configFileName;
 }
 
+void Config::setWorkingDirectory(const std::string& workingDirectory) {
+	workingDir = workingDirectory;
+}
+
 void Config::readConfig() {
+	readConfig(filename);
+}
+
+void Config::readConfig(const std::string& fileName) {
 	// TODO: a bunch of configuration file reading
 }
 
