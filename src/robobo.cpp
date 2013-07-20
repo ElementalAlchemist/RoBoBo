@@ -1,16 +1,5 @@
 #include "robobo.h"
 
-Base* bot;
-
-void sigHandler(int signum) {
-	// Signal calls 
-	if (signum == SIGHUP) {
-		daemon(1, 0);
-		bot->endDebug();
-	} else if (signum == SIGUSR1)
-		bot->sigRehash();
-}
-
 int main(int argc, char** argv) {
 	std::string workingDir = argv[0];
 	workingDir = workingDir.substr(0, workingDir.find_last_of('/'));
@@ -72,7 +61,13 @@ int main(int argc, char** argv) {
 	sigaddset(&signalSet, SIGHUP);
 	sigaddset(&signalSet, SIGUSR1);
 	struct sigaction sigHandle;
-	sigHandle.sa_handler = sigHandler;
+	sigHandle.sa_handler = [](int signum) {
+			if (signum == SIGHUP) {
+			daemon(1, 0);
+			//bot->endDebug();
+		} else if (signum == SIGUSR1)
+			//bot->sigRehash();
+	};
 	sigHandle.sa_mask = signalSet;
 	sigHandle.sa_flags = 0;
 	const struct sigaction* sigPtr = &sigHandle;
