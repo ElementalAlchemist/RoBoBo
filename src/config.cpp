@@ -11,6 +11,7 @@ void Config::setWorkingDirectory(const std::string& workingDirectory) {
 }
 
 void Config::readConfig() {
+	configData.clear();
 	readConfig(filename);
 }
 
