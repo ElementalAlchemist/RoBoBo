@@ -3,7 +3,7 @@
 
 class Config {
 	public:
-		Config* getHandle();
+		static Config* getHandle();
 		void setMainConfigFile(const std::string& configFileName);
 		void setWorkingDirectory(const std::string& workingDirectory);
 		void readConfig();

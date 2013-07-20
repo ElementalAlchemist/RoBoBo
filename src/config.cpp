@@ -1,6 +1,8 @@
 #include "config.h"
 
-Config::Config() {}
+static Config* Config::getHandle() {
+	return instance;
+}
 
 void Config::setMainConfigFile(const std::string& configFileName) {
 	filename = configFileName;
@@ -81,9 +83,7 @@ std::list<bool> Config::getAllBoolValues(const std::string& block, const std::st
 	return valueList;
 }
 
-Config* Config::getHandle() {
-	return instance;
-}
+Config::Config() {}
 
 void Config::readConfig(const std::string& fileName) {
 	// TODO: a bunch of configuration file reading
