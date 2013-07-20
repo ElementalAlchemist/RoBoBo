@@ -1,9 +1,9 @@
 #include "robobo.h"
 
 int main(int argc, char** argv) {
-	std::string workingDir = argv[0];
+	std::string workingDir (argv[0]);
 	workingDir = workingDir.substr(0, workingDir.find_last_of('/'));
-	std::string confName = "robobo.conf";
+	std::string confName ("robobo.conf");
 	unsigned short debugLevel = 0;
 	if (argc > 1) {
 		opterr = 0;
