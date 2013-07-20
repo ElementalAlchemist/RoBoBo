@@ -3,7 +3,6 @@
 int main(int argc, char** argv) {
 	std::string workingDir = argv[0];
 	workingDir = workingDir.substr(0, workingDir.find_last_of('/'));
-	std::string confDir = workingDir;
 	std::string confName = "robobo.conf";
 	unsigned short debugLevel = 0;
 	bool logDump = false;
@@ -13,8 +12,7 @@ int main(int argc, char** argv) {
 			{"help", 0, NULL, 'h'},
 			{"version", 0, NULL, 'v'},
 			{"debug", 2, NULL, 'd'},
-			{"confname", 1, NULL, 1},
-			{"confdir", 1, NULL, 2}
+			{"confname", 1, NULL, 1}
 		};
 		int optCode;
 		while ((optCode = getopt_long(argc, argv, "h?vd::", validOptions, NULL)) != EOF) {
@@ -29,8 +27,10 @@ int main(int argc, char** argv) {
 					std::cout << "--debug/-d: Starts the bot in debug mode (foreground, sends information to standard output)" << std::endl;
 					std::cout << "\tSpecify level 1, 2, or 3 after it for more information" << std::endl;
 					std::cout << "\tIf the debug argument is given with no level, level 1 is assumed." << std::endl;
-					std::cout << "--confname: Specifies the name of the configuration file (default: robobo.conf)" << std::endl;
-					std::cout << "--confdir: Specifies the directory of the configuration file (default: same as executable)" << std::endl;
+					std::cout << "--confname: Specifies the name of the configuration file, along with a directory" << std::endl;
+					std::cout << "\tif it's not in the main robobo directory (default: robobo.conf)" << std::endl;
+					std::cout << "\te.g. '--confname ../test.conf' or '--confname /etc/robobo.conf'" << std::endl;
+					std::cout << "\tRelative paths are relative to the main robobo directory." << std::endl;
 					return 0;
 				case 'v':
 					std::cout << "RoBoBo IRC Bot version 3.0.0 Development" << std::endl;
@@ -45,9 +45,6 @@ int main(int argc, char** argv) {
 					break;
 				case 1:
 					confName = optarg;
-					break;
-				case 2:
-					confDir = optarg;
 			}
 		}
 	}
