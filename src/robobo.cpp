@@ -63,12 +63,13 @@ int main(int argc, char** argv) {
 	sigaddset(&signalSet, SIGHUP);
 	sigaddset(&signalSet, SIGUSR1);
 	struct sigaction sigHandle;
-	sigHandle.sa_handler = [](int signum) {
+	sigHandle.sa_handler = [&](int signum) {
 			if (signum == SIGHUP) {
 			daemon(1, 0);
-			//bot->endDebug();
-		} else if (signum == SIGUSR1)
-			//bot->sigRehash();
+			// TODO: notify server manager? and module manager of the end of debug
+		} else if (signum == SIGUSR1) {
+			configuration->readConfig();
+			// TODO: notify module manager of rehash
 	};
 	sigHandle.sa_mask = signalSet;
 	sigHandle.sa_flags = 0;
