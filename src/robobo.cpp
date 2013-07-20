@@ -67,6 +67,14 @@ int main(int argc, char** argv) {
 	sigaction(SIGHUP, sigPtr, NULL);
 	sigaction(SIGUSR1, sigPtr, NULL);
 	
+	// Default the configuration to the working directory if an absolute path is not provided
+	// If a relative path is provided, it should be relative to the working directory
+	if (confName[0] != '/')
+		confName = workingDir + "/" + confName;
+	Config* configuration = Config::getHandle();
+	configuration.setMainConfigFile(confName);
+	configuration.setWorkingDirectory(workingDir);
+	configuration.readConfig();
 	/*
 	bot = new Base (workingDir, confDir, confName, debugLevel, logDump);
 	bot->readConfiguration();
