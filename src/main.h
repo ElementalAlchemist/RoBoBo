@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include <chrono>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <list>
