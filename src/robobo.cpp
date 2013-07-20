@@ -13,12 +13,11 @@ int main(int argc, char** argv) {
 			{"help", 0, NULL, 'h'},
 			{"version", 0, NULL, 'v'},
 			{"debug", 2, NULL, 'd'},
-			{"log", 0, NULL, 'l'},
 			{"confname", 1, NULL, 1},
 			{"confdir", 1, NULL, 2}
 		};
 		int optCode;
-		while ((optCode = getopt_long(argc, argv, "h?vd::l", validOptions, NULL)) != EOF) {
+		while ((optCode = getopt_long(argc, argv, "h?vd::", validOptions, NULL)) != EOF) {
 			switch (optCode) {
 				case 'h':
 				case '?':
@@ -43,9 +42,6 @@ int main(int argc, char** argv) {
 						std::istringstream debugStr (optarg);
 						debugStr >> debugLevel;
 					}
-					break;
-				case 'l':
-					logDump = true;
 					break;
 				case 1:
 					confName = optarg;
