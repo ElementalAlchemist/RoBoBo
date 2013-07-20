@@ -30,7 +30,7 @@ std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const s
 	return blockList;
 }
 
-const std::string& Config::getValue(const std::string& block, const std::string& key) const {
+std::string Config::getValue(const std::string& block, const std::string& key) const {
 	auto blockIter = configData.find(block);
 	if (blockIter == configData.end())
 		return "";
