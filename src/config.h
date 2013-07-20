@@ -3,6 +3,9 @@
 
 class Config {
 	public:
+		// The default constructor is private so that the class can only be used from the handle specified within
+		Config(const Config&) = delete; // We make copying and assignment forbidden
+		Config& operator=(const Config&) = delete;
 		static Config* getHandle();
 		void setMainConfigFile(const std::string& configFileName);
 		void setWorkingDirectory(const std::string& workingDirectory);
