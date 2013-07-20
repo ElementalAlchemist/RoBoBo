@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 	const struct sigaction* sigPtr = &sigHandle;
 	sigaction(SIGHUP, sigPtr, NULL);
 	sigaction(SIGUSR1, sigPtr, NULL);
-	// We're done parsing command line arguments; it's time to start!
+	
 	/*
 	bot = new Base (workingDir, confDir, confName, debugLevel, logDump);
 	bot->readConfiguration();
