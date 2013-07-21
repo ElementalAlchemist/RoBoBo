@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 					std::cout << "\tRelative paths are relative to the main robobo directory." << std::endl;
 					return 0;
 				case 'v':
-					std::cout << "RoBoBo IRC Bot version 3.0.0 Development" << std::endl;
+					std::cout << "RoBoBo IRC Bot " << BotVersion << std::endl;
 					return 0;
 				case 'd':
 					if (optarg == 0)
