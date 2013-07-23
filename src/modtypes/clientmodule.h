@@ -16,7 +16,7 @@ class ClientModule {
 		virtual void onUserMode(const std::string& server, const std::string& client, const std::list<std::tuple<ModeType, bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {}
 		virtual void onJoin(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags) {}
 		virtual void onPart(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
-		virtual void onQuit(const std::string& server, const std::string& client, const std::string& reason, const std::map<std::string, std::string>& tags) {}
+		virtual void onQuit(const std::string& server, const std::string& client, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void onKick(const std::string& server, const std::string& client, const std::string& channel, const std::string& userKicking, const std::string& userKicked, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void onTopic(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::string& topic, const std::map<std::string, std::string>& tags) {}
 		virtual void onInvite(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags) {}
