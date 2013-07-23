@@ -112,8 +112,7 @@ class ServerModule {
 		bool userHasStatus(const std::string& server, const std::string& channel, const std::string& user, char status);
 		bool userHasStatusOrGreater(const std::string& server, const std::string& channel, const std::string& user, const std::string& status);
 		bool userHasStatusOrGreater(const std::string& server, const std::string& channel, const std::string& user, char status);
-		// TODO: Fix return value for how I end up doing modes
-		std::list<std::string> chanModes(const std::string& server, const std::string& channel);
+		std::map<std::string, std::string> chanModes(const std::string& server, const std::string& channel);
 		bool chanHasMode(const std::string& server, const std::string& channel, const std::string& mode);
 		std::string chanModeParam(const std::string& server, const std::string& channel, const std::string& mode);
 		std::list<std::string> chanListModeList(const std::string& server, const std::string& channel, const std::string& listMode);
@@ -123,8 +122,7 @@ class ServerModule {
 		std::string userIdent(const std::string& server, const std::string& user);
 		std::string userHost(const std::string& server, const std::string& user);
 		std::string userGecos(const std::string& server, const std::string& user);
-		// TODO: Fix return value for how I end up doing modes
-		std::set<std::string> userModes(const std::string& server, const std::string& user);
+		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user);
 		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode);
 		std::set<std::string> userChans(const std::string& server, const std::string& user);
 		time_t userTimestamp(const std::string& server, const std::string& user);
