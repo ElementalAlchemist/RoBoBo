@@ -1,8 +1,9 @@
 #pragma once
 #include "../main.h"
 #include "../modulemanager.h"
-#include "clientmodule.h"
-#include "servermodule.h"
+
+class ClientModule;
+class ServerModule;
 
 class Module {
 	public:
@@ -13,7 +14,7 @@ class Module {
 		virtual const bool keepAlive() const { return false; }
 		virtual std::shared_ptr<ClientModule> clientModule() { return std::shared_ptr<ClientModule> (nullptr); }
 		virtual std::shared_ptr<ServerModule> serverModule() { return std::shared_ptr<ServerModule> (nullptr); }
-		virtual std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>>> registerActions() { return std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>>> (); }
+		virtual std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>, std::hash<int>>, std::hash<int>> registerActions() { return std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>>> (); }
 		
 		virtual const std::string description() const { return "No description provided for this module."; }
 		virtual const std::list<std::string> requires() const { return std::list<std::string> (); }
@@ -36,7 +37,7 @@ class Module {
 		
 		std::shared_ptr<Socket> assignSocket(const std::string& socketType) { return modmanager->assignSocket(socketType); }
 		
-		std::list<std::string> loadedModules() { return modmanager->loadedModules(); }
+		std::list<std::string> loadedModules() { return modmanager->modules(); }
 		
 		std::list<std::string> providedServices() { return modmanager->providedServices(); }
 		bool serviceIsProvided(const std::string& service) { return modmanager->serviceIsProvided(service); }

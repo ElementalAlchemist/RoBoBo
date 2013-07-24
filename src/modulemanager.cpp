@@ -117,6 +117,11 @@ std::list<std::string> ModuleManager::usingModules(const std::string& capability
 	return serviceIter->second;
 }
 
+
+template<ActionType, typename... Args> void ModuleManager::callHook(ActionType type, const Args&... args) {
+	// TODO: this horrible function
+}
+
 void ModuleManager::rehash() {
 	Config* conf = Config::getHandle();
 	conf->readConfig();
@@ -129,7 +134,7 @@ std::shared_ptr<Socket> ModuleManager::assignSocket(const std::string& socketTyp
 	return std::shared_ptr<Socket> (nullptr);
 }
 
-std::list<std::string> ModuleManager::loadedModules() {
+std::list<std::string> ModuleManager::modules() {
 	std::list<std::string> modList;
 	for (auto module : loadedModules)
 		modList.push_back(module.first);
@@ -172,4 +177,10 @@ void ModuleManager::verifyModule(std::shared_ptr<Module> mod) {
 	// TODO: check requires, check with provided stuff
 	// TODO: get client and server modules; store
 	// TODO: call onLoadComplete
+}
+
+void ModuleManager::processQueue() {
+	runningProcess = true;
+	// TODO: this
+	runningProcess = false;
 }

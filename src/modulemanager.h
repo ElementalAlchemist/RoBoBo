@@ -1,10 +1,13 @@
 #pragma once
 #include "main.h"
 #include "config.h"
+#include "ircmessage.h"
+#include "mutexlocker.h"
 #include "servermanager.h"
-#include "modtypes/basemodule.h"
-#include "modtypes/clientmodule.h"
-#include "modtypes/servermodule.h"
+
+class Module;
+class ClientModule;
+class ServerModule;
 
 const std::list<unsigned int> apiVersions { 3000 };
 typedef bool MsgAction;
@@ -74,6 +77,8 @@ enum ActionType {
 	HOOK_SERVER_XLINE_REMOVE,
 	HOOK_SERVER_CONNECT_USER,
 	HOOK_SERVER_QUIT_USER,
+	HOOK_SERVER_CONNECT_USER_SELF,
+	HOOK_SERVER_QUIT_USER_SELF,
 	HOOK_SERVER_CHANGE_IDENT,
 	HOOK_SERVER_CHANGE_HOST,
 	HOOK_SERVER_CHANGE_GECOS,
@@ -116,13 +121,13 @@ class ModuleManager {
 		std::list<std::string> providingModules(const std::string& capability) const;
 		std::list<std::string> usingModules(const std::string& capability) const;
 		
-		// TODO: functions to call hooks
+		template<ActionType, const std::string&, typename... Args> void callHook(ActionType type, const Args&... args);
 		
 		void rehash();
 		
 		std::shared_ptr<Socket> assignSocket(const std::string& socketType);
 		
-		std::list<std::string> loadedModules();
+		std::list<std::string> modules();
 		
 		std::list<std::string> providedServices();
 		bool serviceIsProvided(const std::string& service);
@@ -132,17 +137,25 @@ class ModuleManager {
 		std::shared_ptr<Module> openModule(const std::string& name);
 		void verifyModule(std::shared_ptr<Module> mod);
 		std::unordered_map<std::string, std::shared_ptr<Module>> loadedModules;
-		std::unordered_map<std::string, std::shared_ptr<ClientModule>> clientModules;
-		std::unordered_map<std::string, std::shared_ptr<ServerModule>> serverModules;
-		std::unordered_map<ActionType, std::list<std::string>> registeredActions;
-		std::unordered_map<std::pair<std::string, ActionType>, std::unordered_map<Priority, std::list<std::string>>> actionPriority;
+		std::unordered_map<std::string, std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>, std::hash<int>>, std::hash<int>>> actionPriority;
 		std::unordered_map<std::string, std::list<std::string>> providers;
 		std::unordered_map<std::string, std::list<std::string>> clients;
 		std::unordered_map<std::string, std::list<std::string>> dependents;
 		ServerManager* servers;
+		
+		std::mutex queueMutex;
+		std::queue<std::function<void()>> actionQueue;
+		
+		void processQueue();
+		bool runningProcess = false;
 };
 
 class ServiceNotLoaded : public std::exception {
 	public:
 		const char* what() const noexcept { return "The required service you are trying to add is not loaded."; }
 };
+
+
+#include "modtypes/basemodule.h"
+#include "modtypes/clientmodule.h"
+#include "modtypes/servermodule.h"

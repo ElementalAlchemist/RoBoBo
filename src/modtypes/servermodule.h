@@ -32,13 +32,15 @@ class ServerModule {
 		virtual void onRemoveXLine(const std::string& server, const std::string& lineType, const std::string& mask, const std::map<std::string, std::string>& tags) {}
 		virtual void onUserConnect(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
 		virtual void onUserQuit(const std::string& server, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
+		virtual void onUserSelfConnect(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
+		virtual void onUserSelfQuit(const std::string& server, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void onChangeIdent(const std::string& server, const std::string& user, const std::string& ident, const std::map<std::string, std::string>& tags) {}
 		virtual void onChangeHost(const std::string& server, const std::string& user, const std::string& host, const std::map<std::string, std::string>& tags) {}
 		virtual void onChangeGecos(const std::string& server, const std::string& user, const std::string& gecos, const std::map<std::string, std::string>& tags) {}
 		virtual void onWallops(const std::string& server, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onServerConnect(const std::string& server, const std::string& connectingServer, const map<std::string, std::string>& tags) {}
-		virtual void onServerQuit(const std::string& server, const std::string& quittingServer, const std::string& reason, const map<std::string, std::string>& tags) {}
-		virtual void onCapab(const std::string& server, const std::vector<std::string>& data, const map<std::string, std::string>& tags) {}
+		virtual void onServerConnect(const std::string& server, const std::string& connectingServer, const std::map<std::string, std::string>& tags) {}
+		virtual void onServerQuit(const std::string& server, const std::string& quittingServer, const std::string& reason, const std::map<std::string, std::string>& tags) {}
+		virtual void onCapab(const std::string& server, const std::vector<std::string>& data, const std::map<std::string, std::string>& tags) {}
 		virtual void onBurst(const std::string& server, const std::map<std::string, std::string>& tags) {}
 		virtual void onEndBurst(const std::string& server, const std::map<std::string, std::string>& tags) {}
 		virtual void onSelfConnect(const std::string& server) {}
