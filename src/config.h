@@ -18,7 +18,7 @@ class Config {
 		std::list<bool> getAllBoolValues(const std::string& block, const std::string& key) const;
 	private:
 		Config();
-		static const Config* instance = new Config;
+		static const Config* instance;
 		const std::string filename;
 		const std::string workingDir;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> configData;

@@ -1,5 +1,7 @@
 #include "config.h"
 
+Config::instance = new Config;
+
 static Config* Config::getHandle() {
 	return instance;
 }
