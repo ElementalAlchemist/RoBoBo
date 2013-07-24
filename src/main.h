@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <set>
 #include <sstream>
