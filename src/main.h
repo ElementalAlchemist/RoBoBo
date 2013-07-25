@@ -2,7 +2,6 @@
 #include <unistd.h>
 
 #include <algorithm>
-#include <cstdarg>
 #include <exception>
 #include <functional>
 #include <iostream>
