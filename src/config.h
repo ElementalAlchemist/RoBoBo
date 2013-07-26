@@ -20,8 +20,8 @@ class Config {
 	private:
 		Config();
 		static const Config* instance;
-		const std::string filename;
-		const std::string workingDir;
+		std::string filename;
+		std::string workingDir;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> configData;
 		void readConfig(const std::string& fileName);
 		std::list<std::function<void()>> notifyList;

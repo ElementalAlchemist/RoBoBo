@@ -7,11 +7,13 @@ static Config* Config::getHandle() {
 }
 
 void Config::setMainConfigFile(const std::string& configFileName) {
-	filename = configFileName;
+	if (filename.empty())
+		filename = configFileName;
 }
 
 void Config::setWorkingDirectory(const std::string& workingDirectory) {
-	workingDir = workingDirectory;
+	if (workingDir.empty())
+		workingDir = workingDirectory;
 }
 
 void Config::readConfig() {
