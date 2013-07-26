@@ -464,10 +464,10 @@ std::function<void()> ModuleManager::generateHookCaller(void(ModType::*func)(Arg
 				((*modules.find(modName)->second).*(func))(args...);
 			} catch (const std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
 			}
 		}
 	};
@@ -483,10 +483,10 @@ std::function<void()> ModuleManager::generateMsgHookCaller(MsgAction(ModType::*f
 					break;
 			} catch (const std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
 			}
 		}
 	};
@@ -507,10 +507,10 @@ std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*fu
 					return;
 			} catch (const std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
 			}
 		}
 		if (!channels.empty() && !message.empty())
@@ -532,10 +532,10 @@ std::function<void()> ModuleManager::generateUserOutHookCaller(void(ModType::*fu
 					return;
 			} catch (std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
 			}
 		}
 		if (!users.empty() && !message.empty())
