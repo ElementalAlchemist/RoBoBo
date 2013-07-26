@@ -41,6 +41,8 @@ int main(int argc, char** argv) {
 						std::istringstream debugStr (optarg);
 						debugStr >> debugLevel;
 					}
+					if (debugLevel > 4)
+						debugLevel = 4;
 					break;
 				case 1:
 					confName = optarg;
@@ -52,10 +54,13 @@ int main(int argc, char** argv) {
 	if (confName[0] != '/')
 		confName = workingDir + "/" + confName;
 	Config* configuration = Config::getHandle();
-	configuration.setMainConfigFile(confName);
-	configuration.setWorkingDirectory(workingDir);
-	configuration.readConfig();
-	// TODO: init LogManager
+	LogManager* logger = LogManager::getHandle();
+	logger->setLogDir(workingDir + "/logs/");
+	logger->setDefaultLevel(static_cast<LogLevel> (debugLevel));
+	configuration->setMainConfigFile(confName);
+	configuration->setWorkingDirectory(workingDir);
+	configuration->addRehashNotify(std::bind(&LogManager::updateLogFiles, logger));
+	configuration->readConfig();
 	// TODO: module manager and server manager
 	
 	// Add signal handlers
