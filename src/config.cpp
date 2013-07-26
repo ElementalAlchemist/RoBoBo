@@ -59,8 +59,8 @@ bool Config::getBoolValue(const std::string& block, const std::string& key) cons
 	return false;
 }
 
-std::list<const std::string&> Config::getAllValues(const std::string& block, const std::string& key) const {
-	std::list<const std::string&> valueList;
+std::list<std::string> Config::getAllValues(const std::string& block, const std::string& key) const {
+	std::list<std::string> valueList;
 	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
 	std::tie(startIter, endIter) = configData.equal_range(block);
 	for (; startIter != endIter; ++startIter) {
