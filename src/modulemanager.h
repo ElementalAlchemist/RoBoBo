@@ -70,6 +70,13 @@ enum ActionType {
 	HOOK_SERVER_PONG,
 	HOOK_SERVER_AWAY,
 	HOOK_SERVER_UNAWAY,
+	HOOK_SERVER_CREATE_CHANNEL,
+	HOOK_SERVER_DESTROY_CHANNEL,
+	HOOK_SERVER_REQUEST_STATS,
+	HOOK_SERVER_REQUEST_MOTD,
+	HOOK_SERVER_REQUEST_TIME,
+	HOOK_SERVER_REQUEST_ADMIN,
+	HOOK_SERVER_REQUEST_INFO,
 	HOOK_SERVER_NOTICE_SERVER,
 	HOOK_SERVER_METADATA_CHANNEL,
 	HOOK_SERVER_METADATA_USER,
@@ -122,9 +129,12 @@ class ModuleManager {
 		std::list<std::string> providingModules(const std::string& capability) const;
 		std::list<std::string> usingModules(const std::string& capability) const;
 		
-		template<ActionType, const std::string&, typename... Args> void callHook(ActionType type, const Args&... args);
+		template<typename... Args>
+		void callClientHook(ActionType type, Args... args);
+		template<typename... Args>
+		void callServerHook(ActionType type, Args... args);
 		
-		void rehash();
+		void onRehash();
 		
 		std::shared_ptr<Socket> assignSocket(const std::string& socketType);
 		
@@ -138,6 +148,9 @@ class ModuleManager {
 		std::shared_ptr<Module> openModule(const std::string& name);
 		void verifyModule(std::shared_ptr<Module> mod);
 		std::unordered_map<std::string, std::shared_ptr<Module>> loadedModules;
+		std::unordered_map<std::string, std::shared_ptr<ClientModule>> clientModules;
+		std::unordered_map<std::string, std::shared_ptr<ServerModule>> serverModules;
+		std::unordered_map<ActionType, std::list<std::string>, std::hash<int>> registeredActions;
 		std::unordered_map<std::string, std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>, std::hash<int>>, std::hash<int>>> actionPriority;
 		std::unordered_map<std::string, std::list<std::string>> providers;
 		std::unordered_map<std::string, std::list<std::string>> clients;
@@ -147,6 +160,15 @@ class ModuleManager {
 		std::mutex queueMutex;
 		std::queue<std::function<void()>> actionQueue;
 		
+		template<typename ModType, typename... Args>
+		std::function<void()> generateHookCaller(void(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args);
+		template<typename ModType, typename... Args>
+		std::function<void()> generateMsgHookCaller(MsgAction(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args);
+		template<typename ModType, typename... Args>
+		std::function<void()> generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args);
+		template<typename ModType, typename... Args>
+		std::function<void()> generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args);
+		void startQueue();
 		void processQueue();
 		bool runningProcess = false;
 };
@@ -156,6 +178,10 @@ class ServiceNotLoaded : public std::exception {
 		const char* what() const noexcept { return "The required service you are trying to add is not loaded."; }
 };
 
+class HookTypeException : public std::exception {
+	public:
+		const char* what() const noexcept { return "A client or server type of hook was given, but the other type was requested."; }
+};
 
 #include "modtypes/basemodule.h"
 #include "modtypes/clientmodule.h"

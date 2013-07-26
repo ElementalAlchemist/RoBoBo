@@ -12,7 +12,7 @@ class ClientModule {
 		virtual MsgAction onUserMsg(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
 		virtual MsgAction onChanNotice(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
 		virtual MsgAction onUserNotice(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
-		virtual void onChanMode(const std::string& server, const std::string& client, const std::string& channel, const std::list<std::tuple<ModeType, bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {}
+		virtual void onChanMode(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::list<std::tuple<ModeType, bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {}
 		virtual void onUserMode(const std::string& server, const std::string& client, const std::list<std::tuple<ModeType, bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {}
 		virtual void onJoin(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags) {}
 		virtual void onPart(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
@@ -33,14 +33,14 @@ class ClientModule {
 		virtual void onSelfQuit(const std::string& server, const std::string& client, const std::string& reason) {}
 		virtual void onOtherData(const std::string& server, const std::string& client, const IRCMessage* message) {}
 		
-		virtual void onOutChanMsg(const std::string& server, const std::string& client, std::string& channel, char& status, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onOutUserMsg(const std::string& server, const std::string& client, std::string& user, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onOutChanNotice(const std::string& server, const std::string& client, std::string& channel, char& status, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onOutUserNotice(const std::string& server, const std::string& client, std::string& user, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onSendChanMsg(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onSendUserMsg(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onSendChanNotice(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onSendUserNotice(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onOutChanMsg(const std::string& server, const std::string& client, std::list<std::pair<std::string, char>>& channels, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onOutUserMsg(const std::string& server, const std::string& client, std::list<std::string>& users, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onOutChanNotice(const std::string& server, const std::string& client, std::list<std::pair<std::string, char>>& channels, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onOutUserNotice(const std::string& server, const std::string& client, std::list<std::string>& users, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onSendChanMsg(const std::string& server, const std::string& client, const std::list<std::pair<std::string, char>>& channels, char status, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onSendUserMsg(const std::string& server, const std::string& client, const std::list<std::string>& users, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onSendChanNotice(const std::string& server, const std::string& client, const std::list<std::pair<std::string, std::string>>& channels, char status, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onSendUserNotice(const std::string& server, const std::string& client, const std::list<std::string>& users, const std::string& message, const std::map<std::string, std::string>& tags) {}
 	protected:
 		// TODO: provide implementations when I get ServerManager set up
 		void sendMsg(const std::string& server, const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags);

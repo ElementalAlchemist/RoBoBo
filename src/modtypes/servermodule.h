@@ -21,11 +21,18 @@ class ServerModule {
 		virtual void onInvite(const std::string& server, const std::string& channel, const std::string& userInviting, const std::string& userInvited, const std::map<std::string, std::string>& tags) {}
 		virtual void onKnock(const std::string& server, const std::string& channel, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void onNick(const std::string& server, const std::string& user, const std::string& nick, const std::map<std::string, std::string>& tags) {}
-		virtual void onPing(const std::string& server, const std::string& pingingServer, const std::string& data, const std::map<std::string, std::string>& tags) {}
-		virtual void onPong(const std::string& server, const std::string& pongingServer, const std::string& data, const std::map<std::string, std::string>& tags) {}
+		virtual void onPing(const std::string& server, const std::string& pingingServer, const std::map<std::string, std::string>& tags) {}
+		virtual void onPong(const std::string& server, const std::string& pongingServer, const std::map<std::string, std::string>& tags) {}
 		virtual void onAway(const std::string& server, const std::string& user, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void onUnaway(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
-		virtual void onServerNotice(const std::string& server, const std::string& sourceServer, const std::string& notice, const std::map<std::string, std::string>& tags) {}
+		virtual void onChanCreate(const std::string& server, const std::string& channel, const std::list<std::tuple<ModeType, bool, std::string, std::string>>& modes, const std::list<std::pair<std::string, std::list<std::string>>>& users, const std::map<std::string, std::string>& tags) {}
+		virtual void onChanDestroy(const std::string& server, const std::string& channel) {}
+		virtual void onRequestStats(const std::string& server, const std::string& user, const std::string& type, const std::map<std::string, std::string>& tags) {}
+		virtual void onRequestMOTD(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
+		virtual void onRequestTime(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
+		virtual void onRequestAdmin(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
+		virtual void onRequestInfo(const std::string& server, const std::string& user, const std::map<std::string, std::string>& tags) {}
+		virtual void onServerNotice(const std::string& server, const std::string& sourceServer, const std::string& type, const std::string& notice, const std::map<std::string, std::string>& tags) {}
 		virtual void onChanMetadata(const std::string& server, const std::string& channel, const std::string& key, const std::string& value, const std::map<std::string, std::string>& tags) {}
 		virtual void onUserMetadata(const std::string& server, const std::string& user, const std::string& key, const std::string& value, const std::map<std::string, std::string>& tags) {}
 		virtual void onAddXLine(const std::string& server, const std::string& lineType, const std::string& mask, time_t expiry, const std::string& reason, const std::map<std::string, std::string>& tags) {}
@@ -47,14 +54,14 @@ class ServerModule {
 		virtual void onSelfQuit(const std::string& server, const std::string& reason) {}
 		virtual void onOtherData(const std::string& server, const IRCMessage* message) {}
 		
-		virtual void onOutChanMsg(const std::string& server, std::string& client, std::string& channel, char& status, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onOutUserMsg(const std::string& server, std::string& client, std::string& user, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onOutChanNotice(const std::string& server, std::string& client, std::string& channel, char& status, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onOutUserNotice(const std::string& server, std::string& client, std::string& user, std::string& message, std::map<std::string, std::string>& tags) {}
-		virtual void onSendChanMsg(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onSendUserMsg(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onSendChanNotice(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual void onSendUserNotice(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onOutChanMsg(const std::string& server, std::string& client, std::list<std::pair<std::string, char>>& channels, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onOutUserMsg(const std::string& server, std::string& client, std::list<std::string>& users, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onOutChanNotice(const std::string& server, std::string& client, std::list<std::pair<std::string, char>>& channels, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onOutUserNotice(const std::string& server, std::string& client, std::list<std::string>& users, std::string& message, std::map<std::string, std::string>& tags) {}
+		virtual void onSendChanMsg(const std::string& server, const std::string& client, const std::list<std::pair<std::string, char>>& channels, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onSendUserMsg(const std::string& server, const std::string& client, const std::list<std::string>& users, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onSendChanNotice(const std::string& server, const std::string& client, const std::list<std::pair<std::string, char>>& channels, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual void onSendUserNotice(const std::string& server, const std::string& client, const std::list<std::string>& users, const std::string& message, const std::map<std::string, std::string>& tags) {}
 	protected:
 		// TODO: Define all of these once the ServerManager is set up
 		void sendMsg(const std::string& server, const std::string& source, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags);
@@ -80,6 +87,7 @@ class ServerModule {
 		void changeHost(const std::string& server, const std::string& user, const std::string& host, const std::map<std::string, std::string>& tags);
 		void changeGecos(const std::string& server, const std::string& user, const std::string& gecos, const std::map<std::string, std::string>& tags);
 		void sendWallops(const std::string& server, const std::string& source, const std::string& message, const std::map<std::string, std::string>& tags);
+		void pushLine(const std::string& server, const std::string& user, const IRCMessage* line);
 		void sendOtherData(const std::string& server, const IRCMessage* message);
 		
 		std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& host, const std::string& gecos);
