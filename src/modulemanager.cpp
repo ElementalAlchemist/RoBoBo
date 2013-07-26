@@ -535,6 +535,16 @@ void ModuleManager::startQueue() {
 }
 
 void ModuleManager::processQueue() {
-	// TODO: this
+	if (actionQueue.empty()) {
+		runningProcess = false;
+		return;
+	}
+	while (true) {
+		actionQueue.front()();
+		MutexLocker mutexLock (&queueMutex);
+		actionQueue.pop();
+		if (actionQueue.empty())
+			break;
+	}
 	runningProcess = false;
 }
