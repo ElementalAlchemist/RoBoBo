@@ -3,7 +3,7 @@
 #include "globpattern.h"
 #include "config.h"
 
-enum LogLevel { LOG_NONE = 0, LOG_ERRORS = 1, LOG_DEFAULT = 2, LOG_DEBUG = 3, LOG_ALL = 4 };
+enum LogLevel { LOG_NONE = 0, LOG_ERROR = 1, LOG_DEFAULT = 2, LOG_DEBUG = 3, LOG_ALL = 4 };
 
 class LogManager {
 	public:

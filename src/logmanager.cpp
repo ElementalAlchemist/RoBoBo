@@ -27,8 +27,8 @@ void LogManager::updateLogFiles() {
 		if (blockContents["level"] == "none" || blockContents["types"].empty() || blockContents["file"].empty())
 			continue;
 		LogLevel level = LOG_DEFAULT;
-		if (blockContents["level"] == "errors")
-			level = LOG_ERRORS;
+		if (blockContents["level"] == "error")
+			level = LOG_ERROR;
 		else if (blockContents["level"] == "debug")
 			level = LOG_DEBUG;
 		else if (blockContents["level"] == "all")
@@ -52,7 +52,7 @@ void LogManager::log(LogLevel level, const std::string& type, const std::string&
 		return;
 	if (level <= defaultLog)
 		std::cout << type << ": " << info << std::endl;
-	for (LogLevel lvl = LOG_ERRORS; lvl <= level; lvl++) {
+	for (LogLevel lvl = LOG_ERROR; lvl <= level; lvl++) {
 		for (auto logFile : logFiles[lvl]) {
 			bool canWriteType = false;
 			for (std::string typeSpec : logFile.first) {
