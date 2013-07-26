@@ -17,6 +17,12 @@ void Config::setWorkingDirectory(const std::string& workingDirectory) {
 void Config::readConfig() {
 	configData.clear();
 	readConfig(filename);
+	for (auto callback : notifyList)
+		callback();
+}
+
+void Config::addRehashNotify(std::function<void()> notifyCallback) {
+	notifyList.push_back(notifyCallback);
 }
 
 size_t Config::blockCount(const std::string& block) const {

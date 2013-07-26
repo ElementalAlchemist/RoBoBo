@@ -33,7 +33,6 @@ class Module {
 		void disconnectServer(const std::string& server) { modmanager->disconnectServer(server); }
 		void loadModule(const std::string& modName) { modmanager->loadModule(modName); }
 		void unloadModule(const std::string& modName) { modmanager->unloadModule(modName); }
-		void rehash() { modmanager->rehash(); }
 		
 		std::shared_ptr<Socket> assignSocket(const std::string& socketType) { return modmanager->assignSocket(socketType); }
 		

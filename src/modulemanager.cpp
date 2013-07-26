@@ -1,5 +1,10 @@
 #include "modulemanager.h"
 
+ModuleManager::ModuleManager() {
+	Config* config = Config::getHandle();
+	config->addRehashNotify(std::bind(&ModuleManager::onRehash, this));
+}
+
 void ModuleManager::pointServerManager(ServerManager* sm) {
 	servers = sm;
 }
@@ -122,9 +127,7 @@ template<ActionType, typename... Args> void ModuleManager::callHook(ActionType t
 	// TODO: this horrible function
 }
 
-void ModuleManager::rehash() {
-	Config* conf = Config::getHandle();
-	conf->readConfig();
+void ModuleManager::onRehash() {
 	for (auto module : loadedModules)
 		module.second->onRehash();
 }
