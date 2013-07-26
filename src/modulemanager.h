@@ -3,6 +3,7 @@
 #include "config.h"
 #include "ircmessage.h"
 #include "mutexlocker.h"
+#include "logmanager.h"
 #include "servermanager.h"
 
 class Module;
