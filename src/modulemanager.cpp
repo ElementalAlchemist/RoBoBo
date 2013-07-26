@@ -1,6 +1,6 @@
 #include "modulemanager.h"
 
-ModuleManager::ModuleManager() {
+ModuleManager::ModuleManager(const std::string& wd) : workingDir(wd) {
 	Config* config = Config::getHandle();
 	config->addRehashNotify(std::bind(&ModuleManager::onRehash, this));
 }

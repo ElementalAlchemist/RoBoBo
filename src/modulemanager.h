@@ -111,7 +111,7 @@ enum ActionType {
 
 class ModuleManager {
 	public:
-		ModuleManager();
+		ModuleManager(const std::string& wd);
 		void pointServerManager(ServerManager* sm);
 		void loadStartupModules();
 		void loadModule(const std::string& name);
@@ -156,6 +156,7 @@ class ModuleManager {
 		std::unordered_map<std::string, std::list<std::string>> providers;
 		std::unordered_map<std::string, std::list<std::string>> clients;
 		std::unordered_map<std::string, std::list<std::string>> dependents;
+		const std::string workingDir;
 		ServerManager* servers;
 		
 		std::mutex queueMutex;
