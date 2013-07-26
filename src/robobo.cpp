@@ -69,13 +69,15 @@ int main(int argc, char** argv) {
 	sigaddset(&signalSet, SIGHUP);
 	sigaddset(&signalSet, SIGUSR1);
 	struct sigaction sigHandle;
-	sigHandle.sa_handler = [&](int signum) {
-			if (signum == SIGHUP) {
+	sigHandle.sa_handler = [](int signum) {
+		if (signum == SIGHUP) {
 			daemon(1, 0);
-			// TODO: notify server manager? and module manager of the end of debug
+			LogManager* logger = LogManager::getHandle();
+			logger->setDefaultLevel(LOG_NONE);
 		} else if (signum == SIGUSR1) {
-			configuration->readConfig();
-			// TODO: notify module manager of rehash
+			Config* config = Config::getHandle();
+			config->readConfig();
+		}
 	};
 	sigHandle.sa_mask = signalSet;
 	sigHandle.sa_flags = 0;
