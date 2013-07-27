@@ -146,12 +146,12 @@ class ModuleManager {
 		std::list<std::string> serviceUsers(const std::string& service);
 	private:
 		std::shared_ptr<Module> openModule(const std::string& name);
-		void verifyModule(std::shared_ptr<Module> mod);
+		void verifyModule(const std::string& name, std::shared_ptr<Module> mod);
 		std::unordered_map<std::string, std::shared_ptr<Module>> loadedModules;
 		std::unordered_map<std::string, std::shared_ptr<ClientModule>> clientModules;
 		std::unordered_map<std::string, std::shared_ptr<ServerModule>> serverModules;
 		std::unordered_map<ActionType, std::list<std::string>, std::hash<int>> registeredActions;
-		std::unordered_map<std::string, std::unordered_map<ActionType, std::unordered_map<Priority, std::list<std::string>, std::hash<int>>, std::hash<int>>> actionPriority;
+		std::unordered_map<std::string, std::unordered_map<ActionType, std::unordered_map<Priority, std::set<std::string>, std::hash<int>>, std::hash<int>>> actionPriority;
 		std::unordered_map<std::string, std::list<std::string>> providers;
 		std::unordered_map<std::string, std::list<std::string>> clients;
 		std::unordered_map<std::string, std::list<std::string>> dependents;
@@ -184,6 +184,11 @@ class HookTypeException : public std::exception {
 		const char* what() const noexcept { return "A client or server type of hook was given, but the other type was requested."; }
 };
 
+class ModuleAlreadyLoaded : public std::exception {
+	public:
+		const char* what() const noexcept { return "The module is already loaded."; }
+};
+
 class ModuleLoadFailed : public std::exception {
 	public:
 		ModuleLoadFailed(const std::string& description) : desc(description) {}
@@ -197,7 +202,7 @@ class ModuleAPIMismatch : public std::exception {
 		const char* what() const noexcept { return "The module does not support the current module API."; }
 };
 
-class ModuleAlreadyLoaded : public std::exception {
+class ModuleRequirementsNotMet : public std::exception {
 	public:
-		const char* what() const noexcept { return "The module is already loaded."; }
+		const char* what() const noexcept { return "The module's service requirements were not fulfilled by loaded modules."; }
 };

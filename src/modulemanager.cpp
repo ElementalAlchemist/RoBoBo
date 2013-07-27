@@ -45,13 +45,13 @@ void ModuleManager::loadStartupModules() {
 		}
 	}
 	for (auto mod : openedModules) {
-		verifyModule(mod->second);
+		verifyModule(mod.first, mod.second);
 		logger->log(LOG_DEBUG, "module-load", "Module " + mod->first + " loaded successfully.");
 	}
 }
 
 void ModuleManager::loadModule(const std::string& name) {
-	verifyModule(openModule(name));
+	verifyModule(name, openModule(name));
 	/* This function, unlike the startup function above, should allow exceptions to fall through.
 	 * This allows callers of the loadModule function to find out that something was wrong with
 	 * loading and that they should respond to that somehow.
@@ -502,11 +502,63 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	return newModule;
 }
 
-void ModuleManager::verifyModule(std::shared_ptr<Module> mod) {
-	// TODO: check provides
-	// TODO: check requires, check with provided stuff
-	// TODO: get client and server modules; store
-	// TODO: call onLoadComplete
+void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module> mod) {
+	std::list<std::string> requiredServices = mod->requires();
+	for (std::string ability : requiredServices) {
+		if (providers.find(ability) == providers.end())
+			throw ModuleRequirementsNotMet;
+	}
+	loadedModules[name] = mod;
+	std::list<std::string> providingServices = mod->provides();
+	std::list<std::string> usingServices = mod->uses();
+	for (std::string ability : providingServices)
+		providers[ability].push_back(name);
+	for (std::string ability : requiredServices) {
+		dependents[ability].push_back(name);
+		clients[ability].push_back(name);
+	}
+	for (std::string ability : usingServices)
+		clients[ability].push_back(name);
+	std::shared_ptr<ClientModule> clientMod = mod->clientModule();
+	if (clientMod)
+		clientModules[name] = clientMod;
+	std::shared_ptr<ServerModule> serverMod = mod->serverModule();
+	if (serverMod)
+		serverModules[name] = serverMod;
+	std::unordered_map<ActionType, std::unordered_map<Priority, std::set<std::string>, std::hash<int>>, std::hash<int>> actions = mod->registerActions();
+	actionPriority[name] = actions;
+	for (auto hook : actions) {
+		std::set<std::string> before = hook.second[PRIORITY_BEFORE];
+		std::set<std::string> after = hook.second[PRIORITY_AFTER];
+		for (auto otherPriority : actionPriority) {
+			if (otherPriority.second[hook.first][PRIORITY_BEFORE].find(mod->functionid()) != otherPriority.second[hook.first][PRIORITY_BEFORE].end())
+				after.insert(loadedModules[otherPriority.first]->functionid());
+			if (otherPriority.second[hook.first][PRIORITY_AFTER].find(mod->functionid()) != otherPriority.second[hook.first][PRIORITY_AFTER].end())
+				before.insert(loadedModules[otherPriority.first]->functionid());
+		}
+		std::list<std::string>& actionList = registeredActions[hook.first];
+		auto beforeIter = actionList.begin();
+		auto afterIter = actionList.rbegin();
+		for (; beforeIter != actionList.end() && before.find(loadedModules[*beforeIter]->functionid()) != before.end(); ++beforeIter) {}
+		for (; afterIter != actionList.rend() && after.find(loadedModules[*afterIter]->function()) != after.end() && *beforeIter != *afterIter; ++afterIter) {}
+		if (beforeIter == actionList.end() && afterIter == actionList.end()) {
+			if (hook.second.find(PRIORITY_FIRST) != hook.second.end())
+				actionList.push_front(name);
+			else if (hook.second.find(PRIORITY_LAST) != hook.second.end())
+				actionList.push_back(name);
+			else {
+				auto actIter = actionList.begin();
+				size_t advanceAmt = actionList.size() / 2;
+				for (size_t i = 0; i < advanceAmt; i++)
+					actIter++;
+				actionList.insert(actIter, name);
+			}
+		} else if (beforeIter == actionList.end())
+			actionList.insert(afterIter.base(), name);
+		else
+			actionList.insert(beforeIter, name);
+	}
+	mod->onLoadComplete();
 }
 
 template<typename ModType, typename... Args>
