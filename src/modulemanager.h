@@ -5,10 +5,9 @@
 #include "mutexlocker.h"
 #include "logmanager.h"
 #include "servermanager.h"
-
-class Module;
-class ClientModule;
-class ServerModule;
+#include "modtypes/basemodule.h"
+#include "modtypes/clientmodule.h"
+#include "modtypes/servermodule.h"
 
 const std::list<unsigned int> apiVersions { 3000 };
 typedef bool MsgAction;
@@ -202,7 +201,3 @@ class ModuleAlreadyLoaded : public std::exception {
 	public:
 		const char* what() const noexcept { return "The module is already loaded."; }
 };
-
-#include "modtypes/basemodule.h"
-#include "modtypes/clientmodule.h"
-#include "modtypes/servermodule.h"

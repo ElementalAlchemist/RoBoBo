@@ -1,9 +1,9 @@
 #pragma once
 #include "../main.h"
-#include "../modulemanager.h"
 
 class ClientModule;
 class ServerModule;
+class ModuleManager;
 
 class Module {
 	public:

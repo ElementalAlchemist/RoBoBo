@@ -1,6 +1,5 @@
 #pragma once
 #include "../main.h"
-#include "../modulemanager.h"
 #include "basemodule.h"
 
 class ServerModule {
