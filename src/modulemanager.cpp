@@ -620,6 +620,10 @@ void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module
 			actionList.insert(beforeIter, name);
 	}
 	mod->onLoadComplete();
+	for (auto mod : loadedModules) {
+		if (mod.first != name)
+			mod.second->onModuleLoad(name);
+	}
 }
 
 template<typename ModType, typename... Args>
