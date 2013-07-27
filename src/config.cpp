@@ -250,6 +250,6 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 
 ConfigError::ConfigError(const std::string& filename, unsigned int lineNum, const std::string& description) {
 	std::ostringstream descStr;
-	descStr << "An error occurred reading the configuration file " << filename << " on line " << lineNum << ": " << description;
+	descStr << "An error occurred reading the configuration from '" << filename << "' on line " << lineNum << ": " << description;
 	desc = descStr.str();
 }
