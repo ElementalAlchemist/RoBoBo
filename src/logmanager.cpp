@@ -6,18 +6,13 @@ LogManager* LogManager::getHandle() {
 	return instance;
 }
 
-void LogManager::setLogDir(const std::string& dir) {
-	if (logDir.empty())
-		logDir = dir;
-}
-
 void LogManager::setDefaultLevel(LogLevel level) {
 	defaultLog = level;
 }
 
 void LogManager::updateLogFiles() {
 	for (auto logFileList : logFiles) {
-		for (auto file : logFileList)
+		for (auto file : logFileList.second)
 			delete file->second;
 	}
 	logFiles.clear();
@@ -43,7 +38,7 @@ void LogManager::updateLogFiles() {
 				typeStr = typeStr.substr(nextType.size() + 1);
 			types.push_back(nextType);
 		}
-		logFiles[level].push_back(std::pair<std::list<std::string>, std::ofstream*> (types, new std::ofstream(logDir + blockContents["file"], std::ios_base::out | std::ios_base::app)));
+		logFiles[level].push_back(std::pair<std::list<std::string>, std::ofstream*> (types, new std::ofstream("logs/" + blockContents["file"], std::ios_base::out | std::ios_base::app)));
 	}
 }
 

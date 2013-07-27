@@ -1,6 +1,6 @@
 #include "modulemanager.h"
 
-ModuleManager::ModuleManager(const std::string& wd) : workingDir(wd) {
+ModuleManager::ModuleManager() {
 	Config* config = Config::getHandle();
 	config->addRehashNotify(std::bind(&ModuleManager::onRehash, this));
 }
@@ -538,7 +538,7 @@ std::list<std::string> ModuleManager::serviceUsers(const std::string& service) {
 std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	if (loadedModules.find(name) != loadedModules.end())
 		throw ModuleAlreadyLoaded;
-	void* modFile = dlopen((workingDir + "/modules/" + name).c_str(), RTLD_NOW);
+	void* modFile = dlopen(("modules/" + name).c_str(), RTLD_NOW);
 	if (modFile == nullptr)
 		throw ModuleLoadFailed (name, dlerror());
 	void* spawnFunc = dlsym(modFile, "spawn");
@@ -549,8 +549,8 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 			throw ModuleLoadFailed (name, loadError);
 		throw ModuleLoadFailed (name, "The spawn symbol has been set to null, but it must be a valid function");
 	}
-	std::shared_ptr<Module>(*spawnCallFunc)(const std::string&, const std::string&) = static_cast<std::shared_ptr<Module>(*)(const std::string&, const std::string&)> (spawnFunc);
-	std::shared_ptr<Module> newModule = spawnCallFunc(name, workingDir);
+	std::shared_ptr<Module>(*spawnCallFunc)(const std::string&) = static_cast<std::shared_ptr<Module>(*)(const std::string&)> (spawnFunc);
+	std::shared_ptr<Module> newModule = spawnCallFunc(name);
 	if (std::find(apiVersions.begin(), apiVersions.end(), newModule->apiVersion()) == apiVersions.end()) {
 		dlclose(modFile);
 		throw ModuleAPIMismatch (name);

@@ -9,7 +9,6 @@ class Config {
 		Config& operator=(const Config&) = delete;
 		static Config* getHandle();
 		void setMainConfigFile(const std::string& configFileName);
-		void setWorkingDirectory(const std::string& workingDirectory);
 		void readConfig();
 		void addRehashNotify(std::function<void()> notifyCallback);
 		size_t blockCount(const std::string& block) const;
@@ -22,7 +21,6 @@ class Config {
 		Config();
 		static const Config* instance;
 		std::string confname;
-		std::string workingDir;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> configData;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> readConfig(const std::string& filename, std::istream&& configData);
 		std::list<std::function<void()>> notifyList;

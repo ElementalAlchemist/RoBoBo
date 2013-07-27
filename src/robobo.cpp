@@ -3,6 +3,7 @@
 int main(int argc, char** argv) {
 	std::string workingDir (argv[0]);
 	workingDir = workingDir.substr(0, workingDir.find_last_of('/'));
+	chdir(workingDir.c_str());
 	std::string confName ("robobo.conf");
 	unsigned short debugLevel = 0;
 	if (argc > 1) {
@@ -53,10 +54,8 @@ int main(int argc, char** argv) {
 	// If a relative path is provided, it should be relative to the working directory
 	Config* configuration = Config::getHandle();
 	LogManager* logger = LogManager::getHandle();
-	logger->setLogDir(workingDir + "/logs/");
 	logger->setDefaultLevel(static_cast<LogLevel> (debugLevel));
 	configuration->setMainConfigFile(confName);
-	configuration->setWorkingDirectory(workingDir);
 	configuration->addRehashNotify(std::bind(&LogManager::updateLogFiles, logger));
 	configuration->readConfig();
 	// TODO: module manager and server manager

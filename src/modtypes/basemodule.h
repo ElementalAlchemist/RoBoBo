@@ -7,7 +7,7 @@ class ModuleManager;
 
 class Module {
 	public:
-		Module(const std::string& name, const std::string& wd) : moduleName(name), workingDir(wd) {}
+		Module(const std::string& name) : moduleName(name) {}
 		void loadManagerPointer(ModuleManager* mm) { modmanager = mm; }
 		virtual const unsigned int apiVersion() const = 0;
 		virtual const std::string functionid() const = 0;
@@ -27,7 +27,7 @@ class Module {
 		virtual void onModuleLoad(const std::string& module) {}
 		virtual void onModuleUnload(const std::string& module) {}
 	protected:
-		const std::string moduleName, workingDir;
+		const std::string moduleName;
 		
 		void connectServer(const std::string& server) { modmanager->connectServer(server); }
 		void disconnectServer(const std::string& server) { modmanager->disconnectServer(server); }

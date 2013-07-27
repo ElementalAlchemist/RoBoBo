@@ -11,11 +11,6 @@ void Config::setMainConfigFile(const std::string& configFileName) {
 		confname = configFileName;
 }
 
-void Config::setWorkingDirectory(const std::string& workingDirectory) {
-	if (workingDir.empty())
-		workingDir = workingDirectory;
-}
-
 void Config::readConfig() {
 	// TODO: append workingDir and filename
 	// TODO: create std::ifstream object
@@ -223,8 +218,6 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 			auto inclfIter = block.second.find("file");
 			if (inclfIter != block.second.end()) {
 				std::string name = inclfIter->second;
-				if (name[0] != '/')
-					name = workingDir + "/" + name;
 				logger->log(LOG_ALL, "config", "Reading included file " + inclfIter->second);
 				includedConfigs.push_back(readConfig(inclfIter->second, std::ifstream(name)));
 			} else {

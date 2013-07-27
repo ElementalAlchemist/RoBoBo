@@ -10,14 +10,12 @@ class LogManager {
 		LogManager(const LogManager&) = delete;
 		LogManager& operator=(const LogManager&) = delete;
 		LogManager* getHandle();
-		void setLogDir(const std::string& dir);
 		void setDefaultLevel(LogLevel level);
 		void updateLogFiles();
 		void log(LogLevel level, const std::string& type, const std::string& info);
 	private:
 		LogManager();
 		static const LogManager* instance;
-		std::string logDir;
 		LogLevel defaultLog;
 		std::unordered_map<LogLevel, std::list<std::pair<std::list<std::string>, std::ofstream*>>, std::hash<int>> logFiles;
 };
