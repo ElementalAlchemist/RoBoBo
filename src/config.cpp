@@ -12,11 +12,8 @@ void Config::setMainConfigFile(const std::string& configFileName) {
 }
 
 void Config::readConfig() {
-	// TODO: append workingDir and filename
-	// TODO: create std::ifstream object
-	// TODO: fix everything about this function
-	configData.clear();
-	readConfig(filename);
+	config.clear();
+	config = readConfig(confname, std::ifstream(confname));
 	for (auto callback : notifyList)
 		callback();
 }
@@ -26,21 +23,21 @@ void Config::addRehashNotify(std::function<void()> notifyCallback) {
 }
 
 size_t Config::blockCount(const std::string& block) const {
-	return configData.count(block);
+	return config.count(block);
 }
 
 std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const std::string& block) const {
 	std::list<std::unordered_map<std::string, std::string>> blockList;
 	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
-	std::tie(startIter, endIter) = configData.equal_range(block);
+	std::tie(startIter, endIter) = config.equal_range(block);
 	for (; startIter != endIter; ++startIter)
 		blockList.push_back(startIter->second);
 	return blockList;
 }
 
 std::string Config::getValue(const std::string& block, const std::string& key) const {
-	auto blockIter = configData.find(block);
-	if (blockIter == configData.end())
+	auto blockIter = config.find(block);
+	if (blockIter == config.end())
 		return "";
 	auto dataIter = blockIter->second.find(key);
 	if (dataIter == blockIter->second.end())
@@ -60,7 +57,7 @@ bool Config::getBoolValue(const std::string& block, const std::string& key) cons
 std::list<std::string> Config::getAllValues(const std::string& block, const std::string& key) const {
 	std::list<std::string> valueList;
 	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
-	std::tie(startIter, endIter) = configData.equal_range(block);
+	std::tie(startIter, endIter) = config.equal_range(block);
 	for (; startIter != endIter; ++startIter) {
 		auto dataIter = startIter->second.find(key);
 		if (dataIter == startIter->second.end())
@@ -74,7 +71,7 @@ std::list<std::string> Config::getAllValues(const std::string& block, const std:
 std::list<bool> Config::getAllBoolValues(const std::string& block, const std::string& key) const {
 	std::list<bool> valueList;
 	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
-	std::tie(startIter, endIter) = configData.equal_range(block);
+	std::tie(startIter, endIter) = config.equal_range(block);
 	for (std::string lowerValue; startIter != endIter; ++startIter) {
 		auto dataIter = startIter->second.find(key);
 		if (dataIter == startIter->second.end())

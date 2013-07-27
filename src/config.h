@@ -21,7 +21,7 @@ class Config {
 		Config();
 		static const Config* instance;
 		std::string confname;
-		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> configData;
+		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> config;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> readConfig(const std::string& filename, std::istream&& configData);
 		std::list<std::function<void()>> notifyList;
 };
