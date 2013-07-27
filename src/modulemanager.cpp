@@ -10,6 +10,11 @@ void ModuleManager::pointServerManager(ServerManager* sm) {
 }
 
 void ModuleManager::loadStartupModules() {
+	/* Modules are loaded on startup by opening the files and instantiating the classes, pulling out what services they provide,
+	 * and THEN verifying and storing the module, rather than simply by calling loadModule for each module we get from the
+	 * configuration.  This is so that modules can be loaded on startup in any order without the order affecting whether modules
+	 * will load and run properly.
+	 */
 	Config* conf = Config::getHandle();
 	std::list<std::string> modulesToLoad = conf->getAllValues("module", "name");
 	std::list<std::shared_ptr<Module>> openedModules;
