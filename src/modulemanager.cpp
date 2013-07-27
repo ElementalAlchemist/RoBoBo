@@ -491,22 +491,30 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	void* spawnFunc = dlsym(modFile, "spawn");
 	if (spawnFunc == nullptr) { // The spawn function should not be null in valid RoBoBo modules.
 		const char* loadError = dlerror();
+		dlclose(modFile);
 		if (loadError)
 			throw ModuleLoadFailed (name, loadError);
 		throw ModuleLoadFailed (name, "The spawn symbol has been set to null, but it must be a valid function");
 	}
 	std::shared_ptr<Module>(*spawnCallFunc)(const std::string&, const std::string&) = static_cast<std::shared_ptr<Module>(*)(const std::string&, const std::string&)> (spawnFunc);
 	std::shared_ptr<Module> newModule = spawnCallFunc(name, workingDir);
-	if (std::find(apiVersions.begin(), apiVersions.end(), newModule->apiVersion()) == apiVersions.end())
+	if (std::find(apiVersions.begin(), apiVersions.end(), newModule->apiVersion()) == apiVersions.end()) {
+		dlclose(modFile);
 		throw ModuleAPIMismatch (name);
+	}
+	moduleFiles.insert(std::pair<std::string, void*> (name, modFile));
 	return newModule;
 }
 
 void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module> mod) {
 	std::list<std::string> requiredServices = mod->requires();
 	for (std::string ability : requiredServices) {
-		if (providers.find(ability) == providers.end())
+		if (providers.find(ability) == providers.end()) {
+			auto fileIter = moduleFiles.find(name);
+			dlclose(fileIter->second);
+			moduleFiles.erase(fileIter);
 			throw ModuleRequirementsNotMet;
+		}
 	}
 	loadedModules[name] = mod;
 	std::list<std::string> providingServices = mod->provides();

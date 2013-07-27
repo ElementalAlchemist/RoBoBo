@@ -155,6 +155,7 @@ class ModuleManager {
 		std::unordered_map<std::string, std::list<std::string>> providers;
 		std::unordered_map<std::string, std::list<std::string>> clients;
 		std::unordered_map<std::string, std::list<std::string>> dependents;
+		std::unordered_map<std::string, void*> moduleFiles;
 		const std::string workingDir;
 		ServerManager* servers;
 		
