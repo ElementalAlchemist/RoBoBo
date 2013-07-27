@@ -51,8 +51,6 @@ int main(int argc, char** argv) {
 	}
 	// Default the configuration to the working directory if an absolute path is not provided
 	// If a relative path is provided, it should be relative to the working directory
-	if (confName[0] != '/')
-		confName = workingDir + "/" + confName;
 	Config* configuration = Config::getHandle();
 	LogManager* logger = LogManager::getHandle();
 	logger->setLogDir(workingDir + "/logs/");

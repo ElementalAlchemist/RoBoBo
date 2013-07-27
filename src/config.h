@@ -1,5 +1,6 @@
 #pragma once
 #include "main.h"
+#include "logmanager.h"
 
 class Config {
 	public:
@@ -20,9 +21,17 @@ class Config {
 	private:
 		Config();
 		static const Config* instance;
-		std::string filename;
+		std::string confname;
 		std::string workingDir;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> configData;
-		void readConfig(const std::string& fileName);
+		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> readConfig(const std::string& filename, std::istream&& configData);
 		std::list<std::function<void()>> notifyList;
+};
+
+class ConfigError : public std::exception {
+	public:
+		ConfigError(const std::string& fileName, unsigned int lineNum, const std::string& description);
+		const char* what() const noexcept { return desc.c_str(); }
+	private:
+		std::string desc;
 };
