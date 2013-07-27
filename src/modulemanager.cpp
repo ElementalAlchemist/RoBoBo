@@ -10,10 +10,34 @@ void ModuleManager::pointServerManager(ServerManager* sm) {
 }
 
 void ModuleManager::loadStartupModules() {
-	// TODO: get modules from config
-	// TODO: call openModule for all of them
-	// TODO: handle provided services for all of them (just add service to the providers map)
-	// TODO: call verifyModule for all of them
+	Config* conf = Config::getHandle();
+	std::list<std::string> modulesToLoad = conf->getAllValues("module", "name");
+	std::list<std::shared_ptr<Module>> openedModules;
+	for (std::string modName : modulesToLoad) {
+		try {
+			std::shared_ptr<Module> mod = openModule(modName);
+			const std::list<std::string> provided = mod->provides();
+			for (std::string ability : provided) {
+				if (providers.find(ability) == providers.end())
+					providers.insert(std::pair<std::string, std::list<std::string>> (ability, std::list<std::string> ()));
+			}
+			openedModules.insert(mod);
+		} catch (const ModuleAlreadyLoaded& ex) {
+			LogManager* log = LogManager::getHandle();
+			log->log(LOG_ERROR, "module-load", "The module " + modName + " was duplicated in the configuration.");
+		} catch (const std::bad_alloc& ex) {
+			LogManager* log = LogManager::getHandle();
+			log->log(LOG_ERROR, "module-load", "Memory could not be allocated to load " + modName + ".");
+			/* This log message is assuming that the issue is that the module is too big to fit in memory or something,
+			 * or we may be in a restrained memory environment and the module that could conceivably fit was just not able to be allocated.
+			 * In any case, I realize that getting the log handler and trying to write a log message MAY rethrow std::bad_alloc, but
+			 * in that situation, we should probably let it go and shut everything down because we're basically too desperately out of
+			 * memory for the core to run at that point.
+			 */
+		} // TODO: catch exceptions indicating other module errors
+	}
+	for (auto mod : openedModules)
+		verifyModule(mod);
 }
 
 void ModuleManager::loadModule(const std::string& name) {

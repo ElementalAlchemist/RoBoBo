@@ -185,6 +185,11 @@ class HookTypeException : public std::exception {
 		const char* what() const noexcept { return "A client or server type of hook was given, but the other type was requested."; }
 };
 
+class ModuleAlreadyLoaded : public std::exception {
+	public:
+		const char* what() const noexcept { return "The module is already loaded."; }
+};
+
 #include "modtypes/basemodule.h"
 #include "modtypes/clientmodule.h"
 #include "modtypes/servermodule.h"
