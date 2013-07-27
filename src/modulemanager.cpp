@@ -30,6 +30,10 @@ void ModuleManager::loadStartupModules() {
 			openedModules.insert(std::pair<std::string, std::shared_ptr<Module>> (modName, mod));
 		} catch (const ModuleAlreadyLoaded& ex) {
 			logger->log(LOG_ERROR, "module-load", "The module " + modName + " was duplicated in the configuration.");
+		} catch (const ModuleLoadFailed& ex) {
+			logger->log(LOG_ERROR, "module-load", "The module " + modName + " could not be loaded: " + ex.what());
+		} catch (const ModuleAPIMismatch& ex) {
+			logger->log(LOG_ERROR, "module-load", "The module " + modName + " does not support the current module API.");
 		} catch (const std::bad_alloc& ex) {
 			logger->log(LOG_ERROR, "module-load", "Memory could not be allocated to load " + modName + ".");
 			/* This log message is assuming that the issue is that the module is too big to fit in memory or something,
@@ -38,7 +42,7 @@ void ModuleManager::loadStartupModules() {
 			 * in that situation, we should probably let it go and shut everything down because we're basically too desperately out of
 			 * memory for the core to run at that point.
 			 */
-		} // TODO: catch exceptions indicating other module errors
+		}
 	}
 	for (auto mod : openedModules) {
 		verifyModule(mod->second);
@@ -479,9 +483,23 @@ std::list<std::string> ModuleManager::serviceUsers(const std::string& service) {
 }
 
 std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
-	// TODO: open module
-	// TODO: get module instance
-	// TODO: store module instance
+	if (loadedModules.find(name) != loadedModules.end())
+		throw ModuleAlreadyLoaded;
+	void* modFile = dlopen((workingDir + "/modules/" + name).c_str(), RTLD_NOW);
+	if (modFile == nullptr)
+		throw ModuleLoadFailed (name, dlerror());
+	void* spawnFunc = dlsym(modFile, "spawn");
+	if (spawnFunc == nullptr) { // The spawn function should not be null in valid RoBoBo modules.
+		const char* loadError = dlerror();
+		if (loadError)
+			throw ModuleLoadFailed (name, loadError);
+		throw ModuleLoadFailed (name, "The spawn symbol has been set to null, but it must be a valid function");
+	}
+	std::shared_ptr<Module>(*spawnCallFunc)(const std::string&, const std::string&) = static_cast<std::shared_ptr<Module>(*)(const std::string&, const std::string&)> (spawnFunc);
+	std::shared_ptr<Module> newModule = spawnCallFunc(name, workingDir);
+	if (std::find(apiVersions.begin(), apiVersions.end(), newModule->apiVersion()) == apiVersions.end())
+		throw ModuleAPIMismatch (name);
+	return newModule;
 }
 
 void ModuleManager::verifyModule(std::shared_ptr<Module> mod) {

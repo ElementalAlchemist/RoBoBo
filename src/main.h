@@ -23,5 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include <dlfcn.h>
+
 const std::string BotVersion ("3.0.0-devel");
 const unsigned int BotVersionNum = 2800;

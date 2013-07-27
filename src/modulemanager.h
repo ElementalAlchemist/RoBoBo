@@ -185,6 +185,19 @@ class HookTypeException : public std::exception {
 		const char* what() const noexcept { return "A client or server type of hook was given, but the other type was requested."; }
 };
 
+class ModuleLoadFailed : public std::exception {
+	public:
+		ModuleLoadFailed(const std::string& description) : desc(description) {}
+		const char* what() const noexcept { return desc.c_str(); }
+	private:
+		const std::string desc;
+};
+
+class ModuleAPIMismatch : public std::exception {
+	public:
+		const char* what() const noexcept { return "The module does not support the current module API."; }
+};
+
 class ModuleAlreadyLoaded : public std::exception {
 	public:
 		const char* what() const noexcept { return "The module is already loaded."; }
