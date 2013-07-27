@@ -207,3 +207,8 @@ class ModuleRequirementsNotMet : public std::exception {
 	public:
 		const char* what() const noexcept { return "The module's service requirements were not fulfilled by loaded modules."; }
 };
+
+class ModuleNotLoaded : public std::exception {
+	public:
+		const char* what() const noexcept { return "The module being unloaded wasn't already loaded."; }
+};

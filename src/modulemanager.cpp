@@ -61,8 +61,61 @@ void ModuleManager::loadModule(const std::string& name) {
 }
 
 void ModuleManager::unloadModule(const std::string& name) {
-	// TODO: remove module's data from everything
-	// TODO: remove empty provides, clients, dependents from maps
+	auto modIter = loadedModules.find(name);
+	if (modIter == loadedModules.end())
+		throw ModuleNotLoaded;
+	for (auto& action : registeredActions)
+		action.second.remove(name);
+	auto storedPriority = actionPriority.find(name);
+	if (storedPriority != actionPriority.end())
+		actionPriority.erase(storedPriority);
+	std::list<std::string> emptyProviders, emptyClients, emptyDependents;
+	for (auto& provider : providers) {
+		provider.second.remove(name);
+		if (provider.second.empty())
+			emptyProviders.push_back(provider.first);
+	}
+	for (auto& client : clients) {
+		client.second.remove(name);
+		if (client.second.empty())
+			emptyClients.push_back(client.first);
+	}
+	for (auto& dependent : dependents) {
+		dependent.second.remove(name);
+		if (dependent.second.empty())
+			emptyDependents.push_back(dependent.first);
+	}
+	for (std::string provider : emptyProviders)
+		providers.erase(provider);
+	for (std::string client : emptyClients)
+		clients.erase(client);
+	for (std::string dependent : emptyDependents)
+		dependents.erase(dependent);
+	
+	std::set<std::string> alsoUnload;
+	for (auto dependent : dependents) {
+		if (providers.find(dependent.first) == providers.end()) {
+			for (std::string modName : dependent.second)
+				alsoUnload.insert(modName);
+		}
+	}
+	for (std::string modName : alsoUnload)
+		unloadModule(modName);
+	
+	MutexLocker mutexLock (&queueMutex);
+	actionQueue.push([=]() {
+		auto modIter = loadedModules.find(name);
+		auto modFileIter = moduleFiles.find(name);
+		void* filePtr = modFileIter->second;
+		modIter->second->onUnload();
+		moduleFiles.erase(modFileIter);
+		loadedModules.erase(modIter);
+		clientModules.erase(name);
+		serverModules.erase(name);
+		for (auto mod : loadedModules)
+			mod.second->onModuleUnload(name);
+		dlclose(filePtr);
+	});
 }
 
 bool ModuleManager::checkKeepAlive() const {
