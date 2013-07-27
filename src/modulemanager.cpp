@@ -41,8 +41,13 @@ void ModuleManager::loadStartupModules() {
 }
 
 void ModuleManager::loadModule(const std::string& name) {
-	// TODO: open each module
-	// TODO: verify each module
+	verifyModule(openModule(name));
+	/* This function, unlike the startup function above, should allow exceptions to fall through.
+	 * This allows callers of the loadModule function to find out that something was wrong with
+	 * loading and that they should respond to that somehow.
+	 * This is not so allowable on startup as it must continue loading the startup modules and not let exceptions
+	 * fall out of the main function.
+	 */
 }
 
 void ModuleManager::unloadModule(const std::string& name) {
