@@ -17,7 +17,8 @@ void ModuleManager::loadStartupModules() {
 	 */
 	Config* conf = Config::getHandle();
 	std::list<std::string> modulesToLoad = conf->getAllValues("module", "name");
-	std::list<std::shared_ptr<Module>> openedModules;
+	std::unordered_map<std::string, std::shared_ptr<Module>> openedModules;
+	LogManager* logger = LogManager::getHandle();
 	for (std::string modName : modulesToLoad) {
 		try {
 			std::shared_ptr<Module> mod = openModule(modName);
@@ -26,13 +27,11 @@ void ModuleManager::loadStartupModules() {
 				if (providers.find(ability) == providers.end())
 					providers.insert(std::pair<std::string, std::list<std::string>> (ability, std::list<std::string> ()));
 			}
-			openedModules.insert(mod);
+			openedModules.insert(std::pair<std::string, std::shared_ptr<Module>> (modName, mod));
 		} catch (const ModuleAlreadyLoaded& ex) {
-			LogManager* log = LogManager::getHandle();
-			log->log(LOG_ERROR, "module-load", "The module " + modName + " was duplicated in the configuration.");
+			logger->log(LOG_ERROR, "module-load", "The module " + modName + " was duplicated in the configuration.");
 		} catch (const std::bad_alloc& ex) {
-			LogManager* log = LogManager::getHandle();
-			log->log(LOG_ERROR, "module-load", "Memory could not be allocated to load " + modName + ".");
+			logger->log(LOG_ERROR, "module-load", "Memory could not be allocated to load " + modName + ".");
 			/* This log message is assuming that the issue is that the module is too big to fit in memory or something,
 			 * or we may be in a restrained memory environment and the module that could conceivably fit was just not able to be allocated.
 			 * In any case, I realize that getting the log handler and trying to write a log message MAY rethrow std::bad_alloc, but
@@ -41,8 +40,10 @@ void ModuleManager::loadStartupModules() {
 			 */
 		} // TODO: catch exceptions indicating other module errors
 	}
-	for (auto mod : openedModules)
-		verifyModule(mod);
+	for (auto mod : openedModules) {
+		verifyModule(mod->second);
+		logger->log(LOG_DEBUG, "module-load", "Module " + mod->first + " loaded successfully.");
+	}
 }
 
 void ModuleManager::loadModule(const std::string& name) {
