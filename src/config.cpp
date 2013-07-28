@@ -12,7 +12,6 @@ void Config::setMainConfigFile(const std::string& configFileName) {
 }
 
 void Config::readConfig() {
-	config.clear();
 	config = readConfig(confname, std::ifstream(confname));
 	for (auto callback : notifyList)
 		callback();
