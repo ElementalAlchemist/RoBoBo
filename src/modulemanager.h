@@ -193,10 +193,10 @@ class ModuleAlreadyLoaded : public std::exception {
 
 class ModuleLoadFailed : public std::exception {
 	public:
-		ModuleLoadFailed(const std::string& description) : desc(description) {}
-		const char* what() const noexcept { return desc.c_str(); }
+		ModuleLoadFailed(const std::string& desc) : description(desc) {}
+		const char* what() const noexcept { return description.c_str(); }
 	private:
-		const std::string desc;
+		const std::string description;
 };
 
 class ModuleAPIMismatch : public std::exception {
