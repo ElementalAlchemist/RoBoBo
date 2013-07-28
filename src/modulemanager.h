@@ -201,7 +201,7 @@ class ModuleLoadFailed : public std::exception {
 
 class ModuleAPIMismatch : public std::exception {
 	public:
-		const char* what() const noexcept { return "The module does not support the current module API."; }
+		const char* what() const noexcept { return "The module is not compatible with the current module API."; }
 };
 
 class ModuleRequirementsNotMet : public std::exception {
