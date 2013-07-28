@@ -557,7 +557,7 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	std::shared_ptr<Module> newModule = spawnCallFunc(name);
 	if (apiVersions.find(newModule->apiVersion()) == apiVersions.end()) {
 		dlclose(modFile);
-		throw ModuleAPIMismatch (name);
+		throw ModuleAPIMismatch;
 	}
 	moduleFiles.insert(std::pair<std::string, void*> (name, modFile));
 	return newModule;
