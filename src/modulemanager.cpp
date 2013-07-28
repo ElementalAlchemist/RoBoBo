@@ -9,6 +9,10 @@ void ModuleManager::pointServerManager(ServerManager* sm) {
 	servers = sm;
 }
 
+void ModuleManager::pointSocketManager(SocketManager* sm) {
+	sockets = sm;
+}
+
 void ModuleManager::loadStartupModules() {
 	/* Modules are loaded on startup by opening the files and instantiating the classes, pulling out what services they provide,
 	 * and THEN verifying and storing the module, rather than simply by calling loadModule for each module we get from the
@@ -581,11 +585,15 @@ void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module
 	for (std::string ability : usingServices)
 		clients[ability].push_back(name);
 	std::shared_ptr<ClientModule> clientMod = mod->clientModule();
-	if (clientMod)
+	if (clientMod) {
+		clientMod->loadManagerPointer(this, servers, sockets);
 		clientModules[name] = clientMod;
+	}
 	std::shared_ptr<ServerModule> serverMod = mod->serverModule();
-	if (serverMod)
+	if (serverMod) {
+		serverMod->loadManagerPointer(this, servers, sockets);
 		serverModules[name] = serverMod;
+	}
 	std::unordered_map<ActionType, std::unordered_map<Priority, std::set<std::string>, std::hash<int>>, std::hash<int>> actions = mod->registerActions();
 	actionPriority[name] = actions;
 	for (auto hook : actions) {

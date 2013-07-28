@@ -112,6 +112,7 @@ class ModuleManager {
 	public:
 		ModuleManager();
 		void pointServerManager(ServerManager* sm);
+		void pointSocketManager(SocketManager* sm);
 		void loadStartupModules();
 		void loadModule(const std::string& name);
 		void unloadModule(const std::string& name);
@@ -157,6 +158,7 @@ class ModuleManager {
 		std::unordered_map<std::string, std::list<std::string>> dependents;
 		std::unordered_map<std::string, void*> moduleFiles;
 		ServerManager* servers;
+		SocketManager* sockets;
 		
 		std::mutex queueMutex;
 		std::queue<std::function<void()>> actionQueue;
