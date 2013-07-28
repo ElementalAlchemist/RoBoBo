@@ -542,7 +542,7 @@ std::list<std::string> ModuleManager::serviceUsers(const std::string& service) {
 std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	if (loadedModules.find(name) != loadedModules.end())
 		throw ModuleAlreadyLoaded;
-	void* modFile = dlopen(("modules/" + name).c_str(), RTLD_NOW);
+	void* modFile = dlopen(("modules/" + name + ".so").c_str(), RTLD_NOW);
 	if (modFile == nullptr)
 		throw ModuleLoadFailed (name, dlerror());
 	void* spawnFunc = dlsym(modFile, "spawn");
