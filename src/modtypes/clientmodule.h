@@ -5,6 +5,7 @@
 class ClientModule {
 	public:
 		ClientModule(std::shared_ptr<Module> base) : baseModule(base) {}
+		virtual ~ClientModule() {}
 		void loadManagerPointer(ModuleManager* mm, ServerManager* sm, SocketManager* sockm) { modmanager = mm; servmanager = sm; sockmanager = sockm; }
 		
 		virtual MsgAction onChanMsg(const std::string& server, const std::string& client, const std::string& channel, char status, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }

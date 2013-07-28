@@ -8,6 +8,7 @@ class ModuleManager;
 class Module {
 	public:
 		Module(const std::string& name) : moduleName(name) {}
+		virtual ~Module() {}
 		void loadManagerPointer(ModuleManager* mm) { modmanager = mm; }
 		virtual const unsigned int apiVersion() const = 0;
 		virtual const std::string functionid() const = 0;
