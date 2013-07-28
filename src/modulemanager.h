@@ -193,7 +193,7 @@ class ModuleAlreadyLoaded : public std::exception {
 
 class ModuleLoadFailed : public std::exception {
 	public:
-		ModuleLoadFailed(const std::string& desc) : description(desc) {}
+		ModuleLoadFailed(const std::string& name, const std::string& desc) : description("The module " + name + " failed to load: " + desc) {}
 		const char* what() const noexcept { return description.c_str(); }
 	private:
 		const std::string description;
