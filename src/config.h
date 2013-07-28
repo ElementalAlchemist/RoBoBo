@@ -10,6 +10,7 @@ class Config {
 		static Config* getHandle();
 		void setMainConfigFile(const std::string& configFileName);
 		void readConfig();
+		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> readConfig(const std::string& filename, std::istream&& configData);
 		void addRehashNotify(std::function<void()> notifyCallback);
 		size_t blockCount(const std::string& block) const;
 		std::list<std::unordered_map<std::string, std::string>> getBlock(const std::string& block) const;
@@ -22,7 +23,6 @@ class Config {
 		static const Config* instance;
 		std::string confname;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> config;
-		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> readConfig(const std::string& filename, std::istream&& configData);
 		std::list<std::function<void()>> notifyList;
 };
 

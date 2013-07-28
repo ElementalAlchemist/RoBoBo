@@ -18,79 +18,8 @@ void Config::readConfig() {
 		callback();
 }
 
-void Config::addRehashNotify(std::function<void()> notifyCallback) {
-	notifyList.push_back(notifyCallback);
-}
-
-size_t Config::blockCount(const std::string& block) const {
-	return config.count(block);
-}
-
-std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const std::string& block) const {
-	std::list<std::unordered_map<std::string, std::string>> blockList;
-	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
-	std::tie(startIter, endIter) = config.equal_range(block);
-	for (; startIter != endIter; ++startIter)
-		blockList.push_back(startIter->second);
-	return blockList;
-}
-
-std::string Config::getValue(const std::string& block, const std::string& key) const {
-	auto blockIter = config.find(block);
-	if (blockIter == config.end())
-		return "";
-	auto dataIter = blockIter->second.find(key);
-	if (dataIter == blockIter->second.end())
-		return "";
-	return dataIter->second;
-}
-
-bool Config::getBoolValue(const std::string& block, const std::string& key) const {
-	const std::string& value = getValue(block, key);
-	std::string lowerValue;
-	std::transform(value.begin(), value.end(), std::back_inserter(lowerValue), ::tolower);
-	if (lowerValue == "yes" || lowerValue == "on" || lowerValue == "true")
-		return true;
-	return false;
-}
-
-std::list<std::string> Config::getAllValues(const std::string& block, const std::string& key) const {
-	std::list<std::string> valueList;
-	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
-	std::tie(startIter, endIter) = config.equal_range(block);
-	for (; startIter != endIter; ++startIter) {
-		auto dataIter = startIter->second.find(key);
-		if (dataIter == startIter->second.end())
-			valueList.push_back("");
-		else
-			valueList.push_back(dataIter->second);
-	}
-	return valueList;
-}
-
-std::list<bool> Config::getAllBoolValues(const std::string& block, const std::string& key) const {
-	std::list<bool> valueList;
-	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
-	std::tie(startIter, endIter) = config.equal_range(block);
-	for (std::string lowerValue; startIter != endIter; ++startIter) {
-		auto dataIter = startIter->second.find(key);
-		if (dataIter == startIter->second.end())
-			valueList.push_back(false);
-		else {
-			lowerValue.clear();
-			std::transform(dataIter->second.begin(), dataIter->second.end(), std::back_inserter(lowerValue), ::tolower);
-			if (lowerValue == "yes" || lowerValue == "on" || lowerValue == "true")
-				valueList.push_back(true);
-			else
-				valueList.push_back(false);
-		}
-	}
-	return valueList;
-}
-
-Config::Config() {}
-
 enum ConfigState { CONFIG_BLOCK, CONFIG_KEY, CONFIG_VALUE, CONFIG_VALUE_NEXT, CONFIG_VALUE_VAR, CONFIG_VALUE_STR, CONFIG_VALUE_STR_ESCAPED };
+// This enum is simply an implementation detail for the configuration parser; hence it is placed here instead of the header file.
 
 std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> Config::readConfig(const std::string& filename, std::istream&& configData) {
 	ConfigState state = CONFIG_BLOCK;
@@ -244,6 +173,78 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 	}
 	return localConfig;
 }
+
+void Config::addRehashNotify(std::function<void()> notifyCallback) {
+	notifyList.push_back(notifyCallback);
+}
+
+size_t Config::blockCount(const std::string& block) const {
+	return config.count(block);
+}
+
+std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const std::string& block) const {
+	std::list<std::unordered_map<std::string, std::string>> blockList;
+	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
+	std::tie(startIter, endIter) = config.equal_range(block);
+	for (; startIter != endIter; ++startIter)
+		blockList.push_back(startIter->second);
+	return blockList;
+}
+
+std::string Config::getValue(const std::string& block, const std::string& key) const {
+	auto blockIter = config.find(block);
+	if (blockIter == config.end())
+		return "";
+	auto dataIter = blockIter->second.find(key);
+	if (dataIter == blockIter->second.end())
+		return "";
+	return dataIter->second;
+}
+
+bool Config::getBoolValue(const std::string& block, const std::string& key) const {
+	const std::string& value = getValue(block, key);
+	std::string lowerValue;
+	std::transform(value.begin(), value.end(), std::back_inserter(lowerValue), ::tolower);
+	if (lowerValue == "yes" || lowerValue == "on" || lowerValue == "true")
+		return true;
+	return false;
+}
+
+std::list<std::string> Config::getAllValues(const std::string& block, const std::string& key) const {
+	std::list<std::string> valueList;
+	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
+	std::tie(startIter, endIter) = config.equal_range(block);
+	for (; startIter != endIter; ++startIter) {
+		auto dataIter = startIter->second.find(key);
+		if (dataIter == startIter->second.end())
+			valueList.push_back("");
+		else
+			valueList.push_back(dataIter->second);
+	}
+	return valueList;
+}
+
+std::list<bool> Config::getAllBoolValues(const std::string& block, const std::string& key) const {
+	std::list<bool> valueList;
+	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
+	std::tie(startIter, endIter) = config.equal_range(block);
+	for (std::string lowerValue; startIter != endIter; ++startIter) {
+		auto dataIter = startIter->second.find(key);
+		if (dataIter == startIter->second.end())
+			valueList.push_back(false);
+		else {
+			lowerValue.clear();
+			std::transform(dataIter->second.begin(), dataIter->second.end(), std::back_inserter(lowerValue), ::tolower);
+			if (lowerValue == "yes" || lowerValue == "on" || lowerValue == "true")
+				valueList.push_back(true);
+			else
+				valueList.push_back(false);
+		}
+	}
+	return valueList;
+}
+
+Config::Config() {}
 
 ConfigError::ConfigError(const std::string& filename, unsigned int lineNum, const std::string& description) {
 	std::ostringstream descStr;
