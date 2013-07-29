@@ -111,8 +111,7 @@ enum ActionType {
 class ModuleManager {
 	public:
 		ModuleManager();
-		void pointServerManager(ServerManager* sm);
-		void pointSocketManager(SocketManager* sm);
+		void pointManagers(ServerManager* sm, SocketManager* sockm);
 		void loadStartupModules();
 		void loadModule(const std::string& name);
 		void unloadModule(const std::string& name);
