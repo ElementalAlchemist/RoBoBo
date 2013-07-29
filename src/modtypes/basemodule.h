@@ -4,6 +4,8 @@
 class ClientModule;
 class ServerModule;
 class ModuleManager;
+class ServerManager;
+class Socket;
 
 class Module {
 	public:
