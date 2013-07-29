@@ -190,6 +190,21 @@ std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const s
 	return blockList;
 }
 
+std::unordered_map<std::string, std::string> Config::getSingleBlock(const std::string& block, const std::unordered_map<std::string, std::string>& conditions) const {
+	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
+	std::tie(startIter, endIter) = config.equal_range(block);
+	for (; startIter != endIter; ++startIter) {
+		for (auto check : conditions) {
+			auto blockIter = startIter->second.find(check.first);
+			if (blockIter == startIter->second.end())
+				continue;
+			if (check.second == blockIter->second)
+				return startIter->second;
+		}
+	}
+	return std::unordered_map<std::string, std::string> ();
+}
+
 std::string Config::getValue(const std::string& block, const std::string& key) const {
 	auto blockIter = config.find(block);
 	if (blockIter == config.end())
