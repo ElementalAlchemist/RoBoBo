@@ -6,7 +6,4 @@ OBJECTS=$(shell for source in $(basename $(wildcard *.cpp)); do printf " ../../m
 
 default: ${OBJECTS}
 
-clean:
-	@rm -f modules.mk
-
 include modules.mk
