@@ -26,20 +26,20 @@ $(shell ${CC} ${GENDEPS} ircmessage.cpp)
 
 $(shell ${CC} ${GENDEPS} logmanager.cpp)
 	@echo "\033[1;32mBuild:\033[0m\tlogmanager.cpp"
-	@${CC} ${CXXFLAGS} ${DEBUG} logmanager.cpp -c -o logmanager.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} logmanager.cpp -c -o logmanager.o
 
 $(shell ${CC} ${GENDEPS} modulemanager.cpp)
 	@echo "\033[1;32mBuild:\033[0m\tmodulemanager.cpp"
-	@${CC} ${CXXFLAGS} ${DEBUG} modulemanager.cpp -c -o modulemanager.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} modulemanager.cpp -c -o modulemanager.o
 
 $(shell ${CC} ${GENDEPS} mutexlocker.cpp)
 	@echo "\033[1;32mBuild:\033[0m\tmutexlocker.cpp"
-	@${CC} ${CXXFLAGS} ${DEBUG} mutexlocker.cpp -c -o mutexlocker.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} mutexlocker.cpp -c -o mutexlocker.o
 
 $(shell ${CC} ${GENDEPS} servermanager.cpp)
 	@echo "\033[1;32mBuild:\033[0m\tservermanager.cpp"
-	@${CC} ${CXXFLAGS} ${DEBUG} servermanager.cpp -c -o servermanager.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} servermanager.cpp -c -o servermanager.o
 
 $(shell ${CC} ${GENDEPS} socketmanager.cpp)
 	@echo "\033[1;32mBuild:\033[0m\tsocketmanager.cpp"
-	@${CC} ${CXXFLAGS} ${DEBUG} socketmanager.cpp -c -o socketmanager.cpp
+	@${CC} ${CXXFLAGS} ${DEBUG} socketmanager.cpp -c -o socketmanager.o
