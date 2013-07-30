@@ -149,7 +149,7 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 				if (incleIter != block.second.end()) {
 					std::string cmd = incleIter->second;
 					logger->log(LOG_ALL, "config", "Getting configuration data from `" + incleIter->second + "`");
-					FILE* pipe = popen(cmd, "r");
+					FILE* pipe = popen(cmd.c_str(), "r");
 					if (!pipe)
 						raise ConfigError (cmd, 0, "Could not open pipe to read output.");
 					char buffer[256];
