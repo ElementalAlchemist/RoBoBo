@@ -258,6 +258,14 @@ std::list<bool> Config::getAllBoolValues(const std::string& block, const std::st
 	return valueList;
 }
 
+static bool Config::makeBool(const std::string& value) {
+	std::string lowerValue;
+	std::transform(value.begin(), value.end(), std::back_inserter(lowerValue), ::tolower);
+	if (lowerValue == "yes" || lowerValue == "on" || lowerValue == "true")
+		return true;
+	return false;
+}
+
 Config::Config() {}
 
 ConfigError::ConfigError(const std::string& filename, unsigned int lineNum, const std::string& description) {
