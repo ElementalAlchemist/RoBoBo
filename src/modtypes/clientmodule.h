@@ -52,7 +52,7 @@ class ClientModule {
 		void setTopic(const std::string& server, const std::string& client, const std::string& channel, const std::string& topic, const std::map<std::string, std::string>& tags);
 		void inviteUser(const std::string& server, const std::string& client, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags);
 		void knock(const std::string& server, const std::string& client, const std::string& channel, const std::string& reason, const std::map<std::string, std::string>& tags);
-		void changeNick(const std::string& server, const std::string& client, const std::string& newNick, const std::map<std::string, std::string>& tags);
+		void changeNick(const std::string& server, const std::string& client, const std::string& nick, const std::map<std::string, std::string>& tags);
 		void sendPing(const std::string& server, const std::string& data, const std::map<std::string, std::string>& tags);
 		void setAway(const std::string& server, const std::string& client, const std::string& reason, const std::map<std::string, std::string>& tags);
 		void setUnaway(const std::string& server, const std::string& client, const std::map<std::string, std::string>& tags);
