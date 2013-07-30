@@ -22,7 +22,6 @@ class Config {
 		static bool makeBool(const std::string& value);
 	private:
 		Config();
-		static Config* const instance = new Config;
 		std::string confname;
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> config;
 		std::list<std::function<void()>> notifyList;

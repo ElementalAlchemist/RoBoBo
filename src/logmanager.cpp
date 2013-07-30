@@ -1,9 +1,8 @@
 #include "logmanager.h"
 
-LogManager::instance = new LogManager;
-
 LogManager* LogManager::getHandle() {
-	return instance;
+	static LogManager instance;
+	return &instance;
 }
 
 void LogManager::setDefaultLevel(LogLevel level) {

@@ -1,7 +1,8 @@
 #include "config.h"
 
 Config* Config::getHandle() {
-	return instance;
+	static Config instance;
+	return &instance;
 }
 
 void Config::setMainConfigFile(const std::string& configFileName) {
