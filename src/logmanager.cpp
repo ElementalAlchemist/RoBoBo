@@ -60,7 +60,7 @@ void LogManager::log(LogLevel level, const std::string& type, const std::string&
 			std::time_t currTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			std::tm currTimeStruct = std::gmtime(&currTime);
 			// Compilers do not yet support std::put_time, so I must make do with doing it manually for now.
-			*(logFile.second) << "[" << (currTimeStruct.tm_year + 1900) << "-" << std::setfill('0') << std::setw(2) << (currTimeStruct.tm_month + 1) << "-" << std::setw(2) << currTimeStruct.tm_mday << " " << currTimeStruct.tm_hour << ":" << std::setw(2) << currTimeStruct.tm_min << ":" << std::setw(2) << currTimeStruct.tm_sec << "] " << type << ": " << info << std::endl;
+			*(logFile.second) << "[" << (currTimeStruct.tm_year + 1900) << "-" << std::setfill('0') << std::setw(2) << (currTimeStruct.tm_mon + 1) << "-" << std::setw(2) << currTimeStruct.tm_mday << " " << currTimeStruct.tm_hour << ":" << std::setw(2) << currTimeStruct.tm_min << ":" << std::setw(2) << currTimeStruct.tm_sec << "] " << type << ": " << info << std::endl;
 		}
 	}
 }
