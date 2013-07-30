@@ -7,6 +7,7 @@ class ServerProtocol {
 	public:
 		ServerProtocol(const std::string& name) : serverName(name) {}
 		virtual ~ServerProtocol() {}
+		virtual unsigned int apiVersion() = 0;
 		void pointManagers(ModuleManager* mm, SocketManager* sm) { modmanager = mm; sockmanager = sm; }
 		virtual void connectServer() {}
 		virtual bool connected() { return false; }

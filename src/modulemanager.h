@@ -9,7 +9,7 @@
 #include "modtypes/clientmodule.h"
 #include "modtypes/servermodule.h"
 
-const std::set<unsigned int> apiVersions { 3000 };
+const std::set<unsigned int> modAPIVersions { 3000 };
 typedef bool MsgAction;
 const bool MSG_CONTINUE = true;
 const bool MSG_IGNORE = false;

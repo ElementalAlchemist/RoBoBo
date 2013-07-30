@@ -3,6 +3,8 @@
 #include "modtypes/clientprotocol.h"
 #include "modtypes/serverprotocol.h"
 
+const std::set<unsigned int> protoAPIVersions { 3000 };
+
 class ServerManager {
 	public:
 		void pointManagers(ModuleManager* mm, SocketManager* sm);
@@ -122,6 +124,11 @@ class ProtoLoadFailed : public std::exception {
 		const char* what() const noexcept { return description.c_str(); }
 	private:
 		const std::string description;
+};
+
+class ProtoAPIMismatch : public std::exception {
+	public:
+		const char* what() const noexcept { return "The protocol module is not compatible with the current module API."; }
 };
 
 class ServerNotLoaded : public std::exception {

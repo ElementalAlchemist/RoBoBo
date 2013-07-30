@@ -3,7 +3,7 @@
 #include "logmanager.h"
 #include "modtypes/socket.h"
 
-const std::set<unsigned int> apiVersions { 3000 };
+const std::set<unsigned int> sockAPIVersions { 3000 };
 
 class SocketManager {
 	public:

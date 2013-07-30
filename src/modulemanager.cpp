@@ -552,7 +552,7 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	}
 	Module*(*spawnCallFunc)(const std::string&) = static_cast<Module*(*)(const std::string&)> (spawnFunc);
 	std::shared_ptr<Module> newModule (spawnCallFunc(name));
-	if (apiVersions.find(newModule->apiVersion()) == apiVersions.end()) {
+	if (modAPIVersions.find(newModule->apiVersion()) == modAPIVersions.end()) {
 		dlclose(modFile);
 		throw ModuleAPIMismatch;
 	}
