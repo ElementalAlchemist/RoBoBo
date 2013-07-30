@@ -40,8 +40,8 @@ class ServerProtocol {
 		virtual void pushLine(const std::string& server, const std::string& user, const IRCMessage* line) {}
 		virtual void sendOtherData(const std::string& server, const IRCMessage* line) {}
 		
-		virtual std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& host, const std::string& gecos) { return ""; }
-		virtual void removeClient(const std::string& server, const std::string& client) {}
+		virtual std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& host, const std::string& gecos, const std::map<std::string, std::string> tags) { return ""; }
+		virtual void removeClient(const std::string& server, const std::string& client, const std::map<std::string, std::string>& tags) {}
 		
 		virtual std::list<std::string> networkServerList(const std::string& server) { return std::list<std::string> (); }
 		virtual std::list<std::string> xLineTypes(const std::string& server) { return std::list<std::string> (); }
