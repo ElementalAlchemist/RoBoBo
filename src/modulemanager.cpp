@@ -5,7 +5,7 @@ ModuleManager::ModuleManager() {
 	config->addRehashNotify(std::bind(&ModuleManager::onRehash, this));
 }
 
-void ModuleManager::pointServerManager(ServerManager* sm, SocketManager* sockm) {
+void ModuleManager::pointManagers(ServerManager* sm, SocketManager* sockm) {
 	servers = sm;
 	sockets = sockm;
 }
