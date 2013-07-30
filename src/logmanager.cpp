@@ -12,7 +12,7 @@ void LogManager::setDefaultLevel(LogLevel level) {
 void LogManager::updateLogFiles() {
 	for (auto logFileList : logFiles) {
 		for (auto file : logFileList.second)
-			delete file->second;
+			delete file.second;
 	}
 	logFiles.clear();
 	Config* conf = Config::getHandle();
