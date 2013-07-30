@@ -1,7 +1,8 @@
 $(info Checking compiler availability...)
 CC:=$(shell clang++ --version > /dev/null 2>&1; CLANG=$$?; g++ --version > /dev/null 2>&1; GCC=$$?; if [ $$CLANG -eq 0 ]; then echo "clang++"; elif [ $$GCC -eq 0 ]; then echo "g++"; fi)
 ifdef CC
-$(info Using ${CC})
+$(info Using ${CC} for building.)
+$(info )
 else
 $(error No compiler found)
 endif
