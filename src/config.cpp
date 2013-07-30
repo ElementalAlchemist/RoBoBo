@@ -151,7 +151,7 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 					logger->log(LOG_ALL, "config", "Getting configuration data from `" + incleIter->second + "`");
 					FILE* pipe = popen(cmd.c_str(), "r");
 					if (!pipe)
-						raise ConfigError (cmd, 0, "Could not open pipe to read output.");
+						throw ConfigError (cmd, 0, "Could not open pipe to read output.");
 					char buffer[256];
 					std::stringstream output;
 					while (!feof(pipe)) {
