@@ -500,8 +500,7 @@ void ModuleManager::onRehash() {
 }
 
 std::shared_ptr<Socket> ModuleManager::assignSocket(const std::string& socketType) {
-	// TODO: this when socket modules are implemented at all
-	return std::shared_ptr<Socket> (nullptr);
+	return sockets->getSocket(socketType);
 }
 
 std::list<std::string> ModuleManager::modules() {

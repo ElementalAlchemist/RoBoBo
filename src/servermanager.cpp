@@ -390,6 +390,10 @@ time_t ServerManager::userAwayTimestamp(const std::string& server, const std::st
 	return callServerHook(&ServerProtocol::userAwayTimestamp, server, user);
 }
 
+std::shared_ptr<Socket> ServerManager::assignSocket(const std::string& socketType) {
+	return sockmanager->getSocket(socketType);
+}
+
 template<typename Protocol>
 void ServerManager::unloadServer(const std::string& name, void* protoFile, Protocol* serverPtr) {
 	delete serverPtr;

@@ -5,6 +5,7 @@
 #include "mutexlocker.h"
 #include "logmanager.h"
 #include "servermanager.h"
+#include "socketmanager.h"
 #include "modtypes/basemodule.h"
 #include "modtypes/clientmodule.h"
 #include "modtypes/servermodule.h"

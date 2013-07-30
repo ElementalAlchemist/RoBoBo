@@ -1,5 +1,7 @@
 #pragma once
 #include "main.h"
+#include "modulemanager.h"
+#include "socketmanager.h"
 #include "modtypes/clientprotocol.h"
 #include "modtypes/serverprotocol.h"
 
@@ -91,6 +93,8 @@ class ServerManager {
 		time_t userTimestamp(const std::string& server, const std::string& user);
 		time_t userNickTimestamp(const std::string& server, const std::string& user);
 		time_t userAwayTimestamp(const std::string& server, const std::string& user);
+		
+		std::shared_ptr<Socket> assignSocket(const std::string& socketType);
 	private:
 		std::unordered_map<std::string, std::shared_ptr<ClientProtocol>> clientServers;
 		std::unordered_map<std::string, std::shared_ptr<ServerProtocol>> serverServers;
