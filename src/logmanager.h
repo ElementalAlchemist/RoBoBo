@@ -9,7 +9,7 @@ class LogManager {
 	public:
 		LogManager(const LogManager&) = delete;
 		LogManager& operator=(const LogManager&) = delete;
-		LogManager* getHandle();
+		static LogManager* getHandle();
 		void setDefaultLevel(LogLevel level);
 		void updateLogFiles();
 		void log(LogLevel level, const std::string& type, const std::string& info);
