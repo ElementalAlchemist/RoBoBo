@@ -166,10 +166,8 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 		}
 	}
 	for (auto includes : includedConfigs) {
-		for (auto conf : includes) {
-			for (auto block : conf.second)
-				localConfig.insert(std::pair<std::string, std::unordered_map<std::string, std::string>> (block.first, block.second));
-		}
+		for (auto conf : includes)
+			localConfig.insert(std::pair<std::string, std::unordered_map<std::string, std::string>> (conf.first, conf.second));
 	}
 	return localConfig;
 }
