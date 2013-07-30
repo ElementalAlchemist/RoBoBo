@@ -1,11 +1,12 @@
 #include "ircmessage.h"
 
 IRCMessage::IRCMessage(const std::string& line) {
-	size_t spacePos = line.find(' ');
-	if (line[0] == '@') {
-		std::string tagLine (line.substr(1, spacePos - 1));
-		line = line.substr(spacePos + 1);
-		spacePos = line.find(' ');
+	std::string unprocessedLine (line);
+	size_t spacePos = unprocessedLine.find(' ');
+	if (unprocessedLine[0] == '@') {
+		std::string tagLine (unprocessedLine.substr(1, spacePos - 1));
+		unprocessedLine = unprocessedLine.substr(spacePos + 1);
+		spacePos = unprocessedLine.find(' ');
 		size_t sepPos = tagLine.find(';');
 		while (!tagLine.empty()) {
 			std::string nextTag (tagLine.substr(0, sepPos));
@@ -24,22 +25,22 @@ IRCMessage::IRCMessage(const std::string& line) {
 			}
 		}
 	}
-	if (line[0] == ':') {
-		lineprefix = line.substr(1, spacePos - 1);
-		line = line.substr(spacePos + 1);
-		spacePos = line.find(' ');
+	if (unprocessedLine[0] == ':') {
+		lineprefix = unprocessedLine.substr(1, spacePos - 1);
+		unprocessedLine = unprocessedLine.substr(spacePos + 1);
+		spacePos = unprocessedLine.find(' ');
 	}
-	linecommand = line.substr(0, spacePos);
-	line = line.substr(spacePos + 1);
-	spacePos = line.find(' ');
-	while (!line.empty()) {
-		if (line[0] == ':' || spacePos == std::string::npos) {
-			lineparams.push_back(line);
-			line.clear();
+	linecommand = unprocessedLine.substr(0, spacePos);
+	unprocessedLine = unprocessedLine.substr(spacePos + 1);
+	spacePos = unprocessedLine.find(' ');
+	while (!unprocessedLine.empty()) {
+		if (unprocessedLine[0] == ':' || spacePos == std::string::npos) {
+			lineparams.push_back(unprocessedLine);
+			unprocessedLine.clear();
 		} else {
-			lineparams.push_back(line.substr(0, spacePos));
-			line = line.substr(spacePos + 1);
-			spacePos = line.find(' ');
+			lineparams.push_back(unprocessedLine.substr(0, spacePos));
+			unprocessedLine = unprocessedLine.substr(spacePos + 1);
+			spacePos = unprocessedLine.find(' ');
 		}
 	}
 }
