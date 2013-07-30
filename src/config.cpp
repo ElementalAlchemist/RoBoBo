@@ -40,13 +40,13 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 			} else if (nextChar == '}')
 				throw ConfigError (filename, lineNum, "A closing brace could not be mached to an open block.");
 			else if (nextChar == '#') {
-				while (configFile.good() && configFile.get() != '\n') {}
+				while (configData.good() && configData.get() != '\n') {}
 				lineNum++;
 			} else if (nextChar != ' ' && nextChar != '\t' && nextChar != '\r' && nextChar != '\n')
 				blockName += nextChar;
 		} else if (state == CONFIG_KEY) {
 			if (nextChar == '#') {
-				while (configFile.good() && configFile.get() != '\n') {}
+				while (configData.good() && configData.get() != '\n') {}
 				lineNum++;
 			} else if (nextChar == '{')
 				throw ConfigError (filename, lineNum, "A block was opened inside another block.");
@@ -68,7 +68,7 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 				key += nextChar;
 		} else if (state == CONFIG_VALUE) {
 			if (nextChar == '#') {
-				while (configFile.good() && configFile.get() != '\n') {}
+				while (configData.good() && configData.get() != '\n') {}
 				lineNum++;
 			} else if (nextChar == ';') {
 				blockValues.insert(std::pair<std::string, std::string> (key, value));
@@ -81,7 +81,7 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 				throw ConfigError (filename, lineNum, "An unexpected character was encountered; expected ';' or '+' (perhaps you forgot to end or properly concatenate your value?).");
 		} else if (state == CONFIG_VALUE_NEXT) {
 			if (nextChar == '#') {
-				while (configFile.good() && configFile.get() != '\n') {}
+				while (configData.good() && configData.get() != '\n') {}
 				lineNum++;
 			} else if (nextChar == '"')
 				state = CONFIG_VALUE_STR;
