@@ -82,16 +82,16 @@ int main(int argc, char** argv) {
 	sigaction(SIGHUP, sigPtr, nullptr);
 	sigaction(SIGUSR1, sigPtr, nullptr);
 	
-	/*
-	bot = new Base (workingDir, confDir, confName, debugLevel, logDump);
-	bot->readConfiguration();
-	bot->loadModules();
-	bot->connectServers();
-	if (debugLevel == 0)
-		daemon(1, 0);
-	bot->checkServers();
-	// If checkModules returns, the bot is shutting down, so kill all the things
-	bot->unloadEverything();
-	delete bot;
-	*/
+	SocketManager sockmanager;
+	ModuleManager modmanager;
+	ServerManager servmanager;
+	modmanager.pointManagers(&servmanager, &sockmanager);
+	servmanager.pointManagers(&modmanager, &sockmanager);
+	modmanager.loadStartupModules();
+	servmanager.connectStartupServers();
+	while (true) {
+		std::this_thread::sleep_for(std::chrono::seconds(60));
+		if (servmanager.checkServers() == 0 && !modmanager.checkKeepAlive())
+			break;
+	}
 }
