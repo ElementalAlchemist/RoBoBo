@@ -25,7 +25,7 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 	LogManager* logger = LogManager::getHandle();
 	std::string blockName, key, value, valueVar;
 	std::unordered_map<std::string, std::string> blockValues;
-	std::unordered_multimap<std::string, std::string> localConfig;
+	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> localConfig;
 	while (configData.good()) {
 		char nextChar = configData.get();
 		if (nextChar == std::istream::traits_type::eof())
