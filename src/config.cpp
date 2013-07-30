@@ -159,7 +159,7 @@ std::unordered_multimap<std::string, std::unordered_map<std::string, std::string
 							output << buffer;
 					}
 					pclose(pipe);
-					includedConfigs.push_back(readConfig(cmd, output));
+					includedConfigs.push_back(readConfig(cmd, std::move(output)));
 				} else
 					throw ConfigError (filename, lineNum, "An include block was present that contained neither a file nor an executable.");
 			}
