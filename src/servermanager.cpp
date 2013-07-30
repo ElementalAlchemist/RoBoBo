@@ -82,6 +82,20 @@ void ServerManager::disconnectServer(const std::string& server) {
 }
 
 size_t ServerManager::checkServers() {
+	std::list<std::unordered_map<std::string, std::shared_ptr<ClientProtocol>>::iterator> clientRemove;
+	std::list<std::unordered_map<std::string, std::shared_ptr<ServerProtocol>>::iterator> serverRemove;
+	for (auto clientIter = clientServers.begin(); clientIter != clientServers.end(); ++clientIter) {
+		if (!clientIter->second->connected() && clientIter->second->shouldUnload())
+			clientRemove.push_back(clientIter);
+	}
+	for (auto serverIter = serverServers.begin(); serverIter != serverServers.end(); ++serverIter) {
+		if (!serverIter->second->connected() && serverIter->second->shouldUnload())
+			serverRemove.push_back(serverIter);
+	}
+	for (auto remove : clientRemove)
+		clientServers.erase(remove);
+	for (auto remove : serverRemove)
+		serverServers.erase(remove);
 	return clientServers.size() + serverServers.size();
 }
 
