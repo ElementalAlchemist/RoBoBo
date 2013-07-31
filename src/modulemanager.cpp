@@ -702,6 +702,7 @@ std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*fu
 	};
 }
 
+template<typename ModType, typename... Args>
 std::function<void()> ModuleManager::generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
 	std::string server, client, message;
 	std::list<std::string> users;
