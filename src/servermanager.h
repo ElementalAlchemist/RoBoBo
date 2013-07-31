@@ -47,7 +47,7 @@ class ServerManager {
 		std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& host, const std::string& gecos, const std::map<std::string, std::string>& tags) { return callServerHook(&ServerProtocol::addClient, server, std::forward<const std::string>(nick), std::forward<const std::string>(ident), std::forward<const std::string>(host), std::forward<const std::string>(gecos), std::forward<const std::map<std::string, std::string>>(tags)); }
 		std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& gecos) { return callClientHook(&ClientProtocol::addClient, server, std::forward<const std::string>(nick), std::forward<const std::string>(ident), std::forward<const std::string>(gecos)); }
 		void removeClient(const std::string& server, const std::string& client, const std::map<std::string, std::string>& tags) { callServerHook(&ServerProtocol::removeClient, server, std::forward<const std::string>(client), std::forward<const std::map<std::string, std::string>>(tags)); }
-		void removeClient(const std::string& server, const std::string& client) { callEitherHook(&ClientProtocol::removeClient, server, std::forward<const std::string>(client)); }
+		void removeClient(const std::string& server, const std::string& client) { callClientHook(&ClientProtocol::removeClient, server, std::forward<const std::string>(client)); }
 		
 		std::list<std::pair<std::string, bool>> activeServers(bool requestedByServerModule);
 		std::list<std::pair<std::string, bool>> connectedServers(bool requestedByServerModule);
