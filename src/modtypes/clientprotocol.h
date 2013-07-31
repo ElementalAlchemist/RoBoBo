@@ -46,7 +46,7 @@ class ClientProtocol {
 		virtual time_t chanTimestamp(const std::string& server, const std::string& channel) { return 0; }
 		virtual std::list<std::string> chanUsers(const std::string& server, const std::string& channel) { return std::list<std::string> (); }
 		virtual bool userInChan(const std::string& server, const std::string& channel, const std::string& user) { return false; }
-		virtual std::pair<std::string, char> userStatus(const std::string& server, const std::string& channel, const std::string& user) { std::pair<std::string, char> ("", ' '); }
+		virtual std::pair<std::string, char> userStatus(const std::string& server, const std::string& channel, const std::string& user) { return std::pair<std::string, char> ("", ' '); }
 		virtual bool userHasStatus(const std::string& server, const std::string& channel, const std::string& user, const std::string& status) { return false; }
 		virtual bool userHasStatus(const std::string& server, const std::string& channel, const std::string& user, char status) { return false; }
 		virtual bool userHasStatusOrGreater(const std::string& server, const std::string& channel, const std::string& user, const std::string& status) { return false; }
