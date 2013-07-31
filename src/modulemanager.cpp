@@ -57,7 +57,7 @@ void ModuleManager::loadStartupModules() {
 	}
 	for (auto mod : openedModules) {
 		verifyModule(mod.first, mod.second);
-		logger->log(LOG_DEBUG, "module-load", "Module " + mod->first + " loaded successfully.");
+		logger->log(LOG_DEBUG, "module-load", "Module " + mod.first + " loaded successfully.");
 	}
 }
 
