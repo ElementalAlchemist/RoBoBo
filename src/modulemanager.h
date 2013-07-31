@@ -4,11 +4,12 @@
 #include "ircmessage.h"
 #include "mutexlocker.h"
 #include "logmanager.h"
-#include "servermanager.h"
 #include "socketmanager.h"
 #include "modtypes/basemodule.h"
 #include "modtypes/clientmodule.h"
 #include "modtypes/servermodule.h"
+
+class ServerManager;
 
 const std::set<unsigned int> modAPIVersions { 3000 };
 typedef bool MsgAction;
@@ -214,3 +215,6 @@ class ModuleNotLoaded : public std::exception {
 	public:
 		const char* what() const noexcept { return "The module being unloaded wasn't already loaded."; }
 };
+
+
+#include "servermanager.h"
