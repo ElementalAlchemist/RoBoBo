@@ -76,7 +76,7 @@ void ModuleManager::loadModule(const std::string& name) {
 void ModuleManager::unloadModule(const std::string& name) {
 	auto modIter = loadedModules.find(name);
 	if (modIter == loadedModules.end())
-		throw ModuleNotLoaded;
+		throw ModuleNotLoaded ();
 	for (auto& action : registeredActions)
 		action.second.remove(name);
 	auto storedPriority = actionPriority.find(name);
@@ -191,7 +191,7 @@ void ModuleManager::removeServiceClient(const std::string& modName, const std::s
 
 void ModuleManager::addServiceDependency(const std::string& modName, const std::string& service) {
 	if (providers.find(service) == providers.end())
-		throw ServiceNotLoaded;
+		throw ServiceNotLoaded ();
 	if (dependents.find(service) != dependents.end()) {
 		const std::list<std::string>& dependentList = dependents[service];
 		if (std::find(dependentList.begin(), dependentList.end(), modName) != dependentList.end())
@@ -230,7 +230,7 @@ std::list<std::string> ModuleManager::usingModules(const std::string& capability
 template<typename... Args>
 void ModuleManager::callClientHook(ActionType type, Args... args) {
 	if (type >= ServerHookLevel)
-		throw HookTypeException;
+		throw HookTypeException ();
 	auto modIter = registeredActions.find(type);
 	if (modIter == registeredActions.end())
 		return;
@@ -336,7 +336,7 @@ void ModuleManager::callClientHook(ActionType type, Args... args) {
 			actionQueue.push(generateHookCaller(&ClientModule::onSendUserNotice, modList, args...));
 			break;
 		default:
-			throw HookTypeException;
+			throw HookTypeException ();
 	}
 	startQueue();
 }
@@ -344,7 +344,7 @@ void ModuleManager::callClientHook(ActionType type, Args... args) {
 template<typename... Args>
 void ModuleManager::callServerHook(ActionType type, Args... args) {
 	if (type < ServerHookLevel)
-		throw HookTypeException;
+		throw HookTypeException ();
 	auto modIter = registeredActions.find(type);
 	if (modIter == registeredActions.end())
 		return;
@@ -501,7 +501,7 @@ void ModuleManager::callServerHook(ActionType type, Args... args) {
 			actionQueue.push(generateUserOutHookCaller(&ServerModule::onOutUserNotice, modList, args...));
 			break;
 		default:
-			throw HookTypeException;
+			throw HookTypeException ();
 	}
 	startQueue();
 }
@@ -549,7 +549,7 @@ std::list<std::string> ModuleManager::serviceUsers(const std::string& service) {
 
 std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	if (loadedModules.find(name) != loadedModules.end())
-		throw ModuleAlreadyLoaded;
+		throw ModuleAlreadyLoaded ();
 	void* modFile = dlopen(("modules/" + name + ".so").c_str(), RTLD_NOW);
 	if (modFile == nullptr)
 		throw ModuleLoadFailed (name, dlerror());
@@ -565,7 +565,7 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 	std::shared_ptr<Module> newModule (spawnCallFunc(name));
 	if (modAPIVersions.find(newModule->apiVersion()) == modAPIVersions.end()) {
 		dlclose(modFile);
-		throw ModuleAPIMismatch;
+		throw ModuleAPIMismatch ();
 	}
 	moduleFiles.insert(std::pair<std::string, void*> (name, modFile));
 	return newModule;
@@ -578,7 +578,7 @@ void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module
 			auto fileIter = moduleFiles.find(name);
 			dlclose(fileIter->second);
 			moduleFiles.erase(fileIter);
-			throw ModuleRequirementsNotMet;
+			throw ModuleRequirementsNotMet ();
 		}
 	}
 	loadedModules[name] = mod;

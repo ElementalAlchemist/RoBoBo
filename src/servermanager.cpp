@@ -20,10 +20,10 @@ void ServerManager::connectServer(const std::string& server) {
 	Config* config = Config::getHandle();
 	std::unordered_map<std::string, std::string> serverConfig = config->getSingleBlock("server", std::unordered_map<std::string, std::string> { { "name", server } });
 	if (serverConfig.empty())
-		throw ServerNotConfigured;
+		throw ServerNotConfigured ();
 	auto protocolIter = serverConfig.find("protocol");
 	if (protocolIter == serverConfig.end())
-		throw ServerNoProtocol;
+		throw ServerNoProtocol ();
 	void* protoFile = dlopen("protocols/" + protocolIter->second + ".so");
 	if (protoFile == nullptr)
 		throw ProtoLoadFailed (dlerror());
@@ -47,7 +47,7 @@ void ServerManager::connectServer(const std::string& server) {
 		ServerProtocol*(*spawnCallFunc)(const std::string&) = static_cast<ServerProtocol*(*)(const std::string&)> (spawnFunc);
 		std::shared_ptr<ServerProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServer, this, server, protoFile, std::placeholders::_1));
 		if (protoAPIVersions.find(newProto->apiVersion()) == protoAPIVersions.end())
-			throw ProtoAPIMismatch;
+			throw ProtoAPIMismatch ();
 		newProto->pointManagers(modmanager, sockmanager);
 		newProto->connectServer();
 		serverServers.insert(std::pair<std::string, std::shared_ptr<ServerProtocol>> (protocolIter->second, newProto));
@@ -55,7 +55,7 @@ void ServerManager::connectServer(const std::string& server) {
 		ClientProtocol*(*spawnCallFunc)(const std::string&) = static_cast<ClientProtocol*(*)(const std::string&)> (spawnFunc);
 		std::shared_ptr<ClientProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServer, this, server, protoFile, std::placeholders::_1));
 		if (protoAPIVersions.find(newProto->apiVersion()) == protoAPIVersions.end())
-			throw ProtoAPIMismatch;
+			throw ProtoAPIMismatch ();
 		newProto->pointManagers(modmanager, sockmanager);
 		newProto->connectServer();
 		clientServers.insert(std::pair<std::string, std::shared_ptr<ClientProtocol>> (protocolIter->second, newProto));
@@ -124,7 +124,7 @@ std::list<std::pair<std::string, bool>> ServerManager::connectedServers(bool req
 std::string ServerManager::serverType(const std::string& server) {
 	auto serverIter = serverTypes.find(server);
 	if (serverIter == serverTypes.end())
-		throw ServerNotLoaded;
+		throw ServerNotLoaded ();
 	return serverIter->second;
 }
 
@@ -143,7 +143,7 @@ RetVal ServerManager::callEitherHook(RetVal(ClientProtocol::*clientFunc)(Args&..
 	if (clientIter == clientServers.end()) {
 		auto serverIter = serverServers.find(server);
 		if (serverIter == serverServers.end())
-			throw ServerNotLoaded;
+			throw ServerNotLoaded ();
 		return ((*serverIter->second).*(serverFunc))(args...);
 	}
 	return ((*clientIter->second).*(clientFunc))(args...);
@@ -154,8 +154,8 @@ RetVal ServerManager::callClientHook(RetVal(ClientProtocol::*func)(Args&...), co
 	auto clientIter = clientServers.find(server);
 	if (clientIter == clientServers.end()) {
 		if (serverServers.find(server) == serverServers.end())
-			throw ServerNotLoaded;
-		throw ServerDoesNotSupport;
+			throw ServerNotLoaded ();
+		throw ServerDoesNotSupport ();
 	}
 	return ((*clientIter->second).*(func))(args...);
 }
@@ -165,8 +165,8 @@ RetVal ServerManager::callServerHook(RetVal(ServerProtocol::*func)(Args&...), co
 	auto serverIter = serverServers.find(server);
 	if (serverIter == serverServers.end()) {
 		if (clientServers.find(server) == clientServers.end())
-			throw ServerNotLoaded;
-		throw ServerDoesNotSupport;
+			throw ServerNotLoaded ();
+		throw ServerDoesNotSupport ();
 	}
 	return ((*serverIter->second).*(func))(args...);
 }

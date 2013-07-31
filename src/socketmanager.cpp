@@ -15,7 +15,7 @@ std::shared_ptr<Socket> SocketManager::getSocket(const std::string& socketType) 
 	Socket*(*spawnCallFunc)() = static_cast<Socket*(*)()> (spawnFunc);
 	std::shared_ptr<Socket> newSocket (spawnCallFunc(), std::bind(&SocketManager::removeSocket, this, socketType, sockFile, std::placeholders::_1));
 	if (sockAPIVersions.find(newSocket->apiVersion()) == sockAPIVersions.end())
-		throw SocketAPIMismatch;
+		throw SocketAPIMismatch ();
 	return newSocket;
 }
 
