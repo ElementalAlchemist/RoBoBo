@@ -615,7 +615,7 @@ void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module
 		auto beforeIter = actionList.begin();
 		auto afterIter = actionList.rbegin();
 		for (; beforeIter != actionList.end() && before.find(loadedModules[*beforeIter]->functionid()) != before.end(); ++beforeIter) {}
-		for (; afterIter != actionList.rend() && after.find(loadedModules[*afterIter]->function()) != after.end() && *beforeIter != *afterIter; ++afterIter) {}
+		for (; afterIter != actionList.rend() && after.find(loadedModules[*afterIter]->functionid()) != after.end() && *beforeIter != *afterIter; ++afterIter) {}
 		if (beforeIter == actionList.end() && afterIter == actionList.end()) {
 			if (hook.second.find(PRIORITY_FIRST) != hook.second.end())
 				actionList.push_front(name);
