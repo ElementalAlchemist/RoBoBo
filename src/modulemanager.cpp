@@ -232,9 +232,9 @@ void ModuleManager::callClientHook(ActionType type, Args... args) {
 	auto modIter = registeredActions.find(type);
 	if (modIter == registeredActions.end())
 		return;
-	std::list<std::shared_ptr<ClientModule>> modList;
+	std::list<std::pair<std::string, std::shared_ptr<ClientModule>>> modList;
 	for (std::string modName : modIter->second)
-		modList.push_back(clientModules[modName]);
+		modList.push_back(std::pair<std::string, std::shared_ptr<ClientModule>> (modName, clientModules[modName]));
 	MutexLocker mutexLock (&queueMutex);
 	switch (type) {
 		case HOOK_CLIENT_MESSAGE_CHANNEL:
@@ -346,9 +346,9 @@ void ModuleManager::callServerHook(ActionType type, Args... args) {
 	auto modIter = registeredActions.find(type);
 	if (modIter == registeredActions.end())
 		return;
-	std::list<std::shared_ptr<ServerModule>> modList;
+	std::list<std::pair<std::string, std::shared_ptr<ServerModule>>> modList;
 	for (std::string modName : modIter->second)
-		modList.push_back(serverModules[modName]);
+		modList.push_back(std::pair<std::string, std::shared_ptr<ServerModule>> (modName, serverModules[modName]));
 	MutexLocker mutexLock (&queueMutex);
 	switch (type) {
 		case HOOK_SERVER_MESSAGE_CHANNEL:
@@ -641,60 +641,60 @@ void ModuleManager::verifyModule(const std::string& name, std::shared_ptr<Module
 }
 
 template<typename ModType, typename... Args>
-std::function<void()> ModuleManager::generateHookCaller(void(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args) {
+std::function<void()> ModuleManager::generateHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
 	return [=]() {
-		for (std::string modName : modList) {
+		for (auto mod : modList) {
 			try {
-				((*modules.find(modName)->second).*(func))(args...);
+				((*mod.second).*(func))(args...);
 			} catch (const std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + mod.first + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + mod.first);
 			}
 		}
 	};
 }
 
 template<typename ModType, typename... Args>
-std::function<void()> ModuleManager::generateMsgHookCaller(MsgAction(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args) {
+std::function<void()> ModuleManager::generateMsgHookCaller(MsgAction(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
 	return [=]() {
-		for (std::string modName : modList) {
+		for (auto mod : modList) {
 			try {
-				MsgAction result = ((*modules.find(modName)->second).*(func))(args...);
+				MsgAction result = ((*mod.second).*(func))(args...);
 				if (result == MSG_IGNORE)
 					break;
 			} catch (const std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + mod.first + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + mod.first);
 			}
 		}
 	};
 }
 	
 template<typename ModType, typename... Args>
-std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args) {
+std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
 	std::string server, client, message;
 	std::list<std::pair<std::string, char>> channels;
 	std::map<std::string, std::string> tags;
 	std::function<void(const std::string&, const std::list<std::pair<std::string, char>>&, const std::string&, const std::map<std::string, std::string>&)> callback;
 	std::tie(server, client, channels, message, tags, callback) = std::tuple<Args...> (args...);
 	return [=]() {
-		for (std::string modName : modList) {
+		for (auto mod : modList) {
 			try {
-				((*modules.find(modName)->second).*(func))(server, client, channels, message, tags);
+				((*mod.second).*(func))(server, client, channels, message, tags);
 				if (channels.empty() || message.empty())
 					return;
 			} catch (const std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + mod.first + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + mod.first);
 			}
 		}
 		if (!channels.empty() && !message.empty())
@@ -702,24 +702,24 @@ std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*fu
 	};
 }
 
-std::function<void()> ModuleManager::generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::shared_ptr<ModType>>& modList, Args... args) {
+std::function<void()> ModuleManager::generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
 	std::string server, client, message;
 	std::list<std::string> users;
 	std::map<std::string, std::string> tags;
 	std::function<void(const std::string&, const std::list<std::string>&, const std::string&, const std::map<std::string, std::string>&)> callback;
 	std::tie(server, client, users, message, tags, callback) = std::tuple<Args...> (args...);
 	return [=]() {
-		for (std::string modName : modList) {
+		for (auto mod : modList) {
 			try {
-				((*modules.find(modName).second).*(func))(server, client, users, message, tags);
+				((*mod.second).*(func))(server, client, users, message, tags);
 				if (users.empty() || message.empty())
 					return;
 			} catch (std::exception& ex) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + modName + "; Details: " + ex.what());
+				logger->log(LOG_ERROR, "module-run", "An exception has been thrown from a module. Module: " + mod.first + "; Details: " + ex.what());
 			} catch (...) {
 				LogManager* logger = LogManager::getHandle();
-				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + modName);
+				logger->log(LOG_ERROR, "module-run", "An unknown exception has been thrown from a module (not derived from std::exception). Module: " + mod.first);
 			}
 		}
 		if (!users.empty() && !message.empty())
