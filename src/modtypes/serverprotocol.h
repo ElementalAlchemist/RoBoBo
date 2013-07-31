@@ -46,8 +46,8 @@ class ServerProtocol {
 		virtual std::list<std::string> networkServerList(const std::string& server) { return std::list<std::string> (); }
 		virtual std::list<std::string> xLineTypes(const std::string& server) { return std::list<std::string> (); }
 		virtual std::list<std::string> xLineList(const std::string& server, const std::string& lineType) { return std::list<std::string> (); }
-		virtual time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask) { return std::list<std::string> (); }
-		virtual std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask) { return std::list<std::string> (); }
+		virtual time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask) { return 0; }
+		virtual std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask) { return ""; }
 		
 		virtual std::set<std::string> chanTypes(const std::string& server) { return std::set<std::string> (); }
 		virtual std::list<std::pair<ModeType, std::string>> allChanModes(const std::string& server) { return std::list<std::pair<ModeType, std::string>> (); }
