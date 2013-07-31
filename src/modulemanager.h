@@ -5,9 +5,6 @@
 #include "mutexlocker.h"
 #include "logmanager.h"
 #include "socketmanager.h"
-#include "modtypes/basemodule.h"
-#include "modtypes/clientmodule.h"
-#include "modtypes/servermodule.h"
 
 class ServerManager;
 
@@ -218,3 +215,6 @@ class ModuleNotLoaded : public std::exception {
 
 
 #include "servermanager.h"
+#include "modtypes/basemodule.h"
+#include "modtypes/clientmodule.h"
+#include "modtypes/servermodule.h"
