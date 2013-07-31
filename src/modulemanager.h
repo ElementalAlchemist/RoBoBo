@@ -7,6 +7,8 @@
 #include "socketmanager.h"
 
 class Module;
+class ClientModule;
+class ServerModule;
 class ServerManager;
 
 const std::set<unsigned int> modAPIVersions { 3000 };
