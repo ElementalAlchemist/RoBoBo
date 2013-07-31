@@ -6,10 +6,8 @@ ModuleManager::ModuleManager() {
 }
 
 ModuleManager::~ModuleManager() {
-	for (auto clientMod : clientModules)
-		clientMod.second->onUnload();
-	for (auto serverMod : serverModules)
-		serverMod.second->onUnload();
+	for (auto mod : loadedModules)
+		mod.second->onUnload();
 	clientModules.clear(); // Although these aren't strictly necessary in the destructor,
 	serverModules.clear(); // they should be done in the specified order (clientModules and
 	loadedModules.clear(); // serverModules can be switched, though), so I ensure that here.
