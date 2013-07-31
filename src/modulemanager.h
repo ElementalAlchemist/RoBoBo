@@ -6,6 +6,7 @@
 #include "logmanager.h"
 #include "socketmanager.h"
 
+class Module;
 class ServerManager;
 
 const std::set<unsigned int> modAPIVersions { 3000 };
