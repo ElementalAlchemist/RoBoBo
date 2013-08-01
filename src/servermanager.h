@@ -2,6 +2,7 @@
 #include "main.h"
 #include "ircmessage.h"
 #include "modhooks.h"
+#include "socketmanager.h"
 
 class ModuleManager;
 class SocketManager;
@@ -150,6 +151,5 @@ class ServerDoesNotSupport : public std::exception {
 };
 
 #include "modulemanager.h"
-#include "socketmanager.h"
 #include "modtypes/clientprotocol.h"
 #include "modtypes/serverprotocol.h"
