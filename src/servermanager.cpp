@@ -34,7 +34,7 @@ void ServerManager::connectServer(const std::string& server) {
 			throw ProtoLoadFailed (loadError);
 		throw ProtoLoadFailed ("The serverType symbol was set to null, but it must be a valid function.");
 	}
-	bool (*serverCallFunc)() = static_cast<bool(*)()>(serverFunc);
+	bool (*serverCallFunc)() = (bool(*)()) serverFunc;
 	bool isServer = serverCallFunc();
 	void* spawnFunc = dlsym(protoFile, "spawn");
 	if (spawnFunc == nullptr) {
@@ -44,7 +44,7 @@ void ServerManager::connectServer(const std::string& server) {
 		throw ProtoLoadFailed ("The spawn symbol was set to null, but it must be a valid function.");
 	}
 	if (isServer) {
-		ServerProtocol*(*spawnCallFunc)(const std::string&) = static_cast<ServerProtocol*(*)(const std::string&)> (spawnFunc);
+		ServerProtocol*(*spawnCallFunc)(const std::string&) = (ServerProtocol*(*)(const std::string&)) spawnFunc;
 		std::shared_ptr<ServerProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServer, this, server, protoFile, std::placeholders::_1));
 		if (protoAPIVersions.find(newProto->apiVersion()) == protoAPIVersions.end())
 			throw ProtoAPIMismatch ();
@@ -52,7 +52,7 @@ void ServerManager::connectServer(const std::string& server) {
 		newProto->connectServer();
 		serverServers.insert(std::pair<std::string, std::shared_ptr<ServerProtocol>> (protocolIter->second, newProto));
 	} else {
-		ClientProtocol*(*spawnCallFunc)(const std::string&) = static_cast<ClientProtocol*(*)(const std::string&)> (spawnFunc);
+		ClientProtocol*(*spawnCallFunc)(const std::string&) = (ClientProtocol*(*)(const std::string&)) spawnFunc;
 		std::shared_ptr<ClientProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServer, this, server, protoFile, std::placeholders::_1));
 		if (protoAPIVersions.find(newProto->apiVersion()) == protoAPIVersions.end())
 			throw ProtoAPIMismatch ();
