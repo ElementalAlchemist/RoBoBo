@@ -64,3 +64,5 @@ void LogManager::log(LogLevel level, const std::string& type, const std::string&
 		}
 	}
 }
+
+LogManager::LogManager() {}
