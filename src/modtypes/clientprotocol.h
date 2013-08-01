@@ -24,7 +24,7 @@ class ClientProtocol {
 		virtual void inviteUser(const std::string& client, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags) {}
 		virtual void knock(const std::string& client, const std::string& channel, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void changeNick(const std::string& client, const std::string& newNick, const std::map<std::string, std::string>& tags) {}
-		virtual void sendPing(const std::string& data, const std::map<std::string, std::string>& tags) {}
+		virtual void sendPing(const std::string& client, const std::string& data, const std::map<std::string, std::string>& tags) {}
 		virtual void setAway(const std::string& client, const std::string& reason, const std::map<std::string, std::string>& tags) {}
 		virtual void setUnaway(const std::string& client, const std::map<std::string, std::string>& tags) {}
 		virtual void oper(const std::string& client, const std::string& username, const std::string& password, const std::map<std::string, std::string>& tags) {}
