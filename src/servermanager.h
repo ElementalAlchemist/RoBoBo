@@ -9,7 +9,7 @@ const std::set<unsigned int> protoAPIVersions { 3000 };
 
 class ServerManager {
 	public:
-		void pointManagers(ModuleManager* mm, SocketManager* sm) { modmanager = mm; sockmanager = sm; }
+		void pointManagers(ModuleManager* mm, SocketManager* sm);
 		void connectStartupServers();
 		void connectServer(const std::string& server);
 		void disconnectServer(const std::string& server);
