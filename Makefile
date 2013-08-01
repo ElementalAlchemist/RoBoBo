@@ -1,5 +1,8 @@
 $(info Checking compiler availability...)
-CC:=$(shell clang++ --version > /dev/null 2>&1; CLANG=$$?; g++ --version > /dev/null 2>&1; GCC=$$?; if [ $$CLANG -eq 0 ]; then echo "clang++"; elif [ $$GCC -eq 0 ]; then echo "g++"; fi)
+# CC:=$(shell clang++ --version > /dev/null 2>&1; CLANG=$$?; g++ --version > /dev/null 2>&1; GCC=$$?; if [ $$CLANG -eq 0 ]; then echo "clang++"; elif [ $$GCC -eq 0 ]; then echo "g++"; fi)
+# Note: g++ up through 4.8 still has a bug which prevents the core from compiling; as such, only clang is officially supported for now.
+# I will investigate this problem further with g++ 4.9+ and hopefully support g++ again in the future, but for now it only works in clang.
+CC:=$(shell clang++ --version > /dev/null 2>&1; CLANG=$$?; if [ $$CLANG -eq 0 ]; then echo "clang++"; fi)
 ifdef CC
 $(info Using ${CC} for building.)
 $(info )
