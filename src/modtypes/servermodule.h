@@ -1,6 +1,6 @@
 #pragma once
 #include "../main.h"
-#include "../ircmessage.h"
+#include "../servermanager.h"
 #include "basemodule.h"
 
 class ServerModule {
@@ -9,10 +9,10 @@ class ServerModule {
 		virtual ~ServerModule() {}
 		void loadManagerPointer(ModuleManager* mm, ServerManager* sm, SocketManager* sockm) { modmanager = mm; servmanager = sm; sockmanager = sockm; }
 		
-		virtual MsgAction onChanMsg(const std::string& server, const std::string& channel, char status, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual MsgAction onUserMsg(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual MsgAction onChanNotice(const std::string& server, const std::string& channel, char status, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
-		virtual MsgAction onUserNotice(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
+		virtual MsgAction onChanMsg(const std::string& server, const std::string& channel, char status, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
+		virtual MsgAction onUserMsg(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
+		virtual MsgAction onChanNotice(const std::string& server, const std::string& channel, char status, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
+		virtual MsgAction onUserNotice(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) { return MSG_CONTINUE; }
 		virtual void onChanMode(const std::string& server, const std::string& channel, const std::list<std::tuple<ModeType, bool, std::string, std::string>> modes, const std::map<std::string, std::string>& tags) {}
 		virtual void onUserMode(const std::string& server, const std::string& user, const std::list<std::tuple<ModeType, bool, std::string, std::string>> modes, const std::map<std::string, std::string>& tags) {}
 		virtual void onJoin(const std::string& server, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags) {}
