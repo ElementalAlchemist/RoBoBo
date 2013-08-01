@@ -45,7 +45,7 @@ void ServerManager::connectServer(const std::string& server) {
 	}
 	if (isServer) {
 		ServerProtocol*(*spawnCallFunc)(const std::string&) = (ServerProtocol*(*)(const std::string&)) spawnFunc;
-		std::shared_ptr<ServerProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServer, this, server, protoFile, std::placeholders::_1));
+		std::shared_ptr<ServerProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServerServer, this, server, protoFile, std::placeholders::_1));
 		if (protoAPIVersions.find(newProto->apiVersion()) == protoAPIVersions.end())
 			throw ProtoAPIMismatch ();
 		newProto->pointManagers(modmanager, sockmanager);
@@ -53,7 +53,7 @@ void ServerManager::connectServer(const std::string& server) {
 		serverServers.insert(std::pair<std::string, std::shared_ptr<ServerProtocol>> (protocolIter->second, newProto));
 	} else {
 		ClientProtocol*(*spawnCallFunc)(const std::string&) = (ClientProtocol*(*)(const std::string&)) spawnFunc;
-		std::shared_ptr<ClientProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadServer, this, server, protoFile, std::placeholders::_1));
+		std::shared_ptr<ClientProtocol> newProto (spawnCallFunc(server), std::bind(&ServerManager::unloadClientServer, this, server, protoFile, std::placeholders::_1));
 		if (protoAPIVersions.find(newProto->apiVersion()) == protoAPIVersions.end())
 			throw ProtoAPIMismatch ();
 		newProto->pointManagers(modmanager, sockmanager);
@@ -422,8 +422,15 @@ time_t ServerManager::userAwayTimestamp(const std::string& server, const std::st
 	return callServerHook(&ServerProtocol::userAwayTimestamp, server, std::forward<const std::string&>(user));
 }
 
-template<typename Protocol>
-void ServerManager::unloadServer(const std::string& name, void* protoFile, Protocol* serverPtr) {
+void ServerManager::unloadClientServer(const std::string& name, void* protoFile, ClientProtocol* serverPtr) {
+	delete serverPtr;
+	dlclose(protoFile);
+	serverTypes.erase(name);
+	LogManager* logger = LogManager::getHandle();
+	logger->log(LOG_DEBUG, "servers", "Server " + name + " unloaded.");
+}
+
+void ServerManager::unloadServerServer(const std::string& name, void* protoFile, ServerProtocol* serverPtr) {
 	delete serverPtr;
 	dlclose(protoFile);
 	serverTypes.erase(name);

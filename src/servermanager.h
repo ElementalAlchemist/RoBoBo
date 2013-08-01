@@ -107,8 +107,8 @@ class ServerManager {
 		ModuleManager* modmanager;
 		SocketManager* sockmanager;
 		
-		template<typename Protocol>
-		void unloadServer(const std::string& type, void* protoFile, Protocol* serverPtr);
+		void unloadClientServer(const std::string& type, void* protoFile, ClientProtocol* serverPtr);
+		void unloadServerServer(const std::string& type, void* protoFile, ServerProtocol* serverPtr);
 		template<typename RetVal, typename... Args>
 		RetVal callEitherHook(RetVal(ClientProtocol::*clientFunc)(Args...), RetVal(ServerProtocol::*serverFunc)(Args...), const std::string& server, Args&&... args);
 		template<typename RetVal, typename... Args>
