@@ -1,6 +1,7 @@
 #pragma once
 #include "main.h"
 #include "ircmessage.h"
+#include "modhooks.h"
 
 class ModuleManager;
 class SocketManager;
