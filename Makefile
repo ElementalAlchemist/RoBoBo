@@ -1,5 +1,5 @@
 $(info Checking compiler availability...)
-CC:=$(shell CLANGVERSION=`clang++ -dumpversion`; CLANG=$$?; GCCVERSION=`g++ -dumpversion`; GCC=$$?; if [ $$CLANG -eq 0 ]; then if [ `echo $$CLANGVERSION | cut -d '.' -f 1` -ge 4 -a `echo $$CLANGVERSION | cut -d '.' -f 2` -ge 2 ]; then echo "clang++"; exit; fi; fi; if [ $$GCC -eq 0 ]; then if [ `echo $$GCCVERSION | cut -d '.' -f 1` -ge 4 -a `echo $$GCCVERSION | cut -d '.' -f 2` -ge 9 ]; then echo "g++"; exit; fi; fi)
+CC:=$(shell CLANGVERSION=`clang++ -dumpversion 2> /dev/null`; CLANG=$$?; GCCVERSION=`g++ -dumpversion 2> /dev/null`; GCC=$$?; if [ $$CLANG -eq 0 ]; then if [ `echo $$CLANGVERSION | cut -d '.' -f 1` -ge 4 -a `echo $$CLANGVERSION | cut -d '.' -f 2` -ge 2 ]; then echo "clang++"; exit; fi; fi; if [ $$GCC -eq 0 ]; then if [ `echo $$GCCVERSION | cut -d '.' -f 1` -ge 4 -a `echo $$GCCVERSION | cut -d '.' -f 2` -ge 9 ]; then echo "g++"; exit; fi; fi)
 ifdef CC
 $(info Using ${CC} for building.)
 $(info )
