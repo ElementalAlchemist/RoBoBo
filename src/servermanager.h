@@ -1,9 +1,11 @@
 #pragma once
 #include "main.h"
-#include "modulemanager.h"
-#include "socketmanager.h"
-#include "modtypes/clientprotocol.h"
-#include "modtypes/serverprotocol.h"
+#include "ircmessage.h"
+
+class ModuleManager;
+class SocketManager;
+class ClientProtocol;
+class ServerProtocol;
 
 const std::set<unsigned int> protoAPIVersions { 3000 };
 
@@ -145,3 +147,8 @@ class ServerDoesNotSupport : public std::exception {
 	public:
 		const char* what() const noexcept { return "The server does not support the request."; }
 };
+
+#include "modulemanager.h"
+#include "socketmanager.h"
+#include "modtypes/clientprotocol.h"
+#include "modtypes/serverprotocol.h"
