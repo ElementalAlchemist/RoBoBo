@@ -1,7 +1,5 @@
 #pragma once
 #include "../main.h"
-#include "../modulemanager.h"
-#include "../socketmanager.h"
 
 class ClientProtocol {
 	public:

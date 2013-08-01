@@ -1,7 +1,5 @@
 #pragma once
 #include "../main.h"
-#include "../servermanager.h"
-#include "basemodule.h"
 
 class ClientModule {
 	public:
