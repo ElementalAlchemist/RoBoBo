@@ -677,12 +677,7 @@ std::function<void()> ModuleManager::generateMsgHookCaller(MsgAction(ModType::*f
 }
 	
 template<typename ModType, typename... Args>
-std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
-	std::string server, client, message;
-	std::list<std::pair<std::string, char>> channels;
-	std::map<std::string, std::string> tags;
-	std::function<void(const std::string&, const std::list<std::pair<std::string, char>>&, const std::string&, const std::map<std::string, std::string>&)> callback;
-	std::tie(server, client, channels, message, tags, callback) = std::tuple<Args...> (args...);
+std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, const std::string& server, const std::string& client, const std::list<std::pair<std::string, char>>& channels, const std::string& message, const std::map<std::string, std::string>& tags, const std::function<void(const std::string&, const std::list<std::pair<std::string, char>>&, const std::string&, const std::map<std::string, std::string>&)>& callback) {
 	return [=]() {
 		for (auto mod : modList) {
 			try {
@@ -703,12 +698,7 @@ std::function<void()> ModuleManager::generateChanOutHookCaller(void(ModType::*fu
 }
 
 template<typename ModType, typename... Args>
-std::function<void()> ModuleManager::generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args) {
-	std::string server, client, message;
-	std::list<std::string> users;
-	std::map<std::string, std::string> tags;
-	std::function<void(const std::string&, const std::list<std::string>&, const std::string&, const std::map<std::string, std::string>&)> callback;
-	std::tie(server, client, users, message, tags, callback) = std::tuple<Args...> (args...);
+std::function<void()> ModuleManager::generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, const std::string& server, const std::string& client, const std::list<std::string>& users, const std::string& message, const std::map<std::string, std::string>& tags, const std::function<void(const std::string&, const std::list<std::string>&, const std::string&, const std::map<std::string, std::string>&)>& callback) {
 	return [=]() {
 		for (auto mod : modList) {
 			try {

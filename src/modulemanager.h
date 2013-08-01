@@ -77,9 +77,9 @@ class ModuleManager {
 		template<typename ModType, typename... Args>
 		std::function<void()> generateMsgHookCaller(MsgAction(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args);
 		template<typename ModType, typename... Args>
-		std::function<void()> generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args);
+		std::function<void()> generateChanOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, const std::string& server, const std::string& client, const std::list<std::pair<std::string, char>>& channels, const std::string& message, const std::map<std::string, std::string>& tags, const std::function<void(const std::string&, const std::list<std::pair<std::string, char>>&, const std::string&, const std::map<std::string, std::string>&)>& callback);
 		template<typename ModType, typename... Args>
-		std::function<void()> generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, Args... args);
+		std::function<void()> generateUserOutHookCaller(void(ModType::*func)(Args...), const std::list<std::pair<std::string, std::shared_ptr<ModType>>>& modList, const std::string& server, const std::string& client, const std::list<std::string>& users, const std::string& message, const std::map<std::string, std::string>& tags, const std::function<void(const std::string&, const std::list<std::string>&, const std::string&, const std::map<std::string, std::string>&)>& callback);
 		void startQueue();
 		void processQueue();
 		bool runningProcess = false;
