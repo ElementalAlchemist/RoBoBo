@@ -24,7 +24,7 @@ void ServerManager::connectServer(const std::string& server) {
 	auto protocolIter = serverConfig.find("protocol");
 	if (protocolIter == serverConfig.end())
 		throw ServerNoProtocol ();
-	void* protoFile = dlopen("protocols/" + protocolIter->second + ".so");
+	void* protoFile = dlopen(("protocols/" + protocolIter->second + ".so").c_str(), RTLD_NOW);
 	if (protoFile == nullptr)
 		throw ProtoLoadFailed (dlerror());
 	void* serverFunc = dlsym(protoFile, "serverType");
