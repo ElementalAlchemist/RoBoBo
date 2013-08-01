@@ -559,7 +559,7 @@ std::shared_ptr<Module> ModuleManager::openModule(const std::string& name) {
 			throw ModuleLoadFailed (loadError);
 		throw ModuleLoadFailed ("The spawn symbol has been set to null, but it must be a valid function.");
 	}
-	Module*(*spawnCallFunc)(const std::string&) = static_cast<Module*(*)(const std::string&)> (spawnFunc);
+	Module*(*spawnCallFunc)(const std::string&) = (Module*(*)(const std::string&)) spawnFunc;
 	std::shared_ptr<Module> newModule (spawnCallFunc(name));
 	if (modAPIVersions.find(newModule->apiVersion()) == modAPIVersions.end()) {
 		dlclose(modFile);
