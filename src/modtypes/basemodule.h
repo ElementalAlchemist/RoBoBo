@@ -5,13 +5,14 @@ class ClientModule;
 class ServerModule;
 class ModuleManager;
 class ServerManager;
+class SocketManager;
 class Socket;
 
 class Module {
 	public:
 		Module(const std::string& name) : moduleName(name) {}
 		virtual ~Module() {}
-		void loadManagerPointer(ModuleManager* mm) { modmanager = mm; }
+		void loadManagerPointer(ModuleManager* mm, ServerManager* sm, SocketManager* sockm) { modmanager = mm; servmanager = sm; sockmanager = sockm; }
 		virtual const unsigned int apiVersion() const = 0;
 		virtual const std::string functionid() const = 0;
 		virtual const bool keepAlive() const { return false; }
@@ -32,12 +33,12 @@ class Module {
 	protected:
 		const std::string moduleName;
 		
-		void connectServer(const std::string& server) { modmanager->connectServer(server); }
-		void disconnectServer(const std::string& server) { modmanager->disconnectServer(server); }
+		void connectServer(const std::string& server) { servmanager->connectServer(server); }
+		void disconnectServer(const std::string& server) { servmanager->disconnectServer(server); }
 		void loadModule(const std::string& modName) { modmanager->loadModule(modName); }
 		void unloadModule(const std::string& modName) { modmanager->unloadModule(modName); }
 		
-		std::shared_ptr<Socket> assignSocket(const std::string& socketType) { return modmanager->assignSocket(socketType); }
+		std::shared_ptr<Socket> assignSocket(const std::string& socketType) { return sockmanager->getSocket(socketType); }
 		
 		std::list<std::string> loadedModules() { return modmanager->modules(); }
 		
@@ -53,4 +54,6 @@ class Module {
 		void removeServiceDependency(const std::string& modName, const std::string& service) { modmanager->removeServiceDependency(modName, service); }
 	private:
 		ModuleManager* modmanager;
+		ServerManager* servmanager;
+		SocketManager* sockmanager;
 };
