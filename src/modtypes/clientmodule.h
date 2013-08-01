@@ -61,7 +61,7 @@ class ClientModule {
 		void sendOtherData(const std::string& server, const std::string& client, const IRCMessage* line) { servmanager->sendOtherData(server, client, line); }
 		
 		std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& gecos) { return servmanager->addClient(server, nick, ident, gecos); }
-		void removeClient(const std::string& server, const std::string& client) { servmanager->addClient(server, client); }
+		void removeClient(const std::string& server, const std::string& client) { servmanager->removeClient(server, client); }
 		
 		std::list<std::pair<std::string, bool>> activeServers() { return servmanager->activeServers(false); }
 		std::list<std::pair<std::string, bool>> connectedServers() { return servmanager->connectedServers(false); }

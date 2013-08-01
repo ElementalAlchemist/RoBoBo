@@ -90,12 +90,12 @@ class ServerModule {
 		void pushLine(const std::string& server, const std::string& user, const IRCMessage* line) { servmanager->pushLine(server, user, line); }
 		void sendOtherData(const std::string& server, const IRCMessage* message) { servmanager->sendOtherData(server, message); }
 		
-		std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& host, const std::string& gecos) { return servmanager->addClient(server, nick, ident, host, gecos); }
-		void removeClient(const std::string& server, const std::string& client) { servmanager->removeClient(server, client); }
+		std::string addClient(const std::string& server, const std::string& nick, const std::string& ident, const std::string& host, const std::string& gecos, const std::map<std::string, std::string>& tags) { return servmanager->addClient(server, nick, ident, host, gecos, tags); }
+		void removeClient(const std::string& server, const std::string& client, const std::map<std::string, std::string>& tags) { servmanager->removeClient(server, client, tags); }
 		
-		std::list<std::pair<std::string, bool>> activeServers() { return servmanager->activeServers(); }
-		std::list<std::pair<std::string, bool>> connectedServers() { return servmanager->connectedServers(); }
-		std::string serverType(const std::string& server) { return servmanager->serverType(); }
+		std::list<std::pair<std::string, bool>> activeServers() { return servmanager->activeServers(true); }
+		std::list<std::pair<std::string, bool>> connectedServers() { return servmanager->connectedServers(true); }
+		std::string serverType(const std::string& server) { return servmanager->serverType(server); }
 		
 		std::list<std::string> networkServerList(const std::string& server) { return servmanager->networkServerList(server); }
 		std::list<std::string> xLineTypes(const std::string& server) { return servmanager->xLineTypes(server); }
