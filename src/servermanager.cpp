@@ -432,7 +432,7 @@ void ServerManager::unloadServer(const std::string& name, void* protoFile, Proto
 }
 
 template<typename RetVal, typename... Args>
-RetVal ServerManager::callEitherHook(RetVal(ClientProtocol::*clientFunc)(Args&...), RetVal(ServerProtocol::*serverFunc)(Args&...), const std::string& server, Args&... args) {
+RetVal ServerManager::callEitherHook(RetVal(ClientProtocol::*clientFunc)(Args...), RetVal(ServerProtocol::*serverFunc)(Args...), const std::string& server, Args&&... args) {
 	auto clientIter = clientServers.find(server);
 	if (clientIter == clientServers.end()) {
 		auto serverIter = serverServers.find(server);
@@ -444,7 +444,7 @@ RetVal ServerManager::callEitherHook(RetVal(ClientProtocol::*clientFunc)(Args&..
 }
 
 template<typename RetVal, typename... Args>
-RetVal ServerManager::callClientHook(RetVal(ClientProtocol::*func)(Args&...), const std::string& server, Args&... args) {
+RetVal ServerManager::callClientHook(RetVal(ClientProtocol::*func)(Args...), const std::string& server, Args&&... args) {
 	auto clientIter = clientServers.find(server);
 	if (clientIter == clientServers.end()) {
 		if (serverServers.find(server) == serverServers.end())
@@ -455,7 +455,7 @@ RetVal ServerManager::callClientHook(RetVal(ClientProtocol::*func)(Args&...), co
 }
 
 template<typename RetVal, typename... Args>
-RetVal ServerManager::callServerHook(RetVal(ServerProtocol::*func)(Args&...), const std::string& server, Args&... args) {
+RetVal ServerManager::callServerHook(RetVal(ServerProtocol::*func)(Args...), const std::string& server, Args&&... args) {
 	auto serverIter = serverServers.find(server);
 	if (serverIter == serverServers.end()) {
 		if (clientServers.find(server) == clientServers.end())
