@@ -406,6 +406,14 @@ bool ServerManager::userHasMode(const std::string& server, const std::string& us
 	return callEitherHook(&ClientProtocol::userHasMode, &ServerProtocol::userHasMode, server, std::forward<const std::string&>(user), std::forward<const std::string&>(mode));
 }
 
+std::string ServerManager::userModeParam(const std::string& server, const std::string& user, const std::string& mode) {
+	return callEitherHook(&ClientProtocol::userHasMode, &ServerProtocol::userHasMode, server, std::forward<const std::string&>(user), std::forward<const std::string&>(mode));
+}
+
+std::list<std::string> ServerManager::userListModeList(const std::string& server, const std::string& user, const std::string& listMode) {
+	return callServerHook(&ServerProtocol::userListModeList, server, std::forward<const std::string&>(user), std::forward<const std::string&>(listMode));
+}
+
 std::set<std::string> ServerManager::userChans(const std::string& server, const std::string& user) {
 	return callEitherHook(&ClientProtocol::userChans, &ServerProtocol::userChans, server, std::forward<const std::string&>(user));
 }

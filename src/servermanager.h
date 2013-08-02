@@ -94,6 +94,8 @@ class ServerManager {
 		std::string userGecos(const std::string& server, const std::string& user);
 		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user);
 		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode);
+		std::string userModeParam(const std::string& server, const std::string& user, const std::string& mode);
+		std::list<std::string> userListModeList(const std::string& server, const std::string& user, const std::string& listMode);
 		std::set<std::string> userChans(const std::string& server, const std::string& user);
 		time_t userTimestamp(const std::string& server, const std::string& user);
 		time_t userNickTimestamp(const std::string& server, const std::string& user);

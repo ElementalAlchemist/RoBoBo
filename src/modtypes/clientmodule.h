@@ -94,6 +94,7 @@ class ClientModule {
 		std::string userGecos(const std::string& server, const std::string& user) { return servmanager->userGecos(server, user); }
 		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user) { return servmanager->userModes(server, user); }
 		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userHasMode(server, user, mode); }
+		std::string userModeParam(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userModeParam(server, user, mode); }
 		std::set<std::string> userChans(const std::string& server, const std::string& user) { return servmanager->userChans(server, user); }
 	private:
 		std::shared_ptr<Module> baseModule;
