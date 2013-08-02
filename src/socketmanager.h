@@ -24,3 +24,11 @@ class SocketAPIMismatch : public std::exception {
 	public:
 		const char* what() const noexcept { return "The socket module is not compatible with the current module API."; }
 };
+
+class SocketOperationFail : public std::exception {
+	public:
+		SocketConnectFail(std::string&& desc) : description(std::forward<std::string>(desc)) {}
+		const char* what() const noexcept { return description.c_str(); }
+	private:
+		std::string description;
+};
