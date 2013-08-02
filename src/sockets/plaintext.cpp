@@ -112,6 +112,7 @@ std::string Plaintext::receive() {
 }
 
 void Plaintext::send(const std::string& data) {
+	std::string line (data + delimiter);
 	ssize_t status;
 	do
 		status = send(socketfd, line.c_str(), line.size(), 0);
