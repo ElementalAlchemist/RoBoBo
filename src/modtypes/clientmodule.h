@@ -86,6 +86,7 @@ class ClientModule {
 		std::map<std::string, std::string> chanModes(const std::string& server, const std::string& channel) { return servmanager->chanModes(server, channel); }
 		bool chanHasMode(const std::string& server, const std::string& channel, const std::string& mode) { return servmanager->chanHasMode(server, channel, mode); }
 		std::string chanModeParam(const std::string& server, const std::string& channel, const std::string& mode) { return servmanager->chanModeParam(server, channel, mode); }
+		std::list<std::string> chanListModeList(const std::string& server, const std::string& channel, const std::string& mode) { return servmanager->chanListModeList(server, channel, mode); }
 		
 		std::list<std::string> clientList(const std::string& server) { return servmanager->clientList(server); }
 		std::string userNick(const std::string& server, const std::string& user) { return servmanager->userNick(server, user); }
@@ -95,6 +96,7 @@ class ClientModule {
 		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user) { return servmanager->userModes(server, user); }
 		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userHasMode(server, user, mode); }
 		std::string userModeParam(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userModeParam(server, user, mode); }
+		std::list<std::string> userListModeList(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userListModeList(server, user, mode); }
 		std::set<std::string> userChans(const std::string& server, const std::string& user) { return servmanager->userChans(server, user); }
 	private:
 		std::shared_ptr<Module> baseModule;

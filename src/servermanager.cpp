@@ -375,7 +375,7 @@ std::string ServerManager::chanModeParam(const std::string& server, const std::s
 }
 
 std::list<std::string> ServerManager::chanListModeList(const std::string& server, const std::string& channel, const std::string& listMode) {
-	return callServerHook(&ServerProtocol::chanListModeList, server, std::forward<const std::string&>(channel), std::forward<const std::string&>(listMode));
+	return callEitherHook(&ClientProtocol::chanListModeList, &ServerProtocol::chanListModeList, server, std::forward<const std::string&>(channel), std::forward<const std::string&>(listMode));
 }
 
 std::list<std::string> ServerManager::clientList(const std::string& server) {
@@ -411,7 +411,7 @@ std::string ServerManager::userModeParam(const std::string& server, const std::s
 }
 
 std::list<std::string> ServerManager::userListModeList(const std::string& server, const std::string& user, const std::string& listMode) {
-	return callServerHook(&ServerProtocol::userListModeList, server, std::forward<const std::string&>(user), std::forward<const std::string&>(listMode));
+	return callEitherHook(&ClientProtocol::userListModeList, &ServerProtocol::userListModeList, server, std::forward<const std::string&>(user), std::forward<const std::string&>(listMode));
 }
 
 std::set<std::string> ServerManager::userChans(const std::string& server, const std::string& user) {
