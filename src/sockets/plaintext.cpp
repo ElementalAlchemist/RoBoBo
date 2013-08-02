@@ -10,7 +10,7 @@ class Plaintext : public Socket {
 		unsigned int apiVersion() { return 3000; }
 		void connectServer(const std::string& server, const std::string& port, const std::string& bindAddr = "");
 		std::string receive();
-		void send(const std::string& data);
+		void sendData(const std::string& data);
 		void closeConnection();
 	private:
 		int socketfd;
@@ -111,7 +111,7 @@ std::string Plaintext::receive() {
 	}
 }
 
-void Plaintext::send(const std::string& data) {
+void Plaintext::sendData(const std::string& data) {
 	std::string line (data + delimiter);
 	ssize_t status;
 	do
