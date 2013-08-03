@@ -27,7 +27,7 @@ class SocketAPIMismatch : public std::exception {
 
 class SocketOperationFailed : public std::exception {
 	public:
-		SocketConnectFailed(std::string&& desc) : description(std::forward<std::string>(desc)) {}
+		SocketOperationFailed(std::string&& desc) : description(std::forward<std::string>(desc)) {}
 		const char* what() const noexcept { return description.c_str(); }
 	private:
 		std::string description;
