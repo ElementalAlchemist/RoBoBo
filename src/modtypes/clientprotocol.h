@@ -52,7 +52,7 @@ class ClientProtocol {
 		virtual std::map<std::string, std::string> chanModes(const std::string& channel) { return std::map<std::string, std::string> (); }
 		virtual bool chanHasMode(const std::string& channel, const std::string& mode) { return false; }
 		virtual std::string chanModeParam(const std::string& channel, const std::string& mode) { return ""; }
-		virtual std::list<std::string> chanListModeList(const std:string& channel, const std::string& mode) { return std::list<std::string> (); }
+		virtual std::list<std::string> chanListModeList(const std::string& channel, const std::string& mode) { return std::list<std::string> (); }
 		
 		virtual std::list<std::string> clientList() { return std::list<std::string> (); }
 		virtual std::string userNick(const std::string& user) { return ""; }
