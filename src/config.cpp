@@ -180,7 +180,7 @@ size_t Config::blockCount(const std::string& block) const {
 	return config.count(block);
 }
 
-std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const std::string& block) const {
+std::list<std::unordered_map<std::string, std::string>> Config::getBlocks(const std::string& block) const {
 	std::list<std::unordered_map<std::string, std::string>> blockList;
 	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
 	std::tie(startIter, endIter) = config.equal_range(block);

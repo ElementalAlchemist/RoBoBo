@@ -7,7 +7,7 @@ void ServerManager::pointManagers(ModuleManager* mm, SocketManager* sm) {
 
 void ServerManager::connectStartupServers() {
 	Config* config = Config::getHandle();
-	std::list<std::unordered_map<std::string, std::string>> servers = config->getBlock("server");
+	std::list<std::unordered_map<std::string, std::string>> servers = config->getBlocks("server");
 	for (auto serverConf : servers) {
 		auto nameIter = serverConf.find("name");
 		auto startupIter = serverConf.find("startup");

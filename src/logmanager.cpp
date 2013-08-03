@@ -16,7 +16,7 @@ void LogManager::updateLogFiles() {
 	}
 	logFiles.clear();
 	Config* conf = Config::getHandle();
-	std::list<std::unordered_map<std::string, std::string>> logBlockList = conf->getBlock("log");
+	std::list<std::unordered_map<std::string, std::string>> logBlockList = conf->getBlocks("log");
 	for (std::unordered_map<std::string, std::string> blockContents : logBlockList) {
 		if (blockContents["level"] == "none" || blockContents["types"].empty() || blockContents["file"].empty())
 			continue;

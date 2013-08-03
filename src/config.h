@@ -13,7 +13,7 @@ class Config {
 		std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>> readConfig(const std::string& filename, std::istream&& configData);
 		void addRehashNotify(std::function<void()> notifyCallback);
 		size_t blockCount(const std::string& block) const;
-		std::list<std::unordered_map<std::string, std::string>> getBlock(const std::string& block) const;
+		std::list<std::unordered_map<std::string, std::string>> getBlocks(const std::string& block) const;
 		std::list<std::unordered_map<std::string, std::string>> getBlocksOnConditions(const std::string& block, const std::unordered_map<std::string, std::string>& conditions) const;
 		std::unordered_map<std::string, std::string> getSingleBlock(const std::string& block) const;
 		std::unordered_map<std::string, std::string> getSingleBlockOnConditions(const std::string& block, const std::unordered_map<std::string, std::string>& conditions) const;
