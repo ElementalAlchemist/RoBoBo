@@ -189,7 +189,30 @@ std::list<std::unordered_map<std::string, std::string>> Config::getBlock(const s
 	return blockList;
 }
 
-std::unordered_map<std::string, std::string> Config::getSingleBlock(const std::string& block, const std::unordered_map<std::string, std::string>& conditions) const {
+std::list<std::unordered_map<std::string, std::string>> Config::getBlocksOnConditions(const std::string& block, const std::unordered_map<std::string, std::string>& conditions) const {
+	std::list<std::unordered_map<std::string, std::string>> blockList;
+	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
+	std::tie(startIter, endIter) = config.equal_range(block);
+	for (; startIter != endIter; ++startIter) {
+		for (auto check : conditions) {
+			auto blockIter = startIter->second.find(check.first);
+			if (blockIter == startIter->second.end())
+				continue;
+			if (check.second == blockIter->second)
+				blockList.push_back(startIter->second);
+		}
+	}
+	return blockList;
+}
+
+std::unordered_map<std::string, std::string> Config::getSingleBlock(const std::string& block) const {
+	auto blockIter = config.find(block);
+	if (block == config.end())
+		return std::unordered_map<std::string, std::string> ();
+	return blockIter->second;
+}
+
+std::unordered_map<std::string, std::string> Config::getSingleBlockOnConditions(const std::string& block, const std::unordered_map<std::string, std::string>& conditions) const {
 	std::unordered_multimap<std::string, std::unordered_map<std::string, std::string>>::const_iterator startIter, endIter;
 	std::tie(startIter, endIter) = config.equal_range(block);
 	for (; startIter != endIter; ++startIter) {

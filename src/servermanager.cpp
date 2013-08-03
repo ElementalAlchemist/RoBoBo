@@ -18,7 +18,7 @@ void ServerManager::connectStartupServers() {
 
 void ServerManager::connectServer(const std::string& server) {
 	Config* config = Config::getHandle();
-	std::unordered_map<std::string, std::string> serverConfig = config->getSingleBlock("server", std::unordered_map<std::string, std::string> { { "name", server } });
+	std::unordered_map<std::string, std::string> serverConfig = config->getSingleBlockOnConditions("server", std::unordered_map<std::string, std::string> { { "name", server } });
 	if (serverConfig.empty())
 		throw ServerNotConfigured ();
 	auto protocolIter = serverConfig.find("protocol");
