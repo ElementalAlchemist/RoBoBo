@@ -207,7 +207,7 @@ std::list<std::unordered_map<std::string, std::string>> Config::getBlocksOnCondi
 
 std::unordered_map<std::string, std::string> Config::getSingleBlock(const std::string& block) const {
 	auto blockIter = config.find(block);
-	if (block == config.end())
+	if (blockIter == config.end())
 		return std::unordered_map<std::string, std::string> ();
 	return blockIter->second;
 }
