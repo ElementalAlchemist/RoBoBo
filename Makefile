@@ -1,16 +1,20 @@
 $(info Checking compiler availability...)
+ifeq ($(origin CC), default)
 CC:=$(shell CLANGVERSION=`clang++ -dumpversion 2> /dev/null`; CLANG=$$?; GCCVERSION=`g++ -dumpversion 2> /dev/null`; GCC=$$?; if [ $$CLANG -eq 0 ]; then if [ `echo $$CLANGVERSION | cut -d '.' -f 1` -ge 4 -a `echo $$CLANGVERSION | cut -d '.' -f 2` -ge 2 ]; then echo "clang++"; exit; fi; fi; if [ $$GCC -eq 0 ]; then if [ `echo $$GCCVERSION | cut -d '.' -f 1` -ge 4 -a `echo $$GCCVERSION | cut -d '.' -f 2` -ge 9 ]; then echo "g++"; exit; fi; fi)
+else # In this case, it came from the environment, so just check for sanity
+CC:=$(shell ${CC} --version > /dev/null 2>&1; if [ $$? -eq 0 ]; then echo ${CC}; fi)
+endif
 ifdef CC
 $(info Using ${CC} for building.)
 $(info )
 else
 $(error No compiler found)
 endif
-CXXFLAGS=-std=c++11 -Wall -pedantic -pthread $(DEBUG)
-LDFLAGS=-ldl -rdynamic
-SOFLAGS=-pipe -fPIC -shared
-GENDEPS=-std=c++11 -E -MM
-GENDEPSTARGET=-MT
+CXXFLAGS?=-std=c++11 -Wall -pedantic -pthread $(DEBUG)
+LDFLAGS?=-ldl -rdynamic
+SOFLAGS?=-pipe -fPIC -shared
+GENDEPS?=-std=c++11 -E -MM
+GENDEPSTARGET?=-MT
 SHELL:=/bin/bash
 export
 
