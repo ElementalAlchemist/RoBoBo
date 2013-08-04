@@ -12,7 +12,7 @@ $(error No compiler found)
 endif
 CXXFLAGS?=-std=c++11 -Wall -pedantic -pthread $(DEBUG)
 LDFLAGS?=-ldl -rdynamic
-SOFLAGS?=-pipe -fPIC -shared
+SOFLAGS?=-pipe -fPIC
 GENDEPS?=-std=c++11 -E -MM
 GENDEPSTARGET?=-MT
 SHELL:=/bin/bash
