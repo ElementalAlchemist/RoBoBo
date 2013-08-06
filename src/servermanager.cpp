@@ -11,7 +11,7 @@ void ServerManager::connectStartupServers() {
 	for (auto serverConf : servers) {
 		auto nameIter = serverConf.find("name");
 		auto startupIter = serverConf.find("startup");
-		if (nameIter != serverConf.end() && startupIter != serverConf.end() && Config::makeBool(startupIter->second))
+		if (nameIter != serverConf.end() && startupIter != serverConf.end() && Config::makeBool(startupIter->second, false))
 			connectServer(nameIter->second);
 	}
 }

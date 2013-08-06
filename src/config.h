@@ -21,7 +21,7 @@ class Config {
 		bool getBoolValue(const std::string& block, const std::string& key) const;
 		std::list<std::string> getAllValues(const std::string& block, const std::string& key) const;
 		std::list<bool> getAllBoolValues(const std::string& block, const std::string& key) const;
-		static bool makeBool(const std::string& value);
+		static bool makeBool(const std::string& value, bool defaultValue);
 	private:
 		Config();
 		std::string confname;

@@ -280,9 +280,14 @@ std::list<bool> Config::getAllBoolValues(const std::string& block, const std::st
 	return valueList;
 }
 
-bool Config::makeBool(const std::string& value) {
+bool Config::makeBool(const std::string& value, bool defaultValue) {
 	std::string lowerValue;
 	std::transform(value.begin(), value.end(), std::back_inserter(lowerValue), ::tolower);
+	if (defaultValue) {
+		if (lowerValue == "no" || lowerValue == "off" || lowerValue == "false")
+			return false;
+		return true;
+	}
 	if (lowerValue == "yes" || lowerValue == "on" || lowerValue == "true")
 		return true;
 	return false;
