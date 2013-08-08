@@ -63,6 +63,7 @@ class ServerManager {
 		std::list<std::string> xLineList(const std::string& server, const std::string& lineType);
 		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask);
 		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask);
+		std::set<std::string> serverCapabilities(const std::string& server);
 		
 		std::set<char> chanTypes(const std::string& server);
 		std::list<std::pair<ModeType, std::string>> allChanModes(const std::string& server);

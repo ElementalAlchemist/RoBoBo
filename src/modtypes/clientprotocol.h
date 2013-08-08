@@ -32,6 +32,8 @@ class ClientProtocol {
 		virtual std::string addClient(const std::string& nick, const std::string& ident, const std::string& gecos) { return ""; }
 		virtual void removeClient(const std::string& client) {}
 		
+		virtual std::set<std::string> serverCapabilities() { return std::set<std::string> (); }
+		
 		virtual std::set<char> chanTypes() { return std::set<char> (); }
 		virtual std::list<std::pair<ModeType, std::string>> allChanModes() { return std::list<std::pair<ModeType, std::string>> (); }
 		virtual ModeType chanModeType(const std::string& mode) { return MODE_NOPARAM; }
