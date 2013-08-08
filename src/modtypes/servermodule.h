@@ -101,7 +101,7 @@ class ServerModule {
 		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask) { return servmanager->xLineExpiry(server, lineType, mask); }
 		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask) { return servmanager->xLineReason(server, lineType, mask); }
 		
-		std::set<std::string> chanTypes(const std::string& server) { return servmanager->chanTypes(server); }
+		std::set<char> chanTypes(const std::string& server) { return servmanager->chanTypes(server); }
 		std::list<std::pair<ModeType, std::string>> allChanModes(const std::string& server) { return servmanager->allChanModes(server); }
 		char prefixSymbol(const std::string& server, const std::string& mode) { return servmanager->prefixSymbol(server, mode); }
 		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, const std::string& status1) { return servmanager->compareStatus(server, status0, status1); }

@@ -280,7 +280,7 @@ std::string ServerManager::xLineReason(const std::string& server, const std::str
 	return callServerHook(&ServerProtocol::xLineReason, server, std::forward<const std::string&>(lineType), std::forward<const std::string&>(mask));
 }
 
-std::set<std::string> ServerManager::chanTypes(const std::string& server) {
+std::set<char> ServerManager::chanTypes(const std::string& server) {
 	return callEitherHook(&ClientProtocol::chanTypes, &ServerProtocol::chanTypes, server);
 }
 

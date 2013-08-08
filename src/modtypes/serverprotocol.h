@@ -47,7 +47,7 @@ class ServerProtocol {
 		virtual time_t xLineExpiry(const std::string& lineType, const std::string& mask) { return 0; }
 		virtual std::string xLineReason(const std::string& lineType, const std::string& mask) { return ""; }
 		
-		virtual std::set<std::string> chanTypes() { return std::set<std::string> (); }
+		virtual std::set<char> chanTypes() { return std::set<char> (); }
 		virtual std::list<std::pair<ModeType, std::string>> allChanModes() { return std::list<std::pair<ModeType, std::string>> (); }
 		virtual char prefixSymbol(const std::string& mode) { return ' '; }
 		virtual std::pair<std::string, char> compareStatus(const std::string& status0, const std::string& status1) { return std::pair<std::string, char> ("", ' '); }

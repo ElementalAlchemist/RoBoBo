@@ -32,7 +32,7 @@ class ClientProtocol {
 		virtual std::string addClient(const std::string& nick, const std::string& ident, const std::string& gecos) { return ""; }
 		virtual void removeClient(const std::string& client) {}
 		
-		virtual std::set<std::string> chanTypes() { return std::set<std::string> (); }
+		virtual std::set<char> chanTypes() { return std::set<char> (); }
 		virtual std::list<std::pair<ModeType, std::string>> allChanModes() { return std::list<std::pair<ModeType, std::string>> (); }
 		virtual char prefixSymbol(const std::string& mode) { return ' '; }
 		virtual std::pair<std::string, char> compareStatus(const std::string& status0, const std::string& status1) { return std::pair<std::string, char> ("", ' '); }

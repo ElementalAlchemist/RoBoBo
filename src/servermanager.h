@@ -64,7 +64,7 @@ class ServerManager {
 		time_t xLineExpiry(const std::string& server, const std::string& lineType, const std::string& mask);
 		std::string xLineReason(const std::string& server, const std::string& lineType, const std::string& mask);
 		
-		std::set<std::string> chanTypes(const std::string& server);
+		std::set<char> chanTypes(const std::string& server);
 		std::list<std::pair<ModeType, std::string>> allChanModes(const std::string& server);
 		char prefixSymbol(const std::string& server, const std::string& mode);
 		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, const std::string& status1);

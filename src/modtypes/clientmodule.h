@@ -65,7 +65,7 @@ class ClientModule {
 		std::list<std::pair<std::string, bool>> connectedServers() { return servmanager->connectedServers(false); }
 		std::string serverType(const std::string& server) { return servmanager->serverType(server); }
 		
-		std::set<std::string> chanTypes(const std::string& server) { return servmanager->chanTypes(server); }
+		std::set<char> chanTypes(const std::string& server) { return servmanager->chanTypes(server); }
 		std::list<std::pair<ModeType, std::string>> allChanModes(const std::string& server) { return servmanager->allChanModes(server); }
 		char prefixSymbol(const std::string& server, const std::string& mode) { return servmanager->prefixSymbol(server, mode); }
 		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, const std::string& status1) { return servmanager->compareStatus(server, status0, status1); }
