@@ -93,6 +93,7 @@ class ServerManager {
 		std::string userIdent(const std::string& server, const std::string& user);
 		std::string userHost(const std::string& server, const std::string& user);
 		std::string userGecos(const std::string& server, const std::string& user);
+		std::string idFromNick(const std::string& server, const std::string& nick);
 		std::list<std::pair<ModeType, std::string>> allUserModes(const std::string& server);
 		ModeType userModeType(const std::string& server, const std::string& mode);
 		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user);

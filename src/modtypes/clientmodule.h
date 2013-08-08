@@ -94,6 +94,7 @@ class ClientModule {
 		std::string userIdent(const std::string& server, const std::string& user) { return servmanager->userIdent(server, user); }
 		std::string userHost(const std::string& server, const std::string& user) { return servmanager->userHost(server, user); }
 		std::string userGecos(const std::string& server, const std::string& user) { return servmanager->userGecos(server, user); }
+		std::string idFromNick(const std::string& server, const std::string& nick) { return servmanager->idFromNick(server, nick); }
 		std::list<std::pair<ModeType, std::string>> allUserModes(const std::string& server) { return servmanager->allUserModes(server); }
 		ModeType userModeType(const std::string& server, const std::string& mode) { return servmanager->userModeType(server, mode); }
 		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user) { return servmanager->userModes(server, user); }

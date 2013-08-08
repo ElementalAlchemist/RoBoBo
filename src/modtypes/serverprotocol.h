@@ -76,6 +76,7 @@ class ServerProtocol {
 		virtual std::string userIdent(const std::string& user) { return ""; }
 		virtual std::string userHost(const std::string& user) { return ""; }
 		virtual std::string userGecos(const std::string& user) { return ""; }
+		virtual std::string idFromNick(const std::string& nick) { return ""; }
 		virtual std::list<std::pair<ModeType, std::string>> allUserModes() { return std::list<std::pair<ModeType, std::string>> (); }
 		virtual ModeType userModeType(const std::string& mode) { return MODE_NOPARAM; }
 		virtual std::map<std::string, std::string> userModes(const std::string& user) { return std::map<std::string, std::string> (); }
