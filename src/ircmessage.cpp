@@ -31,7 +31,10 @@ IRCMessage::IRCMessage(const std::string& line) {
 		spacePos = unprocessedLine.find(' ');
 	}
 	linecommand = unprocessedLine.substr(0, spacePos);
-	unprocessedLine = unprocessedLine.substr(spacePos + 1);
+	if (spacePos == std::string::npos)
+		unprocessedLine.clear();
+	else
+		unprocessedLine = unprocessedLine.substr(spacePos + 1);
 	spacePos = unprocessedLine.find(' ');
 	while (!unprocessedLine.empty()) {
 		if (unprocessedLine[0] == ':' || spacePos == std::string::npos) {
