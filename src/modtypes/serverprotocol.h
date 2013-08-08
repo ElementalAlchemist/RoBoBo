@@ -49,6 +49,7 @@ class ServerProtocol {
 		
 		virtual std::set<char> chanTypes() { return std::set<char> (); }
 		virtual std::list<std::pair<ModeType, std::string>> allChanModes() { return std::list<std::pair<ModeType, std::string>> (); }
+		virtual ModeType chanModeType(const std::string& mode) { return MODE_NOPARAM; }
 		virtual char prefixSymbol(const std::string& mode) { return ' '; }
 		virtual std::pair<std::string, char> compareStatus(const std::string& status0, const std::string& status1) { return std::pair<std::string, char> ("", ' '); }
 		virtual std::pair<std::string, char> compareStatus(const std::string& status0, char status1) { return std::pair<std::string, char> ("", ' '); }
@@ -75,6 +76,8 @@ class ServerProtocol {
 		virtual std::string userIdent(const std::string& user) { return ""; }
 		virtual std::string userHost(const std::string& user) { return ""; }
 		virtual std::string userGecos(const std::string& user) { return ""; }
+		virtual std::list<std::pair<ModeType, std::string>> allUserModes() { return std::list<std::pair<ModeType, std::string>> (); }
+		virtual ModeType userModeType(const std::string& mode) { return MODE_NOPARAM; }
 		virtual std::map<std::string, std::string> userModes(const std::string& user) { return std::map<std::string, std::string> (); }
 		virtual bool userHasMode(const std::string& user, const std::string& mode) { return false; }
 		virtual std::string userModeParam(const std::string& user, const std::string& mode) { return ""; }

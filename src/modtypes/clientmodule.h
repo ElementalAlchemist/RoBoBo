@@ -67,6 +67,7 @@ class ClientModule {
 		
 		std::set<char> chanTypes(const std::string& server) { return servmanager->chanTypes(server); }
 		std::list<std::pair<ModeType, std::string>> allChanModes(const std::string& server) { return servmanager->allChanModes(server); }
+		ModeType chanModeType(const std::string& server, const std::string& mode) { return servmanager->chanModeType(server, mode); }
 		char prefixSymbol(const std::string& server, const std::string& mode) { return servmanager->prefixSymbol(server, mode); }
 		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, const std::string& status1) { return servmanager->compareStatus(server, status0, status1); }
 		std::pair<std::string, char> compareStatus(const std::string& server, const std::string& status0, char status1) { return servmanager->compareStatus(server, status0, status1); }
@@ -93,6 +94,8 @@ class ClientModule {
 		std::string userIdent(const std::string& server, const std::string& user) { return servmanager->userIdent(server, user); }
 		std::string userHost(const std::string& server, const std::string& user) { return servmanager->userHost(server, user); }
 		std::string userGecos(const std::string& server, const std::string& user) { return servmanager->userGecos(server, user); }
+		std::list<std::pair<ModeType, std::string>> allUserModes(const std::string& server) { return servmanager->allUserModes(server); }
+		ModeType userModeType(const std::string& server, const std::string& mode) { return servmanager->userModeType(server, mode); }
 		std::map<std::string, std::string> userModes(const std::string& server, const std::string& user) { return servmanager->userModes(server, user); }
 		bool userHasMode(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userHasMode(server, user, mode); }
 		std::string userModeParam(const std::string& server, const std::string& user, const std::string& mode) { return servmanager->userModeParam(server, user, mode); }

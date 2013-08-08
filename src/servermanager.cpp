@@ -288,6 +288,10 @@ std::list<std::pair<ModeType, std::string>> ServerManager::allChanModes(const st
 	return callEitherHook(&ClientProtocol::allChanModes, &ServerProtocol::allChanModes, server);
 }
 
+ModeType ServerManager::chanModeType(const std::string& server, const std::string& mode) {
+	return callEitherHook(&ClientProtocol::chanModeType, &ServerProtocol::chanModeType, server, mode);
+}
+
 char ServerManager::prefixSymbol(const std::string& server, const std::string& mode) {
 	return callEitherHook(&ClientProtocol::prefixSymbol, &ServerProtocol::prefixSymbol, server, std::forward<const std::string&>(mode));
 }
@@ -396,6 +400,14 @@ std::string ServerManager::userHost(const std::string& server, const std::string
 
 std::string ServerManager::userGecos(const std::string& server, const std::string& user) {
 	return callEitherHook(&ClientProtocol::userGecos, &ServerProtocol::userGecos, server, std::forward<const std::string&>(user));
+}
+
+std::list<std::pair<ModeType, std::string>> ServerManager::allUserModes(const std::string& server) {
+	return callEitherHook(&ClientProtocol::allUserModes, &ServerProtocol::allUserModes, server);
+}
+
+ModeType ServerManager::userModeType(const std::string& server, const std::string& mode) {
+	return callEitherHook(&ClientProtocol::userModeType, &ServerProtocol::userModeType, server, mode);
 }
 
 std::map<std::string, std::string> ServerManager::userModes(const std::string& server, const std::string& user) {
