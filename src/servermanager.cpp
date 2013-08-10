@@ -17,6 +17,8 @@ void ServerManager::connectStartupServers() {
 }
 
 void ServerManager::connectServer(const std::string& server) {
+	if (serverTypes.find(server) != serverTypes.end())
+		throw ServerAlreadyConnected ();
 	Config* config = Config::getHandle();
 	std::unordered_map<std::string, std::string> serverConfig = config->getSingleBlockOnConditions("server", std::unordered_map<std::string, std::string> { { "name", server } });
 	if (serverConfig.empty())

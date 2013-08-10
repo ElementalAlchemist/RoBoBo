@@ -124,6 +124,11 @@ class ServerManager {
 		RetVal callServerHook(RetVal(ServerProtocol::*func)(Args...), const std::string& server, Args&&... args);
 };
 
+class ServerAlreadyConnected : public std::exception {
+	public:
+		const char* what() const noexcept { return "The server is already connected."; }
+};
+
 class ServerNotConfigured : public std::exception {
 	public:
 		const char* what() const noexcept { return "The server is not defined in the configuration file."; }
