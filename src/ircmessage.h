@@ -17,10 +17,10 @@ class IRCMessage {
 		void removePrefix();
 		void setTag(const std::string& tag, const std::string& value);
 		void removeTag(const std::string& tag);
-		void setTags(const std::unordered_map<std::string, std::string>& tags);
+		void setTags(const std::map<std::string, std::string>& tags);
 	private:
 		std::string linecommand;
 		std::vector<std::string> lineparams;
 		std::string lineprefix;
-		std::unordered_map<std::string, std::string> linetags;
+		std::map<std::string, std::string> linetags;
 };

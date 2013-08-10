@@ -118,6 +118,6 @@ void IRCMessage::removeTag(const std::string& tag) {
 		linetags.erase(tagIter);
 }
 
-void IRCMessage::setTags(const std::unordered_map<std::string, std::string>& tags) {
+void IRCMessage::setTags(const std::map<std::string, std::string>& tags) {
 	linetags = tags;
 }
