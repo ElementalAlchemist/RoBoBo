@@ -34,7 +34,7 @@ class Module {
 		const std::string moduleName;
 		
 		void connectServer(const std::string& server) { servmanager->connectServer(server); }
-		void disconnectServer(const std::string& server) { servmanager->disconnectServer(server); }
+		void disconnectServer(const std::string& server, const std::string& reason) { servmanager->disconnectServer(server, reason); }
 		void loadModule(const std::string& modName) { modmanager->loadModule(modName); }
 		void unloadModule(const std::string& modName) { modmanager->unloadModule(modName); }
 		
