@@ -5,6 +5,8 @@ IRCMessage::IRCMessage(const std::string& line) {
 	size_t spacePos = unprocessedLine.find(' ');
 	if (unprocessedLine[0] == '@') {
 		std::string tagLine (unprocessedLine.substr(1, spacePos - 1));
+		if (spacePos == std::string::npos)
+			throw MalformedMessage (); // A command was not provided.
 		unprocessedLine = unprocessedLine.substr(spacePos + 1);
 		spacePos = unprocessedLine.find(' ');
 		size_t sepPos = tagLine.find(';');
@@ -27,10 +29,23 @@ IRCMessage::IRCMessage(const std::string& line) {
 	}
 	if (unprocessedLine[0] == ':') {
 		lineprefix = unprocessedLine.substr(1, spacePos - 1);
+		if (spacePos == std::string::npos)
+			throw MalformedMessage (); // A command was not provided.
 		unprocessedLine = unprocessedLine.substr(spacePos + 1);
 		spacePos = unprocessedLine.find(' ');
 	}
 	linecommand = unprocessedLine.substr(0, spacePos);
+	if (linecommand.empty())
+		throw MalformedMessage ();
+	for (char letter : linecommand) {
+		/* The RFC requires commands to be all letters or a numeric.
+		 * This is a bit more lenient in that it allows mixing and doesn't check that
+		 * numerics are three numbers long, but this is fine for a test to make sure
+		 * that e.g. the prefix and tags aren't out of order.
+		 */
+		if (!std::isalnum(letter))
+			throw MalformedMessage ();
+	}
 	if (spacePos == std::string::npos)
 		unprocessedLine.clear();
 	else

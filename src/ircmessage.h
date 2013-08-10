@@ -24,3 +24,8 @@ class IRCMessage {
 		std::string lineprefix;
 		std::map<std::string, std::string> linetags;
 };
+
+class MalformedMessage : public std::exception {
+	public:
+		const char* what() const noexcept { return "The provided message is not a valid IRC message."; }
+};
