@@ -89,7 +89,7 @@ std::string Plaintext::receive() {
 	while (true) {
 		status = recv(socketfd, &inputBuffer, 1024, 0);
 		while (status < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Give some (although brief) wait before checking again
+			std::this_thread::sleep_for(std::chrono::milliseconds(20)); // Give some (although brief) wait before checking again
 			status = recv(socketfd, &inputBuffer, 1024, 0);
 		}
 		if (status <= 0) {
