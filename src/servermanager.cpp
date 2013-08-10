@@ -421,7 +421,7 @@ std::string ServerManager::userGecos(const std::string& server, const std::strin
 }
 
 std::string ServerManager::idFromNick(const std::string& server, const std::string& nick) {
-	return callEitherHook(&ClientProtocol::idFromNick, &ServerProtocol::idFromNick, server, std::forward<const std::string&>(user));
+	return callEitherHook(&ClientProtocol::idFromNick, &ServerProtocol::idFromNick, server, std::forward<const std::string&>(nick));
 }
 
 std::list<std::pair<ModeType, std::string>> ServerManager::allUserModes(const std::string& server) {
