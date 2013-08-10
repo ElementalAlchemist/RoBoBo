@@ -12,7 +12,7 @@ std::shared_ptr<Socket> SocketManager::getSocket(const std::string& socketType) 
 			throw SocketLoadFailed (loadError);
 		throw SocketLoadFailed ("The spawn symbol has been set to null, but it must be a valid function.");
 	}
-	Socket*(*spawnCallFunc)() = (Socket*(*)()) spawnFunc;
+	Socket*(*spawnCallFunc)() = reinterpret_cast<Socket*(*)()>(spawnFunc);
 	std::shared_ptr<Socket> newSocket (spawnCallFunc(), std::bind(&SocketManager::removeSocket, this, socketType, sockFile, std::placeholders::_1));
 	if (sockAPIVersions.find(newSocket->apiVersion()) == sockAPIVersions.end())
 		throw SocketAPIMismatch ();
