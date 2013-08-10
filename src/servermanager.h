@@ -13,10 +13,12 @@ const std::set<unsigned int> protoAPIVersions { 3000 };
 
 class ServerManager {
 	public:
+		ServerManager();
 		void pointManagers(ModuleManager* mm, SocketManager* sm);
 		void connectStartupServers();
 		void connectServer(const std::string& server);
 		void disconnectServer(const std::string& server, const std::string& reason);
+		void processRehash();
 		size_t checkServers();
 		
 		void sendMsg(const std::string& server, const std::string& source, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags);

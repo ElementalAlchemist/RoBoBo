@@ -1,5 +1,10 @@
 #include "servermanager.h"
 
+ServerManager::ServerManager() {
+	Config* config = Config::getHandle();
+	config->addRehashNotify(std::bind(&ServerManager::processRehash, this));
+}
+
 void ServerManager::pointManagers(ModuleManager* mm, SocketManager* sm) {
 	modmanager = mm;
 	sockmanager = sm;
@@ -81,6 +86,13 @@ void ServerManager::disconnectServer(const std::string& server, const std::strin
 	}
 	LogManager* logger = LogManager::getHandle();
 	logger->log(LOG_DEBUG, "servers", "Server " + server + " disconnected.");
+}
+
+void ServerManager::processRehash() {
+	for (auto server : clientServers)
+		server.second->onRehash();
+	for (auto server : serverServers)
+		server.second->onRehash();
 }
 
 size_t ServerManager::checkServers() {
