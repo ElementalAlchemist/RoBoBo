@@ -10,7 +10,7 @@ class IRCMessage {
 		const std::string& prefix() const;
 		std::string tagValue(const std::string& tag) const;
 		bool tagExists(const std::string& tag) const;
-		const std::unordered_map<std::string, std::string>& tags() const;
+		const std::map<std::string, std::string>& tags() const;
 		void setParam(size_t param, const std::string& value);
 		void setParams(const std::vector<std::string>& params);
 		void setPrefix(const std::string& prefix);

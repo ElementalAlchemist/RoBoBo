@@ -91,7 +91,7 @@ bool IRCMessage::tagExists(const std::string& tag) const {
 	return linetags.find(tag) != linetags.end();
 }
 
-const std::unordered_map<std::string, std::string>& IRCMessage::tags() const {
+const std::map<std::string, std::string>& IRCMessage::tags() const {
 	return linetags;
 }
 
