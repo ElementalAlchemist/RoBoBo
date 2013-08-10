@@ -16,7 +16,7 @@ class ServerManager {
 		void pointManagers(ModuleManager* mm, SocketManager* sm);
 		void connectStartupServers();
 		void connectServer(const std::string& server);
-		void disconnectServer(const std::string& server);
+		void disconnectServer(const std::string& server, const std::string& reason);
 		size_t checkServers();
 		
 		void sendMsg(const std::string& server, const std::string& source, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags);

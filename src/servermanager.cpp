@@ -65,16 +65,16 @@ void ServerManager::connectServer(const std::string& server) {
 	logger->log(LOG_DEBUG, "servers", "Server " + server + " loaded and connected.");
 }
 
-void ServerManager::disconnectServer(const std::string& server) {
+void ServerManager::disconnectServer(const std::string& server, const std::string& reason) {
 	auto clientIter = clientServers.find(server);
 	if (clientIter == clientServers.end()) {
 		auto serverIter = serverServers.find(server);
 		if (serverIter != serverServers.end()) {
-			serverIter->second->disconnect();
+			serverIter->second->disconnect(reason);
 			serverServers.erase(serverIter);
 		}
 	} else {
-		clientIter->second->disconnect();
+		clientIter->second->disconnect(reason);
 		clientServers.erase(clientIter);
 	}
 	LogManager* logger = LogManager::getHandle();

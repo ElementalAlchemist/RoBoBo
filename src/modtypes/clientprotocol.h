@@ -10,7 +10,7 @@ class ClientProtocol {
 		virtual void connectServer() {}
 		virtual bool connected() { return false; }
 		virtual bool shouldUnload() { return true; }
-		virtual void disconnect() {}
+		virtual void disconnect(const std::string& reason) {}
 		
 		virtual void sendMsg(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags) {}
 		virtual void sendNotice(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags) {}
