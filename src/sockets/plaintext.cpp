@@ -18,6 +18,9 @@ class Plaintext : public Socket {
 };
 
 void Plaintext::connectServer(const std::string& server, const std::string& port, const std::string& bindAddr) {
+	if (connected)
+		return;
+	socketfd = -1;
 	addrinfo* addrInfoList;
 	addrinfo hints;
 	hints.ai_family = PF_UNSPEC; // Don't specify whether IPv6 or IPv4
