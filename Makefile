@@ -32,17 +32,17 @@ core:
 
 modules:
 	@test -d modules || mkdir modules
-	@src/modules/module_make.sh > src/modules/modules.mk
+	@./module_make.sh modules > src/modules/modules.mk
 	@make --no-print-directory -C src/modules
 
 protocols:
 	@test -d protocols || mkdir protocols
-	@src/protocols/module_make.sh > src/protocols/modules.mk
+	@./module_make.sh protocols > src/protocols/modules.mk
 	@make --no-print-directory -C src/protocols
 
 sockets:
 	@test -d sockets || mkdir sockets
-	@src/sockets/module_make.sh > src/sockets/modules.mk
+	@./module_make.sh sockets > src/sockets/modules.mk
 	@make --no-print-directory -C src/sockets
 
 debugcore:
