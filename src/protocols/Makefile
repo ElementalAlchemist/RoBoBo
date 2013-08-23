@@ -1,4 +1,4 @@
-OBJECTS=$(shell for source in $(basename $(wildcard *.cpp)); do printf " ../../protocols/$$source.so"; done)
+OBJECTS=$(shell for source in $(basename $(wildcard *.cpp)); do printf " ../../protocols/$$source.so"; done; for sourcedir in $(basename $(wildcard */)); do printf " ../../protocols/$${sourcedir%?}.so"; done)
 
 .DEFAULT: default
 
