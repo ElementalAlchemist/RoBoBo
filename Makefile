@@ -70,6 +70,9 @@ clean:
 	@rm -f protocols/*
 	@rm -f sockets/*
 	@make --no-print-directory -C src clean
+	@make --no-print-directory -C src/modules clean
+	@make --no-print-directory -C src/protocols clean
+	@make --no-print-directory -C src/sockets clean
 	@rm -f src/modules/modules.mk
 	@rm -f src/protocols/modules.mk
 	@rm -f src/sockets/modules.mk
