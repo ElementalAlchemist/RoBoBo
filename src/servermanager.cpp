@@ -344,6 +344,10 @@ std::string ServerManager::chanTopicSetter(const std::string& server, const std:
 	return callEitherHook(&ClientProtocol::chanTopicSetter, &ServerProtocol::chanTopicSetter, server, std::forward<const std::string&>(channel));
 }
 
+time_t ServerManager::chanTopicTimestamp(const std::string& server, const std::string& channel) {
+	return callEitherHook(&ClientProtocol::chanTopicTimestamp, &ServerProtocol::chanTopicTimestamp, server, std::forward<const std::string&>(channel));
+}
+
 time_t ServerManager::chanTimestamp(const std::string& server, const std::string& channel) {
 	return callEitherHook(&ClientProtocol::chanTimestamp, &ServerProtocol::chanTimestamp, server, std::forward<const std::string&>(channel));
 }

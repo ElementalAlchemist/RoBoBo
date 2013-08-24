@@ -113,6 +113,7 @@ class ServerModule {
 		std::list<std::string> chanList(const std::string& server) { return servmanager->chanList(server); }
 		std::string chanTopic(const std::string& server, const std::string& channel) { return servmanager->chanTopic(server, channel); }
 		std::string chanTopicSetter(const std::string& server, const std::string& channel) { return servmanager->chanTopicSetter(server, channel); }
+		time_t chanTopicTimestamp(const std::string& server, const std::string& channel) { return servmanager->chanTopicTimestamp(server, channel); }
 		time_t chanTimestamp(const std::string& server, const std::string& channel) { return servmanager->chanTimestamp(server, channel); }
 		std::list<std::string> chanUsers(const std::string& server, const std::string& channel) { return servmanager->chanUsers(server, channel); }
 		bool userInChan(const std::string& server, const std::string& channel, const std::string& user) { return servmanager->userInChan(server, channel, user); }

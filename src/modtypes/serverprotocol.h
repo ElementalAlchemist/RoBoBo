@@ -59,6 +59,7 @@ class ServerProtocol {
 		virtual std::list<std::string> chanList() { return std::list<std::string> (); }
 		virtual std::string chanTopic(const std::string& channel) { return ""; }
 		virtual std::string chanTopicSetter(const std::string& channel) { return ""; }
+		virtual time_t chanTopicTimestamp(const std::string& channel) { return 0; }
 		virtual time_t chanTimestamp(const std::string& channel) { return 0; }
 		virtual std::list<std::string> chanUsers(const std::string& channel) { return std::list<std::string> (); }
 		virtual bool userInChan(const std::string& channel, const std::string& user) { return false; }
