@@ -1,9 +1,11 @@
 #pragma once
 #include "common.h"
 
+class Protocol;
+
 class Channel {
 	public:
-		Channel(std::string&& name);
+		Channel(std::string&& name, Protocol* mod);
 		std::string name() const;
 		time_t time() const;
 		std::list<std::string> users() const;
@@ -40,4 +42,7 @@ class Channel {
 		time_t chanTopicTime;
 		std::map<std::string, std::string> chanModes;
 		std::map<std::string, std::list<std::string>> chanListModes;
+		Protocol* const proto;
 };
+
+#include "protocol.h"

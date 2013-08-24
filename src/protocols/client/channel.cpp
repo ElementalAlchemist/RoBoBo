@@ -1,6 +1,6 @@
 #include "channel.h"
 
-Channel::Channel(std::string&& name) : chanName(std::forward<std::string> (name)) {}
+Channel::Channel(std::string&& name, Protocol* mod) : chanName(std::forward<std::string> (name)), proto(mod) {}
 
 std::string Channel::name() const {
 	return chanName;
@@ -37,7 +37,11 @@ bool Channel::userHasStatus(const std::string& user, const std::string& status) 
 }
 
 bool Channel::userHasStatusOrGreater(const std::string& user, const std::string& status) const {
-	
+	auto userIter = chanUsers.find(user);
+	if (userIter == chanUsers.end())
+		return false;
+	std::string userStatus (userIter->second.front());
+	return proto->compareStatus(userStatus, status).first == userStatus;
 }
 
 void Channel::addUser(const std::string& user) {
