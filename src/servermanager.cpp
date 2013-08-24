@@ -106,10 +106,15 @@ size_t ServerManager::checkServers() {
 		if (!serverIter->second->connected() && serverIter->second->shouldUnload())
 			serverRemove.push_back(serverIter);
 	}
-	for (auto remove : clientRemove)
+	LogManager* logger = LogManager::getHandle();
+	for (auto remove : clientRemove) {
+		logger->log(LOG_DEBUG, "servers", "Removing disconnected server " + remove->first);
 		clientServers.erase(remove);
-	for (auto remove : serverRemove)
+	}
+	for (auto remove : serverRemove) {
+		logger->log(LOG_DEBUG, "servers", "Removing disconnected server " + remove->first);
 		serverServers.erase(remove);
+	}
 	return clientServers.size() + serverServers.size();
 }
 
