@@ -126,7 +126,7 @@ void ServerManager::setMode(const std::string& server, const std::string& source
 }
 
 void ServerManager::joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::map<std::string, std::string>& tags) {
-	callServerHook(&ServerProtocol::joinChan, server, std::forward<const std::string&>(client), std::forward<const std::string&>(channel), std::forward<const std::map<std::string, std::string>&>(tags));
+	callEitherHook(&ClientProtocol::joinChan, &ServerProtocol::joinChan, server, std::forward<const std::string&>(client), std::forward<const std::string&>(channel), std::forward<const std::map<std::string, std::string>&>(tags));
 }
 
 void ServerManager::joinChan(const std::string& server, const std::string& client, const std::string& channel, const std::string& key, const std::map<std::string, std::string>& tags) {
