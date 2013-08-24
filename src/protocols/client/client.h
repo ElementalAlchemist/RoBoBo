@@ -29,7 +29,7 @@ class Client : public User {
 		std::map<std::string, std::list<std::string>> clientListModes;
 		std::shared_ptr<Socket> socket;
 		bool expectingReconnect;
-		Protocol* proto;
+		Protocol* const proto;
 		std::thread receiveThread;
 		std::thread sendThread;
 		std::thread secondsThread;
@@ -38,3 +38,5 @@ class Client : public User {
 		void sendQueue();
 		void decrementSeconds();
 };
+
+#include "protocol.h"
