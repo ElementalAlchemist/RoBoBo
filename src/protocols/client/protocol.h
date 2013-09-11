@@ -73,6 +73,8 @@ class Protocol : public ClientProtocol {
 		std::string userModeParam(const std::string& user, const std::string& mode);
 		std::list<std::string> userListModeList(const std::string& user, const std::string& listMode);
 		std::set<std::string> userChans(const std::string& user);
+		
+		void processIncoming(const std::string& client, const IRCMessage* message);
 	private:
 		
 };

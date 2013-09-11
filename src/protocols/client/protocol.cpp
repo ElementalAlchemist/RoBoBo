@@ -239,3 +239,7 @@ std::list<std::string> Protocol::userListModeList(const std::string& user, const
 std::set<std::string> Protocol::userChans(const std::string& user) {
 	
 }
+
+void Protocol::processIncoming(const std::string& client, const IRCMessage* message) {
+	
+}
