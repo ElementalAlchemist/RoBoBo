@@ -74,6 +74,7 @@ class Protocol : public ClientProtocol {
 		std::list<std::string> userListModeList(const std::string& user, const std::string& listMode);
 		std::set<std::string> userChans(const std::string& user);
 		
+		std::string serverAddr();
 		void processIncoming(const std::string& client, const IRCMessage* message);
 	private:
 		std::mutex processMutex;

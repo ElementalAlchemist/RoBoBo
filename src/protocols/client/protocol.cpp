@@ -240,6 +240,10 @@ std::set<std::string> Protocol::userChans(const std::string& user) {
 	
 }
 
+std::string Protocol::serverAddr() {
+	return serverName;
+}
+
 void Protocol::processIncoming(const std::string& client, const IRCMessage* message) {
 	MutexLocker mutexLock (&processMutex);
 	// TODO: the rest of this
