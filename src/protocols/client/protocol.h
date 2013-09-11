@@ -76,5 +76,5 @@ class Protocol : public ClientProtocol {
 		
 		void processIncoming(const std::string& client, const IRCMessage* message);
 	private:
-		
+		std::mutex processMutex;
 };
