@@ -102,5 +102,11 @@ void Client::sendQueue() {
 }
 
 void Client::decrementSeconds() {
-	
+	while (socket->isConnected()) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		MutexLocker mutexLock (&sendMutex);
+		if (penaltySeconds > 0)
+			penaltySeconds--;
+	}
+	penaltySeconds = 0;
 }

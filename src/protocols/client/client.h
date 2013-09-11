@@ -37,6 +37,7 @@ class Client : public User {
 		void receiveData();
 		void sendQueue();
 		void decrementSeconds();
+		unsigned int penaltySeconds;
 };
 
 #include "protocol.h"
