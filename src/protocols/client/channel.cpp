@@ -60,7 +60,16 @@ void Channel::grantStatus(const std::string& user, const std::string& status) {
 	auto userIter = chanUsers.find(user);
 	if (userIter == chanUsers.end())
 		return;
-	// TODO: add status in order
+	bool inserted = false;
+	for (auto statusIter = userIter->second.cbegin(); statusIter != userIter->second.cend(); ++statusIter) {
+		if (proto->compareStatus(status, *statusIter).first == status) {
+			userIter->second.insert(statusIter, status);
+			inserted = true;
+			break;
+		}
+	}
+	if (!inserted)
+		userIter->second.push_back(status);
 }
 
 void Channel::revokeStatus(const std::string& user, const std::string& status) {
