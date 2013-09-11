@@ -90,7 +90,7 @@ void Client::unsetListMode(const std::string& mode, const std::string& param) {
 }
 
 void Client::sendLine(const IRCMessage* line) {
-	
+	socket->sendData(line->rawLine());
 }
 
 void Client::receiveData() {
