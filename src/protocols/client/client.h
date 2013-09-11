@@ -37,7 +37,9 @@ class Client : public User {
 		void receiveData();
 		void sendQueue();
 		void decrementSeconds();
+		std::queue<std::unique_ptr<IRCMessage>> linesToSend;
 		unsigned int penaltySeconds;
+		std::map<std::string, unsigned int> commandPenalty;
 };
 
 #include "protocol.h"

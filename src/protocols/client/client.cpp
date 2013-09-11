@@ -3,6 +3,7 @@
 Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, const Protocol* mod)
 	: User(std::forward<std::string> (id), std::forward<std::string> (nick), std::forward<std::string> (ident), std::forward<std::string> (gecos)),
 	expectingReconnect(true), proto(mod) {}
+	// TODO: populate commandPenalty
 
 Client::~Client() {
 	
@@ -94,11 +95,45 @@ void Client::sendLine(const IRCMessage* line) {
 }
 
 void Client::receiveData() {
-	
+	while (socket->isConnected()) {
+		std::string newMsg;
+		try {
+			newMsg = socket->receive();
+		} catch (const SocketOperationFailed& ex) {
+			LogManager* logger = LogManager::getHandle();
+			logger->log(LOG_DEFAULT, "protocol-client", "Connection failed for client " + userID + " (" + userNick + "!" + userIdent + "@" + userHost + " on server " + proto->serverAddr() + ") during receive.");
+			break;
+		}
+		proto->processIncoming(userID, IRCMessage (newMsg));
+	}
 }
 
 void Client::sendQueue() {
-	
+	while (socket->isConnected()) {
+		if (linesToSend.empty()) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(25));
+			continue;
+		}
+		std::unique_ptr<IRCMessage> sendingLine = linesToSend.front();
+		linesToSend.pop();
+		unsigned int thisPenalty = 1;
+		auto penaltyIter = commandPenalty.find(sendingLine->command());
+		if (penaltyIter != commandPenalty.end())
+			thisPenalty = penaltyIter->second;
+		while (penaltySeconds > 10)
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+		MutexLocker mutexLock (&sendMutex);
+		penaltySeconds += thisPenalty;
+		if (socket->isConnected()) // to make sure the connection didn't get lost during the wait
+			socket->sendData(sendingLine->rawLine());
+	}
+	if (socket->isConnected()) {
+		MutexLocker mutexLock (&sendMutex);
+		while (!linesToSend.empty()) {
+			socket->sendData(linesToSend.front()->rawLine());
+			linesToSend.pop();
+		}
+	}
 }
 
 void Client::decrementSeconds() {
