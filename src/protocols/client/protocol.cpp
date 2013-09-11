@@ -36,7 +36,7 @@ void Protocol::joinChan(const std::string& client, const std::string& channel, c
 	
 }
 
-void Protocol::joinChan(const std::string& client, const std::string& channel, const std::map<std::string, std::string>& tags) {
+void Protocol::joinChan(const std::string& client, const std::string& channel, const std::string& key, const std::map<std::string, std::string>& tags) {
 	
 }
 
