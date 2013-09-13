@@ -8,9 +8,12 @@ Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::s
 Client::~Client() {
 	if (socket->isConnected())
 		socket->closeConnection();
-	receiveThread.join();
-	sendThread.join();
-	secondsThread.join();
+	if (receiveThread.joinable())
+		receiveThread.join();
+	if (sendThread.joinable())
+		sendThread.join();
+	if (secondsThread.joinable())
+		secondsThread.join();
 }
 
 void Client::disconnect(const std::string& reason) {
