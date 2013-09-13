@@ -149,5 +149,6 @@ void Client::decrementSeconds() {
 			logger->log(LOG_ALL, "protocol-client-penalty-" + proto->servName(), logMsg.str());
 		}
 	}
+	MutexLocker mutexLock (&sendMutex);
 	penaltySeconds = 0;
 }
