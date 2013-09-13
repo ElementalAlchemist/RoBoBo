@@ -76,6 +76,7 @@ class Protocol : public ClientProtocol {
 		std::set<std::string> userChans(const std::string& user);
 		
 		std::string servName();
+		std::shared_ptr<Socket> obtainSocket(const std::string& sockType);
 		void connectSocket(const std::shared_ptr<Socket> sock);
 		bool floodThrottleInEffect();
 		void processIncoming(const std::string& client, const IRCMessage* message);

@@ -246,6 +246,10 @@ std::string Protocol::servName() {
 	return serverName;
 }
 
+std::shared_ptr<Socket> Protocol::obtainSocket(const std::string& sockType) {
+	return assignSocket(sockType);
+}
+
 void Protocol::connectSocket(const std::shared_ptr<Socket> sock) {
 	sock->connectServer(serverAddress, serverPort, serverBindAddr);
 }

@@ -1,9 +1,8 @@
 #include "client.h"
 
-Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, const Protocol* mod)
+Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& socktype, const Protocol* mod)
 	: User(std::forward<std::string> (id), std::forward<std::string> (nick), std::forward<std::string> (ident), std::forward<std::string> (gecos)),
-	expectingReconnect(true), proto(mod) {}
-	// TODO: populate commandPenalty
+	socket(mod->obtainSocket(socktype)), expectingReconnect(true), proto(mod) {}
 
 Client::~Client() {
 	if (socket->isConnected())
@@ -14,6 +13,15 @@ Client::~Client() {
 		sendThread.join();
 	if (secondsThread.joinable())
 		secondsThread.join();
+}
+
+void Client::connect() {
+	proto->connectSocket(socket);
+	receiveThread = std::thread (&Client::receiveData, this);
+	if (proto->floodThrottleInEffect()) {
+		sendThread = std::thread (&Client::sendQueue, this);
+		secondsThread = std::thread (&Client::decrementSeconds, this);
+	}
 }
 
 void Client::disconnect(const std::string& reason) {
@@ -38,14 +46,13 @@ bool Client::wantsToReconnect() const {
 
 void Client::doReconnect() {
 	expectingReconnect = true;
-	proto->connectSocket(socket);
 	if (receiveThread.joinable())
 		receiveThread.join();
 	if (sendThread.joinable())
 		sendThread.join();
 	if (secondsThread.joinable())
 		secondsThread.join();
-	
+	connect();
 }
 
 std::map<std::string, std::string> Client::modes() const {
