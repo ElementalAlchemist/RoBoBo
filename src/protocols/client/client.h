@@ -9,7 +9,7 @@ class Client : public User {
 	public:
 		Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, Protocol* mod);
 		~Client();
-		void disconnect();
+		void disconnect(const std::string& reason);
 		bool checkConnection() const;
 		bool wantsToReconnect() const;
 		void doReconnect();

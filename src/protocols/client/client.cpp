@@ -6,10 +6,14 @@ Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::s
 	// TODO: populate commandPenalty
 
 Client::~Client() {
-	
+	if (socket->isConnected())
+		socket->closeConnection();
+	receiveThread.join();
+	sendThread.join();
+	secondsThread.join();
 }
 
-void Client::disconnect() {
+void Client::disconnect(const std::string& reason) {
 	// TODO
 	expectingReconnect = false;
 }
