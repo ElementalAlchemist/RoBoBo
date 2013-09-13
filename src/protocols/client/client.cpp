@@ -14,7 +14,12 @@ Client::~Client() {
 }
 
 void Client::disconnect(const std::string& reason) {
-	// TODO
+	if (socket->isConnected()) {
+		IRCMessage quitMsg ("QUIT");
+		quitMsg.setParams(std::vector<std::string> { reason });
+		socket->sendData(quitMsg.rawLine());
+		socket->closeConnection();
+	}
 	expectingReconnect = false;
 }
 
