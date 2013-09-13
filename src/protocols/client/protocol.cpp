@@ -240,7 +240,7 @@ std::set<std::string> Protocol::userChans(const std::string& user) {
 	
 }
 
-std::string Protocol::serverAddr() {
+std::string Protocol::servName() {
 	return serverName;
 }
 
