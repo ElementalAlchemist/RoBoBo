@@ -138,11 +138,16 @@ void Client::sendQueue() {
 }
 
 void Client::decrementSeconds() {
+	LogManager* logger = LogManager::getHandle();
 	while (socket->isConnected()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		MutexLocker mutexLock (&sendMutex);
-		if (penaltySeconds > 0)
+		if (penaltySeconds > 0) {
 			penaltySeconds--;
+			std::ostringstream logMsg;
+			logMsg << "Penalty second count reduced to " << penaltySeconds;
+			logger->log(LOG_ALL, "protocol-client-penalty-" + proto->servName(), logMsg.str());
+		}
 	}
 	penaltySeconds = 0;
 }
