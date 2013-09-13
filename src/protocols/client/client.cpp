@@ -110,6 +110,7 @@ void Client::receiveData() {
 }
 
 void Client::sendQueue() {
+	LogManager* logger = LogManager::getHandle();
 	while (socket->isConnected()) {
 		if (linesToSend.empty()) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(25));
@@ -125,14 +126,22 @@ void Client::sendQueue() {
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 		MutexLocker mutexLock (&sendMutex);
 		penaltySeconds += thisPenalty;
-		if (socket->isConnected()) // to make sure the connection didn't get lost during the wait
-			socket->sendData(sendingLine->rawLine());
+		if (socket->isConnected()) { // to make sure the connection didn't get lost during the wait
+			std::string lineToSend (sendingLine->rawLine());
+			socket->sendData(lineToSend);
+			logger->log(LOG_ALL, "protocol-client-send-" + proto->servName(), lineToSend);
+		}
+		std::stringstream logMsg;
+		logMsg << "The command " << sendingLine->command() << " was sent; the penalty has increased by " << thisPenalty <<< " to " << penaltySeconds << ".";
+		logger->log(LOG_ALL, "protocol-client-penalty-" + proto->servName(), logMsg.str());
 	}
 	if (socket->isConnected()) {
 		MutexLocker mutexLock (&sendMutex);
 		while (!linesToSend.empty()) {
-			socket->sendData(linesToSend.front()->rawLine());
+			std::string lineToSend (linesToSend.front()->rawLine());
 			linesToSend.pop();
+			socket->sendData(lineToSend);
+			logger->log(LOG_ALL, "protocol-client-send-" + proto->servName(), lineToSend);
 		}
 	}
 }
