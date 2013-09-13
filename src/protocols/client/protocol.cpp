@@ -1,5 +1,7 @@
 #include "protocol.h"
 
+Protocol::Protocol() : floodThrottle(true) {}
+
 void Protocol::connectServer() {
 	
 }
@@ -242,6 +244,14 @@ std::set<std::string> Protocol::userChans(const std::string& user) {
 
 std::string Protocol::servName() {
 	return serverName;
+}
+
+void Protocol::connectSocket(const std::shared_ptr<Socket> sock) {
+	sock->connectServer(serverAddress, serverPort, serverBindAddr);
+}
+
+bool Protocol::floodThrottleInEffect() {
+	return floodThrottle;
 }
 
 void Protocol::processIncoming(const std::string& client, const IRCMessage* message) {

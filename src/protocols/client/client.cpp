@@ -37,6 +37,14 @@ bool Client::wantsToReconnect() const {
 }
 
 void Client::doReconnect() {
+	expectingReconnect = true;
+	proto->connectSocket(socket);
+	if (receiveThread.joinable())
+		receiveThread.join();
+	if (sendThread.joinable())
+		sendThread.join();
+	if (secondsThread.joinable())
+		secondsThread.join();
 	
 }
 

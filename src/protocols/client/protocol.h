@@ -6,6 +6,7 @@
 
 class Protocol : public ClientProtocol {
 	public:
+		Protocol();
 		unsigned int apiVersion() { return 3000; }
 		void connectServer();
 		bool connected();
@@ -75,7 +76,13 @@ class Protocol : public ClientProtocol {
 		std::set<std::string> userChans(const std::string& user);
 		
 		std::string servName();
+		void connectSocket(const std::shared_ptr<Socket> sock);
+		bool floodThrottleInEffect();
 		void processIncoming(const std::string& client, const IRCMessage* message);
 	private:
+		std::string serverAddress;
+		std::string serverPort;
+		std::string serverBindAddr;
+		bool floodThrottle;
 		std::mutex processMutex;
 };
