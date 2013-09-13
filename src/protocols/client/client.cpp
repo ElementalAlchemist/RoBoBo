@@ -95,16 +95,17 @@ void Client::sendLine(const IRCMessage* line) {
 }
 
 void Client::receiveData() {
+	LogManager* logger = LogManager::getHandle();
 	while (socket->isConnected()) {
 		std::string newMsg;
 		try {
 			newMsg = socket->receive();
 		} catch (const SocketOperationFailed& ex) {
-			LogManager* logger = LogManager::getHandle();
-			logger->log(LOG_DEFAULT, "protocol-client", "Connection failed for client " + userID + " (" + userNick + "!" + userIdent + "@" + userHost + " on server " + proto->serverAddr() + ") during receive.");
+			logger->log(LOG_DEFAULT, "protocol-client", "Connection failed for client " + userID + " (" + userNick + "!" + userIdent + "@" + userHost + " on server " + proto->servName() + ") during receive.");
 			break;
 		}
 		proto->processIncoming(userID, IRCMessage (newMsg));
+		logger->log(LOG_ALL, "protocol-client-recv-" + proto->servName(), newMsg);
 	}
 }
 
