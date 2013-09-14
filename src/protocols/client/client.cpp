@@ -61,6 +61,23 @@ void Client::doReconnect() {
 	connect();
 }
 
+void Client::doRegister() {
+	if (socket->isConnected()) {
+		if (!password.empty()) {
+			IRCMessage passMsg ("PASS");
+			passMsg.setParams(std::vector<std::string> { password });
+			socket->sendData(passMsg.rawLine());
+		}
+		IRCMessage nickMsg ("NICK");
+		nickMsg.setParams(std::vector<std::string> { userNick });
+		socket->sendData(nickMsg.rawLine());
+		IRCMessage userMsg ("USER");
+		userMsg.setParams(std::vector<std::string> { userIdent, "localhost", proto->servName(), userGecos });
+		socket->sendData(userMsg.rawLine());
+	}
+	needRegisterDelay = false;
+}
+
 std::map<std::string, std::string> Client::modes() const {
 	return clientModes;
 }
@@ -199,17 +216,5 @@ void Client::delayRegister() {
 	std::this_thread::sleep_for(std::chrono::seconds(5));
 	if (!needRegisterDelay)
 		return;
-	if (socket->isConnected()) {
-		if (!password.empty()) {
-			IRCMessage passMsg ("PASS");
-			passMsg.setParams(std::vector<std::string> { password });
-			socket->sendData(passMsg.rawLine());
-		}
-		IRCMessage nickMsg ("NICK");
-		nickMsg.setParams(std::vector<std::string> { userNick });
-		socket->sendData(nickMsg.rawLine());
-		IRCMessage userMsg ("USER");
-		userMsg.setParams(std::vector<std::string> { userIdent, "localhost", proto->servName(), userGecos });
-		socket->sendData(userMsg.rawLine());
-	}
+	doRegister();
 }

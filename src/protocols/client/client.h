@@ -14,6 +14,7 @@ class Client : public User {
 		bool checkConnection() const;
 		bool wantsToReconnect() const;
 		void doReconnect();
+		void doRegister();
 		std::map<std::string, std::string> modes() const;
 		bool modeSet(const std::string& mode) const;
 		std::string modeParam(const std::string& mode) const;
