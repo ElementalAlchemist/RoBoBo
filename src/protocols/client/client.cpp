@@ -1,8 +1,8 @@
 #include "client.h"
 
-Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& socktype, const Protocol* mod)
+Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, const Protocol* mod)
 	: User(std::forward<std::string> (id), std::forward<std::string> (nick), std::forward<std::string> (ident), std::forward<std::string> (gecos)),
-	socket(mod->obtainSocket(socktype)), expectingReconnect(true), proto(mod) {}
+	password(std::forward<std::string>(pass)), socket(mod->obtainSocket(socktype)), expectingReconnect(true), proto(mod), needRegisterDelay(false), penaltySeconds(0) {}
 
 Client::~Client() {
 	if (socket->isConnected())
@@ -13,6 +13,8 @@ Client::~Client() {
 		sendThread.join();
 	if (secondsThread.joinable())
 		secondsThread.join();
+	if (registerThread.joinable())
+		registerThread.join();
 }
 
 void Client::connect() {
@@ -22,6 +24,8 @@ void Client::connect() {
 		sendThread = std::thread (&Client::sendQueue, this);
 		secondsThread = std::thread (&Client::decrementSeconds, this);
 	}
+	registerThread = std::thread (&Client::delayRegister, this);
+	needRegisterDelay = true;
 }
 
 void Client::disconnect(const std::string& reason) {
@@ -52,6 +56,8 @@ void Client::doReconnect() {
 		sendThread.join();
 	if (secondsThread.joinable())
 		secondsThread.join();
+	if (registerThread.joinable())
+		registerThread.join();
 	connect();
 }
 
@@ -187,4 +193,23 @@ void Client::decrementSeconds() {
 	}
 	MutexLocker mutexLock (&sendMutex);
 	penaltySeconds = 0;
+}
+
+void Client::delayRegister() {
+	std::this_thread::sleep_for(std::chrono::seconds(5));
+	if (!needRegisterDelay)
+		return;
+	if (socket->isConnected()) {
+		if (!password.empty()) {
+			IRCMessage passMsg ("PASS");
+			passMsg.setParams(std::vector<std::string> { password });
+			socket->sendData(passMsg.rawLine());
+		}
+		IRCMessage nickMsg ("NICK");
+		nickMsg.setParams(std::vector<std::string> { userNick });
+		socket->sendData(nickMsg.rawLine());
+		IRCMessage userMsg ("USER");
+		userMsg.setParams(std::vector<std::string> { userIdent, "localhost", proto->servName(), userGecos });
+		socket->sendData(userMsg.rawLine());
+	}
 }

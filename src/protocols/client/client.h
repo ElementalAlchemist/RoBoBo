@@ -7,7 +7,7 @@ class Protocol;
 
 class Client : public User {
 	public:
-		Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& socktype, Protocol* mod);
+		Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, Protocol* mod);
 		~Client();
 		void connect();
 		void disconnect(const std::string& reason);
@@ -26,6 +26,7 @@ class Client : public User {
 		void unsetListMode(const std::string& mode, const std::string& param);
 		void sendLine(const IRCMessage* line);
 	private:
+		std::string password;
 		std::map<std::string, std::string> clientModes;
 		std::map<std::string, std::list<std::string>> clientListModes;
 		std::shared_ptr<Socket> socket;
@@ -34,10 +35,13 @@ class Client : public User {
 		std::thread receiveThread;
 		std::thread sendThread;
 		std::thread secondsThread;
+		std::thread registerThread;
 		std::mutex sendMutex;
 		void receiveData();
 		void sendQueue();
 		void decrementSeconds();
+		void delayRegister();
+		bool needRegisterDelay;
 		std::queue<std::unique_ptr<IRCMessage>> linesToSend;
 		unsigned int penaltySeconds;
 		std::map<std::string, unsigned int> commandPenalty;
