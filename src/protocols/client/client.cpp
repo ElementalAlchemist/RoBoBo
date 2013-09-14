@@ -26,6 +26,7 @@ void Client::connect() {
 	}
 	registerThread = std::thread (&Client::delayRegister, this);
 	needRegisterDelay = true;
+	socket->sendData("CAP LS");
 }
 
 void Client::disconnect(const std::string& reason) {
