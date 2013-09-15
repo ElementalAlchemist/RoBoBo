@@ -162,7 +162,7 @@ void Client::receiveData() {
 
 void Client::sendQueue() {
 	LogManager* logger = LogManager::getHandle();
-	while (socket->isConnected()) {
+	while (socket->isConnected() && proto->floodThrottleInEffect()) {
 		if (linesToSend.empty()) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(25));
 			continue;
@@ -199,7 +199,7 @@ void Client::sendQueue() {
 
 void Client::decrementSeconds() {
 	LogManager* logger = LogManager::getHandle();
-	while (socket->isConnected()) {
+	while (socket->isConnected() && proto->floodThrottleInEffect()) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		MutexLocker mutexLock (&sendMutex);
 		if (penaltySeconds > 0) {
