@@ -211,6 +211,7 @@ void Client::decrementSeconds() {
 	}
 	MutexLocker mutexLock (&sendMutex);
 	penaltySeconds = 0;
+	logger->log(LOG_DEBUG, "protocol-client-penalty-" + proto->servName(), "Socket disconnected or flood throttling disabled; penalty reset to 0.");
 }
 
 void Client::delayRegister() {
