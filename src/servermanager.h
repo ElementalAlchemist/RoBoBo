@@ -142,6 +142,11 @@ class ServerNoProtocol : public std::exception {
 		const char* what() const noexcept { return "There is no protocol defined for the server."; }
 };
 
+class ServerBadConfiguration : public std::exception {
+	public:
+		const char* what() const noexcept { return "The configuration for this server is invalid or incomplete."; }
+};
+
 class ProtoLoadFailed : public std::exception {
 	public:
 		ProtoLoadFailed(std::string&& desc) : description(std::forward<const std::string>(desc)) {}
