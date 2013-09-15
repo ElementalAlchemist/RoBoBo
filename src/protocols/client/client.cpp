@@ -79,6 +79,22 @@ void Client::doRegister() {
 	needRegisterDelay = false;
 }
 
+void Client::startFloodThrottle() {
+	if (sendThread.joinable() && secondsThread.joinable())
+		return;
+	if (!sendThread.joinable())
+		sendThread = std::thread(&Client::sendQueue, this);
+	if (!secondsThread.joinable())
+		secondsThread = std::thread(&Client::decrementSeconds, this);
+}
+
+void Client::endFloodThrottle() {
+	if (sendThread.joinable())
+		sendThread.join();
+	if (secondsThread.joinable())
+		secondsThread.join();
+}
+
 std::map<std::string, std::string> Client::modes() const {
 	return clientModes;
 }

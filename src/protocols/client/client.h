@@ -15,6 +15,8 @@ class Client : public User {
 		bool wantsToReconnect() const;
 		void doReconnect();
 		void doRegister();
+		void startFloodThrottle();
+		void endFloodThrottle();
 		std::map<std::string, std::string> modes() const;
 		bool modeSet(const std::string& mode) const;
 		std::string modeParam(const std::string& mode) const;
