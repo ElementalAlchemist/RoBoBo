@@ -315,7 +315,7 @@ void Protocol::removeClient(const std::string& client, const std::string& reason
 }
 
 std::set<std::string> Protocol::serverCapabilities() {
-	
+	return capabilities;
 }
 
 std::set<char> Protocol::chanTypes() {
