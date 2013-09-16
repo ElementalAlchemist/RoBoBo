@@ -289,7 +289,20 @@ void Protocol::sendOtherData(const std::string& client, const IRCMessage* line) 
 }
 
 std::string Protocol::addClient(const std::string& nick, const std::string& ident, const std::string& gecos, const std::string& password, const std::string& socket) {
-	
+	if (nick.empty() || ident.empty() || gecos.empty())
+		return "";
+	if (socket.empty()) {
+		Config* config = Config::getHandle();
+		std::unordered_map<std::string, std::string> configBlock = config->getSingleBlockOnConditions("server", std::unordered_map<std::string, std::string> { { "name", serverName } });
+		socket = configBlock["defaultsocket"];
+		if (socket.empty())
+			return "";
+	}
+	std::string id (getNextID());
+	std::shared_ptr<Client> newClient (new Client (id, std::move(nick), std::move(ident), std::move(gecos), std::move(password), std::move(socket), this));
+	clients.insert(std::pair<std::string, std::shared_ptr<Client>> (id, newClient));
+	users.insert(std::pair<std::string, std::shared_ptr<User>> (id, static_cast<std::shared_ptr<User>>(newClient)));
+	return id;
 }
 
 void Protocol::removeClient(const std::string& client) {
