@@ -88,4 +88,9 @@ class Protocol : public ClientProtocol {
 		std::mutex processMutex;
 		unsigned int nextID;
 		std::string getNextID();
+		
+		std::unordered_map<std::string, std::shared_ptr<User>> users;
+		std::unordered_map<std::string, std::shared_ptr<Channel>> channels;
+		std::unordered_map<std::string, std::shared_ptr<Client>> clients;
+		std::unordered_map<std::string, std::string> nickToID;
 };
