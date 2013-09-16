@@ -85,11 +85,43 @@ void Protocol::onRehash() {
 }
 
 void Protocol::sendMsg(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("PRIVMSG");
+	msg.setParams(std::vector<std::string> (2));
+	msg.setParam(0, convertCommaSeparatedTargetList(target));
+	auto tagIter = tags.find("intents");
+	if (tagIter == tags.end() || capabilities.find("intents") != capabilities.end()) {
+		msg.setParam(1, message);
+		msg.setTags(tags);
+	} else {
+		std::map<std::string, std::string> newTags (tags);
+		newTags.erase("intents");
+		msg.setTags(newTags);
+		msg.setParam(1, "\x01" + tagIter->second + " " + message + "\x01");
+	}
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::sendNotice(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("NOTICE");
+	msg.setParams(std::vector<std::string> (2));
+	msg.setParam(0, convertCommaSeparatedTargetList(target));
+	auto tagIter = tags.find("intents");
+	if (tagIter == tags.end() || capabilities.find("intents") != capabilities.end()) {
+		msg.setParam(1, message);
+		msg.setTags(tags);
+	} else {
+		std::map<std::string, std::string> newTags (tags);
+		newTags.erase("intents");
+		msg.setTags(newTags);
+		msg.setParam(1, "\x01" + tagIter->second + " " + message + "\x01");
+	}
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::setMode(const std::string& client, const std::string& target, const std::list<std::tuple<bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {
@@ -330,4 +362,24 @@ std::string Protocol::getNextID() {
 	currID << nextID;
 	nextID++;
 	return currID.str();
+}
+
+std::string Protocol::convertCommaSeparatedTargetList(std::string targets) {
+	std::list<std::string> targetList;
+	while (!targets.empty()) {
+		size_t commaPos = targets.find(',');
+		targetList.push_back(targets.substr(0, commaPos));
+		if (commaPos == std::string::npos)
+			targets.clear();
+		else
+			targets = targets.substr(commaPos + 1);
+	}
+	for (std::string oneTarget : targetList) {
+		auto userIter = users.find(oneTarget);
+		if (userIter != users.end())
+			targets += "," + userIter->second.nick();
+		else
+			targets += "," + oneTarget;
+	}
+	return targets.substr(1);
 }
