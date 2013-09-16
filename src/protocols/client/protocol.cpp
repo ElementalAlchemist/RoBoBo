@@ -323,7 +323,12 @@ std::set<char> Protocol::chanTypes() {
 }
 
 std::list<std::pair<ModeType, std::string>> Protocol::allChanModes() {
-	
+	std::list<std::pair<ModeType, std::string>> chanModes;
+	for (auto mode : serverChanModes) {
+		if (mode.first != MODE_STATUS)
+			chanModes.push_back(mode);
+	}
+	return chanModes;
 }
 
 ModeType Protocol::chanModeType(const std::string& mode) {
