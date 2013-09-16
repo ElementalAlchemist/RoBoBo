@@ -1,6 +1,6 @@
 #include "protocol.h"
 
-Protocol::Protocol() : floodThrottle(true) {}
+Protocol::Protocol() : floodThrottle(true), nextID(0) {}
 
 void Protocol::connectServer() {
 	
@@ -261,4 +261,11 @@ bool Protocol::floodThrottleInEffect() {
 void Protocol::processIncoming(const std::string& client, const IRCMessage* message) {
 	MutexLocker mutexLock (&processMutex);
 	// TODO: the rest of this
+}
+
+std::string Protocol::getNextID() {
+	std::ostringstream currID;
+	currID << nextID;
+	nextID++;
+	return currID.str();
 }

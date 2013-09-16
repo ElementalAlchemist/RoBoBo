@@ -86,4 +86,6 @@ class Protocol : public ClientProtocol {
 		std::string serverBindAddr;
 		bool floodThrottle;
 		std::mutex processMutex;
+		unsigned int nextID;
+		std::string getNextID();
 };
