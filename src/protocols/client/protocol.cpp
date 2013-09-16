@@ -233,7 +233,13 @@ void Protocol::changeNick(const std::string& client, const std::string& newNick,
 }
 
 void Protocol::sendPing(const std::string& client, const std::string& data, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("PING");
+	msg.setParams(std::vector<std::string> { data });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::setAway(const std::string& client, const std::string& reason, const std::map<std::string, std::string>& tags) {
