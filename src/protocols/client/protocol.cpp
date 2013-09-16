@@ -223,7 +223,13 @@ void Protocol::knock(const std::string& client, const std::string& channel, cons
 }
 
 void Protocol::changeNick(const std::string& client, const std::string& newNick, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("NICK");
+	msg.setParams(std::vector<std::string> { newNick });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::sendPing(const std::string& client, const std::string& data, const std::map<std::string, std::string>& tags) {
