@@ -547,23 +547,38 @@ std::list<std::pair<ModeType, std::string>> Protocol::allUserModes() {
 }
 
 ModeType Protocol::userModeType(const std::string& mode) {
-	
+	auto typeIter = serverUserModeType.find(mode);
+	if (typeIter == serverUserModeType.end())
+		return MODE_NOPARAM;
+	return typeIter->second;
 }
 
 std::map<std::string, std::string> Protocol::userModes(const std::string& user) {
-	
+	auto clientIter = clients.find(user);
+	if (clientIter == clients.end())
+		return std::map<std::string, std::string> ();
+	return clientIter->second->modes();
 }
 
 bool Protocol::userHasMode(const std::string& user, const std::string& mode) {
-	
+	auto clientIter = clients.find(user);
+	if (clientIter == clients.end())
+		return false;
+	return clientIter->second->modeSet(mode);
 }
 
 std::string Protocol::userModeParam(const std::string& user, const std::string& mode) {
-	
+	auto clientIter = clients.find(user);
+	if (clientIter == clients.end())
+		return "";
+	return clientIter->second->modeParam(mode);
 }
 
 std::list<std::string> Protocol::userListModeList(const std::string& user, const std::string& listMode) {
-	
+	auto clientIter = clients.find(user);
+	if (clientIter == clients.end())
+		return std::list<std::string> ();
+	return clientIter->second->modeList(listMode);
 }
 
 std::set<std::string> Protocol::userChans(const std::string& user) {
