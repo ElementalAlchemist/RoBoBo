@@ -411,31 +411,62 @@ time_t Protocol::chanTimestamp(const std::string& channel) {
 }
 
 std::list<std::string> Protocol::chanUsers(const std::string& channel) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::list<std::string> ();
+	return chanIter->second->users();
 }
 
 bool Protocol::userInChan(const std::string& channel, const std::string& user) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	return chanIter->second->userInChan(user);
 }
 
 std::pair<std::string, char> Protocol::userStatus(const std::string& channel, const std::string& user) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::pair<std::string, char> ("", ' ');
+	std::list<std::string> statuses = chanIter->second->statuses(user);
+	if (statuses.empty())
+		return std::pair<std::string, char> ("", ' ');
+	char symbol = chanPrefixModeToSymbol.find(statuses.front())->second;
+	return std::pair<std::string, char> (statuses.front(), symbol);
 }
 
 bool Protocol::userHasStatus(const std::string& channel, const std::string& user, const std::string& status) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	return chanIter->second->userHasStatus(user, status);
 }
 
 bool Protocol::userHasStatus(const std::string& channel, const std::string& user, char status) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	auto prefixIter = chanPrefixSymbolToMode.find(status);
+	if (prefixIter == chanPrefixSymbolToMode.end())
+		return false;
+	return chanIter->second->userHasStatus(user, prefixIter->second);
 }
 
 bool Protocol::userHasStatusOrGreater(const std::string& channel, const std::string& user, const std::string& status) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	return chanIter->second->userHasStatusOrGreater(user, status);
 }
 
 bool Protocol::userHasStatusOrGreater(const std::string& channel, const std::string& user, char status) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	auto prefixIter = chanPrefixSymbolToMode.find(status);
+	if (prefixIter == chanPrefixSymbolToMode.end())
+		return false;
+	return chanIter->second->userHasStatusOrGreater(user, prefixIter->second);
 }
 
 std::map<std::string, std::string> Protocol::chanModes(const std::string& channel) {
