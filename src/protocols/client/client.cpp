@@ -159,7 +159,7 @@ void Client::unsetListMode(const std::string& mode, const std::string& param) {
 
 void Client::sendLine(const IRCMessage* line) {
 	if (proto->floodThrottleInEffect()) {
-		std::unique_ptr<IRCMessage> msgCopy (new IRCMessage (line));
+		std::unique_ptr<IRCMessage> msgCopy (new IRCMessage (*line));
 		linesToSend.push(msgCopy);
 	} else
 		socket->sendData(line->rawLine());
