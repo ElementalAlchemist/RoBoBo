@@ -106,6 +106,8 @@ class Protocol : public ClientProtocol {
 		
 		std::unordered_multimap<ModeType, std::string> serverChanModes;
 		std::unordered_multimap<ModeType, std::string> serverUserModes;
+		std::unordered_map<std::string, ModeType> chanModeType;
+		std::unordered_map<std::string, ModeType> userModeType;
 		
 		std::unordered_map<std::string, char> chanPrefixModeToSymbol;
 		std::unordered_map<char, std::string> chanPrefixSymbolToMode;
