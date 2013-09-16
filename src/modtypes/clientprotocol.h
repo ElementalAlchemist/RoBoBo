@@ -31,7 +31,7 @@ class ClientProtocol {
 		virtual void sendWallops(const std::string& client, const std::string& message, const std::map<std::string, std::string>& tags) {}
 		virtual void sendOtherData(const std::string& client, const IRCMessage* line) {}
 		
-		virtual std::string addClient(const std::string& nick, const std::string& ident, const std::string& gecos) { return ""; }
+		virtual std::string addClient(const std::string& nick, const std::string& ident, const std::string& gecos, const std::string& password, const std::string& socket = "") { return ""; }
 		virtual void removeClient(const std::string& client) {}
 		
 		virtual std::set<std::string> serverCapabilities() { return std::set<std::string> (); }
