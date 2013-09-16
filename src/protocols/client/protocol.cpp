@@ -3,7 +3,38 @@
 Protocol::Protocol() : floodThrottle(true), nextID(0) {}
 
 void Protocol::connectServer() {
-	
+	LogManager* logger = LogManager::getHandle();
+	logger->log(LOG_DEBUG, "protocol-client-connect-" + serverName, "Connecting to " + serverName + " ...");
+	Config* config = Config::getHandle();
+	std::unordered_map<std::string, std::string> configBlock = config->getSingleBlockOnConditions("server", std::unordered_map<std::string, std::string> { { "name", serverName } });
+	serverAddress = configBlock["address"];
+	serverPort = configBlock["port"];
+	serverBindAddr = configBlock["bind"];
+	floodThrottle = Config::makeBool(configBlock["floodthrottle"]);
+	if (serverAddress.empty() || serverPort.empty()) {
+		logger->log(LOG_ERROR, "protocol-client-connect-" + serverName, "Cannot connect to " + serverName + " because the configuration is incomplete or invalid.");
+		throw ServerBadConfiguration ();
+	}
+	std::list<std::unordered_map<std::string, std::string>> clientConfigs = config->getBlocksOnConditions("client", std::unordered_map<std::string, std::string> { { "server", serverName } });
+	for (auto clientConf : clientConfigs) {
+		std::string nick (clientConf["nick"]);
+		std::string ident (clientConf["ident"]);
+		std::string gecos (clientConf["gecos"]);
+		std::string password (clientConf["password"]);
+		std::string socket (clientConf["socket"]);
+		if (nick.empty() || ident.empty() || gecos.empty() || socket.empty()) {
+			logger->log(LOG_ERROR, "protocol-client-connect-" + serverName, "An improperly configured client was encountered.  Client not added.");
+			continue;
+		}
+		std::string id (clientConf["id"]);
+		if (id.empty()) {
+			while (users.find(id) != users.end())
+				id = getNextID();
+		}
+		std::shared_ptr<Client> newClient (new Client (std::move(id), std::move(nick), std::move(ident), std::move(gecos), std::move(password), std::move(socket), this));
+		clients.insert(std::pair<std::string, std::shared_ptr<Client>> (id, newClient));
+		users.insert(std::pair<std::string, std::shared_ptr<User>> (id, static_cast<std::shared_ptr<User>>(newClient)));
+	}
 }
 
 bool Protocol::connected() {
