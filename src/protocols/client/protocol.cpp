@@ -306,7 +306,12 @@ std::string Protocol::addClient(const std::string& nick, const std::string& iden
 }
 
 void Protocol::removeClient(const std::string& client, const std::string& reason) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	clientIter->second->disconnect(reason);
+	users.erase(clientIter->first);
+	clients.erase(clientIter);
 }
 
 std::set<std::string> Protocol::serverCapabilities() {
