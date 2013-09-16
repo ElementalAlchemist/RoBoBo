@@ -203,7 +203,13 @@ void Protocol::setTopic(const std::string& client, const std::string& channel, c
 }
 
 void Protocol::inviteUser(const std::string& client, const std::string& channel, const std::string& user, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("INVITE");
+	msg.setParams(std::vector<std::string> { user, channel });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::knock(const std::string& client, const std::string& channel, const std::string& reason, const std::map<std::string, std::string>& tags) {
