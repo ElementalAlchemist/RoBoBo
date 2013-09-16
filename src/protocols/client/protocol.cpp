@@ -69,7 +69,19 @@ void Protocol::disconnect(const std::string& reason) {
 }
 
 void Protocol::onRehash() {
-	
+	Config* config = Config::getHandle();
+	std::unordered_map<std::string, std::string> configBlock = config->getSingleBlockOnConditions("server", std::unordered_map<std::string, std::string> { { "name", serverName } });
+	bool newFloodThrottle = Config::makeBool(configBlock["floodthrottle"]);
+	if (newFloodThrottle != floodThrottle) {
+		floodThrottle = newFloodThrottle;
+		if (floodThrottle) {
+			for (auto client : clients)
+				client.second->startFloodThrottle();
+		} else {
+			for (auto client : clients)
+				client.second->endFloodThrottle();
+		}
+	}
 }
 
 void Protocol::sendMsg(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags) {
