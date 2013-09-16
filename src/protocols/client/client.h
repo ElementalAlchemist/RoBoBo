@@ -25,8 +25,7 @@ class Client : public User {
 		void setMode(const std::string& mode);
 		void setMode(const std::string& mode, const std::string& param);
 		void unsetMode(const std::string& mode);
-		void setListMode(const std::string& mode, const std::string& param);
-		void unsetListMode(const std::string& mode, const std::string& param);
+		void unsetMode(const std::string& mode, const std::string& param);
 		void sendLine(const IRCMessage* line);
 	private:
 		std::string password;

@@ -130,31 +130,33 @@ void Client::setMode(const std::string& mode) {
 }
 
 void Client::setMode(const std::string& mode, const std::string& param) {
-	clientModes[mode] = param; // If the mode is already set, we should change its param, but if not, it should be added
+	if (proto->userModeType(mode) == MODE_LIST) {
+		auto listModeIter = clientListModes.find(mode);
+		if (listModeIter == clientListModes.end()) {
+			clientListModes[mode].push_back(param);
+			return;
+		}
+		auto listIter = std::find(listModeIter->second.begin(), listModeIter->second.end(), param);
+		if (listIter == listModeIter->second.end())
+			listModeIter->second.push_back(param);
+	} else
+		clientModes[mode] = param; // If the mode is already set, we should change its param, but if not, it should be added
 }
 
 void Client::unsetMode(const std::string& mode) {
 	clientModes.erase(mode);
 }
 
-void Client::setListMode(const std::string& mode, const std::string& param) {
-	auto listModeIter = clientListModes.find(mode);
-	if (listModeIter == clientListModes.end()) {
-		clientListModes[mode].push_back(param);
-		return;
-	}
-	auto listIter = std::find(listModeIter->second.begin(), listModeIter->second.end(), param);
-	if (listIter == listModeIter->second.end())
-		listModeIter->second.push_back(param);
-}
-
-void Client::unsetListMode(const std::string& mode, const std::string& param) {
-	auto listModeIter = clientListModes.find(mode);
-	if (listModeIter == clientListModes.end())
-		return;
-	listModeIter->second.remove(param);
-	if (listModeIter->second.empty())
-		clientListModes.erase(listModeIter);
+void Client::unsetMode(const std::string& mode, const std::string& param) {
+	if (proto->userModeType(mode) == MODE_LIST) {
+		auto listModeIter = clientListModes.find(mode);
+		if (listModeIter == clientListModes.end())
+			return;
+		listModeIter->second.remove(param);
+		if (listModeIter->second.empty())
+			clientListModes.erase(listModeIter);
+	} else
+		unsetMode(mode);
 }
 
 void Client::sendLine(const IRCMessage* line) {
