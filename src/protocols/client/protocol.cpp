@@ -131,7 +131,7 @@ void Protocol::setMode(const std::string& client, const std::string& target, con
 	IRCMessage msg ("MODE");
 	std::vector<std::string> modeParams;
 	bool adding = std::get<0>(modes.front());
-	std::string modeStr = (adding ? "+" : "-");
+	std::string modeStr (adding ? "+" : "-");
 	for (auto mode : modes) {
 		if (std::get<0>(mode) != adding) {
 			adding = std::get<0>(mode);
