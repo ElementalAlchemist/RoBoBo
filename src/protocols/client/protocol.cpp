@@ -253,7 +253,12 @@ void Protocol::setAway(const std::string& client, const std::string& reason, con
 }
 
 void Protocol::setUnaway(const std::string& client, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("AWAY");
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::oper(const std::string& client, const std::string& username, const std::string& password, const std::map<std::string, std::string>& tags) {
