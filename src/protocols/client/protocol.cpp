@@ -282,7 +282,10 @@ void Protocol::sendWallops(const std::string& client, const std::string& message
 }
 
 void Protocol::sendOtherData(const std::string& client, const IRCMessage* line) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	clientIter->second->sendLine(line);
 }
 
 std::string Protocol::addClient(const std::string& nick, const std::string& ident, const std::string& gecos) {
