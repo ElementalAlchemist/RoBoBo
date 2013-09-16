@@ -332,23 +332,54 @@ std::list<std::pair<ModeType, std::string>> Protocol::allChanModes() {
 }
 
 ModeType Protocol::chanModeType(const std::string& mode) {
-	
+	auto modeTypeIter = chanModeType.find(mode);
+	if (modeTypeIter == chanModeType.end())
+		return MODE_NOPARAM;
+	return modeTypeIter->second;
 }
 
 char Protocol::prefixSymbol(const std::string& mode) {
-	
+	auto prefixIter = chanPrefixModeToSymbol.find(mode);
+	if (prefixIter == chanPrefixModeToSymbol.end())
+		return ' ';
+	return prefixIter->second;
 }
 
 std::pair<std::string, char> Protocol::compareStatus(const std::string& status0, const std::string& status1) {
-	
+	for (auto prefix : chanPrefixOrder) {
+		if (prefix == status0) {
+			char symbol = chanPrefixModeToSymbol[status0];
+			return std::pair<std::string, char> (status0, symbol);
+		}
+		if (prefix == status1) {
+			char symbol = chanPrefixModeToSymbol[status1];
+			return std::pair<std::string, char> (status1, symbol);
+		}
+	}
+	return std::pair<std::string, char> ("", ' ');
 }
 
 std::pair<std::string, char> Protocol::compareStatus(const std::string& status0, char status1) {
-	
+	auto prefixIter = chanPrefixSymbolToMode.find(status1);
+	if (prefixIter == chanPrefixSymbolToMode.end()) {
+		auto otherPrefixIter = chanPrefixModeToSymbol.find(status0);
+		if (otherPrefixIter == chanPrefixModeToSymbol.end())
+			return std::pair<std::string, char> ("", ' ');
+		return std::pair<std::string, char> (status0, otherPrefixIter->second);
+	}
+	return compareStatus(status0, prefixIter->second);
 }
 
 std::pair<std::string, char> Protocol::compareStatus(char status0, char status1) {
-	
+	auto prefixIter0 = chanPrefixSymbolToMode.find(status0);
+	auto prefixIter1 = chanPrefixSymbolToMode.find(status1);
+	if (prefixIter0 == chanPrefixSymbolToMode.end() && prefixIter1 == chanPrefixSymbolToMode.end())
+		return std::pair<std::string, char> ("", ' ');
+	if (prefixIter0 == chanPrefixSymbolToMode.end())
+		return std::pair<std::string, char> (prefixIter1->second, status1);
+	if (prefixIter1 == chanPrefixSymbolToMode.end())
+		return std::pair<std::string, char> (prefixIter0->second, status0);
+	return compareStatus(prefixIter0->second, prefixIter1->second);
 }
 
 std::string Protocol::chanTopic(const std::string& channel) {
