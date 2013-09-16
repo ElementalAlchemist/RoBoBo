@@ -38,7 +38,23 @@ void Protocol::connectServer() {
 }
 
 bool Protocol::connected() {
-	
+	bool connectedClientsExist = false;
+	std::list<std::string> removeClients;
+	for (auto client : clients) {
+		if (client.second->checkConnection())
+			connectedClientsExist = true;
+		else if (client.second->wantsToReconnect())
+			client.second->doReconnect();
+		else
+			removeClients.push_back(client.first);
+	}
+	for (auto clientID : removeClients) {
+		clients.erase(clientID);
+		auto clientUser = users.find(clientID);
+		if (clientUser != users.end())
+			users.erase(clientUser);
+	}
+	return connectedClientsExist;
 }
 
 bool Protocol::shouldUnload() {
