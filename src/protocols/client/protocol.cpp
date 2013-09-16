@@ -498,7 +498,10 @@ std::list<std::string> Protocol::chanListModeList(const std::string& channel, co
 }
 
 std::list<std::string> Protocol::clientList() {
-	
+	std::list<std::string> listOfClients;
+	for (auto client : clients)
+		listOfClients.push_back(client.first);
+	return listOfClients;
 }
 
 std::string Protocol::userNick(const std::string& user) {
