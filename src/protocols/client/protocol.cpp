@@ -383,19 +383,31 @@ std::pair<std::string, char> Protocol::compareStatus(char status0, char status1)
 }
 
 std::string Protocol::chanTopic(const std::string& channel) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return "";
+	return chanIter->second->topic();
 }
 
 std::string Protocol::chanTopicSetter(const std::string& channel) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return "";
+	return chanIter->second->topicSetter();
 }
 
 time_t Protocol::chanTopicTimestamp(const std::string& channel) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return 0;
+	return chanIter->second->topicTime();
 }
 
 time_t Protocol::chanTimestamp(const std::string& channel) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return 0;
+	return chanIter->second->time();
 }
 
 std::list<std::string> Protocol::chanUsers(const std::string& channel) {
