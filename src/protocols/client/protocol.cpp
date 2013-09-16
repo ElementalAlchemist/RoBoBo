@@ -262,7 +262,13 @@ void Protocol::setUnaway(const std::string& client, const std::map<std::string, 
 }
 
 void Protocol::oper(const std::string& client, const std::string& username, const std::string& password, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("OPER");
+	msg.setParams(std::vector<std::string> { username, password });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::sendWallops(const std::string& client, const std::string& message, const std::map<std::string, std::string>& tags) {
