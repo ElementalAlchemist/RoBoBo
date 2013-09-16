@@ -97,4 +97,5 @@ class Protocol : public ClientProtocol {
 		std::string convertCommaSeparatedTargetList(std::string targets);
 		
 		std::set<std::string> capabilities;
+		std::set<char> channelTypes;
 };

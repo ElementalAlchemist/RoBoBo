@@ -319,7 +319,7 @@ std::set<std::string> Protocol::serverCapabilities() {
 }
 
 std::set<char> Protocol::chanTypes() {
-	
+	return channelTypes;
 }
 
 std::list<std::pair<ModeType, std::string>> Protocol::allChanModes() {
