@@ -158,7 +158,11 @@ void Client::unsetListMode(const std::string& mode, const std::string& param) {
 }
 
 void Client::sendLine(const IRCMessage* line) {
-	socket->sendData(line->rawLine());
+	if (proto->floodThrottleInEffect()) {
+		std::unique_ptr<IRCMessage> msgCopy (new IRCMessage (line));
+		linesToSend.push(msgCopy);
+	} else
+		socket->sendData(line->rawLine());
 }
 
 void Client::receiveData() {
@@ -199,7 +203,7 @@ void Client::sendQueue() {
 			logger->log(LOG_ALL, "protocol-client-send-" + proto->servName(), lineToSend);
 		}
 		std::stringstream logMsg;
-		logMsg << "The command " << sendingLine->command() << " was sent; the penalty has increased by " << thisPenalty <<< " to " << penaltySeconds << ".";
+		logMsg << "The command " << sendingLine->command() << " was sent; the penalty has increased by " << thisPenalty << " to " << penaltySeconds << ".";
 		logger->log(LOG_ALL, "protocol-client-penalty-" + proto->servName(), logMsg.str());
 	}
 	if (socket->isConnected()) {
