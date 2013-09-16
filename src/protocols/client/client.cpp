@@ -110,7 +110,7 @@ std::string Client::modeParam(const std::string& mode) const {
 	return modeIter->second;
 }
 
-std::list<std::string> Client::listModeList(const std::string& mode) const {
+std::list<std::string> Client::modeList(const std::string& mode) const {
 	auto listModeIter = clientListModes.find(mode);
 	if (listModeIter == clientListModes.end())
 		return std::list<std::string> ();

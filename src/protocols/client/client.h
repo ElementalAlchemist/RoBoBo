@@ -20,7 +20,7 @@ class Client : public User {
 		std::map<std::string, std::string> modes() const;
 		bool modeSet(const std::string& mode) const;
 		std::string modeParam(const std::string& mode) const;
-		std::list<std::string> listModeList(const std::string& mode) const;
+		std::list<std::string> modeList(const std::string& mode) const;
 		bool itemInList(const std::string& mode, const std::string& param) const;
 		void setMode(const std::string& mode);
 		void setMode(const std::string& mode, const std::string& param);
