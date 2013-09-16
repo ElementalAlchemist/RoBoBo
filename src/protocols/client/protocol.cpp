@@ -332,8 +332,8 @@ std::list<std::pair<ModeType, std::string>> Protocol::allChanModes() {
 }
 
 ModeType Protocol::chanModeType(const std::string& mode) {
-	auto modeTypeIter = chanModeType.find(mode);
-	if (modeTypeIter == chanModeType.end())
+	auto modeTypeIter = serverChanModeType.find(mode);
+	if (modeTypeIter == serverChanModeType.end())
 		return MODE_NOPARAM;
 	return modeTypeIter->second;
 }
@@ -540,7 +540,7 @@ std::string Protocol::idFromNick(const std::string& nick) {
 }
 
 std::list<std::pair<ModeType, std::string>> Protocol::allUserModes() {
-	std::List<std::pair<ModeType, std::string>> modes;
+	std::list<std::pair<ModeType, std::string>> modes;
 	for (auto mode : serverUserModes)
 		modes.push_back(mode);
 	return modes;
