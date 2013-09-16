@@ -505,27 +505,45 @@ std::list<std::string> Protocol::clientList() {
 }
 
 std::string Protocol::userNick(const std::string& user) {
-	
+	auto userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->nick();
 }
 
 std::string Protocol::userIdent(const std::string& user) {
-	
+	auto userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->ident();
 }
 
 std::string Protocol::userHost(const std::string& user) {
-	
+	auto userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->host();
 }
 
 std::string Protocol::userGecos(const std::string& user) {
-	
+	auto userIter = users.find(user);
+	if (userIter == users.end())
+		return "";
+	return userIter->second->gecos();
 }
 
 std::string Protocol::idFromNick(const std::string& nick) {
-	
+	auto nickIter = nickToID.find(nick);
+	if (nickIter == nickToID.end())
+		return nick;
+	return nickIter->second;
 }
 
 std::list<std::pair<ModeType, std::string>> Protocol::allUserModes() {
-	
+	std::List<std::pair<ModeType, std::string>> modes;
+	for (auto mode : serverUserModes)
+		modes.push_back(mode);
+	return modes;
 }
 
 ModeType Protocol::userModeType(const std::string& mode) {
