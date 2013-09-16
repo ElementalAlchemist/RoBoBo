@@ -96,6 +96,8 @@ void ServerManager::processRehash() {
 }
 
 size_t ServerManager::checkServers() {
+	LogManager* logger = LogManager::getHandle();
+	logger->log(LOG_DEBUG, "servers", "Checking whether to remove servers");
 	std::list<std::unordered_map<std::string, std::shared_ptr<ClientProtocol>>::iterator> clientRemove;
 	std::list<std::unordered_map<std::string, std::shared_ptr<ServerProtocol>>::iterator> serverRemove;
 	for (auto clientIter = clientServers.begin(); clientIter != clientServers.end(); ++clientIter) {
@@ -106,13 +108,12 @@ size_t ServerManager::checkServers() {
 		if (!serverIter->second->connected() && serverIter->second->shouldUnload())
 			serverRemove.push_back(serverIter);
 	}
-	LogManager* logger = LogManager::getHandle();
 	for (auto remove : clientRemove) {
-		logger->log(LOG_DEBUG, "servers", "Removing disconnected server " + remove->first);
+		logger->log(LOG_DEFAULT, "servers", "Removing disconnected server " + remove->first);
 		clientServers.erase(remove);
 	}
 	for (auto remove : serverRemove) {
-		logger->log(LOG_DEBUG, "servers", "Removing disconnected server " + remove->first);
+		logger->log(LOG_DEFAULT, "servers", "Removing disconnected server " + remove->first);
 		serverServers.erase(remove);
 	}
 	return clientServers.size() + serverServers.size();
