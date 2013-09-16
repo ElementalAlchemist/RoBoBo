@@ -582,7 +582,10 @@ std::list<std::string> Protocol::userListModeList(const std::string& user, const
 }
 
 std::set<std::string> Protocol::userChans(const std::string& user) {
-	
+	auto userIter = users.find(user);
+	if (userIter == users.end())
+		return std::set<std::string> ();
+	return userIter->second->channels();
 }
 
 std::string Protocol::servName() {
