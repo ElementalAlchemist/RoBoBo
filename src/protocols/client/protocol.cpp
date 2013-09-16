@@ -61,8 +61,11 @@ bool Protocol::shouldUnload() {
 	return clients.empty();
 }
 
-void Protocol::disconnect() {
-	
+void Protocol::disconnect(const std::string& reason) {
+	LogManager* logger = LogManager::getHandle();
+	logger->log(LOG_DEFAULT, "protocol-client-connection-" + serverName, "Disconnecting all clients");
+	for (auto client : clients)
+		client.second->disconnect(reason);
 }
 
 void Protocol::onRehash() {
