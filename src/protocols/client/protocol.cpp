@@ -288,7 +288,7 @@ void Protocol::sendOtherData(const std::string& client, const IRCMessage* line) 
 	clientIter->second->sendLine(line);
 }
 
-std::string Protocol::addClient(const std::string& nick, const std::string& ident, const std::string& gecos) {
+std::string Protocol::addClient(const std::string& nick, const std::string& ident, const std::string& gecos, const std::string& password, const std::string& socket) {
 	
 }
 
