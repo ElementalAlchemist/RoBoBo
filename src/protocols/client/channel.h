@@ -31,8 +31,7 @@ class Channel {
 		void setMode(const std::string& mode);
 		void setMode(const std::string& mode, const std::string& param);
 		void unsetMode(const std::string& mode);
-		void setListMode(const std::string& mode, const std::string& param);
-		void unsetListMode(const std::string& mode, const std::string& param);
+		void unsetMode(const std::string& mode, const std::string& param);
 	private:
 		const std::string chanName;
 		time_t chanTimestamp;

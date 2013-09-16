@@ -136,29 +136,31 @@ void Channel::setMode(const std::string& mode) {
 }
 
 void Channel::setMode(const std::string& mode, const std::string& param) {
-	chanModes[mode] = param;
+	if (proto->chanModeType(mode) == MODE_LIST) {
+		auto listModeIter = chanListModes.find(mode);
+		if (listModeIter == chanListModes.end()) {
+			chanListModes[mode].push_back(param);
+			return;
+		}
+		auto listIter = std::find(listModeIter->second.begin(), listModeIter->second.end(), param);
+		if (listIter == listModeIter->second.end())
+			listModeIter->second.push_back(param);
+	} else
+		chanModes[mode] = param;
 }
 
 void Channel::unsetMode(const std::string& mode) {
 	chanModes.erase(mode);
 }
 
-void Channel::setListMode(const std::string& mode, const std::string& param) {
-	auto listModeIter = chanListModes.find(mode);
-	if (listModeIter == chanListModes.end()) {
-		chanListModes[mode].push_back(param);
-		return;
-	}
-	auto listIter = std::find(listModeIter->second.begin(), listModeIter->second.end(), param);
-	if (listIter == listModeIter->second.end())
-		listModeIter->second.push_back(param);
-}
-
-void Channel::unsetListMode(const std::string& mode, const std::string& param) {
-	auto listModeIter = chanListModes.find(mode);
-	if (listModeIter == chanListModes.end())
-		return;
-	listModeIter->second.remove(param);
-	if (listModeIter->second.empty())
-		chanListModes.erase(listModeIter);
+void Channel::unsetMode(const std::string& mode, const std::string& param) {
+	if (proto->chanModeType(mode) == MODE_LIST) {
+		auto listModeIter = chanListModes.find(mode);
+		if (listModeIter == chanListModes.end())
+			return;
+		listModeIter->second.remove(param);
+		if (listModeIter->second.empty())
+			chanListModes.erase(listModeIter);
+	} else
+		unsetMode(mode);
 }
