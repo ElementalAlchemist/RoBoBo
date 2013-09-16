@@ -111,4 +111,5 @@ class Protocol : public ClientProtocol {
 		
 		std::unordered_map<std::string, char> chanPrefixModeToSymbol;
 		std::unordered_map<char, std::string> chanPrefixSymbolToMode;
+		std::list<std::string> chanPrefixOrder;
 };
