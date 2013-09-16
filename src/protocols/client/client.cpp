@@ -1,6 +1,6 @@
 #include "client.h"
 
-Client::Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, const Protocol* mod)
+Client::Client(const std::string& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, const Protocol* mod)
 	: User(std::forward<std::string> (id), std::forward<std::string> (nick), std::forward<std::string> (ident), std::forward<std::string> (gecos)),
 	password(std::forward<std::string>(pass)), socket(mod->obtainSocket(socktype)), expectingReconnect(true), proto(mod), needRegisterDelay(false), penaltySeconds(0) {}
 

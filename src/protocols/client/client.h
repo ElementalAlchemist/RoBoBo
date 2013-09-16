@@ -7,7 +7,7 @@ class Protocol;
 
 class Client : public User {
 	public:
-		Client(std::string&& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, Protocol* mod);
+		Client(const std::string& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, Protocol* mod);
 		~Client();
 		void connect();
 		void disconnect(const std::string& reason);

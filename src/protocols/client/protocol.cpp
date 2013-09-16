@@ -31,7 +31,7 @@ void Protocol::connectServer() {
 			while (users.find(id) != users.end())
 				id = getNextID();
 		}
-		std::shared_ptr<Client> newClient (new Client (std::move(id), std::move(nick), std::move(ident), std::move(gecos), std::move(password), std::move(socket), this));
+		std::shared_ptr<Client> newClient (new Client (id, std::move(nick), std::move(ident), std::move(gecos), std::move(password), std::move(socket), this));
 		clients.insert(std::pair<std::string, std::shared_ptr<Client>> (id, newClient));
 		users.insert(std::pair<std::string, std::shared_ptr<User>> (id, static_cast<std::shared_ptr<User>>(newClient)));
 	}
