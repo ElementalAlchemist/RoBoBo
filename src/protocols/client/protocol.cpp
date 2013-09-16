@@ -305,7 +305,7 @@ std::string Protocol::addClient(const std::string& nick, const std::string& iden
 	return id;
 }
 
-void Protocol::removeClient(const std::string& client) {
+void Protocol::removeClient(const std::string& client, const std::string& reason) {
 	
 }
 

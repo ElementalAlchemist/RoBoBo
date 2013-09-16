@@ -32,7 +32,7 @@ class ClientProtocol {
 		virtual void sendOtherData(const std::string& client, const IRCMessage* line) {}
 		
 		virtual std::string addClient(const std::string& nick, const std::string& ident, const std::string& gecos, const std::string& password, const std::string& socket = "") { return ""; }
-		virtual void removeClient(const std::string& client) {}
+		virtual void removeClient(const std::string& client, const std::string& reason) {}
 		
 		virtual std::set<std::string> serverCapabilities() { return std::set<std::string> (); }
 		

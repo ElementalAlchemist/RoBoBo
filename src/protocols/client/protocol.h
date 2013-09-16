@@ -33,7 +33,7 @@ class Protocol : public ClientProtocol {
 		void sendOtherData(const std::string& client, const IRCMessage* line);
 		
 		std::string addClient(const std::string& nick, const std::string& ident, const std::string& gecos, const std::string& password, const std::string& socket = "");
-		void removeClient(const std::string& client);
+		void removeClient(const std::string& client, const std::string& reason);
 		
 		std::set<std::string> serverCapabilities();
 		
