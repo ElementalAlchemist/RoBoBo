@@ -98,4 +98,15 @@ class Protocol : public ClientProtocol {
 		
 		std::set<std::string> capabilities;
 		std::set<char> channelTypes;
+		
+		std::unordered_map<std::string, char> chanModeStrToChar;
+		std::unordered_map<char, std::string> chanModeCharToStr;
+		std::unordered_map<std::string, cahr> userModeStrToChar;
+		std::unordered_map<char, std::string> userModeCharToStr;
+		
+		std::unordered_multimap<ModeType, std::string> serverChanModes;
+		std::unordered_multimap<ModeType, std::string> serverUserModes;
+		
+		std::unordered_map<std::string, char> chanPrefixModeToSymbol;
+		std::unordered_map<char, std::string> chanPrefixSymbolToMode;
 };
