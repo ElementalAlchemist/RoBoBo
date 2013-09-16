@@ -470,19 +470,31 @@ bool Protocol::userHasStatusOrGreater(const std::string& channel, const std::str
 }
 
 std::map<std::string, std::string> Protocol::chanModes(const std::string& channel) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::map<std::string, std::string> ();
+	return chanIter->second->modes();
 }
 
 bool Protocol::chanHasMode(const std::string& channel, const std::string& mode) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return false;
+	return chanIter->second->modeSet(mode);
 }
 
 std::string Protocol::chanModeParam(const std::string& channel, const std::string& mode) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return "";
+	return chanIter->second->modeParam(mode);
 }
 
 std::list<std::string> Protocol::chanListModeList(const std::string& channel, const std::string& mode) {
-	
+	auto chanIter = channels.find(channel);
+	if (chanIter == channels.end())
+		return std::list<std::string> ();
+	return chanIter->second->modeList(mode);
 }
 
 std::list<std::string> Protocol::clientList() {
