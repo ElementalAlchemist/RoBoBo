@@ -58,7 +58,7 @@ bool Protocol::connected() {
 }
 
 bool Protocol::shouldUnload() {
-	
+	return clients.empty();
 }
 
 void Protocol::disconnect() {
