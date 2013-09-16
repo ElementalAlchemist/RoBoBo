@@ -243,7 +243,13 @@ void Protocol::sendPing(const std::string& client, const std::string& data, cons
 }
 
 void Protocol::setAway(const std::string& client, const std::string& reason, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("AWAY");
+	msg.setParams(std::vector<std::string> { reason });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::setUnaway(const std::string& client, const std::map<std::string, std::string>& tags) {
