@@ -272,7 +272,13 @@ void Protocol::oper(const std::string& client, const std::string& username, cons
 }
 
 void Protocol::sendWallops(const std::string& client, const std::string& message, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("WALLOPS");
+	msg.setParams(std::vector<std::string> { message });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::sendOtherData(const std::string& client, const IRCMessage* line) {
