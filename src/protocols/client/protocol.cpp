@@ -153,11 +153,23 @@ void Protocol::setMode(const std::string& client, const std::string& target, con
 }
 
 void Protocol::joinChan(const std::string& client, const std::string& channel, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("JOIN");
+	msg.setParams(std::vector<std::string> { channel });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::joinChan(const std::string& client, const std::string& channel, const std::string& key, const std::map<std::string, std::string>& tags) {
-	
+	auto clientIter = clients.find(client);
+	if (clientIter == clients.end())
+		return;
+	IRCMessage msg ("JOIN");
+	msg.setParams(std::vector<std::string> { channel, key });
+	msg.setTags(tags);
+	clientIter->second->sendLine(&msg);
 }
 
 void Protocol::partChan(const std::string& client, const std::string& channel, const std::string& reason, const std::map<std::string, std::string>& tags) {
