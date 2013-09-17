@@ -70,6 +70,7 @@ bool Protocol::shouldUnload() {
 void Protocol::disconnect(const std::string& reason) {
 	LogManager* logger = LogManager::getHandle();
 	logger->log(LOG_DEFAULT, "protocol-client-connection-" + serverName, "Disconnecting all clients");
+	MutexLocker mutexLock (&processMutex);
 	for (auto client : clients)
 		client.second->disconnect(reason);
 	loaded = false;
@@ -316,6 +317,7 @@ void Protocol::removeClient(const std::string& client, const std::string& reason
 	auto clientIter = clients.find(client);
 	if (clientIter == clients.end())
 		return;
+	MutexLocker mutexLock (&processMutex);
 	clientIter->second->disconnect(reason);
 	users.erase(clientIter->first);
 	clients.erase(clientIter);
@@ -652,7 +654,6 @@ void Protocol::handleData() {
 		MutexLocker mutexLock (&processMutex);
 		std::pair<std::string, std::unique_ptr<IRCMessage>> msgInfo (receivedData.front());
 		receivedData.pop();
-		mutexLock.unlock();
 		std::string clientID (msgInfo.first);
 		auto clientIter = clients.find(clientID);
 		if (clientIter == clients.end())
