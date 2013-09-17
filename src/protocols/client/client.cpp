@@ -2,7 +2,8 @@
 
 Client::Client(const std::string& id, std::string&& nick, std::string&& ident, std::string&& gecos, std::string&& pass, std::string&& socktype, const Protocol* mod)
 	: User(std::forward<std::string> (id), std::forward<std::string> (nick), std::forward<std::string> (ident), std::forward<std::string> (gecos)),
-	password(std::forward<std::string>(pass)), socket(mod->obtainSocket(socktype)), expectingReconnect(true), proto(mod), needRegisterDelay(false), penaltySeconds(0) {}
+	registered(false), password(std::forward<std::string>(pass)), socket(mod->obtainSocket(socktype)), expectingReconnect(true), proto(mod),
+	needRegisterDelay(false), penaltySeconds(0) {}
 
 Client::~Client() {
 	if (socket->isConnected())
@@ -77,6 +78,14 @@ void Client::doRegister() {
 		socket->sendData(userMsg.rawLine());
 	}
 	needRegisterDelay = false;
+}
+
+void Client::markRegistered() {
+	registered = true;
+}
+
+bool Client::isRegistered() const {
+	return registered;
 }
 
 void Client::startFloodThrottle() {

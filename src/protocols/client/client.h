@@ -15,6 +15,8 @@ class Client : public User {
 		bool wantsToReconnect() const;
 		void doReconnect();
 		void doRegister();
+		void markRegistered();
+		bool isRegistered() const;
 		void startFloodThrottle();
 		void endFloodThrottle();
 		std::map<std::string, std::string> modes() const;
@@ -28,6 +30,7 @@ class Client : public User {
 		void unsetMode(const std::string& mode, const std::string& param);
 		void sendLine(const IRCMessage* line);
 	private:
+		bool registered;
 		std::string password;
 		std::map<std::string, std::string> clientModes;
 		std::map<std::string, std::list<std::string>> clientListModes;
