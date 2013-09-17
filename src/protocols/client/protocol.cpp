@@ -654,6 +654,9 @@ void Protocol::handleData() {
 		receivedData.pop();
 		mutexLock.unlock();
 		std::string clientID (msgInfo.first);
+		auto clientIter = clients.find(clientID);
+		if (clientIter == clients.end())
+			continue; // The client has since disconnected, so we'll just ignore everything it says
 		std::unique_ptr<IRCMessage> msg (msgInfo.second);
 		std::string command (msg->command());
 		if (command == "001") {
