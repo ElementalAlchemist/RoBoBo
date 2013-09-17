@@ -1,6 +1,12 @@
 #include "protocol.h"
 
-Protocol::Protocol() : floodThrottle(true), nextID(0) {}
+Protocol::Protocol() : floodThrottle(true), loaded(true), nextID(0) {}
+
+Protocol::~Protocol() {
+	loaded = false;
+	if (dataThread.joinable())
+		dataThread.join();
+}
 
 void Protocol::connectServer() {
 	LogManager* logger = LogManager::getHandle();
@@ -66,6 +72,7 @@ void Protocol::disconnect(const std::string& reason) {
 	logger->log(LOG_DEFAULT, "protocol-client-connection-" + serverName, "Disconnecting all clients");
 	for (auto client : clients)
 		client.second->disconnect(reason);
+	loaded = false;
 }
 
 void Protocol::onRehash() {
@@ -606,7 +613,7 @@ bool Protocol::floodThrottleInEffect() {
 
 void Protocol::processIncoming(const std::string& client, const IRCMessage* message) {
 	MutexLocker mutexLock (&processMutex);
-	// TODO: the rest of this
+	receivedData.push(std::pair<std::string, std::unique_ptr<IRCMessage>> (client, std::unique_ptr<IRCMessage> (new IRCMessage (*message))));
 }
 
 std::string Protocol::getNextID() {
@@ -634,4 +641,67 @@ std::string Protocol::convertCommaSeparatedTargetList(std::string targets) {
 			targets += "," + oneTarget;
 	}
 	return targets.substr(1);
+}
+
+void Protocol::handleData() {
+	while (loaded) {
+		if (receivedData.empty()) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+			continue;
+		}
+		MutexLocker mutexLock (&processMutex);
+		std::pair<std::string, std::unique_ptr<IRCMessage>> msgInfo (receivedData.front());
+		receivedData.pop();
+		mutexLock.unlock();
+		std::string clientID (msgInfo.first);
+		std::unique_ptr<IRCMessage> msg (msgInfo.second);
+		std::string command (msg->command());
+		if (command == "001") {
+			
+		} else if (command == "004") {
+			
+		} else if (command == "005") {
+			
+		} else if (command == "329") {
+			
+		} else if (command == "333") {
+			
+		} else if (command == "352") {
+			
+		} else if (command == "353") {
+			
+		} else if (command == "366") {
+			
+		} else if (command == "433") {
+			
+		} else if (command == "710") {
+			
+		} else if (command == "CAP") {
+			
+		} else if (command == "PRIVMSG") {
+			
+		} else if (command == "NOTICE") {
+			
+		} else if (command == "MODE") {
+			
+		} else if (command == "TOPIC") {
+			
+		} else if (command == "NICK") {
+			
+		} else if (command == "JOIN") {
+			
+		} else if (command == "PART") {
+			
+		} else if (command == "QUIT") {
+			
+		} else if (command == "INVITE") {
+			
+		} else if (command == "AWAY") {
+			
+		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
+			
+		} else {
+			
+		}
+	}
 }

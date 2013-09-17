@@ -7,6 +7,7 @@
 class Protocol : public ClientProtocol {
 	public:
 		Protocol();
+		~Protocol();
 		unsigned int apiVersion() { return 3000; }
 		void connectServer();
 		bool connected();
@@ -85,6 +86,7 @@ class Protocol : public ClientProtocol {
 		std::string serverPort;
 		std::string serverBindAddr;
 		bool floodThrottle;
+		bool loaded;
 		std::mutex processMutex;
 		unsigned int nextID;
 		std::string getNextID();
@@ -112,4 +114,8 @@ class Protocol : public ClientProtocol {
 		std::unordered_map<std::string, char> chanPrefixModeToSymbol;
 		std::unordered_map<char, std::string> chanPrefixSymbolToMode;
 		std::list<std::string> chanPrefixOrder;
+		
+		void handleData();
+		std::thread dataThread;
+		std::queue<std::pair<std::string, std::unique_ptr<IRCMessage>>> receivedData;
 };
