@@ -112,17 +112,20 @@ void ModuleManager::unloadModule(const std::string& name) {
 	}
 	for (std::string modName : alsoUnload)
 		unloadModule(modName);
+	std::shared_ptr<Module> thisMod = modIter->second;
+	// Remove this module so that it can't be removed again after
+	loadedModules.erase(modIter);
+	// Also remove the client and server segments of the module, if present
+	// so that they don't get added to hooks after this
+	clientModules.erase(name);
+	serverModules.erase(name);
 	
 	MutexLocker mutexLock (&queueMutex);
 	actionQueue.push([=]() {
-		auto modIter = loadedModules.find(name);
 		auto modFileIter = moduleFiles.find(name);
 		void* filePtr = modFileIter->second;
-		modIter->second->onUnload();
+		thisMod->onUnload();
 		moduleFiles.erase(modFileIter);
-		loadedModules.erase(modIter);
-		clientModules.erase(name);
-		serverModules.erase(name);
 		for (auto mod : loadedModules)
 			mod.second->onModuleUnload(name);
 		dlclose(filePtr);
