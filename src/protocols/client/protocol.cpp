@@ -680,6 +680,8 @@ void Protocol::handleData() {
 			
 		} else if (command == "710") {
 			
+		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
+			
 		} else if (command == "CAP") {
 			
 		} else if (command == "PRIVMSG") {
@@ -701,8 +703,6 @@ void Protocol::handleData() {
 		} else if (command == "INVITE") {
 			
 		} else if (command == "AWAY") {
-			
-		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
 			
 		} else {
 			
