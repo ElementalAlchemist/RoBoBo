@@ -41,6 +41,7 @@ void Protocol::connectServer() {
 		clients.insert(std::pair<std::string, std::shared_ptr<Client>> (id, newClient));
 		users.insert(std::pair<std::string, std::shared_ptr<User>> (id, static_cast<std::shared_ptr<User>>(newClient)));
 		newClient->connect();
+		callHook(HOOK_CLIENT_CONNECT_SELF, id);
 	}
 }
 
@@ -314,6 +315,7 @@ std::string Protocol::addClient(const std::string& nick, const std::string& iden
 	clients.insert(std::pair<std::string, std::shared_ptr<Client>> (id, newClient));
 	users.insert(std::pair<std::string, std::shared_ptr<User>> (id, static_cast<std::shared_ptr<User>>(newClient)));
 	newClient->connect();
+	callHook(HOOK_CLIENT_CONNECT_SELF, id);
 	return id;
 }
 
