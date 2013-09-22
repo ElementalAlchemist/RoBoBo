@@ -306,6 +306,9 @@ void ModuleManager::callClientHook(ActionType type, Args... args) {
 		case HOOK_CLIENT_CONNECT_SELF:
 			actionQueue.push(generateHookCaller(&ClientModule::onSelfConnect, modList, args...));
 			break;
+		case HOOK_CLIENT_REGISTER_SELF:
+			actionQueue.push(generateHookCaller(&ClientModule::onSelfRegister, modList, args...));
+			break;
 		case HOOK_CLIENT_QUIT_SELF:
 			actionQueue.push(generateHookCaller(&ClientModule::onSelfQuit, modList, args...));
 			break;

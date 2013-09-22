@@ -29,6 +29,7 @@ class ClientModule {
 		virtual void onWallops(const std::string& server, const std::string& client, const std::string& user, const std::string& message, const std::map<std::string, std::string>& tags) {}
 		virtual void onCap(const std::string& server, const std::string& client, const std::string& subcmd, const std::list<std::string>& list, const std::map<std::string, std::string>& tags) {}
 		virtual void onSelfConnect(const std::string& server, const std::string& client) {}
+		virtual void onSelfRegister(const std::string& server, const std::string& client) {}
 		virtual void onSelfQuit(const std::string& server, const std::string& client, const std::string& reason) {}
 		virtual void onOtherData(const std::string& server, const std::string& client, const IRCMessage* message) {}
 		
