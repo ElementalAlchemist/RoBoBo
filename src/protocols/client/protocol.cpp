@@ -667,7 +667,8 @@ void Protocol::handleData() {
 		std::unique_ptr<IRCMessage> msg (msgInfo.second);
 		std::string command (msg->command());
 		if (command == "001") {
-			
+			clientIter->second->markRegistered();
+			callHook(HOOK_CLIENT_REGISTER_SELF, clientID);
 		} else if (command == "004") {
 			
 		} else if (command == "005") {
