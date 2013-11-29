@@ -101,6 +101,10 @@ class Protocol : public ClientProtocol {
 		std::set<std::string> capabilities;
 		std::set<char> channelTypes;
 		
+		void loadModeNamesAndDefaults(std::unordered_map<std::string, std::string> modeConfig);
+		void saveChanMode(const std::string& name, char letter, const std::string& override);
+		void saveUserMode(const std::string& name, char letter, const std::string& override);
+		
 		std::unordered_map<std::string, char> chanModeStrToChar;
 		std::unordered_map<char, std::string> chanModeCharToStr;
 		std::unordered_map<std::string, cahr> userModeStrToChar;

@@ -17,6 +17,7 @@ void Protocol::connectServer() {
 	serverPort = configBlock["port"];
 	serverBindAddr = configBlock["bind"];
 	floodThrottle = Config::makeBool(configBlock["floodthrottle"]);
+	loadModeNamesAndDefaults(configBlock);
 	if (serverAddress.empty() || serverPort.empty()) {
 		logger->log(LOG_ERROR, "protocol-client-connect-" + serverName, "Cannot connect to " + serverName + " because the configuration is incomplete or invalid.");
 		throw ServerBadConfiguration ();
@@ -649,6 +650,164 @@ std::string Protocol::convertCommaSeparatedTargetList(std::string targets) {
 			targets += "," + oneTarget;
 	}
 	return targets.substr(1);
+}
+
+void Protocol::loadModeNamesAndDefaults(std::unordered_map<std::string, std::string> modeConfig) {
+	// The parameter for this function is intentionally copied instead of referenced.
+	
+	saveChanMode("admin", 'a', modeConfig["cmode/admin"]);
+	saveChanMode("allowinvite", 'A', modeConfig["cmode/allowinvite"]);
+	saveChanMode("auditorium", 'u', modeConfig["cmode/auditorium"]);
+	saveChanMode("autoop", 'w', modeConfig["cmode/autoop"]);
+	saveChanMode("ban", 'b', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("banexception", 'e', modeConfig["cmode/banexception"]);
+	saveChanMode("blockcaps", 'B', modeConfig["cmode/blockcaps"]);
+	saveChanMode("blockcolor", 'c', modeConfig["cmode/blockcolor"]);
+	saveChanMode("c_registered", 'r', modeConfig["cmode/c_registered"]);
+	saveChanMode("censor", 'G', modeConfig["cmode/censor"]);
+	saveChanMode("delayjoin", 'D', modeConfig["cmode/delayjoin"]);
+	saveChanMode("delaymsg", 'd', modeConfig["cmode/delaymsg"]);
+	saveChanMode("exemptchanops", 'X', modeConfig["cmode/exemptchanops"]);
+	saveChanMode("filter", 'g', modeConfig["cmode/filter"]);
+	saveChanMode("flood", 'f', modeConfig["cmode/flood"]);
+	saveChanMode("founder", 'q', modeConfig["cmode/founder"]);
+	saveChanMode("halfop", 'h', modeConfig["cmode/halfop"]);
+	saveChanMode("history", 'H', modeConfig["cmode/history"]);
+	saveChanMode("invex", 'I', modeConfig["cmode/invex"]);
+	saveChanMode("inviteonly", 'i', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("joinflood", 'j', modeConfig["cmode/joinflood"]);
+	saveChanMode("key", 'k', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("kicknorejoin", 'J', modeConfig["cmode/kicknorejoin"]);
+	saveChanMode("limit", 'l', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("moderated", 'm', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("namebase", 'Z', modeConfig["cmode/namebase"]); // NOTE: Even though this is here, there is no special handling for it in this module
+	saveChanMode("nickflood", 'F', modeConfig["cmode/nickflood"]);
+	saveChanMode("noctcp", 'C', modeConfig["cmode/noctcp"]);
+	saveChanMode("noextmsg", 'n', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("nokick", 'Q', modeConfig["cmode/nokick"]);
+	saveChanMode("noknock", 'K', modeConfig["cmode/noknock"]);
+	saveChanMode("nonick", 'N', modeConfig["cmode/nonick"]);
+	saveChanMode("nonotice", 'T', modeConfig["cmode/nonotice"]);
+	saveChanMode("official-join", 'Y', modeConfig["cmode/official-join"]);
+	saveChanMode("op", 'o', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("operonly", 'O', modeConfig["cmode/operonly"]);
+	saveChanMode("operprefix", 'y', modeConfig["cmode/operprefix"]);
+	saveChanMode("permanent", 'P', modeConfig["cmode/permanent"]);
+	saveChanMode("private", 'p', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("quiet", ' ', modeConfig["cmode/quiet"]); // Here to provide the mode name, but is not by default entered
+	saveChanMode("redirect", 'L', modeConfig["cmode/redirect"]);
+	saveChanMode("reginvite", 'R', modeConfig["cmode/reginvite"]);
+	saveChanMode("regmoderated", 'M', modeConfig["cmode/regmoderated"]);
+	saveChanMode("repeat", 'E', modeConfig["cmode/repeat"]);
+	saveChanMode("secret", 's', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("sslonly", 'z', modeConfig["cmode/sslonly"]);
+	saveChanMode("stripcolor", 'S', modeConfig["cmode/stripcolor"]);
+	saveChanMode("topiclock", 't', ""); // The names of RFC-specified modes may not be edited
+	saveChanMode("voice", 'v', ""); // The names of RFC-specified modes may not be edited
+	
+	saveUserMode("antiredirect", 'L', modeConfig["umode/antiredirect"]);
+	saveUserMode("bot", 'B', modeConfig["umode/bot"]);
+	saveUserMode("callerid", 'g', modeConfig["umode/callerid"]);
+	saveUserMode("cloak", 'x', modeConfig["umode/cloak"]);
+	saveUserMode("deaf", 'd', modeConfig["umode/deaf"]);
+	saveUserMode("deaf_commonchan", 'c', modeConfig["umode/deaf_commonchan"]);
+	saveUserMode("helpop", 'h', modeConfig["umode/helpop"]);
+	saveUserMode("hidechans", 'I', modeConfig["umode/hidechans"]);
+	saveUserMode("hideoper", 'H', modeConfig["umode/hideoper"]);
+	saveUserMode("invisible", 'i', ""); // The names of RFC-specified modes may not be edited
+	saveUserMode("oper", 'o', ""); // The names of RFC-specified modes may not be edited
+	saveUserMode("regdeaf", 'R', modeConfig["umode/regdeaf"]);
+	saveUserMode("servprotect", 'k', modeConfig["umode/servprotect"]);
+	saveUserMode("showwhois", 'W', modeConfig["umode/showwhois"]);
+	saveUserMode("snomask", 's', modeConfig["umode/snomask"]);
+	saveUserMode("u_censor", 'G', modeConfig["umode/u_censor"]);
+	saveUserMode("u_registered", 'r', modeConfig["umode/u_registered"]);
+	saveUserMode("u_stripcolor", 'S', modeConfig["umode/u_stripcolor"]);
+	saveUserMode("wallops", 'w', ""); // The names of RFC-specified modes may not be edited
+	
+	// Fill in default channel modes
+	// This list will get wiped and rewritten when we read 005 CHANMODES if the server presents it
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_LIST, "ban"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("ban", MODE_LIST));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "inviteonly"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("inviteonly", MODE_NOPARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_PARAM_UNSET, "key"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("key", MODE_PARAM_UNSET));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_PARAM, "limit"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("limit", MODE_PARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "moderated"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("moderated", MODE_NOPARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "noextmsg"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("noextmsg", MODE_NOPARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_STATUS, "op"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("op", MODE_STATUS));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "private"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("private", MODE_NOPARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "secret"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("secret", MODE_NOPARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "topiclock"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("topiclock", MODE_NOPARAM));
+	serverChanModes.insert(std::pair<ModeType, std::string> (MODE_STATUS, "voice"));
+	serverChanModeType.insert(std::pair<std::string, ModeType> ("voice", MODE_STATUS));
+	// Don't forget to also put the statuses in their own special status place
+	chanPrefixModeToSymbol.insert(std::pair<std::string, char> ("op", '@'));
+	chanPrefixSymbolToMode.insert(std::pair<char, std::string> ('@', "op"));
+	chanPrefixModeToSymbol.insert(std::pair<std::string, char> ("voice", '+'));
+	chanPrefixSymbolToMode.insert(std::pair<char, std::string> ('+', "voice"));
+	chanPrefixOrder = std::list<std::string> { "op", "voice" };
+	
+	// Fill in default user modes
+	// This list will get wiped and rewritten when we read the user modes from 004
+	// (assuming all but +s is MODE_NOPARAM) or if we read 005 USERMODES
+	serverUserModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "invisible"));
+	serverUserModeType.insert(std::pair<std::string, ModeType> ("invisible", MODE_NOPARAM));
+	serverUserModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "oper"));
+	serverUserModeType.insert(std::pair<std::string, ModeType> ("oper", MODE_NOPARAM));
+	serverUserModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, "wallops"));
+	serverUserModeType.insert(std::pair<std::string, ModeType> ("wallops", MODE_NOPARAM));
+	if (chanModeStrToChar.find("snomask") != chanModeStrToChar.end()) {
+		// Assume snomask is a MODE_PARAM type (as it is on most servers) unless we get a 005 USERMODES entry
+		serverUserModes.insert(std::pair<ModeType, std::string> (MODE_PARAM, "snomask"));
+		serverUserModeType.insert(std::pair<std:string, ModeType> ("snomask", MODE_PARAM));
+	}
+}
+
+void Protocol::saveChanMode(const std::string& name, char letter, const std::string& override) {
+	std::string lowerOverride;
+	std::transform(override.begin(), override.end(), std::back_inserter(lowerOverride), ::tolower);
+	if (lowerOverride == "none" || lowerOverride == "disable")
+		return;
+	LogManager* logger = LogManager::getHandle();
+	if (!override.empty())
+		letter = override[0]; // Save the config-specified letter instead
+	if (letter == ' ')
+		return;
+	if (chanModeCharToStr.find(letter) != chanModeCharToStr.end()) {
+		std::ostringstream logMsg;
+		logMsg << "Cannot assign channel mode '" << letter << "' to mode " << name << ": Letter already assigned to another mode.";
+		logger->log(LOG_DEFAULT, "protocol-client-setup-" + serverName, logMsg.str());
+		return;
+	}
+	chanModeStrToChar[name] = letter;
+	chanModeCharToStr[letter] = name;
+}
+
+void Protocol::saveUserMode(const std::string& name, char letter, const std::string& override) {
+	std::string lowerOverride;
+	std::transform(override.begin(), override.end(), std::back_inserter(lowerOverride), ::tolower);
+	if (lowerOverride == "none" || lowerOverride == "disable")
+		return;
+	LogManager* logger = LogManager::getHandle();
+	if (!override.empty())
+		letter = override[0]; // Save the config-specified letter insteda
+	if (userModeCharToStr.find(letter) != userModeCharToStr.end()) {
+		std::ostringstream logMsg;
+		logMsg << "Cannot assign user mode '" << letter "' to mode " << name << ": Letter already assigned to another mode.";
+		logger->log(LOG_DEFAULT, "protocol-client-setup-" + serverName, logMsg.str());
+		return;
+	}
+	userModeStrToChar[name] = letter;
+	userModeCharToStr[letter] = name;
 }
 
 void Protocol::handleData() {
