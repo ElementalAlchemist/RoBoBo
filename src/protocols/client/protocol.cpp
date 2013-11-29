@@ -829,7 +829,21 @@ void Protocol::handleData() {
 			clientIter->second->markRegistered();
 			callHook(HOOK_CLIENT_REGISTER_SELF, clientID);
 		} else if (command == "004") {
-			
+			serverUserModes.clear();
+			serverUserModeType.clear();
+			for (char mode : msg->params()[3]) {
+				if (userModeCharToStr.find(mode) == userModeCharToStr.end()) {
+					serverUserModes.insert(std::pair<ModeType, std::string> (MODE_NOPARAM, std::string(mode)));
+					serverUserModeType.insert(std::pair<std::string, ModeType> (std::string(mode), MODE_NOPARAM));
+				} else {
+					std::string modeName (userModeCharToStr.find(mode)->second);
+					ModeType type = MODE_NOPARAM;
+					if (modeName == "snomask")
+						type = MODE_PARAM; // Unless 005 USERMODES (if it exists) says otherwise (and we'll always get it after 004), snomask is generally implemented as MODE_PARAM
+					serverUserModes.insert(std::pair<ModeType, std::string> (type, modeName));
+					serverUserModeType.insert(std::pair<std::string, ModeType> (modeName, type));
+				}
+			}
 		} else if (command == "005") {
 			
 		} else if (command == "329") {
