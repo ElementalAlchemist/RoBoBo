@@ -632,24 +632,29 @@ std::string Protocol::getNextID() {
 	return currID.str();
 }
 
-std::string Protocol::convertCommaSeparatedTargetList(std::string targets) {
-	std::list<std::string> targetList;
-	while (!targets.empty()) {
-		size_t commaPos = targets.find(',');
-		targetList.push_back(targets.substr(0, commaPos));
+std::list<std::string> Protocol::convertCommaSeparatedTargetList(std::string str) {
+	std::list<std::string> list;
+	while (!str.empty()) {
+		size_t commaPos = str.find(',');
+		list.push_back(str.substr(0, commaPos));
 		if (commaPos == std::string::npos)
-			targets.clear();
+			str.clear();
 		else
-			targets = targets.substr(commaPos + 1);
+			str = str.substr(commaPos + 1);
 	}
-	for (std::string oneTarget : targetList) {
+	return list;
+}
+
+std::string Protocol::convertListToCommaSeparatedString(const std::list<std::string>& list) {
+	std::string str;
+	for (std::string oneTarget : list) {
 		auto userIter = users.find(oneTarget);
 		if (userIter != users.end())
-			targets += "," + userIter->second.nick();
+			str += "," + userIter->second.nick();
 		else
-			targets += "," + oneTarget;
+			str += "," + oneTarget;
 	}
-	return targets.substr(1);
+	return str.substr(1);
 }
 
 void Protocol::loadModeNamesAndDefaults(std::unordered_map<std::string, std::string> modeConfig) {
