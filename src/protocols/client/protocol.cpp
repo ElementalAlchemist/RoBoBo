@@ -163,32 +163,39 @@ void Protocol::sendNotice(const std::string& client, const std::string& target, 
 	}
 }
 
-void Protocol::setMode(const std::string& client, const std::string& target, const std::list<std::tuple<bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {
+void Protocol::setMode(const std::string& client, const std::string& target, std::list<std::tuple<bool, std::string, std::string>> modes, const std::map<std::string, std::string>& tags) {
 	auto clientIter = clients.find(client);
 	if (clientIter == clients.end())
 		return;
 	IRCMessage msg ("MODE");
-	std::vector<std::string> modeParams;
-	bool adding = std::get<0>(modes.front());
-	std::string modeStr (adding ? "+" : "-");
-	for (auto mode : modes) {
-		if (std::get<0>(mode) != adding) {
-			adding = std::get<0>(mode);
-			modeStr += (adding ? "+" : "-");
-		}
-		modeStr += std::get<1>(mode);
-		std::string param (std::get<2>(mode));
-		if (!param.empty())
-			modeParams.push_back(param);
-	}
-	std::vector<std::string> cmdParams { target };
-	cmdParams.reserve(2 + modeParams.size());
-	cmdParams.push_back(modeStr);
-	for (auto param : modeParams)
-		cmdParams.push_back(param);
-	msg.setParams(cmdParams);
 	msg.setTags(tags);
-	clientIter->second->sendLine(&msg);
+	while (!modes.empty()) {
+		std::list<std::tuple<bool, std::string, std::string>> modesThisTime;
+		while (!modes.empty() && modesThisTime.size() < maxModes) {
+			modesThisTime.push_back(modes.front());
+			modes.erase(modes.begin());
+		}
+		std::vector<std::string> modeParams;
+		bool adding = std::get<0>(modesThisTime.front());
+		std::string modeStr (adding ? "+" : "-");
+		for (auto mode : modesThisTime) {
+			if (std::get<0>(mode) != adding) {
+				adding = std::get<0>(mode);
+				modeStr += (adding ? "+" : "-");
+			}
+			modeStr += std::get<1>(mode);
+			std::string param (std::get<2>(mode));
+			if (!param.empty())
+				modeParams.push_back(param);
+		}
+		std::vector<std::string> cmdParams { target };
+		cmdParams.reserve(2 + modeParams.size());
+		cmdParams.push_back(modeStr);
+		for (auto param : modeParams)
+			cmdParams.push_back(param);
+		msg.setParams(cmdParams);
+		clientIter->second->sendLine(&msg);
+	}
 }
 
 void Protocol::joinChan(const std::string& client, const std::string& channel, const std::map<std::string, std::string>& tags) {

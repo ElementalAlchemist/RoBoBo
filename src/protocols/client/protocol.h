@@ -17,7 +17,7 @@ class Protocol : public ClientProtocol {
 		
 		void sendMsg(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags);
 		void sendNotice(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags);
-		void setMode(const std::string& client, const std::string& target, const std::list<std::tuple<bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags);
+		void setMode(const std::string& client, const std::string& target, std::list<std::tuple<bool, std::string, std::string>> modes, const std::map<std::string, std::string>& tags);
 		void joinChan(const std::string& client, const std::string& channel, const std::map<std::string, std::string>& tags);
 		void joinChan(const std::string& client, const std::string& channel, const std::string& key, const std::map<std::string, std::string>& tags);
 		void partChan(const std::string& client, const std::string& channel, const std::string& reason, const std::map<std::string, std::string>& tags);
