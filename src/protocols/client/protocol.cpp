@@ -99,9 +99,20 @@ void Protocol::sendMsg(const std::string& client, const std::string& target, con
 	auto clientIter = clients.find(client);
 	if (clientIter == clients.end())
 		return;
+	if (target.empty())
+		return; // Clearly we can't send this message anywhere.
+	std::list<std::string> targets = convertCommaSeparatedList(target);
+	std::list<std::string> targetLists;
+	while (!targets.empty()) {
+		std::list<std::string> targetSubset;
+		while (!targets.empty() && targetSubset.size() < maxTargets) {
+			targetSubset.push_back(targets.front());
+			targets.erase(targets.begin());
+		}
+		targetLists.push_back(convertListToCommaSeparatedString(targetSubset));
+	}
 	IRCMessage msg ("PRIVMSG");
 	msg.setParams(std::vector<std::string> (2));
-	msg.setParam(0, convertCommaSeparatedTargetList(target));
 	auto tagIter = tags.find("intents");
 	if (tagIter == tags.end() || capabilities.find("intents") != capabilities.end()) {
 		msg.setParam(1, message);
@@ -112,16 +123,30 @@ void Protocol::sendMsg(const std::string& client, const std::string& target, con
 		msg.setTags(newTags);
 		msg.setParam(1, "\x01" + tagIter->second + " " + message + "\x01");
 	}
-	clientIter->second->sendLine(&msg);
+	for (std::string& msgTarget : targetLists) {
+		msg.setParam(0, msgTarget);
+		clientIter->second->sendLine(&msg);
+	}
 }
 
 void Protocol::sendNotice(const std::string& client, const std::string& target, const std::string& message, const std::map<std::string, std::string>& tags) {
 	auto clientIter = clients.find(client);
 	if (clientIter == clients.end())
 		return;
+	if (target.empty())
+		return;
+	std::list<std::string> targets = convertCommaSeparatedList(target);
+	std::list<std::string> targetLists;
+	while (!targets.empty()) {
+		std::list<std::string> targetSubset;
+		while (!targets.empty() && targetSubset.size() < maxTargets) {
+			targetSubset.push_back(targets.front());
+			targets.erase(targets.begin());
+		}
+		targetLists.push_back(convertListToCommaSeparatedString(targetSubset));
+	}
 	IRCMessage msg ("NOTICE");
 	msg.setParams(std::vector<std::string> (2));
-	msg.setParam(0, convertCommaSeparatedTargetList(target));
 	auto tagIter = tags.find("intents");
 	if (tagIter == tags.end() || capabilities.find("intents") != capabilities.end()) {
 		msg.setParam(1, message);
@@ -132,7 +157,10 @@ void Protocol::sendNotice(const std::string& client, const std::string& target, 
 		msg.setTags(newTags);
 		msg.setParam(1, "\x01" + tagIter->second + " " + message + "\x01");
 	}
-	clientIter->second->sendLine(&msg);
+	for (std::string& msgTarget : targetLists) {
+		msg.setParam(0, msgTarget);
+		clientIter->second->sendLine(&msg);
+	}
 }
 
 void Protocol::setMode(const std::string& client, const std::string& target, const std::list<std::tuple<bool, std::string, std::string>>& modes, const std::map<std::string, std::string>& tags) {
