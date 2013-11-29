@@ -1,6 +1,6 @@
 #include "protocol.h"
 
-Protocol::Protocol() : floodThrottle(true), loaded(true), nextID(0) {}
+Protocol::Protocol() : floodThrottle(true), loaded(true), nextID(0), maxModes(1) {}
 
 Protocol::~Protocol() {
 	loaded = false;

@@ -101,6 +101,8 @@ class Protocol : public ClientProtocol {
 		std::set<std::string> capabilities;
 		std::set<char> channelTypes;
 		
+		unsigned int maxModes;
+		
 		void loadModeNamesAndDefaults(std::unordered_map<std::string, std::string> modeConfig);
 		void saveChanMode(const std::string& name, char letter, const std::string& override);
 		void saveUserMode(const std::string& name, char letter, const std::string& override);
