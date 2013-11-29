@@ -655,6 +655,8 @@ std::string Protocol::convertCommaSeparatedTargetList(std::string targets) {
 void Protocol::loadModeNamesAndDefaults(std::unordered_map<std::string, std::string> modeConfig) {
 	// The parameter for this function is intentionally copied instead of referenced.
 	
+	channelTypes.insert('#');
+	
 	saveChanMode("admin", 'a', modeConfig["cmode/admin"]);
 	saveChanMode("allowinvite", 'A', modeConfig["cmode/allowinvite"]);
 	saveChanMode("auditorium", 'u', modeConfig["cmode/auditorium"]);
