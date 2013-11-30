@@ -667,7 +667,7 @@ std::string Protocol::getNextID() {
 	return currID.str();
 }
 
-std::list<std::string> Protocol::convertCommaSeparatedTargetList(std::string str) {
+std::list<std::string> Protocol::convertCommaSeparatedList(std::string str) {
 	std::list<std::string> list;
 	while (!str.empty()) {
 		size_t commaPos = str.find(',');
