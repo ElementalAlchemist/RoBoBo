@@ -111,7 +111,7 @@ class Protocol : public ClientProtocol {
 		
 		std::unordered_map<std::string, char> chanModeStrToChar;
 		std::unordered_map<char, std::string> chanModeCharToStr;
-		std::unordered_map<std::string, cahr> userModeStrToChar;
+		std::unordered_map<std::string, char> userModeStrToChar;
 		std::unordered_map<char, std::string> userModeCharToStr;
 		
 		std::unordered_multimap<ModeType, std::string> serverChanModes;
