@@ -852,6 +852,110 @@ void Protocol::saveUserMode(const std::string& name, char letter, const std::str
 	userModeCharToStr[letter] = name;
 }
 
+ModeType Protocol::selectModeTypeFrom005ModePosition(unsigned int pos) {
+	switch (pos) {
+		case 0:
+			return MODE_LIST;
+		case 1:
+			return MODE_PARAM_UNSET;
+		case 2:
+			return MODE_PARAM;
+		default:
+			return MODE_NOPARAM;
+	}
+}
+
+void Protocol::parse005Prefix(const std::string& prefixDescriptor) {
+	std::string modes (prefixDescriptor.substr(1)); // Don't use the opening parenthesis
+	size_t parenPos = modes.find(')'); // The closing parenthesis is now splitting modes and symbols
+	std::string symbols (modes.substr(parenPos + 1));
+	modes = modes.substr(0, parenPos);
+	if (modes.size() != symbols.size())
+		return; // Something has gone horribly wrong with the server.
+	chanPrefixModeToSymbol.clear();
+	chanPrefixSymbolToMode.clear();
+	chanPrefixOrder.clear();
+	for (size_t i = 0; i < modes.size(); i++) {
+		auto modeIter = chanModeCharToStr.find(modes[i]);
+		std::string mode;
+		if (modeIter == chanModeCharToStr.end())
+			mode = std::string(modes[i]);
+		else
+			mode = modeIter->second;
+		chanPrefixOrder.push_back(mode);
+		chanPrefixModeToSymbol.insert(std::pair<std::string, char> (mode, symbols[i]));
+		chanPrefixSymbolToMode.insert(std::pair<char, std::string> (symbols[i], mode));
+	}
+}
+
+void Protocol::parse005ChanModes(const std::string& channelModeDescriptor) {
+	serverChanModes.clear();
+	serverChanModeType.clear();
+	for (std::string& status : chanPrefixOrder) {
+		serverChanModes.insert(std::pair<ModeType, std::string> (MODE_STATUS, status));
+		serverChanModeType.insert(std::pair<std::string, ModeType> (status, MODE_STATUS));
+	}
+	unsigned int catNum = 0;
+	ModeType currType = selectModeTypeFrom005ModePosition(catNum);
+	for (char mode : channelModeDescriptor) {
+		if (mode == ',') {
+			catNum++;
+			currType = selectModeTypeFrom005ModePosition(catNum);
+			continue;
+		}
+		auto modeIter = chanModeCharToStr.find(mode);
+		std::string modeName;
+		if (modeIter == chanModeCharToStr.end())
+			modeName = std::string(mode);
+		else
+			modeName = modeIter->second;
+		serverChanModes.insert(std::pair<ModeType, std::string> (currType, modeName));
+		serverChanModeType.insert(std::pair<std::string, ModeType> (modeName, currType));
+	}
+}
+
+void Protocol::parse005UserModes(const std::string& userModeDescriptor) {
+	serverUserModes.clear();
+	serverUserModeType.clear();
+	unsigned int catNum = 0;
+	ModeType currType = selectModeTypeFrom005ModePosition(catNum);
+	for (char mode : userModeDescriptor) {
+		if (mode == ',') {
+			catNum++;
+			currType = selectModeTypeFrom005ModePosition(catNum);
+			continue;
+		}
+		auto modeIter = userModeCharToStr.find(mode);
+		std::string modeName;
+		if (modeIter == userModeCharToStr.end())
+			modeName = std::string(mode);
+		else
+			modeName = modeIter->second;
+		serverUserModes.insert(std::pair<ModeType, std::string> (currType, modeName));
+		serverUserModeType.insert(std::pair<std::string, ModeType> (modeName, currType));
+	}
+}
+
+void Protocol::parse005ChanTypes(const std::string& chanTypesChars) {
+	channelTypes.clear();
+	for (char chanType : chanTypesChars)
+		channelTypes.insert(chanType);
+}
+
+void Protocol::parse005MaxModes(const std::string& modeCount) {
+	std::istringstream modeStr (modeCount);
+	modeStr >> maxModes;
+	if (maxModes < 1)
+		maxModes = 1;
+}
+
+void Protocol::parse005MaxTargets(const std::string& targCount) {
+	std::istringstream targStr (targCount);
+	targStr >> maxTargets;
+	if (maxTargets < 1)
+		maxTargets = 1;
+}
+
 void Protocol::handleData() {
 	while (loaded) {
 		if (receivedData.empty()) {
@@ -887,7 +991,26 @@ void Protocol::handleData() {
 				}
 			}
 		} else if (command == "005") {
-			
+			for (unsigned int i = 1; i < msg->params().size() - 1; i++) {
+				const std::string currParam (msg->params()[i]);
+				const size_t equalsPos = currParam.find('=');
+				if (equalsPos == std::string::npos)
+					continue;
+				const std::string currType (currParam.substr(0, equalsPos));
+				const std::string supportParam (currParam.substr(equalsPos + 1));
+				if (currType == "PREFIX")
+					parse005Prefix(supportParam);
+				else if (currType == "CHANMODES")
+					parse005ChanModes(supportParam);
+				else if (currType == "USERMODES")
+					parse005UserModes(supportParam);
+				else if (currType == "CHANTYPES")
+					parse005ChanTypes(supportParam);
+				else if (currType == "MODES")
+					parse005MaxModes(supportParam);
+				else if (currType == "MAXTARGETS")
+					parse005MaxTargets(supportParam);
+			}
 		} else if (command == "329") {
 			
 		} else if (command == "333") {

@@ -109,6 +109,14 @@ class Protocol : public ClientProtocol {
 		void saveChanMode(const std::string& name, char letter, const std::string& override);
 		void saveUserMode(const std::string& name, char letter, const std::string& override);
 		
+		ModeType selectModeTypeFrom005ModePosition(unsigned int pos);
+		void parse005Prefix(const std::string& prefixDescriptor);
+		void parse005ChanModes(const std::string& channelModeDescriptor);
+		void parse005UserModes(const std::string& userModeDescriptor);
+		void parse005ChanTypes(const std::string& chanTypesChars);
+		void parse005MaxModes(const std::string& modeCount);
+		void parse005MaxTargets(const std::string& targCount);
+		
 		std::unordered_map<std::string, char> chanModeStrToChar;
 		std::unordered_map<char, std::string> chanModeCharToStr;
 		std::unordered_map<std::string, char> userModeStrToChar;
