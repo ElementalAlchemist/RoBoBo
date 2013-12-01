@@ -990,6 +990,7 @@ void Protocol::handleData() {
 					serverUserModeType.insert(std::pair<std::string, ModeType> (modeName, type));
 				}
 			}
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "004", msg->params(), msg->tags());
 		} else if (command == "005") {
 			for (unsigned int i = 1; i < msg->params().size() - 1; i++) {
 				const std::string currParam (msg->params()[i]);
@@ -1011,6 +1012,7 @@ void Protocol::handleData() {
 				else if (currType == "MAXTARGETS")
 					parse005MaxTargets(supportParam);
 			}
+			callHook(HOOK_CLIENT_NUMERIC, "005", msg->params(), msg->tags());
 		} else if (command == "324") {
 			
 		} else if (command == "329") {
