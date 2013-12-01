@@ -79,6 +79,10 @@ void Channel::revokeStatus(const std::string& user, const std::string& status) {
 	userIter->second.remove(status);
 }
 
+void Channel::clearUsers() {
+	chanUsers.clear();
+}
+
 std::string Channel::topic() const {
 	return chanTopic;
 }
@@ -163,4 +167,14 @@ void Channel::unsetMode(const std::string& mode, const std::string& param) {
 			chanListModes.erase(listModeIter);
 	} else
 		unsetMode(mode);
+}
+
+void Channel::clearModes() {
+	chanModes.clear();
+}
+
+void Channel::clearListMode(const std::string& mode) {
+	auto modeIter = chanListModes.find(mode);
+	if (modeIter != chanListModes.end())
+		chanListModes.erase(modeIter);
 }

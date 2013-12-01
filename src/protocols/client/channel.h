@@ -18,6 +18,7 @@ class Channel {
 		void removeUser(const std::string& user);
 		void grantStatus(const std::string& user, const std::string& status);
 		void revokeStatus(const std::string& user, const std::string& status);
+		void clearUsers();
 		std::string topic() const;
 		std::string topicSetter() const;
 		time_t topicTime() const;
@@ -32,6 +33,8 @@ class Channel {
 		void setMode(const std::string& mode, const std::string& param);
 		void unsetMode(const std::string& mode);
 		void unsetMode(const std::string& mode, const std::string& param);
+		void clearModes();
+		void clearListMode(const std::string& mode);
 	private:
 		const std::string chanName;
 		time_t chanTimestamp;
