@@ -1011,7 +1011,11 @@ void Protocol::handleData() {
 				else if (currType == "MAXTARGETS")
 					parse005MaxTargets(supportParam);
 			}
+		} else if (command == "324") {
+			
 		} else if (command == "329") {
+			
+		} else if (command == "332") {
 			
 		} else if (command == "333") {
 			
