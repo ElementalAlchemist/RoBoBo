@@ -1013,6 +1013,25 @@ void Protocol::handleData() {
 					parse005MaxTargets(supportParam);
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "005", msg->params(), msg->tags());
+		} else if (command == "221") {
+			clientIter->second->clearModes();
+			size_t currParam = 2;
+			std::vector<std::string> params = msg->params();
+			for (char mode : params[1]) {
+				if (mode == '+')
+					continue;
+				std::string longmode;
+				auto modeNameIter = userModeCharToStr.find(mode);
+				if (modeNameIter == userModeCharToStr.end())
+					longmode = std::string(mode);
+				else
+					longmode = modeNameIter->second;
+				auto modeTypeIter = serverUserModeType.find(longmode);
+				if (modeTypeIter == serverUserModeType.end() || modeTypeIter->second == MODE_NOPARAM)
+					clientIter->second->setMode(longmode);
+				else
+					clientIter->second->setMode(longmode, params[currParam++]);
+			}
 		} else if (command == "324") {
 			
 		} else if (command == "329") {
