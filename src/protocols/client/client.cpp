@@ -168,6 +168,16 @@ void Client::unsetMode(const std::string& mode, const std::string& param) {
 		unsetMode(mode);
 }
 
+void Client::clearModes() {
+	clientModes.clear();
+}
+
+void Client::clearListMode(const std::string& mode) {
+	audo modeIter = clientListModes.find(mode);
+	if (modeIter != clientListModes.end())
+		clientListModes.erase(modeIter);
+}
+
 void Client::sendLine(const IRCMessage* line) {
 	if (proto->floodThrottleInEffect()) {
 		std::unique_ptr<IRCMessage> msgCopy (new IRCMessage (*line));

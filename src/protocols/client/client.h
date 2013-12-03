@@ -28,6 +28,8 @@ class Client : public User {
 		void setMode(const std::string& mode, const std::string& param);
 		void unsetMode(const std::string& mode);
 		void unsetMode(const std::string& mode, const std::string& param);
+		void clearModes();
+		void clearListMode(const std::string& mode);
 		void sendLine(const IRCMessage* line);
 	private:
 		bool registered;
