@@ -1032,6 +1032,7 @@ void Protocol::handleData() {
 				else
 					clientIter->second->setMode(longmode, params[currParam++]);
 			}
+			callHook(HOOK_CLIENT_NUMERIC, "221", msg->params(), msg->tags());
 		} else if (command == "324") {
 			
 		} else if (command == "329") {
