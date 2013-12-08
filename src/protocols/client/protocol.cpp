@@ -1139,7 +1139,13 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "366", msg->params(), msg->tags());
 		} else if (command == "433") {
-			
+			if (!clientIter->second->isRegistered()) {
+				clientIter->second->nick(clientIter->second->nick() + "_");
+				IRCMessage response ("NICK");
+				response.setParams(std::vector<std::string> { clientIter->second->nick() });
+				clientIter->sendLine(&response);
+			}
+			callHook(HOOK_CLIENT_NUMERIC, "433", msg->params(), msg->tags());
 		} else if (command == "710") {
 			
 		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
