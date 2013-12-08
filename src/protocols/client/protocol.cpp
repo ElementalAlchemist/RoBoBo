@@ -1034,7 +1034,30 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "221", msg->params(), msg->tags());
 		} else if (command == "324") {
-			
+			auto chanIter = channels.find(msg->params()[1]);
+			if (chanIter != channels.end()) {
+				size_t currParam = 3;
+				chanIter->second->clearModes();
+				for (char modeChar : msg->params()[2]) {
+					if (modeChar == '+')
+						continue;
+					std::string modeName;
+					auto modeIter = chanModeCharToStr.find(modeChar);
+					if (modeIter == chanModeCharToStr.end())
+						modeName = std::string(modeChar);
+					else
+						modeName = modeIter->second;
+					ModeType modeType = MODE_NOPARAM;
+					auto modeTypeIter = chanModeType.find(modeName);
+					if (modeTypeIter != chanModeType.end())
+						modeType = modeTypeIter->second;
+					if (modeType == MODE_NOPARAM)
+						chanIter->second->setMode(modeName);
+					else
+						chanIter->second->setMode(modeName, msg->params()[currParam++]);
+				}
+			}
+			callHook(HOOK_CLIENT_NUMERIC, "324", msg->params(), msg->tags());
 		} else if (command == "329") {
 			
 		} else if (command == "332") {
