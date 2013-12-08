@@ -1012,7 +1012,7 @@ void Protocol::handleData() {
 				else if (currType == "MAXTARGETS")
 					parse005MaxTargets(supportParam);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "005", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "005", msg->params(), msg->tags());
 		} else if (command == "221") {
 			clientIter->second->clearModes();
 			size_t currParam = 2;
@@ -1032,7 +1032,7 @@ void Protocol::handleData() {
 				else
 					clientIter->second->setMode(longmode, params[currParam++]);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "221", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "221", msg->params(), msg->tags());
 		} else if (command == "324") {
 			auto chanIter = channels.find(msg->params()[1]);
 			if (chanIter != channels.end()) {
@@ -1057,7 +1057,7 @@ void Protocol::handleData() {
 						chanIter->second->setMode(modeName, msg->params()[currParam++]);
 				}
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "324", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "324", msg->params(), msg->tags());
 		} else if (command == "329") {
 			// :irc.desertbus.org 329 Alchy #desertbus 1379900411
 			auto chanIter = channels.find(msg->params()[1]);
@@ -1067,7 +1067,7 @@ void Protocol::handleData() {
 				timeStr >> chanTime;
 				chanIter->second->time(chanTime);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "329", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "329", msg->params(), msg->tags());
 		} else if (command == "332") {
 			auto chanIter = channels.find(msg->params()[1]);
 			if (chanIter != channels.end())
@@ -1082,7 +1082,7 @@ void Protocol::handleData() {
 				timeStr >> topicTime;
 				chanIter->second->topicTime(topicTime);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "333", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "333", msg->params(), msg->tags());
 		} else if (command == "352") {
 			auto nickIter = nickToID.find(msg->params()[5]);
 			if (nickIter != nickToID.end()) {
@@ -1097,7 +1097,7 @@ void Protocol::handleData() {
 				else
 					userIter->second->setUnaway();
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "352", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "352", msg->params(), msg->tags());
 		} else if (command == "353") {
 			auto chanIter = channels.find(msg->params()[2]);
 			if (chanIter != channels.end()) {
@@ -1130,14 +1130,14 @@ void Protocol::handleData() {
 				} else
 					chanIter->second->addAdditionalSyncingClient(clientID);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "353", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "353", msg->params(), msg->tags());
 		} else if (command == "366") {
 			auto chanIter = channels.find(msg->params()[1]);
 			if (chanIter != channels.end() && clientID == chanIter->second->userSyncingClient()) {
 				chanIter->second->setUsersSynced();
 				chanIter->second->removeAdditionalSyncingClient(clientID);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "366", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "366", msg->params(), msg->tags());
 		} else if (command == "433") {
 			if (!clientIter->second->isRegistered()) {
 				clientIter->second->nick(clientIter->second->nick() + "_");
@@ -1145,7 +1145,7 @@ void Protocol::handleData() {
 				response.setParams(std::vector<std::string> { clientIter->second->nick() });
 				clientIter->sendLine(&response);
 			}
-			callHook(HOOK_CLIENT_NUMERIC, "433", msg->params(), msg->tags());
+			callHook(HOOK_CLIENT_NUMERIC, clientID, "433", msg->params(), msg->tags());
 		} else if (command == "710") {
 			
 		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
