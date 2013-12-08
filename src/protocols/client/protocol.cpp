@@ -1171,9 +1171,9 @@ void Protocol::handleData() {
 			if (nickIter != nickToID.end())
 				nick = nickIter->second;
 			callHook(HOOK_CLIENT_KNOCK, clientID, msg->params()[1], nick, msg->params()[3], msg->tags());
-		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
-			
-		} else if (command == "PING") {
+		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9')
+			callHook(HOOK_CLIENT_NUMERIC, clientID, command, msg->params(), msg->tags());
+		else if (command == "PING") {
 			
 		} else if (command == "CAP") {
 			
