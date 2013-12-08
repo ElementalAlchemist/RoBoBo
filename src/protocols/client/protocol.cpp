@@ -1099,9 +1099,39 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "352", msg->params(), msg->tags());
 		} else if (command == "353") {
-			
+			auto chanIter = channels.find(msg->params()[2]);
+			if (chanIter != channels.end()) {
+				if (chanIter->second->usersSynced()) {
+					chanIter->second->clearUsers();
+					chanIter->second->usersSynced(false);
+				}
+				std::list<std::string> newUsers (convertDelimitedStringList(msg->params()[3], " "));
+				for (std::string& nick : newUsers) {
+					std::list<std::string> statuses;
+					auto prefixIter = chanPrefixSymbolToMode.find(nick[0]);
+					while (prefixIter != chanPrefixSymbolToMode.end()) {
+						statuses.push_back(prefixIter->second);
+						nick = nick.substr(1);
+						prefixIter = chanPrefixSymbolToMode.find(nick[0]);
+					}
+					std::string id;
+					auto nickIter = nickToID.find(nick);
+					if (nickIter == nickToID.end()) {
+						id = getNextID();
+						std::shared_ptr<User> newUser (new User (id, nick, "", ""));
+						users.insert(std::pair<std::string, std::shared_ptr<User>> (id, newUser));
+						nickToID.insert(std::pair<std::string, std::string> (nick, id));
+					} else
+						id = nickIter->second;
+					chanIter->second->addUser(id, statuses);
+				}
+			}
+			callHook(HOOK_CLIENT_NUMERIC, "353", msg->params(), msg->tags());
 		} else if (command == "366") {
-			
+			auto chanIter = channels.find(msg->params()[1]);
+			if (chanIter != channels.end())
+				chanIter->second->usersSynced(true);
+			callHook(HOOK_CLIENT_NUMERIC, "366", msg->params(), msg->tags());
 		} else if (command == "433") {
 			
 		} else if (command == "710") {
