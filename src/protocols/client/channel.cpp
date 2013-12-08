@@ -1,6 +1,6 @@
 #include "channel.h"
 
-Channel::Channel(std::string&& name, Protocol* mod) : chanName(std::forward<std::string> (name)), proto(mod) {}
+Channel::Channel(std::string&& name, Protocol* mod) : chanName(std::forward<std::string> (name)), proto(mod), chanTimestamp(0), chanUsersSynced(false), chanTopicTime(0) {}
 
 std::string Channel::name() const {
 	return chanName;
@@ -85,6 +85,14 @@ void Channel::revokeStatus(const std::string& user, const std::string& status) {
 
 void Channel::clearUsers() {
 	chanUsers.clear();
+}
+
+bool Channel::usersSynced() const {
+	return chanUsersSynced;
+}
+
+void Channel::usersSynced(bool synced) {
+	chanUsersSynced = synced;
 }
 
 std::string Channel::topic() const {

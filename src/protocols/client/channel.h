@@ -20,6 +20,8 @@ class Channel {
 		void grantStatus(const std::string& user, const std::string& status);
 		void revokeStatus(const std::string& user, const std::string& status);
 		void clearUsers();
+		bool usersSynced() const;
+		void usersSynced(bool synced);
 		std::string topic() const;
 		std::string topicSetter() const;
 		time_t topicTime() const;
@@ -40,6 +42,7 @@ class Channel {
 		const std::string chanName;
 		time_t chanTimestamp;
 		std::map<std::string, std::list<std::string>> chanUsers;
+		bool chanUsersSynced;
 		std::string chanTopic;
 		std::string chanTopicSetter;
 		time_t chanTopicTime;
