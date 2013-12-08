@@ -1069,9 +1069,20 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "329", msg->params(), msg->tags());
 		} else if (command == "332") {
-			
+			auto chanIter = channels.find(msg->params()[1]);
+			if (chanIter != channels.end())
+				chanIter->second->topic(msg->params()[2], "");
+			callHook(HOOK_CLIENT_NUMERIC, "332", msg->params(), msg->tags());
 		} else if (command == "333") {
-			
+			auto chanIter = channels.find(msg->params()[1]);
+			if (chanIter != channels.end()) {
+				chanIter->second->topic(chanIter->second->topic(), msg->params()[2]);
+				std::istringstream timeStr (msg->params()[3]);
+				time_t topicTime;
+				timeStr >> topicTime;
+				chanIter->second->topicTime(topicTime);
+			}
+			callHook(HOOK_CLIENT_NUMERIC, "333", msg->params(), msg->tags());
 		} else if (command == "352") {
 			
 		} else if (command == "353") {
