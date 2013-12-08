@@ -1105,7 +1105,8 @@ void Protocol::handleData() {
 					chanIter->second->clearUsers();
 					chanIter->second->setUserSyncingClient(clientID);
 				}
-				if (chanIter->second->userSyncingClient() == clientID) { // Don't break the list by adding multiples of a user with possibly conflicting statuses or whatever
+				if (chanIter->second->userSyncingClient() == clientID && !chanIter->second->isAdditionalSyncingClient(clientID)) {
+					// Do various checks to make sure the channel list doesn't get broken when various clients receive a channel list at overlapping times
 					std::list<std::string> newUsers (convertDelimitedStringList(msg->params()[3], " "));
 					for (std::string& nick : newUsers) {
 						std::list<std::string> statuses;
@@ -1126,13 +1127,16 @@ void Protocol::handleData() {
 							id = nickIter->second;
 						chanIter->second->addUser(id, statuses);
 					}
-				}
+				} else
+					chanIter->second->addAdditionalSyncingClient(clientID);
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "353", msg->params(), msg->tags());
 		} else if (command == "366") {
 			auto chanIter = channels.find(msg->params()[1]);
-			if (chanIter != channels.end() && clientID == chanIter->second->userSyncingClient())
+			if (chanIter != channels.end() && clientID == chanIter->second->userSyncingClient()) {
 				chanIter->second->setUsersSynced();
+				chanIter->second->removeAdditionalSyncingClient(clientID);
+			}
 			callHook(HOOK_CLIENT_NUMERIC, "366", msg->params(), msg->tags());
 		} else if (command == "433") {
 			

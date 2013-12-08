@@ -24,6 +24,9 @@ class Channel {
 		std::string userSyncingClient() const;
 		void setUserSyncingClient(const std::string& clientID);
 		void setUsersSynced();
+		bool isAdditionalSyncingClient(const std::string& clientID) const;
+		void addAdditionalSyncingClient(const std::string& clientID);
+		void removeAdditionalSyncingClient(const std::string& clientID);
 		std::string topic() const;
 		std::string topicSetter() const;
 		time_t topicTime() const;
@@ -45,6 +48,7 @@ class Channel {
 		time_t chanTimestamp;
 		std::map<std::string, std::list<std::string>> chanUsers;
 		std::string chanUsersSyncingClient;
+		std::set<std::string> additionalSyncingClients;
 		std::string chanTopic;
 		std::string chanTopicSetter;
 		time_t chanTopicTime;

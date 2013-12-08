@@ -103,6 +103,18 @@ void Channel::setUsersSynced() {
 	chanUsersSyncingClient.clear();
 }
 
+bool Channel::isAdditionalSyncingClient(const std::string& clientID) const {
+	return additionalSyncingClients.find(clientID) != additionalSyncingClients.end();
+}
+
+void Channel::addAdditionalSyncingClient(const std::string& clientID) {
+	additionalSyncingClients.insert(clientID);
+}
+
+void Channel::removeAdditionalSyncingClient(const std::string& clientID) {
+	additionalSyncingClients.erase(clientID);
+}
+
 std::string Channel::topic() const {
 	return chanTopic;
 }
