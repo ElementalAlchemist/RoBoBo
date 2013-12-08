@@ -1077,6 +1077,8 @@ void Protocol::handleData() {
 			
 		} else if (command == "AWAY") {
 			
+		} else if (command == "CHGHOST") {
+			
 		} else {
 			
 		}
