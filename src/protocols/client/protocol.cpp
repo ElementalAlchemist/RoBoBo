@@ -101,7 +101,7 @@ void Protocol::sendMsg(const std::string& client, const std::string& target, con
 		return;
 	if (target.empty())
 		return; // Clearly we can't send this message anywhere.
-	std::list<std::string> targets = convertCommaSeparatedList(target);
+	std::list<std::string> targets = convertDelimitedStringList(target, ",");
 	std::list<std::string> targetLists;
 	while (!targets.empty()) {
 		std::list<std::string> targetSubset;
@@ -135,7 +135,7 @@ void Protocol::sendNotice(const std::string& client, const std::string& target, 
 		return;
 	if (target.empty())
 		return;
-	std::list<std::string> targets = convertCommaSeparatedList(target);
+	std::list<std::string> targets = convertDelimitedStringList(target, ",");
 	std::list<std::string> targetLists;
 	while (!targets.empty()) {
 		std::list<std::string> targetSubset;
@@ -667,15 +667,15 @@ std::string Protocol::getNextID() {
 	return currID.str();
 }
 
-std::list<std::string> Protocol::convertCommaSeparatedList(std::string str) {
+std::list<std::string> Protocol::convertDelimitedStringList(std::string str, const std::string& separator) {
 	std::list<std::string> list;
 	while (!str.empty()) {
-		size_t commaPos = str.find(',');
-		list.push_back(str.substr(0, commaPos));
-		if (commaPos == std::string::npos)
+		size_t sepPos = str.find(separator);
+		list.push_back(str.substr(0, sepPos));
+		if (sepPos == std::string::npos)
 			str.clear();
 		else
-			str = str.substr(commaPos + 1);
+			str = str.substr(sepPos + 1);
 	}
 	return list;
 }

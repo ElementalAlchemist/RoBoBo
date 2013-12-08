@@ -96,7 +96,7 @@ class Protocol : public ClientProtocol {
 		std::unordered_map<std::string, std::shared_ptr<Client>> clients;
 		std::unordered_map<std::string, std::string> nickToID;
 		
-		std::list<std::string> convertCommaSeparatedList(std::string str);
+		std::list<std::string> convertDelimitedStringList(std::string str, const std::string& separator);
 		std::string convertListToCommaSeparatedString(const std::list<std::string>& list);
 		
 		std::set<std::string> capabilities;
