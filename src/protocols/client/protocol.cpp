@@ -1084,7 +1084,20 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "333", msg->params(), msg->tags());
 		} else if (command == "352") {
-			
+			auto nickIter = nickToID.find(msg->params()[5]);
+			if (nickIter != nickToID.end()) {
+				auto userIter = users.find(nickIter->second);
+				userIter->ident(msg->params()[2]);
+				userIter->host(msg->params()[3]);
+				std::string gecos (msg->params()[7]);
+				size_t spacePos = gecos.find(' ');
+				userIter->gecos(gecos.substr(spacePos + 1));
+				if (msg->params()[6][0] == 'G')
+					userIter->second->setAway("Away");
+				else
+					userIter->second->setUnaway();
+			}
+			callHook(HOOK_CLIENT_NUMERIC, "352", msg->params(), msg->tags());
 		} else if (command == "353") {
 			
 		} else if (command == "366") {
