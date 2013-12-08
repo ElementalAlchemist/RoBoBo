@@ -88,11 +88,19 @@ void Channel::clearUsers() {
 }
 
 bool Channel::usersSynced() const {
-	return chanUsersSynced;
+	return chanUsersSyncingClient.empty();
 }
 
-void Channel::usersSynced(bool synced) {
-	chanUsersSynced = synced;
+std::string Channel::userSyncingClient() const {
+	return chanUsersSyncingClient;
+}
+
+void Channel::setUserSyncingClient(const std::string& clientID) {
+	chanUsersSyncingClient = clientID;
+}
+
+void Channel::setUsersSynced() {
+	chanUsersSyncingClient.clear();
 }
 
 std::string Channel::topic() const {
