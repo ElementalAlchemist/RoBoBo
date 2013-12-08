@@ -667,6 +667,24 @@ std::string Protocol::getNextID() {
 	return currID.str();
 }
 
+std::tuple<std::string, std::string, std::string> Protocol::splitHostmask(const std::string& hostmask) {
+	if (hostmask.find('!') == std::string::npos && hostmask.find('@') == std::string::npos)
+		return std::make_tuple(hostmask, "", "");
+	std::string nick, ident, host;
+	std::string hostmaskPart (hostmask);
+	size_t identPos = hostmaskPart.find('!');
+	if (identPos != std::string::npos) {
+		nick = hostmaskPart.substr(0, identPos);
+		hostmaskPart = hostmaskPart.substr(identPos + 1);
+	}
+	size_t hostPos = hostmaskPart.find('@');
+	if (hostPos != std::string::npos) {
+		ident = hostmaskPart.substr(0, hostPos);
+		host = hostmaskPart.substr(hostPos + 1);
+	}
+	return std::make_tuple(nick, ident, host);
+}
+
 std::list<std::string> Protocol::convertDelimitedStringList(std::string str, const std::string& separator) {
 	std::list<std::string> list;
 	while (!str.empty()) {
@@ -1147,7 +1165,12 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, clientID, "433", msg->params(), msg->tags());
 		} else if (command == "710") {
-			
+			std::string nick;
+			std::tie(nick, std::ignore, std::ignore) = splitHostmask(msg->params()[2]);
+			auto nickIter = nickToID.find(nick);
+			if (nickIter != nickToID.end())
+				nick = nickIter->second;
+			callHook(HOOK_CLIENT_KNOCK, clientID, msg->params()[1], nick, msg->params()[3], msg->tags());
 		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9') {
 			
 		} else if (command == "PING") {

@@ -96,6 +96,8 @@ class Protocol : public ClientProtocol {
 		std::unordered_map<std::string, std::shared_ptr<Client>> clients;
 		std::unordered_map<std::string, std::string> nickToID;
 		
+		std::tuple<std::string, std::string, std::string> splitHostmask(const std::string& hostmask);
+		
 		std::list<std::string> convertDelimitedStringList(std::string str, const std::string& separator);
 		std::string convertListToCommaSeparatedString(const std::list<std::string>& list);
 		
