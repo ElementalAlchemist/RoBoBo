@@ -10,6 +10,10 @@ time_t Channel::time() const {
 	return chanTimestamp;
 }
 
+void Channel::time(time_t time) {
+	chanTimestamp = time;
+}
+
 std::list<std::string> Channel::users() const {
 	std::list<std::string> userList;
 	for (auto user : chanUsers)

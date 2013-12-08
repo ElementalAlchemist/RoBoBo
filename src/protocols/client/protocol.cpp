@@ -1059,7 +1059,15 @@ void Protocol::handleData() {
 			}
 			callHook(HOOK_CLIENT_NUMERIC, "324", msg->params(), msg->tags());
 		} else if (command == "329") {
-			
+			// :irc.desertbus.org 329 Alchy #desertbus 1379900411
+			auto chanIter = channels.find(msg->params()[1]);
+			if (chanIter != channels.end()) {
+				std::istringstream timeStr (msg->params()[2]);
+				time_t chanTime;
+				timeStr >> chanTime;
+				chanIter->second->time(chanTime);
+			}
+			callHook(HOOK_CLIENT_NUMERIC, "329", msg->params(), msg->tags());
 		} else if (command == "332") {
 			
 		} else if (command == "333") {

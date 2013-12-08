@@ -8,6 +8,7 @@ class Channel {
 		Channel(std::string&& name, Protocol* mod);
 		std::string name() const;
 		time_t time() const;
+		void time(time_t time);
 		std::list<std::string> users() const;
 		bool userInChan(const std::string& user) const;
 		std::list<std::string> statuses(const std::string& user) const;
