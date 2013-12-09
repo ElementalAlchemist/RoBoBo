@@ -1174,7 +1174,10 @@ void Protocol::handleData() {
 		} else if (command.size() == 3 && command[0] >= '0' && command[0] <= '9' && command[1] >= '0' && command[1] <= '9' && command[2] >= '0' && command[2] <= '9')
 			callHook(HOOK_CLIENT_NUMERIC, clientID, command, msg->params(), msg->tags());
 		else if (command == "PING") {
-			
+			IRCMessage response ("PONG");
+			response.setParams(std::vector<std::string> { msg->params()[0] });
+			clientIter->second->sendLine(&response);
+			callHook(HOOK_CLIENT_PING, clientID, msg->params()[0], msg->tags());
 		} else if (command == "CAP") {
 			
 		} else if (command == "PRIVMSG") {
