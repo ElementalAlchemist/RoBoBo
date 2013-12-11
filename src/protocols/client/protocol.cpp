@@ -1179,7 +1179,51 @@ void Protocol::handleData() {
 			clientIter->second->sendLine(&response);
 			callHook(HOOK_CLIENT_PING, clientID, msg->params()[0], msg->tags());
 		} else if (command == "CAP") {
-			
+			std::string subcmd (msg->params()[1]);
+			if (subcmd == "LS") {
+				std::list<std::string> capList = convertDelimitedStringList(msg->params()[2], " ");
+				std::list<std::string> requestCaps;
+				for (std::string capability : capList) {
+					if (capability == "multi-prefix" || capability == "intents" || capability == "server-time" || capability == "account-notify" || capability == "away-notify" || capability == "extended-join" || capability == "metadata-notify")
+						requestCaps.push_back(capability);
+				}
+				if (!requestCaps.empty()) {
+					IRCMessage response ("CAP");
+					response.setParams(std::vector<std::string> { "REQ", convertListToDelimitedString(requestCaps, " ") });
+					clientIter->second->sendLine(&response);
+				} else if (!clientIter->isRegistered()) {
+					IRCMessage response ("CAP");
+					response.setParams(std::vector<std::string> { "END" });
+					clientIter->second->sendLine(&response);
+				}
+				callHook(HOOK_CLIENT_CAP, clientID, "LS", capList, msg->tags());
+			} else if (subcmd == "ACK") {
+				std::list<std::string> acknowledgedCaps = convertDelimitedStringList(msg->params()[2], " ");
+				for (std::string capability : acknowledgedCaps) {
+					if (capability[0] == '-') {
+						capability.erase(0, 1);
+						capabilities.erase(capability);
+					} else
+						capabilities.insert(capability);
+				}
+				if (!clientIter->second->isRegistered()) {
+					IRCMessage response ("CAP");
+					response.setParams(std::vector<std::string> { "END" });
+					clientIter->second->sendLine(&response);
+				}
+				callHook(HOOK_CLIENT_CAP, clientID, "ACK", acknowledgedCaps, msg->tags());
+			} else if (subcmd == "NAK") {
+				std::list<std::string> unacknowledgedCaps = convertDelimitedStringList(msg->params()[2], " ");
+				for (std::string capability : unacknowledgedCaps)
+					capabilities.erase(capability); // The server no longer supports this (if it supported it at all).
+				if (!clientIter->second->isRegistered()) {
+					IRCMessage response ("CAP");
+					response.setParams(std::vector<std::string> { "END" });
+					clientIter->second->sendLine(&response);
+				}
+				callHook(HOOK_CLIENT_CAP, clientID, "NAK", unacknowledgedCaps, msg->tags());
+			} else
+				callHook(HOOK_CLIENT_CAP, clientID, subcmd, convertDelimitedStringList(msg->params()[2]), msg->tags());
 		} else if (command == "PRIVMSG") {
 			
 		} else if (command == "NOTICE") {
