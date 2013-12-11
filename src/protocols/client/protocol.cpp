@@ -113,13 +113,13 @@ void Protocol::sendMsg(const std::string& client, const std::string& target, con
 	}
 	IRCMessage msg ("PRIVMSG");
 	msg.setParams(std::vector<std::string> (2));
-	auto tagIter = tags.find("intents");
+	auto tagIter = tags.find("intent");
 	if (tagIter == tags.end() || capabilities.find("intents") != capabilities.end()) {
 		msg.setParam(1, message);
 		msg.setTags(tags);
 	} else {
 		std::map<std::string, std::string> newTags (tags);
-		newTags.erase("intents");
+		newTags.erase("intent");
 		msg.setTags(newTags);
 		msg.setParam(1, "\x01" + tagIter->second + " " + message + "\x01");
 	}
@@ -147,13 +147,13 @@ void Protocol::sendNotice(const std::string& client, const std::string& target, 
 	}
 	IRCMessage msg ("NOTICE");
 	msg.setParams(std::vector<std::string> (2));
-	auto tagIter = tags.find("intents");
+	auto tagIter = tags.find("intent");
 	if (tagIter == tags.end() || capabilities.find("intents") != capabilities.end()) {
 		msg.setParam(1, message);
 		msg.setTags(tags);
 	} else {
 		std::map<std::string, std::string> newTags (tags);
-		newTags.erase("intents");
+		newTags.erase("intent");
 		msg.setTags(newTags);
 		msg.setParam(1, "\x01" + tagIter->second + " " + message + "\x01");
 	}
