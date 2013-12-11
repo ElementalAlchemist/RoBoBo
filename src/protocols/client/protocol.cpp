@@ -109,7 +109,7 @@ void Protocol::sendMsg(const std::string& client, const std::string& target, con
 			targetSubset.push_back(targets.front());
 			targets.erase(targets.begin());
 		}
-		targetLists.push_back(convertListToCommaSeparatedString(targetSubset));
+		targetLists.push_back(convertListToDelimitedString(targetSubset, ","));
 	}
 	IRCMessage msg ("PRIVMSG");
 	msg.setParams(std::vector<std::string> (2));
@@ -143,7 +143,7 @@ void Protocol::sendNotice(const std::string& client, const std::string& target, 
 			targetSubset.push_back(targets.front());
 			targets.erase(targets.begin());
 		}
-		targetLists.push_back(convertListToCommaSeparatedString(targetSubset));
+		targetLists.push_back(convertListToDelimitedString(targetSubset, ","));
 	}
 	IRCMessage msg ("NOTICE");
 	msg.setParams(std::vector<std::string> (2));
@@ -698,14 +698,14 @@ std::list<std::string> Protocol::convertDelimitedStringList(std::string str, con
 	return list;
 }
 
-std::string Protocol::convertListToCommaSeparatedString(const std::list<std::string>& list) {
+std::string Protocol::convertListToDelimitedString(const std::list<std::string>& list, const std::string& delimiter) {
 	std::string str;
 	for (std::string oneTarget : list) {
 		auto userIter = users.find(oneTarget);
 		if (userIter != users.end())
-			str += "," + userIter->second.nick();
+			str += delimiter + userIter->second.nick();
 		else
-			str += "," + oneTarget;
+			str += delimiter + oneTarget;
 	}
 	return str.substr(1);
 }

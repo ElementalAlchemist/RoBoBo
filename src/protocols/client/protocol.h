@@ -99,7 +99,7 @@ class Protocol : public ClientProtocol {
 		std::tuple<std::string, std::string, std::string> splitHostmask(const std::string& hostmask);
 		
 		std::list<std::string> convertDelimitedStringList(std::string str, const std::string& separator);
-		std::string convertListToCommaSeparatedString(const std::list<std::string>& list);
+		std::string convertListToDelimitedString(const std::list<std::string>& list, const std::string& delimiter);
 		
 		std::set<std::string> capabilities;
 		std::set<char> channelTypes;
