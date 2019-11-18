@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 use std::fs;
 use std::io;
 use std::io::prelude::*;
@@ -40,10 +41,14 @@ pub struct ConfigParseError {
 	message: String,
 }
 
-struct ConfigFileResult {
-	modules: HashMap<String, HashMap<String, String>>,
-	connections: HashMap<String, HashMap<String, String>>,
-	declared_values: HashMap<String, String>,
+impl fmt::Display for ConfigParseError {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(
+			f,
+			"An error occurred parsing configuration file {} on line {}: {}",
+			self.file_name, self.line_number, self.message
+		)
+	}
 }
 
 pub fn read_config(file_name: &str) -> Result<Config, ConfigError> {
@@ -52,11 +57,7 @@ pub fn read_config(file_name: &str) -> Result<Config, ConfigError> {
 		file_name = "robobo.conf";
 	}
 
-	let config_data = read_config_file(&file_name)?;
-	Ok(Config {
-		modules: config_data.modules,
-		connections: config_data.connections,
-	})
+	Ok(read_config_file(&file_name, &mut HashMap::new())?)
 }
 
 enum ParseToken {
@@ -71,7 +72,7 @@ enum ParseExpectOperation {
 	ValueOperator,
 }
 
-fn read_config_file(file_name: &str) -> Result<ConfigFileResult, ConfigError> {
+fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, String>) -> Result<Config, ConfigError> {
 	let file = match fs::File::open(&file_name) {
 		Ok(f) => f,
 		Err(e) => return Err(ConfigError::FileError(e)),
@@ -104,6 +105,9 @@ fn read_config_file(file_name: &str) -> Result<ConfigFileResult, ConfigError> {
 	let mut module_blocks = Vec::new();
 	let mut connection_blocks = Vec::new();
 
+	let mut modules: HashMap<String, HashMap<String, String>> = HashMap::new();
+	let mut connections: HashMap<String, HashMap<String, String>> = HashMap::new();
+
 	for (block, line) in blocks {
 		if block.starts_with("declare ") || block.starts_with("declare\n") {
 			declare_blocks.push((String::from(block[8..].trim()), line));
@@ -122,15 +126,24 @@ fn read_config_file(file_name: &str) -> Result<ConfigFileResult, ConfigError> {
 		}
 	}
 
-	let mut declared_variables: HashMap<String, String> = HashMap::new();
 	for (block, line) in declare_blocks {
-		match parse_declare_instruction(&block, &declared_variables, &file_name, line) {
+		match parse_declare_instruction(&block, declared_variables, file_name, line) {
 			Ok(mut result) => {
 				for (var, value) in result.drain() {
 					declared_variables.insert(var, value);
 				}
 			}
 			Err(e) => return Err(ConfigError::ParseError(e)),
+		}
+	}
+
+	for (block, line) in include_blocks {
+		let mut result = parse_include_instruction(&block, declared_variables, file_name, line)?;
+		for (module, data) in result.modules.drain() {
+			modules.insert(module, data);
+		}
+		for (connection, data) in result.connections.drain() {
+			connections.insert(connection, data);
 		}
 	}
 
@@ -155,7 +168,7 @@ fn parse_declare_instruction(
 		});
 	}
 
-	let declare_block = declare_block[1..declare_block.len() - 1].trim();
+	let declare_block = &declare_block[1..declare_block.len() - 1];
 	let mut buffer = String::new();
 	let mut current_variable = String::new();
 	let mut concat_value: Vec<ParseToken> = Vec::new();
@@ -336,6 +349,42 @@ fn parse_declare_instruction(
 	}
 
 	Ok(new_variable_values)
+}
+
+fn parse_include_instruction(
+	include_file: &str,
+	variables: &mut HashMap<String, String>,
+	file_name: &str,
+	line_number: u32,
+) -> Result<Config, ConfigError> {
+	if !include_file.starts_with("\"") || !include_file.ends_with("\"") {
+		return Err(ConfigError::ParseError(ConfigParseError {
+			file_name: String::from(file_name),
+			line_number,
+			message: String::from("Include must be a literal string file path"),
+		}));
+	}
+
+	let include_file = &include_file[1..include_file.len() - 1];
+	let mut path = String::new();
+	let mut escaped = false;
+	for current_char in include_file.chars() {
+		if current_char == '"' && !escaped {
+			return Err(ConfigError::ParseError(ConfigParseError {
+				file_name: String::from(file_name),
+				line_number,
+				message: String::from("Include must be a single literal string file path"),
+			}));
+		}
+		if !escaped && current_char == '\\' {
+			escaped = true;
+			continue;
+		}
+		escaped = false;
+		path.push(current_char);
+	}
+
+	return read_config_file(&path, variables);
 }
 
 #[cfg(test)]
