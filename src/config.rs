@@ -147,6 +147,22 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 		}
 	}
 
+	for (block, line) in module_blocks {
+		match parse_module_instruction(&block, declared_variables, file_name, line_number) {
+			Ok((name, data)) => {
+				if modules.contains_key(&name) {
+					return Err(ConfigError::ParseError(ConfigParseError {
+						file_name: String::from(file_name),
+						line_number,
+						message: format!("Redeclared module {}", name),
+					}));
+				}
+				modules.insert(name, data);
+			}
+			Err(e) => return Err(ConfigError::ParseError(e)),
+		}
+	}
+
 	Err(ConfigError::ParseError(ConfigParseError {
 		file_name: String::from(file_name),
 		line_number: 0,
@@ -187,7 +203,7 @@ fn parse_declare_instruction(
 						message: String::from("Unexpected end of variable declaration"),
 					});
 				}
-				if current_char == ' ' || current_char == '\n' {
+				if current_char.is_whitespace() {
 					if !buffer.is_empty() {
 						current_variable = buffer.drain(..).collect();
 						expecting = ParseExpectOperation::AssignOperator;
@@ -197,7 +213,7 @@ fn parse_declare_instruction(
 				}
 			}
 			ParseExpectOperation::AssignOperator => {
-				if current_char == ' ' || current_char == '\n' {
+				if current_char.is_whitespace() {
 					continue;
 				}
 				if current_char == '=' {
@@ -385,6 +401,31 @@ fn parse_include_instruction(
 	}
 
 	return read_config_file(&path, variables);
+}
+
+fn parse_module_instruction(
+	module_block_data: &str,
+	variables: &HashMap<String, String>,
+	file_name: &str,
+	line_number: u32,
+) -> Result<(String, HashMap<String, String>), ConfigParseError> {
+	let module_name_end = module_block_data.find(|c: char| c.is_whitespace());
+	let module_name = match module_name_end {
+		Some(end) => &module_block_data[0..end],
+		None => {
+			return Err(ConfigParseError {
+				file_name: String::from(file_name),
+				line_number,
+				message: String::from("Module declaration must start with the module name"),
+			})
+		}
+	};
+
+	let module_block_data = &module_block_data[module_name_end.unwrap() + 1..module_block_data.len()];
+	Ok((
+		module_name.to_string(),
+		parse_declare_instruction(module_block_data, variables, file_name, line_number)?,
+	))
 }
 
 #[cfg(test)]
