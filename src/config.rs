@@ -6,10 +6,18 @@ use std::io::prelude::*;
 
 pub struct Config {
 	modules: HashMap<String, HashMap<String, String>>,
-	connections: HashMap<String, HashMap<String, String>>,
+	connections: HashMap<String, ConnectionData>,
 }
 
-impl Config {}
+impl Config {
+	pub fn get_module_data(&self) -> &HashMap<String, HashMap<String, String>> {
+		&self.modules
+	}
+
+	pub fn get_connection_data(&self) -> &HashMap<String, ConnectionData> {
+		&self.connections
+	}
+}
 /*
 Config blocks:
 
@@ -24,11 +32,26 @@ module ExtraFunctionality {
 	usewith = "your mother";
 }
 
-connection SomeNetwork {
+connection SomeNetwork client {
 	server = "127.0.0.1";
 	port = "6667";
 }
 */
+
+pub struct ConnectionData {
+	connection_type: String,
+	connection_data: HashMap<String, String>,
+}
+
+impl ConnectionData {
+	pub fn get_type(&self) -> &String {
+		&self.connection_type
+	}
+
+	pub fn get_data(&self) -> &HashMap<String, String> {
+		&self.connection_data
+	}
+}
 
 pub enum ConfigError {
 	FileError(io::Error),
@@ -106,7 +129,7 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 	let mut connection_blocks = Vec::new();
 
 	let mut modules: HashMap<String, HashMap<String, String>> = HashMap::new();
-	let mut connections: HashMap<String, HashMap<String, String>> = HashMap::new();
+	let mut connections: HashMap<String, ConnectionData> = HashMap::new();
 
 	for (block, line) in blocks {
 		if block.starts_with("declare ") || block.starts_with("declare\n") {
@@ -148,12 +171,12 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 	}
 
 	for (block, line) in module_blocks {
-		match parse_module_instruction(&block, declared_variables, file_name, line_number) {
+		match parse_module_instruction(&block, declared_variables, file_name, line) {
 			Ok((name, data)) => {
 				if modules.contains_key(&name) {
 					return Err(ConfigError::ParseError(ConfigParseError {
 						file_name: String::from(file_name),
-						line_number,
+						line_number: line,
 						message: format!("Redeclared module {}", name),
 					}));
 				}
@@ -163,11 +186,23 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 		}
 	}
 
-	Err(ConfigError::ParseError(ConfigParseError {
-		file_name: String::from(file_name),
-		line_number: 0,
-		message: String::from("Incomplete parser implementation"),
-	}))
+	for (block, line) in connection_blocks {
+		match parse_connection_instruction(&block, declared_variables, file_name, line) {
+			Ok((name, data)) => {
+				if connections.contains_key(&name) {
+					return Err(ConfigError::ParseError(ConfigParseError {
+						file_name: String::from(file_name),
+						line_number: line,
+						message: format!("Redeclared connection {}", name),
+					}));
+				}
+				connections.insert(name, data);
+			}
+			Err(e) => return Err(ConfigError::ParseError(e)),
+		}
+	}
+
+	Ok(Config { modules, connections })
 }
 
 fn parse_declare_instruction(
@@ -409,6 +444,7 @@ fn parse_module_instruction(
 	file_name: &str,
 	line_number: u32,
 ) -> Result<(String, HashMap<String, String>), ConfigParseError> {
+	let module_block_data = module_block_data.trim();
 	let module_name_end = module_block_data.find(|c: char| c.is_whitespace());
 	let module_name = match module_name_end {
 		Some(end) => &module_block_data[0..end],
@@ -421,10 +457,54 @@ fn parse_module_instruction(
 		}
 	};
 
-	let module_block_data = &module_block_data[module_name_end.unwrap() + 1..module_block_data.len()];
+	let module_block_data = &module_block_data[module_name_end.unwrap() + 1..module_block_data.len()].trim();
 	Ok((
 		module_name.to_string(),
 		parse_declare_instruction(module_block_data, variables, file_name, line_number)?,
+	))
+}
+
+fn parse_connection_instruction(
+	connection_block_data: &str,
+	variables: &HashMap<String, String>,
+	file_name: &str,
+	line_number: u32,
+) -> Result<(String, ConnectionData), ConfigParseError> {
+	let connection_block_data = connection_block_data.trim();
+	let network_name_end = connection_block_data.find(|c: char| c.is_whitespace());
+	let network_name = match network_name_end {
+		Some(end) => &connection_block_data[0..end],
+		None => {
+			return Err(ConfigParseError {
+				file_name: String::from(file_name),
+				line_number,
+				message: String::from("Connection declaration must start with the network name"),
+			})
+		}
+	};
+
+	let connection_block_data =
+		&connection_block_data[network_name_end.unwrap() + 1..connection_block_data.len()].trim();
+	let connection_type_end = connection_block_data.find(|c: char| c.is_whitespace());
+	let connection_type = match connection_type_end {
+		Some(end) => &connection_block_data[0..end],
+		None => {
+			return Err(ConfigParseError {
+				file_name: String::from(file_name),
+				line_number,
+				message: String::from("The network name must be followed by the connection type"),
+			})
+		}
+	};
+
+	let connection_block_data =
+		connection_block_data[connection_type_end.unwrap() + 1..connection_block_data.len()].trim();
+	Ok((
+		network_name.to_string(),
+		ConnectionData {
+			connection_type: connection_type.to_string(),
+			connection_data: parse_declare_instruction(connection_block_data, variables, file_name, line_number)?,
+		},
 	))
 }
 
