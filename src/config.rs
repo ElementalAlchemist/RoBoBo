@@ -114,12 +114,11 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 			// \n
 			line_number += 1;
 		}
-		if current_byte == 59 {
-			// ;
+		buffer.push(current_byte);
+		if current_byte == 125 {
+			// }
 			blocks.push((String::from_utf8_lossy(&buffer).to_string(), line_number));
 			buffer.clear();
-		} else {
-			buffer.push(current_byte);
 		}
 	}
 
