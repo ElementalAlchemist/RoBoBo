@@ -305,7 +305,7 @@ fn parse_declare_instruction(
 					}
 					new_variables.insert(current_variable.drain(..).collect(), concat_value.drain(..).collect());
 					expecting = ParseExpectOperation::Variable;
-				} else if !in_string_literal && (current_char == ' ' || current_char == '\n') {
+				} else if !in_string_literal && current_char.is_whitespace() {
 					continue;
 				} else {
 					buffer.push(current_char);
