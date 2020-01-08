@@ -511,5 +511,20 @@ fn parse_connection_instruction(
 mod tests {
 	use super::*;
 
-	// TODO write tests
+	#[test]
+	fn declare_block_parses_variables() -> Result<(), String> {
+		// The leading "declare" keyword should be stripped out first
+		let declare_block = "{
+			test = \"1\";
+			5=\"five\";
+			need_to_test = \"true\";
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
+
+		match result {
+			Ok(_) => Ok(()),
+			Err(e) => Err(format!("Failed to parse declare block: {}", e.message))
+		}
+	}
 }
