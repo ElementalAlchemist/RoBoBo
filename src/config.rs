@@ -242,6 +242,14 @@ fn parse_declare_instruction(
 						current_variable = buffer.drain(..).collect();
 						expecting = ParseExpectOperation::AssignOperator;
 					}
+				} else if current_char == '=' {
+					if buffer.is_empty() {
+						return Err(ConfigParseError {
+							file_name: String::from(file_name), line_number, message: String::from("Expected variable name, not =")
+						});
+					}
+					current_variable = buffer.drain(..).collect();
+					expecting = ParseExpectOperation::Expression;
 				} else {
 					buffer.push(current_char);
 				}
