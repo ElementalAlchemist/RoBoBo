@@ -99,6 +99,12 @@ pub fn parse_config_value_as_bool(value: &str) -> Option<bool> {
 	if lower_value == "false" {
 		return Some(false);
 	}
+	if lower_value == "yes" {
+		return Some(true);
+	}
+	if lower_value == "no" {
+		return Some(false);
+	}
 	None
 }
 
