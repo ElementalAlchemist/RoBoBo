@@ -4,16 +4,22 @@ use std::fs;
 use std::io;
 use std::io::prelude::*;
 
+/// Represents configuration data. The functionality that can be configured falls into two categories,
+/// each represented by a callable function returning data.
 pub struct Config {
 	modules: HashMap<String, HashMap<String, String>>,
 	connections: HashMap<String, ConnectionData>,
 }
 
 impl Config {
+	/// Returns a HashMap of all module configuration. For each module, a key-value pair of
+	/// configuration values is provided.
 	pub fn get_module_data(&self) -> &HashMap<String, HashMap<String, String>> {
 		&self.modules
 	}
 
+	/// Returns a HashMap of all connections the bot can make. For each named connection, a
+	/// connection type and a key-value pair of configuration values are provided.
 	pub fn get_connection_data(&self) -> &HashMap<String, ConnectionData> {
 		&self.connections
 	}
@@ -40,21 +46,25 @@ connection SomeNetwork client {
 }
 */
 
+/// Represents the connection data for a single connection that is configured in the bot.
 pub struct ConnectionData {
 	connection_type: String,
 	connection_data: HashMap<String, String>,
 }
 
 impl ConnectionData {
+	/// Returns the type name of the connection to make
 	pub fn get_type(&self) -> &String {
 		&self.connection_type
 	}
 
+	/// Returns the key-value pair configuration data for a connection
 	pub fn get_data(&self) -> &HashMap<String, String> {
 		&self.connection_data
 	}
 }
 
+/// Represents a file I/O error or parse error that occurred reading configuration data
 pub enum ConfigError {
 	FileError(io::Error),
 	ParseError(ConfigParseError),
@@ -76,6 +86,14 @@ impl fmt::Display for ConfigParseError {
 	}
 }
 
+/// Reads and parses the bot configuration.
+/// Pass the file name of the primary configuration file. This function
+/// will read all blocks and follow all includes to read the entire configuration
+/// file.
+/// 
+/// On success. returns all parsed configuration data.
+/// On failure, returns a configuration error representing an I/O error or a
+/// parsing failure.
 pub fn read_config(file_name: &str) -> Result<Config, ConfigError> {
 	let mut file_name = file_name;
 	if file_name == "" {
@@ -85,6 +103,9 @@ pub fn read_config(file_name: &str) -> Result<Config, ConfigError> {
 	Ok(read_config_file(&file_name, &mut HashMap::new())?)
 }
 
+/// Given a string value, attempts to parse it as a boolean. If the string
+/// value can be parsed as a boolean value, returns the bool representation;
+/// otherwise, returns None.
 pub fn parse_config_value_as_bool(value: &str) -> Option<bool> {
 	if value == "1" {
 		return Some(true);
