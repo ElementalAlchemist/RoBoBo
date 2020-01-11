@@ -521,17 +521,38 @@ mod tests {
 
 	#[test]
 	fn declare_block_parses_variables() -> Result<(), String> {
-		// The leading "declare" keyword should be stripped out first
+		// The leading "declare" keyword should be stripped out first by calling code
 		let declare_block = "{
 			test = \"1\";
 			5=\"five\";
 			need_to_test = \"true\";
+			fifty_one = \"5\" + test;
 		}";
 		let predeclared_variables: HashMap<String, String> = HashMap::new();
 		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
 
 		match result {
-			Ok(_) => Ok(()),
+			Ok(vars) => {
+				let mut bad_vars_msgs: Vec<String> = Vec::new();
+				if vars["test"] != "1" {
+					bad_vars_msgs.push(format!("Variable `test` has wrong value \"{}\" (expected \"1\")", vars["test"]));
+				}
+				if vars["5"] != "five" {
+					bad_vars_msgs.push(format!("Variable `5` has wrong value \"{}\" (expected \"five\")", vars["5"]));
+				}
+				if vars["need_to_test"] != "true" {
+					bad_vars_msgs.push(format!("Variable `need_to_test` has wrong value \"{}\" (expected \"true\")", vars["need_to_test"]));
+				}
+				if vars["fifty_one"] != "51" {
+					bad_vars_msgs.push(format!("Variable `fifty_one` has wrong value \"{}\" (expected \"51\")", vars["fifty_one"]));
+				}
+
+				if bad_vars_msgs.is_empty() {
+					Ok(())
+				} else {
+					Err(bad_vars_msgs.join("\n"))
+				}
+			},
 			Err(e) => Err(format!("Failed to parse declare block: {}", e.message))
 		}
 	}
