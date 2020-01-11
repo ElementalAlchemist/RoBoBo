@@ -676,7 +676,7 @@ mod tests {
 			fifty_one = \"5\" + test;
 		}";
 		let predeclared_variables: HashMap<String, String> = HashMap::new();
-		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
+		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 6);
 
 		match result {
 			Ok(vars) => {
@@ -708,7 +708,7 @@ mod tests {
 		let mut predeclared_variables: HashMap<String, String> = HashMap::new();
 		predeclared_variables.insert(String::from("inherit"), String::from("value"));
 
-		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
+		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 7);
 
 		match result {
 			Ok(vars) => {
@@ -734,7 +734,7 @@ mod tests {
 		let declare_block = "test = \"yes\"";
 		let predeclared_variables: HashMap<String, String> = HashMap::new();
 
-		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
+		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 1);
 
 		if let Ok(_) = result {
 			Err("Successfully parsed invalid block")
@@ -755,6 +755,112 @@ mod tests {
 
 		if let Ok(_) = result {
 			Err("Successfully parsed invalid value")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn module_block_parses() -> Result<(), String> {
+		let module_block = "ModuleName {
+			autoload = \"true\";
+			log_level = \"debug\";
+			extend = log_level + \"_extended\";
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 5);
+
+		match result {
+			Ok(config) => {
+				if config.0 == "ModuleName" {
+					let mut bad_vars_msgs: Vec<String> = Vec::new();
+					format_bad_vars_msg(&mut bad_vars_msgs, &config.1, "autoload", "true");
+					format_bad_vars_msg(&mut bad_vars_msgs, &config.1, "log_level", "debug");
+					format_bad_vars_msg(&mut bad_vars_msgs, &config.1, "extend", "debug_extended");
+
+					if bad_vars_msgs.is_empty() {
+						Ok(())
+					} else {
+						Err(format!("Variables had incorrect values:\n{}", bad_vars_msgs.join("\n")))
+					}
+				} else {
+					Err(format!(
+						"Expected module to be named ModuleName; instead got \"{}\"",
+						config.0
+					))
+				}
+			}
+			Err(e) => Err(format!("Failed to parse module block declaration: {}", e.message)),
+		}
+	}
+
+	#[test]
+	fn module_block_uses_predeclared_variables() -> Result<(), String> {
+		let module_block = "ModuleName {
+			autoload = load_this_module;
+			log_level = global_log_level;
+			extend = log_level + global_log_level_extension;
+		}";
+		let mut predeclared_variables: HashMap<String, String> = HashMap::new();
+		predeclared_variables.insert(String::from("load_this_module"), String::from("true"));
+		predeclared_variables.insert(String::from("global_log_level"), String::from("debug"));
+		predeclared_variables.insert(String::from("global_log_level_extension"), String::from("_extended"));
+
+		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 5);
+
+		match result {
+			Ok(config) => {
+				if config.0 == "ModuleName" {
+					let mut bad_vars_msgs: Vec<String> = Vec::new();
+					format_bad_vars_msg(&mut bad_vars_msgs, &config.1, "autoload", "true");
+					format_bad_vars_msg(&mut bad_vars_msgs, &config.1, "log_level", "debug");
+					format_bad_vars_msg(&mut bad_vars_msgs, &config.1, "extend", "debug_extended");
+
+					if bad_vars_msgs.is_empty() {
+						Ok(())
+					} else {
+						Err(format!("Variables had incorrect values:\n{}", bad_vars_msgs.join("\n")))
+					}
+				} else {
+					Err(format!(
+						"Expected module to be named ModuleName; instead got \"{}\"",
+						config.0
+					))
+				}
+			}
+			Err(e) => Err(format!("Failed to parse module block declaration: {}", e.message)),
+		}
+	}
+
+	#[test]
+	fn module_block_fail_no_module_name() -> Result<(), &'static str> {
+		let module_block = "{
+			autoload = \"false\";
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 3);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed a module block with no module name")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn module_block_fail_parse_variables() -> Result<(), &'static str> {
+		let module_block = "AModule {
+			name = \"module name\";
+			bad = \"this line is \" broken;
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 4);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed a module block with syntax errors")
 		} else {
 			Ok(())
 		}
