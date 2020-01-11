@@ -90,7 +90,7 @@ impl fmt::Display for ConfigParseError {
 /// Pass the file name of the primary configuration file. This function
 /// will read all blocks and follow all includes to read the entire configuration
 /// file.
-/// 
+///
 /// On success. returns all parsed configuration data.
 /// On failure, returns a configuration error representing an I/O error or a
 /// parsing failure.
@@ -291,7 +291,9 @@ fn parse_declare_instruction(
 				} else if current_char == '=' {
 					if buffer.is_empty() {
 						return Err(ConfigParseError {
-							file_name: String::from(file_name), line_number, message: String::from("Expected variable name, not =")
+							file_name: String::from(file_name),
+							line_number,
+							message: String::from("Expected variable name, not ="),
 						});
 					}
 					current_variable = buffer.drain(..).collect();
@@ -569,9 +571,98 @@ fn parse_connection_instruction(
 mod tests {
 	use super::*;
 
-	fn format_bad_vars_msg(bad_vars_msgs: &mut Vec<String>, variables: &HashMap<String, String>, key_to_check: &str, expected_value: &str) {
+	fn format_bad_vars_msg(
+		bad_vars_msgs: &mut Vec<String>,
+		variables: &HashMap<String, String>,
+		key_to_check: &str,
+		expected_value: &str,
+	) {
 		if variables[key_to_check] != expected_value {
-			bad_vars_msgs.push(format!("Variable `{}` has wrong value \"{}\" (expected \"{}\")", key_to_check, variables[key_to_check], expected_value));
+			bad_vars_msgs.push(format!(
+				"Variable `{}` has wrong value \"{}\" (expected \"{}\")",
+				key_to_check, variables[key_to_check], expected_value
+			));
+		}
+	}
+
+	#[test]
+	fn bool_parse_empty() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("") {
+			Some(true) => Err("Expected nothing but got true"),
+			Some(false) => Err("Expected nothing but got false"),
+			None => Ok(()),
+		}
+	}
+
+	#[test]
+	fn bool_parse_one() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("1") {
+			Some(true) => Ok(()),
+			Some(false) => Err("Expected true but got false"),
+			None => Err("Expected true but got nothing"),
+		}
+	}
+
+	#[test]
+	fn bool_parse_zero() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("0") {
+			Some(true) => Err("Expected false but got true"),
+			Some(false) => Ok(()),
+			None => Err("Expected false but got nothing"),
+		}
+	}
+
+	#[test]
+	fn bool_parse_true() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("true") {
+			Some(true) => Ok(()),
+			Some(false) => Err("Expected true but got false"),
+			None => Err("Expected true but got nothing"),
+		}
+	}
+
+	#[test]
+	fn bool_parse_false() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("false") {
+			Some(true) => Err("Expected false but got true"),
+			Some(false) => Ok(()),
+			None => Err("Expected false but got nothing"),
+		}
+	}
+
+	#[test]
+	fn bool_parse_yes() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("yes") {
+			Some(true) => Ok(()),
+			Some(false) => Err("Expected true but got false"),
+			None => Err("Expected true but got nothing"),
+		}
+	}
+
+	#[test]
+	fn bool_parse_no() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("no") {
+			Some(true) => Err("Expected false but got true"),
+			Some(false) => Ok(()),
+			None => Err("Expected false but got nothing"),
+		}
+	}
+
+	#[test]
+	fn bool_parse_two() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("2") {
+			Some(true) => Err("Expected nothing but got true"),
+			Some(false) => Err("Expected nothing but got false"),
+			None => Ok(()),
+		}
+	}
+
+	#[test]
+	fn bool_parse_text() -> Result<(), &'static str> {
+		match parse_config_value_as_bool("text") {
+			Some(true) => Err("Expected nothing but got true"),
+			Some(false) => Err("Expected nothing but got false"),
+			None => Ok(()),
 		}
 	}
 
@@ -600,8 +691,8 @@ mod tests {
 				} else {
 					Err(bad_vars_msgs.join("\n"))
 				}
-			},
-			Err(e) => Err(format!("Failed to parse declare block: {}", e.message))
+			}
+			Err(e) => Err(format!("Failed to parse declare block: {}", e.message)),
 		}
 	}
 
@@ -633,8 +724,8 @@ mod tests {
 				} else {
 					Err(bad_vars_msgs.join("\n"))
 				}
-			},
-			Err(e) => Err(format!("Failed to parse declare block: {}", e.message))
+			}
+			Err(e) => Err(format!("Failed to parse declare block: {}", e.message)),
 		}
 	}
 
