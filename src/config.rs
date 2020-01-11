@@ -29,7 +29,7 @@ declare {
 include "butts/poop.conf"
 
 module ExtraFunctionality {
-	usewith = "your mother";
+	extraval = "5";
 }
 
 connection SomeNetwork client {
