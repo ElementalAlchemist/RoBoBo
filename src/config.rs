@@ -30,11 +30,13 @@ include "butts/poop.conf"
 
 module ExtraFunctionality {
 	extraval = "5";
+	autoload = "true";
 }
 
 connection SomeNetwork client {
 	server = "127.0.0.1";
 	port = "6667";
+	autoconnect = "true";
 }
 */
 
