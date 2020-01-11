@@ -83,6 +83,23 @@ pub fn read_config(file_name: &str) -> Result<Config, ConfigError> {
 	Ok(read_config_file(&file_name, &mut HashMap::new())?)
 }
 
+pub fn parse_config_value_as_bool(value: &str) -> Option<bool> {
+	if value == "1" {
+		return Some(true);
+	}
+	if value == "0" {
+		return Some(false);
+	}
+	let lower_value = value.to_lowercase();
+	if lower_value == "true" {
+		return Some(true);
+	}
+	if lower_value == "false" {
+		return Some(false);
+	}
+	None
+}
+
 enum ParseToken {
 	Variable(String),
 	Literal(String),
