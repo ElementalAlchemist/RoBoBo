@@ -519,6 +519,12 @@ fn parse_connection_instruction(
 mod tests {
 	use super::*;
 
+	fn format_bad_vars_msg(bad_vars_msgs: &mut Vec<String>, variables: &HashMap<String, String>, key_to_check: &str, expected_value: &str) {
+		if variables[key_to_check] != expected_value {
+			bad_vars_msgs.push(format!("Variable `{}` has wrong value \"{}\" (expected \"{}\")", key_to_check, variables[key_to_check], expected_value));
+		}
+	}
+
 	#[test]
 	fn declare_block_parses_variables() -> Result<(), String> {
 		// The leading "declare" keyword should be stripped out first by calling code
@@ -534,18 +540,43 @@ mod tests {
 		match result {
 			Ok(vars) => {
 				let mut bad_vars_msgs: Vec<String> = Vec::new();
-				if vars["test"] != "1" {
-					bad_vars_msgs.push(format!("Variable `test` has wrong value \"{}\" (expected \"1\")", vars["test"]));
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "test", "1");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "5", "five");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "need_to_test", "true");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "fifty_one", "51");
+
+				if bad_vars_msgs.is_empty() {
+					Ok(())
+				} else {
+					Err(bad_vars_msgs.join("\n"))
 				}
-				if vars["5"] != "five" {
-					bad_vars_msgs.push(format!("Variable `5` has wrong value \"{}\" (expected \"five\")", vars["5"]));
-				}
-				if vars["need_to_test"] != "true" {
-					bad_vars_msgs.push(format!("Variable `need_to_test` has wrong value \"{}\" (expected \"true\")", vars["need_to_test"]));
-				}
-				if vars["fifty_one"] != "51" {
-					bad_vars_msgs.push(format!("Variable `fifty_one` has wrong value \"{}\" (expected \"51\")", vars["fifty_one"]));
-				}
+			},
+			Err(e) => Err(format!("Failed to parse declare block: {}", e.message))
+		}
+	}
+
+	#[test]
+	fn declare_block_uses_existing_variables() -> Result<(), String> {
+		let declare_block = "{
+			test = \"yes\";
+			verify = inherit;
+			verify_concat_post = inherit + \"4\";
+			verify_concat_pre = \"hi \" + inherit;
+			verify_concat_both = \"sup \" + inherit + \" ok\";
+		}";
+		let mut predeclared_variables: HashMap<String, String> = HashMap::new();
+		predeclared_variables.insert(String::from("inherit"), String::from("value"));
+
+		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
+
+		match result {
+			Ok(vars) => {
+				let mut bad_vars_msgs: Vec<String> = Vec::new();
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "test", "yes");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "verify", "value");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "verify_concat_post", "value4");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "verify_concat_pre", "hi value");
+				format_bad_vars_msg(&mut bad_vars_msgs, &vars, "verify_concat_both", "sup value ok");
 
 				if bad_vars_msgs.is_empty() {
 					Ok(())
