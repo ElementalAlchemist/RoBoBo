@@ -730,21 +730,21 @@ mod tests {
 	}
 
 	#[test]
-	fn declare_block_fail_no_braces() -> Result<(), String> {
+	fn declare_block_fail_no_braces() -> Result<(), &'static str> {
 		let declare_block = "test = \"yes\"";
 		let predeclared_variables: HashMap<String, String> = HashMap::new();
 
 		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
 
 		if let Ok(_) = result {
-			Err(String::from("Successfully parsed invalid block"))
+			Err("Successfully parsed invalid block")
 		} else {
 			Ok(())
 		}
 	}
 
 	#[test]
-	fn declare_block_fail_no_concat_operator() -> Result<(), String> {
+	fn declare_block_fail_no_concat_operator() -> Result<(), &'static str> {
 		let declare_block = "{
 			test = \"4\";
 			concat = \"butts\" test;
@@ -754,7 +754,7 @@ mod tests {
 		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
 
 		if let Ok(_) = result {
-			Err(String::from("Successfully parsed invalid value"))
+			Err("Successfully parsed invalid value")
 		} else {
 			Ok(())
 		}
