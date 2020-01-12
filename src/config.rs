@@ -157,6 +157,9 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 
 	let mut buffer: Vec<u8> = Vec::new();
 	let mut blocks: Vec<(String, u32)> = Vec::new();
+	let mut in_comment = false;
+	let mut in_string = false;
+	let mut escaping = false;
 	for current_byte in file.bytes() {
 		let current_byte = match current_byte {
 			Ok(b) => b,
@@ -165,8 +168,29 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 		if current_byte == 10 {
 			// \n
 			line_number += 1;
+			if in_comment {
+				in_comment = false;
+			}
+		}
+		if in_comment {
+			continue;
+		}
+		if !in_string && current_byte == 35 {
+			// #
+			in_comment = true;
+			continue;
 		}
 		buffer.push(current_byte);
+		if !escaping && current_byte == 34 {
+			// "
+			in_string = !in_string;
+		}
+		if in_string && current_byte == 92 {
+			// \
+			escaping = true;
+		} else if escaping {
+			escaping = false;
+		}
 		if current_byte == 125 {
 			// }
 			blocks.push((String::from_utf8_lossy(&buffer).to_string(), line_number));
