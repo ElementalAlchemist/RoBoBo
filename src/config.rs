@@ -924,4 +924,194 @@ mod tests {
 			Ok(())
 		}
 	}
+
+	#[test]
+	fn connection_block_parses() -> Result<(), String> {
+		let connection_block = "MyCoolNetwork client plain {
+			connect = \"irc.example.com\";
+			port = \"6667\";
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_connection_instruction(&connection_block, &predeclared_variables, "test", 4);
+
+		match result {
+			Ok(config) => {
+				if config.0 == "MyCoolNetwork" {
+					let connection_data = config.1;
+					if connection_data.get_protocol() == "client" {
+						if connection_data.get_socket() == "plain" {
+							let connection_config = connection_data.get_data();
+							let mut bad_vars_msgs: Vec<String> = Vec::new();
+							format_bad_vars_msg(&mut bad_vars_msgs, &connection_config, "connect", "irc.example.com");
+							format_bad_vars_msg(&mut bad_vars_msgs, &connection_config, "port", "6667");
+
+							if bad_vars_msgs.is_empty() {
+								Ok(())
+							} else {
+								Err(format!("Variables had incorrect values:\n{}", bad_vars_msgs.join("\n")))
+							}
+						} else {
+							Err(format!(
+								"Read incorrect socket type; expected \"plain\" but got \"{}\"",
+								connection_data.get_socket()
+							))
+						}
+					} else {
+						Err(format!(
+							"Read incorrect protocol type; expected \"client\" but got \"{}\"",
+							connection_data.get_protocol()
+						))
+					}
+				} else {
+					Err(format!(
+						"Read incorrect network name; expected \"MyCoolNetwork\" but got \"{}\"",
+						config.0
+					))
+				}
+			}
+			Err(e) => Err(format!("Failed to parse connect block declaration: {}", e.message)),
+		}
+	}
+
+	#[test]
+	fn connection_block_uses_predeclared_variables() -> Result<(), String> {
+		let connection_block = "MyCoolNetwork client plain {
+			connect = cool_network_addr;
+			port = default_client_port_plain;
+		}";
+		let mut predeclared_variables: HashMap<String, String> = HashMap::new();
+		predeclared_variables.insert(String::from("cool_network_addr"), String::from("irc.example.com"));
+		predeclared_variables.insert(String::from("default_client_port_plain"), String::from("6667"));
+
+		let result = parse_connection_instruction(&connection_block, &predeclared_variables, "test", 4);
+
+		match result {
+			Ok(config) => {
+				if config.0 == "MyCoolNetwork" {
+					let connection_data = config.1;
+					if connection_data.get_protocol() == "client" {
+						if connection_data.get_socket() == "plain" {
+							let connection_config = connection_data.get_data();
+							let mut bad_vars_msgs: Vec<String> = Vec::new();
+							format_bad_vars_msg(&mut bad_vars_msgs, &connection_config, "connect", "irc.example.com");
+							format_bad_vars_msg(&mut bad_vars_msgs, &connection_config, "port", "6667");
+
+							if bad_vars_msgs.is_empty() {
+								Ok(())
+							} else {
+								Err(format!("Variables had incorrect values:\n{}", bad_vars_msgs.join("\n")))
+							}
+						} else {
+							Err(format!(
+								"Read incorrect socket type; expected \"plain\" but got \"{}\"",
+								connection_data.get_socket()
+							))
+						}
+					} else {
+						Err(format!(
+							"Read incorrect protocol type; expected \"client\" but got \"{}\"",
+							connection_data.get_protocol()
+						))
+					}
+				} else {
+					Err(format!(
+						"Read incorrect network name; expected \"MyCoolNetwork\" but got \"{}\"",
+						config.0
+					))
+				}
+			}
+			Err(e) => Err(format!("Failed to parse connect block declaration: {}", e.message)),
+		}
+	}
+
+	#[test]
+	fn connection_block_fail_no_network_name() -> Result<(), &'static str> {
+		let connect_block = "{
+			connect = \"irc.example.com\";
+			port = \"6667\";
+		}";
+		let predefined_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 4);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed connect block with no network name")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn connection_block_fail_no_protocol_name() -> Result<(), &'static str> {
+		let connect_block = "MyCoolNetwork {
+			protocol = \"client\";
+			socket = \"plain\";
+			connect = \"irc.example.con\";
+			port = \"6667\";
+		}";
+		let predefined_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 6);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed connect block with no protocol name")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn connection_block_fail_no_socket_name() -> Result<(), &'static str> {
+		let connect_block = "MyCoolNetwork client {
+			socket = \"plain\";
+			connect = \"irc.example.com\";
+			port = \"6667\";
+		}";
+		let predefined_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 5);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed connect block with no socket type name")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn connection_block_fail_parse_variables() -> Result<(), &'static str> {
+		let connect_block = "MyCoolNetwork client plain {
+			connect = \"irc.example.com\";
+			port = \"6667\";
+			extra = \"I\" messed up;
+		}";
+		let predefined_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 5);
+
+		if let Ok(_) = result {
+			Err("Succesfully parsed connect block with syntax errors")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn connection_block_fail_uses_undefined_variables() -> Result<(), &'static str> {
+		let connect_block = "MyCoolNetwork client plain {
+			connect = \"irc.\" + cool_network_domain_root;
+			port = \"6667\";
+			extra = butts;
+		}";
+		let predefined_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 5);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed connect block with undefined variables")
+		} else {
+			Ok(())
+		}
+	}
 }
