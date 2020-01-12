@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::fmt;
 use std::fs;
 use std::io;
-use std::io::prelude::*;
 
 /// Represents configuration data. The functionality that can be configured falls into two categories,
 /// each represented by a callable function returning data.
@@ -148,55 +147,12 @@ enum ParseExpectOperation {
 }
 
 fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, String>) -> Result<Config, ConfigError> {
-	let file = match fs::File::open(&file_name) {
-		Ok(f) => f,
-		Err(e) => return Err(ConfigError::FileError(e)),
+	let file_contents = match fs::read_to_string(&file_name) {
+		Ok(contents) => contents,
+		Err(e) => return Err(ConfigError::FileError(e))
 	};
 
-	let mut line_number = 1;
-
-	let mut buffer: Vec<u8> = Vec::new();
-	let mut blocks: Vec<(String, u32)> = Vec::new();
-	let mut in_comment = false;
-	let mut in_string = false;
-	let mut escaping = false;
-	for current_byte in file.bytes() {
-		let current_byte = match current_byte {
-			Ok(b) => b,
-			Err(e) => return Err(ConfigError::FileError(e)),
-		};
-		if current_byte == 10 {
-			// \n
-			line_number += 1;
-			if in_comment {
-				in_comment = false;
-			}
-		}
-		if in_comment {
-			continue;
-		}
-		if !in_string && current_byte == 35 {
-			// #
-			in_comment = true;
-			continue;
-		}
-		buffer.push(current_byte);
-		if !escaping && current_byte == 34 {
-			// "
-			in_string = !in_string;
-		}
-		if in_string && current_byte == 92 {
-			// \
-			escaping = true;
-		} else if escaping {
-			escaping = false;
-		}
-		if current_byte == 125 {
-			// }
-			blocks.push((String::from_utf8_lossy(&buffer).to_string(), line_number));
-			buffer.clear();
-		}
-	}
+	let blocks: Vec<(String, u32)> = parse_blocks_from_file(&file_contents);
 
 	let mut declare_blocks = Vec::new();
 	let mut include_blocks = Vec::new();
@@ -278,6 +234,45 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 	}
 
 	Ok(Config { modules, connections })
+}
+
+fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
+	let mut line_number = 1;
+
+	let mut buffer: String = String::new();
+	let mut blocks: Vec<(String, u32)> = Vec::new();
+	let mut in_comment = false;
+	let mut in_string = false;
+	let mut escaping = false;
+	for current_char in file_contents.chars() {
+		if current_char == '\n' {
+			line_number += 1;
+			if in_comment {
+				in_comment = false;
+			}
+		}
+		if in_comment {
+			continue;
+		}
+		if !in_string && current_char == '#' {
+			in_comment = true;
+			continue;
+		}
+		buffer.push(current_char);
+		if !escaping && current_char == '"' {
+			in_string = !in_string;
+		}
+		if in_string && current_char == '\\' {
+			escaping = true;
+		} else if escaping {
+			escaping = false;
+		}
+		if current_char == '}' {
+			blocks.push((buffer.drain(..).collect(), line_number));
+		}
+	}
+	
+	blocks
 }
 
 fn parse_declare_instruction(
