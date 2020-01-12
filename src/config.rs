@@ -39,7 +39,7 @@ module ExtraFunctionality {
 	autoload = "true";
 }
 
-connection SomeNetwork client {
+connection SomeNetwork client plain {
 	server = "127.0.0.1";
 	port = "6667";
 	autoconnect = "true";
@@ -48,14 +48,20 @@ connection SomeNetwork client {
 
 /// Represents the connection data for a single connection that is configured in the bot.
 pub struct ConnectionData {
-	connection_type: String,
+	connection_protocol: String,
+	connection_socket: String,
 	connection_data: HashMap<String, String>,
 }
 
 impl ConnectionData {
-	/// Returns the type name of the connection to make
-	pub fn get_type(&self) -> &String {
-		&self.connection_type
+	/// Returns the protocol type name of the connection to make
+	pub fn get_protocol(&self) -> &String {
+		&self.connection_protocol
+	}
+
+	/// Returns the socket type name of the connection to make
+	pub fn get_socket(&self) -> &String {
+		&self.connection_socket
 	}
 
 	/// Returns the key-value pair configuration data for a connection
@@ -544,24 +550,43 @@ fn parse_connection_instruction(
 
 	let connection_block_data =
 		&connection_block_data[network_name_end.unwrap() + 1..connection_block_data.len()].trim();
-	let connection_type_end = connection_block_data.find(|c: char| c.is_whitespace());
-	let connection_type = match connection_type_end {
+	let connection_protocol_end = connection_block_data.find(|c: char| c.is_whitespace());
+	let connection_protocol = match connection_protocol_end {
 		Some(end) => &connection_block_data[0..end],
 		None => {
 			return Err(ConfigParseError {
 				file_name: String::from(file_name),
 				line_number,
-				message: String::from("The network name must be followed by the connection type"),
+				message: String::from("The network name must be followed by the connection protocol type"),
 			})
 		}
 	};
 
 	let connection_block_data =
-		connection_block_data[connection_type_end.unwrap() + 1..connection_block_data.len()].trim();
+		connection_block_data[connection_protocol_end.unwrap() + 1..connection_block_data.len()].trim();
+
+	let connection_socket_end = connection_block_data.find(|c: char| c.is_whitespace());
+	let connection_socket = match connection_socket_end {
+		Some(end) => &connection_block_data[0..end],
+		None => {
+			return Err(ConfigParseError {
+				file_name: String::from(file_name),
+				line_number,
+				message: String::from(
+					"The network name and connection protocol type must be followed by the connection socket type",
+				),
+			})
+		}
+	};
+
+	let connection_block_data =
+		connection_block_data[connection_socket_end.unwrap() + 1..connection_block_data.len()].trim();
+
 	Ok((
 		network_name.to_string(),
 		ConnectionData {
-			connection_type: connection_type.to_string(),
+			connection_protocol: connection_protocol.to_string(),
+			connection_socket: connection_socket.to_string(),
 			connection_data: parse_declare_instruction(connection_block_data, variables, file_name, line_number)?,
 		},
 	))
