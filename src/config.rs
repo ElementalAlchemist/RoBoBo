@@ -761,6 +761,23 @@ mod tests {
 	}
 
 	#[test]
+	fn declare_block_fail_uses_undefined_variable() -> Result<(), &'static str> {
+		let declare_block = "{
+			test = \"4\";
+			mine = \"my \" + thing;
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed undefined variable")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
 	fn module_block_parses() -> Result<(), String> {
 		let module_block = "ModuleName {
 			autoload = \"true\";
@@ -861,6 +878,23 @@ mod tests {
 
 		if let Ok(_) = result {
 			Err("Successfully parsed a module block with syntax errors")
+		} else {
+			Ok(())
+		}
+	}
+
+	#[test]
+	fn module_block_fail_uses_undefined_variables() -> Result<(), &'static str> {
+		let module_block = "ModuleName {
+			autoload = \"false\";
+			meme = \"use \" + reference;
+		}";
+		let predeclared_variables: HashMap<String, String> = HashMap::new();
+
+		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 4);
+
+		if let Ok(_) = result {
+			Err("Successfully parsed a module block with undefined variable usage")
 		} else {
 			Ok(())
 		}
