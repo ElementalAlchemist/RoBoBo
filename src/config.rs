@@ -258,6 +258,9 @@ fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
 			in_comment = true;
 			continue;
 		}
+		if current_char.is_whitespace() && buffer.is_empty() {
+			continue;
+		}
 		buffer.push(current_char);
 		if !escaping && current_char == '"' {
 			in_string = !in_string;
