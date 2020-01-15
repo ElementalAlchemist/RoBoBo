@@ -244,6 +244,7 @@ fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
 	let mut in_comment = false;
 	let mut in_string = false;
 	let mut escaping = false;
+	let mut inside_block_count = 0;
 	for current_char in file_contents.chars() {
 		if current_char == '\n' {
 			line_number += 1;
@@ -270,7 +271,15 @@ fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
 		} else if escaping {
 			escaping = false;
 		}
-		if current_char == '}' {
+		if current_char == '{' {
+			inside_block_count += 1;
+		} else if current_char == '}' {
+			inside_block_count -= 1;
+			if inside_block_count == 0 {
+				blocks.push((buffer.drain(..).collect(), line_number));
+			}
+		} else if current_char == ';' && inside_block_count == 0 {
+			// Semicolons outside any block should end blocks as well (needed for include blocks)
 			blocks.push((buffer.drain(..).collect(), line_number));
 		}
 	}
@@ -736,7 +745,10 @@ mod tests {
 		let blocks = parse_blocks_from_file(&config_blocks);
 
 		if blocks.len() != 4 {
-			return Err(format!("Incorrect number of blocks parsed (expected 4 blocks but got {}", blocks.len()));
+			return Err(format!(
+				"Incorrect number of blocks parsed (expected 4 blocks but got {}",
+				blocks.len()
+			));
 		}
 
 		let first_block = &blocks[0];
