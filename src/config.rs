@@ -149,7 +149,7 @@ enum ParseExpectOperation {
 fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, String>) -> Result<Config, ConfigError> {
 	let file_contents = match fs::read_to_string(&file_name) {
 		Ok(contents) => contents,
-		Err(e) => return Err(ConfigError::FileError(e))
+		Err(e) => return Err(ConfigError::FileError(e)),
 	};
 
 	let blocks: Vec<(String, u32)> = parse_blocks_from_file(&file_contents);
@@ -274,7 +274,7 @@ fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
 			blocks.push((buffer.drain(..).collect(), line_number));
 		}
 	}
-	
+
 	blocks
 }
 
@@ -711,6 +711,106 @@ mod tests {
 			Some(false) => Err("Expected nothing but got false"),
 			None => Ok(()),
 		}
+	}
+
+	#[test]
+	fn properly_parses_blocks() -> Result<(), String> {
+		let config_blocks = "# Not all of these would be valid in later parsing steps,
+		# but they should be parsed correctly
+		module TestModule {
+			autoload = \"true\";
+		}
+
+		include \"otherfile.conf\";
+
+		declare {
+			variable = \"yes\";
+			# There's a comment in this block
+		}
+
+		connect MyNetwork {
+			autoconnect = \"true\";
+			protocol = \"client\"; # An inline comment is good too
+		}";
+
+		let blocks = parse_blocks_from_file(&config_blocks);
+
+		if blocks.len() != 4 {
+			return Err(format!("Incorrect number of blocks parsed (expected 4 blocks but got {}", blocks.len()));
+		}
+
+		let first_block = &blocks[0];
+		if first_block.1 != 5 {
+			return Err(format!(
+				"Wrong number of lines counted for first block (expected 5 but got {})",
+				first_block.1
+			));
+		}
+
+		let expected_first_block = "module TestModule {
+			autoload = \"true\";
+		}";
+		if first_block.0 != expected_first_block {
+			return Err(format!(
+				"First block is incorrect. Expected:\n{}\n\nbut got:\n{}",
+				expected_first_block, first_block.0
+			));
+		}
+
+		let second_block = &blocks[1];
+		if second_block.1 != 7 {
+			return Err(format!(
+				"Wrong number of lines counted for second block (expected 7 but got {})",
+				second_block.1
+			));
+		}
+
+		let expected_second_block = "include \"otherfile.conf\";";
+		if second_block.0 != expected_second_block {
+			return Err(format!(
+				"Second block is incorrect. Expected:\n{}\n\nbut got:\n{}",
+				expected_second_block, second_block.0
+			));
+		}
+
+		let third_block = &blocks[2];
+		if third_block.1 != 12 {
+			return Err(format!(
+				"Wrong number of lines counted for third block (expected 12 but got {})",
+				third_block.1
+			));
+		}
+
+		let expected_third_block = "declare {
+			variable = \"yes\";
+			
+		}";
+		if third_block.0 != expected_third_block {
+			return Err(format!(
+				"Third block is incorrect. Expected:\n{}\n\nbut got:\n{}",
+				expected_third_block, third_block.0
+			));
+		}
+
+		let fourth_block = &blocks[3];
+		if fourth_block.1 != 17 {
+			return Err(format!(
+				"Wrong number of lines counted for fourth block (expected 17 but got {})",
+				fourth_block.1
+			));
+		}
+
+		let expected_fourth_block = "connect MyNetwork {
+			autoconnect = \"true\";
+			protocol = \"client\"; 
+		}"; // The protocol line has an expected trailing space
+		if fourth_block.0 != expected_fourth_block {
+			return Err(format!(
+				"Fourth block is incorrect. Expected:\n{}\n\nbut got:\n{}",
+				expected_fourth_block, fourth_block.0
+			));
+		}
+		Ok(())
 	}
 
 	#[test]
