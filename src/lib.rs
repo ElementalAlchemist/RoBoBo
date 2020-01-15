@@ -6,10 +6,9 @@ pub fn run(config_file_name: &str, debug_level: u32) {
 		Ok(config) => config,
 		Err(error) => {
 			match error {
-				config::ConfigError::FileError(err) => eprintln!(
-					"An error occurred reading the configuration file: {}",
-					err.description()
-				),
+				config::ConfigError::FileError(err) => {
+					eprintln!("An error occurred reading the configuration file: {}", err)
+				}
 				config::ConfigError::ParseError(err) => eprintln!("{}", err),
 			}
 			return;
