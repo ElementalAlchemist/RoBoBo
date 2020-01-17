@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 clap = "2.33.0"
 libloading = "0.5"
+libc = "0.2.66"
