@@ -1,4 +1,5 @@
 mod config;
+mod logger;
 
 pub fn run(config_file_name: &str, debug_level: u32) {
 	let config_data = match config::read_config(config_file_name) {
