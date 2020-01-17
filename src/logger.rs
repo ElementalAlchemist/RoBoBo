@@ -3,7 +3,7 @@ use std::io::Write;
 
 pub struct Logger {
 	log_file: Option<fs::File>,
-	log_level: u32
+	log_level: u32,
 }
 
 impl Logger {
