@@ -6,6 +6,7 @@ use std::io;
 /// Represents configuration data. The functionality that can be configured falls into two categories,
 /// each represented by a callable function returning data.
 pub struct Config {
+	log: HashMap<String, String>,
 	modules: HashMap<String, HashMap<String, String>>,
 	connections: HashMap<String, ConnectionData>,
 }
@@ -158,6 +159,7 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 	let mut include_blocks = Vec::new();
 	let mut module_blocks = Vec::new();
 	let mut connection_blocks = Vec::new();
+	let mut log_blocks = Vec::new();
 
 	let mut modules: HashMap<String, HashMap<String, String>> = HashMap::new();
 	let mut connections: HashMap<String, ConnectionData> = HashMap::new();
@@ -171,6 +173,8 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 			module_blocks.push((String::from(block[7..].trim()), line));
 		} else if block.starts_with("connection ") || block.starts_with("connection\n") {
 			connection_blocks.push((String::from(block[11..].trim()), line));
+		} else if block.starts_with("log ") || block.starts_with("log\n") {
+			log_blocks.push((String::from(block[4..].trim()), line));
 		} else {
 			return Err(ConfigError::ParseError(ConfigParseError {
 				file_name: String::from(file_name),
@@ -233,7 +237,19 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 		}
 	}
 
-	Ok(Config { modules, connections })
+	let mut log: HashMap<String, String> = HashMap::new();
+	if !log_blocks.is_empty() {
+		if log_blocks.len() > 1 {
+			return Err(ConfigError::ParseError(ConfigParseError { file_name: String::from(file_name), line_number: log_blocks[1].1, message: format!("Multiple ({}) log blocks were found, but only one can be defined", log_blocks.len())));
+		}
+		let (log_block, line) = log_blocks[0];
+		match parse_declare_instruction(&log_block, declared_variables, file_name, line) {
+			Ok(config) => log = config,
+			Err(e) => return Err(ConfigError::ParseError(e))
+		}
+	}
+
+	Ok(Config { log, modules, connections })
 }
 
 fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
