@@ -245,16 +245,27 @@ fn read_config_file(file_name: &str, declared_variables: &mut HashMap<String, St
 	let mut log: HashMap<String, String> = HashMap::new();
 	if !log_blocks.is_empty() {
 		if log_blocks.len() > 1 {
-			return Err(ConfigError::ParseError(ConfigParseError { file_name: String::from(file_name), line_number: log_blocks[1].1, message: format!("Multiple ({}) log blocks were found, but only one can be defined", log_blocks.len())));
+			return Err(ConfigError::ParseError(ConfigParseError {
+				file_name: String::from(file_name),
+				line_number: log_blocks[1].1,
+				message: format!(
+					"Multiple ({}) log blocks were found, but only one can be defined",
+					log_blocks.len()
+				),
+			}));
 		}
-		let (log_block, line) = log_blocks[0];
+		let (log_block, line) = log_blocks.pop().unwrap();
 		match parse_declare_instruction(&log_block, declared_variables, file_name, line) {
 			Ok(config) => log = config,
-			Err(e) => return Err(ConfigError::ParseError(e))
+			Err(e) => return Err(ConfigError::ParseError(e)),
 		}
 	}
 
-	Ok(Config { log, modules, connections })
+	Ok(Config {
+		log,
+		modules,
+		connections,
+	})
 }
 
 fn parse_blocks_from_file(file_contents: &str) -> Vec<(String, u32)> {
