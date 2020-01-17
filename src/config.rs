@@ -12,6 +12,11 @@ pub struct Config {
 }
 
 impl Config {
+	/// Returns a HashMap of log configuration data.
+	pub fn get_log_data(&self) -> &HashMap<String, String> {
+		&self.log
+	}
+
 	/// Returns a HashMap of all module configuration. For each module, a key-value pair of
 	/// configuration values is provided.
 	pub fn get_module_data(&self) -> &HashMap<String, HashMap<String, String>> {
