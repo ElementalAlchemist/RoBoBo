@@ -15,4 +15,12 @@ pub fn run(config_file_name: &str, debug_level: u32) {
 			return;
 		}
 	};
+
+	let log = logger::Logger::new(config_data.get_log_data(), debug_level);
+
+	if debug_level == 0 {
+		unsafe {
+			daemon(1, 0);
+		}
+	}
 }
