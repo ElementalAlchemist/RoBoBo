@@ -22,7 +22,7 @@ pub fn run(args: &ProgramArgs) {
 		}
 	};
 
-	let log = logger::Logger::new(config_data.get_log_data(), args.debug_level);
+	let log = logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout);
 
 	if args.debug_level == 0 {
 		unsafe {

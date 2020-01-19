@@ -6,10 +6,11 @@ use std::num::ParseIntError;
 pub struct Logger {
 	log_file: Option<fs::File>,
 	log_level: u32,
+	both_file_and_stdout: bool,
 }
 
 impl Logger {
-	pub fn new(config: &HashMap<String, String>, debug_level: u32) -> Logger {
+	pub fn new(config: &HashMap<String, String>, debug_level: u32, both_file_and_stdout: bool) -> Logger {
 		let mut log_file: Option<fs::File> = None;
 		if debug_level == 0 {
 			let mut log_file_name = "robobo.log";
@@ -32,7 +33,11 @@ impl Logger {
 			});
 		}
 
-		Logger { log_file, log_level }
+		Logger {
+			log_file,
+			log_level,
+			both_file_and_stdout,
+		}
 	}
 
 	pub fn log(&mut self, log_msg_level: u32, message: &str) {
@@ -44,6 +49,8 @@ impl Logger {
 			if let Err(_) = file.write(message.as_bytes()) {
 				log_stdout(message);
 				self.log_file = None;
+			} else if self.both_file_and_stdout {
+				log_stdout(message);
 			}
 		} else {
 			log_stdout(message);
