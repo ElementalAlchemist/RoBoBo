@@ -1,6 +1,9 @@
 mod config;
 mod logger;
 use libc::daemon;
+use signal_hook;
+use std::sync::atomic::AtomicBool;
+use std::sync::Arc;
 
 pub struct ProgramArgs<'a> {
 	pub config_file_name: &'a str,
@@ -23,6 +26,12 @@ pub fn run(args: &ProgramArgs) {
 	};
 
 	let log = logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout);
+
+	let needs_rehash = Arc::new(AtomicBool::new(false));
+
+	if let Err(_) = signal_hook::flag::register(signal_hook::SIGHUP, Arc::clone(&needs_rehash)) {
+		eprintln!("Failed to register the SIGHUP signal; the application will not be able to rehash from a signal");
+	}
 
 	if args.debug_level == 0 {
 		unsafe {
