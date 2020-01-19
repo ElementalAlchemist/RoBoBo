@@ -18,9 +18,13 @@ fn main() {
 				.takes_value(true)
 				.help("Loads the configuration from the specified file instead of the default (robobo.conf)"),
 		)
+		.arg(
+			Arg::with_name("log_with_stdout")
+				.long("log-with-stdout")
+				.help("When debugging, enables logging to both the log file and stdout"),
+		)
 		.get_matches();
 
-	let config_file_name = option_values.value_of("config").unwrap_or("robobo.conf");
 	let debug_level = option_values.occurrences_of("debug");
 	let debug_level = if debug_level > u32::max_value().into() {
 		u32::max_value()
@@ -28,5 +32,11 @@ fn main() {
 		debug_level as u32
 	};
 
-	robobo::run(config_file_name, debug_level);
+	let args = robobo::ProgramArgs {
+		config_file_name: option_values.value_of("config").unwrap_or("robobo.conf"),
+		debug_level,
+		use_log_with_stdout: option_values.is_present("log_with_stdout"),
+	};
+
+	robobo::run(&args);
 }
