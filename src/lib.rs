@@ -4,6 +4,7 @@ use libc::daemon;
 use signal_hook;
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
+use std::sync::Mutex;
 
 pub struct ProgramArgs<'a> {
 	pub config_file_name: &'a str,
@@ -25,7 +26,7 @@ pub fn run(args: &ProgramArgs) {
 		}
 	};
 
-	let log = Arc::new(logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout));
+	let log = Arc::new(Mutex::new(logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout)));
 
 	let needs_rehash = Arc::new(AtomicBool::new(false));
 
