@@ -1,5 +1,6 @@
 mod config;
 mod logger;
+mod protocol_module;
 mod socket_module;
 use libc::daemon;
 use signal_hook;
