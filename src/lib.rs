@@ -26,7 +26,11 @@ pub fn run(args: &ProgramArgs) {
 		}
 	};
 
-	let log = Arc::new(Mutex::new(logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout)));
+	let log = Arc::new(Mutex::new(logger::Logger::new(
+		config_data.get_log_data(),
+		args.debug_level,
+		args.use_log_with_stdout,
+	)));
 
 	let needs_rehash = Arc::new(AtomicBool::new(false));
 
