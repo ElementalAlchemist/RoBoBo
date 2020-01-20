@@ -1,4 +1,5 @@
 mod config;
+mod irc_data;
 mod logger;
 mod protocol_module;
 mod socket_module;
