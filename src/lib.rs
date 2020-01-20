@@ -12,7 +12,7 @@ pub struct ProgramArgs<'a> {
 }
 
 pub fn run(args: &ProgramArgs) {
-	let config_data = match config::read_config(&args.config_file_name) {
+	let mut config_data = match config::read_config(&args.config_file_name) {
 		Ok(config) => config,
 		Err(error) => {
 			match error {
@@ -25,7 +25,7 @@ pub fn run(args: &ProgramArgs) {
 		}
 	};
 
-	let log = logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout);
+	let log = Arc::new(logger::Logger::new(config_data.get_log_data(), args.debug_level, args.use_log_with_stdout));
 
 	let needs_rehash = Arc::new(AtomicBool::new(false));
 
