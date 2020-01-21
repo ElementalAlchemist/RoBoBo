@@ -1,12 +1,38 @@
 use std::collections::HashMap;
 use std::fs;
 use std::io::Write;
-use std::num::ParseIntError;
 
 pub struct Logger {
 	log_file: Option<fs::File>,
-	log_level: u32,
+	log_level: LogLevel,
 	both_file_and_stdout: bool,
+}
+
+impl Logger {
+	fn should_log_error(&self, msg_log_level: LogLevel) -> bool {
+		match msg_log_level {
+			LogLevel::Error => true,
+			LogLevel::Warn => match self.log_level {
+				LogLevel::Error => false,
+				_ => true,
+			},
+			LogLevel::Info => match self.log_level {
+				LogLevel::Debug | LogLevel::Info => true,
+				_ => false,
+			},
+			LogLevel::Debug => match self.log_level {
+				LogLevel::Debug => true,
+				_ => false,
+			},
+		}
+	}
+}
+
+pub enum LogLevel {
+	Error,
+	Warn,
+	Info,
+	Debug,
 }
 
 impl Logger {
@@ -25,13 +51,41 @@ impl Logger {
 			}
 		}
 
-		let mut log_level: u32 = 0;
+		let mut log_level: LogLevel = LogLevel::Warn;
 		if config.contains_key("level") {
-			log_level = config["level"].parse().unwrap_or_else(|error: ParseIntError| {
-				eprintln!("Failed to read integer log level ({}); using log level 0", error);
-				0
-			});
+			let configured_log_level = config["level"].to_lowercase();
+			log_level = if configured_log_level == "error" {
+				LogLevel::Error
+			} else if configured_log_level == "warn" {
+				LogLevel::Warn
+			} else if configured_log_level == "info" {
+				LogLevel::Info
+			} else if configured_log_level == "debug" {
+				LogLevel::Debug
+			} else {
+				eprintln!(
+					"Failed to parse log level \"{}\"; using log level warn",
+					config["level"]
+				);
+				LogLevel::Warn
+			}
 		}
+
+		if debug_level >= 3 {
+			log_level = LogLevel::Debug;
+		} else if debug_level == 2 {
+			log_level = match log_level {
+				LogLevel::Debug => LogLevel::Info,
+				_ => log_level,
+			};
+		} else if debug_level == 1 {
+			log_level = match log_level {
+				LogLevel::Debug | LogLevel::Info => LogLevel::Warn,
+				_ => log_level,
+			};
+		}
+		// We don't handle debug level 0 here because it means the user didn't choose to specify anything
+		// This means we'll daemonize and should use the default/configured log level
 
 		Logger {
 			log_file,
@@ -40,8 +94,8 @@ impl Logger {
 		}
 	}
 
-	pub fn log(&mut self, log_msg_level: u32, message: &str) {
-		if log_msg_level < self.log_level {
+	pub fn log(&mut self, log_msg_level: LogLevel, message: &str) {
+		if !self.should_log_error(log_msg_level) {
 			return;
 		}
 
