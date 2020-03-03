@@ -44,7 +44,10 @@ pub fn run(args: &ProgramArgs) {
 
 	if args.debug_level == 0 {
 		unsafe {
-			daemon(1, 0);
+			let daemon_result = daemon(1, 0);
+			if daemon_result < 0 {
+				eprintln!("Failed to daemonize; running as a foreground process instead");
+			}
 		}
 	}
 }
