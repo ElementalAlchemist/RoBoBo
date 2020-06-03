@@ -38,7 +38,7 @@ pub fn run(args: &ProgramArgs) {
 
 	let needs_rehash = Arc::new(AtomicBool::new(false));
 
-	if let Err(_) = signal_hook::flag::register(signal_hook::SIGHUP, Arc::clone(&needs_rehash)) {
+	if signal_hook::flag::register(signal_hook::SIGHUP, Arc::clone(&needs_rehash)).is_err() {
 		eprintln!("Failed to register the SIGHUP signal; the application will not be able to rehash from a signal");
 	}
 

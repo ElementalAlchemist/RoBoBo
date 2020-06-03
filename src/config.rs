@@ -325,7 +325,7 @@ fn parse_declare_instruction(
 	file_name: &str,
 	line_number: u32,
 ) -> Result<HashMap<String, String>, ConfigParseError> {
-	if !declare_block.starts_with("{") || !declare_block.ends_with("}") {
+	if !declare_block.starts_with('{') || !declare_block.ends_with('}') {
 		return Err(ConfigParseError {
 			file_name: String::from(file_name),
 			line_number,
@@ -389,21 +389,19 @@ fn parse_declare_instruction(
 				if current_char == '"' {
 					if escaping_character {
 						buffer.push(current_char);
+					} else if in_string_literal {
+						in_string_literal = false;
+						expecting = ParseExpectOperation::ValueOperator;
+						concat_value.push(ParseToken::Literal(buffer.drain(..).collect()));
 					} else {
-						if in_string_literal {
-							in_string_literal = false;
-							expecting = ParseExpectOperation::ValueOperator;
-							concat_value.push(ParseToken::Literal(buffer.drain(..).collect()));
-						} else {
-							if !buffer.is_empty() {
-								return Err(ConfigParseError {
-									file_name: String::from(file_name),
-									line_number,
-									message: String::from("Unexpected start of string"),
-								});
-							}
-							in_string_literal = true;
+						if !buffer.is_empty() {
+							return Err(ConfigParseError {
+								file_name: String::from(file_name),
+								line_number,
+								message: String::from("Unexpected start of string"),
+							});
 						}
+						in_string_literal = true;
 					}
 				} else if current_char == '\\' && in_string_literal {
 					if escaping_character {
@@ -536,7 +534,7 @@ fn parse_include_instruction(
 	file_name: &str,
 	line_number: u32,
 ) -> Result<Config, ConfigError> {
-	if !include_file.starts_with("\"") || !include_file.ends_with("\"") {
+	if !include_file.starts_with('\"') || !include_file.ends_with('\"') {
 		return Err(ConfigError::ParseError(ConfigParseError {
 			file_name: String::from(file_name),
 			line_number,
@@ -563,7 +561,7 @@ fn parse_include_instruction(
 		path.push(current_char);
 	}
 
-	return read_config_file(&path, variables);
+	read_config_file(&path, variables)
 }
 
 fn parse_module_instruction(
@@ -927,7 +925,7 @@ mod tests {
 
 		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 1);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed invalid block")
 		} else {
 			Ok(())
@@ -944,7 +942,7 @@ mod tests {
 
 		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed invalid value")
 		} else {
 			Ok(())
@@ -961,7 +959,7 @@ mod tests {
 
 		let result = parse_declare_instruction(&declare_block, &predeclared_variables, "test", 4);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed undefined variable")
 		} else {
 			Ok(())
@@ -1050,7 +1048,7 @@ mod tests {
 
 		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 3);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed a module block with no module name")
 		} else {
 			Ok(())
@@ -1067,7 +1065,7 @@ mod tests {
 
 		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 4);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed a module block with syntax errors")
 		} else {
 			Ok(())
@@ -1084,7 +1082,7 @@ mod tests {
 
 		let result = parse_module_instruction(&module_block, &predeclared_variables, "test", 4);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed a module block with undefined variable usage")
 		} else {
 			Ok(())
@@ -1201,7 +1199,7 @@ mod tests {
 
 		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 4);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed connect block with no network name")
 		} else {
 			Ok(())
@@ -1220,7 +1218,7 @@ mod tests {
 
 		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 6);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed connect block with no protocol name")
 		} else {
 			Ok(())
@@ -1238,7 +1236,7 @@ mod tests {
 
 		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 5);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed connect block with no socket type name")
 		} else {
 			Ok(())
@@ -1256,7 +1254,7 @@ mod tests {
 
 		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 5);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Succesfully parsed connect block with syntax errors")
 		} else {
 			Ok(())
@@ -1274,7 +1272,7 @@ mod tests {
 
 		let result = parse_connection_instruction(&connect_block, &predefined_variables, "test", 5);
 
-		if let Ok(_) = result {
+		if result.is_ok() {
 			Err("Successfully parsed connect block with undefined variables")
 		} else {
 			Ok(())
