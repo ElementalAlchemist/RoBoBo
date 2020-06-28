@@ -2,6 +2,7 @@ mod config;
 mod irc_data;
 mod logger;
 mod module_communication;
+mod module_module;
 mod protocol_module;
 mod socket_module;
 use libc::daemon;
