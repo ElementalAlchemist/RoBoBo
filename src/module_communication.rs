@@ -163,3 +163,237 @@ where
 	list.push(value);
 	Some(map)
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn module_invoke_data_created() -> Result<(), &'static str> {
+		let data = ModuleInvokeData::new("test");
+		if data.get_invoke_type() == "test" {
+			Ok(())
+		} else {
+			Err("The module invoke data didn't get the correct type")
+		}
+	}
+
+	#[test]
+	fn value_set_in_option_hashmap_none() -> Result<(), &'static str> {
+		let mut map_option: Option<HashMap<&'static str, &'static str>> = None;
+		map_option = set_value_in_option_hashmap(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map was not created");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		if map["test"] != "one" {
+			return Err("Value of key \"test\" is not correct");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_set_in_option_hashmap_empty() -> Result<(), &'static str> {
+		let mut map_option: Option<HashMap<&'static str, &'static str>> = Some(HashMap::new());
+		map_option = set_value_in_option_hashmap(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		if map["test"] != "one" {
+			return Err("Value of key \"test\" is not correct");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_set_in_option_hashmap_new_key() -> Result<(), &'static str> {
+		let mut existing_map: HashMap<&'static str, &'static str> = HashMap::new();
+		existing_map.insert("butts", "yes");
+		let mut map_option: Option<HashMap<&'static str, &'static str>> = Some(existing_map);
+		map_option = set_value_in_option_hashmap(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		if !map.contains_key("butts") {
+			return Err("Key was lost from map");
+		}
+		if map["test"] != "one" {
+			return Err("Value of key \"test\" is not correct");
+		}
+		if map["butts"] != "yes" {
+			return Err("Value of key \"yes\" is not correct");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_set_in_option_hashmap_existing() -> Result<(), &'static str> {
+		let mut existing_map: HashMap<&'static str, &'static str> = HashMap::new();
+		existing_map.insert("test", "one");
+		let mut map_option: Option<HashMap<&'static str, &'static str>> = Some(existing_map);
+		map_option = set_value_in_option_hashmap(map_option, "test", "two");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("Key was removed from map");
+		}
+		if map["test"] == "one" {
+			return Err("Value of key \"test\" was not updated");
+		}
+		if map["test"] != "two" {
+			return Err("Value of key \"test\" is not correct");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_added_to_option_hashmap_list_none() -> Result<(), &'static str> {
+		let mut map_option: Option<HashMap<&'static str, Vec<&'static str>>> = None;
+		map_option = add_value_to_option_hashmap_list(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map was not created");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		let list = &map["test"];
+		if list.len() != 1 {
+			return Err("List should have exactly 1 item in it, but it does not");
+		}
+		if list[0] != "one" {
+			return Err("The list value at index 0 is incorrect");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_added_to_option_hashmap_list_empty() -> Result<(), &'static str> {
+		let mut map_option: Option<HashMap<&'static str, Vec<&'static str>>> = Some(HashMap::new());
+		map_option = add_value_to_option_hashmap_list(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		let list = &map["test"];
+		if list.len() != 1 {
+			return Err("List should have exactly 1 item in it, but it does not");
+		}
+		if list[0] != "one" {
+			return Err("The list value at index 0 is incorrect");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_added_to_option_hashmap_list_new_key() -> Result<(), &'static str> {
+		let mut existing_map: HashMap<&'static str, Vec<&'static str>> = HashMap::new();
+		existing_map.insert("butts", vec!["yes", "obviously"]);
+		let mut map_option: Option<HashMap<&'static str, Vec<&'static str>>> = Some(existing_map);
+		map_option = add_value_to_option_hashmap_list(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("butts") {
+			return Err("The existing key was lost");
+		}
+		let butts_list = &map["butts"];
+		if butts_list.len() != 2 {
+			return Err("Existing list should have exactly 2 items, but it does not");
+		}
+		if butts_list[0] != "yes" || butts_list[1] != "obviously" {
+			return Err("Existing list values have been changed");
+		}
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		let list = &map["test"];
+		if list.len() != 1 {
+			return Err("List should have exactly 1 item in it, but it does not");
+		}
+		if list[0] != "one" {
+			return Err("The list value at index 0 is incorrect");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_added_to_option_hashmap_list_new_key_multiple() -> Result<(), &'static str> {
+		let mut existing_map: HashMap<&'static str, Vec<&'static str>> = HashMap::new();
+		existing_map.insert("butts", vec!["yes", "obviously"]);
+		let mut map_option: Option<HashMap<&'static str, Vec<&'static str>>> = Some(existing_map);
+		map_option = add_value_to_option_hashmap_list(map_option, "test", "one");
+		map_option = add_value_to_option_hashmap_list(map_option, "test", "two");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("butts") {
+			return Err("The existing key was lost");
+		}
+		let butts_list = &map["butts"];
+		if butts_list.len() != 2 {
+			return Err("Existing list should have exactly 2 items, but it does not");
+		}
+		if butts_list[0] != "yes" || butts_list[1] != "obviously" {
+			return Err("Existing list values have been changed");
+		}
+		if !map.contains_key("test") {
+			return Err("Key was not added to map");
+		}
+		let list = &map["test"];
+		if list.len() != 2 {
+			return Err("List should have exactly 2 items in it, but it does not");
+		}
+		if list[0] != "one" {
+			return Err("The list value at index 0 is incorrect");
+		}
+		if list[1] != "two" {
+			return Err("The list value at index 1 is incorrect");
+		}
+		Ok(())
+	}
+
+	#[test]
+	fn value_added_to_option_hashmap_list_existing() -> Result<(), &'static str> {
+		let mut existing_map: HashMap<&'static str, Vec<&'static str>> = HashMap::new();
+		existing_map.insert("test", vec!["butts"]);
+		let mut map_option: Option<HashMap<&'static str, Vec<&'static str>>> = Some(existing_map);
+		map_option = add_value_to_option_hashmap_list(map_option, "test", "one");
+		if map_option.is_none() {
+			return Err("Map became None");
+		}
+		let map = map_option.unwrap();
+		if !map.contains_key("test") {
+			return Err("The key was lost");
+		}
+		let list = &map["test"];
+		if list.len() != 2 {
+			return Err("List should have exactly 2 items, but it does not");
+		}
+		if list[0] != "butts" {
+			return Err("The existing list value at index 0 is incorrect");
+		}
+		if list[1] != "one" {
+			return Err("The new value at index 1 is incorrect");
+		}
+		Ok(())
+	}
+}
