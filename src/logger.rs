@@ -39,7 +39,7 @@ impl Logger {
 	pub fn new(config: &HashMap<String, String>, debug_level: u32, both_file_and_stdout: bool) -> Logger {
 		let mut log_file: Option<fs::File> = None;
 		if debug_level == 0 {
-			let log_file_name = if config.contains_key ("file") {
+			let log_file_name = if config.contains_key("file") {
 				&config["file"]
 			} else {
 				"robobo.log"
