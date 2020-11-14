@@ -1,6 +1,4 @@
 use crate::config;
-use crate::logger;
-use std::sync::{Arc, Mutex};
 
 pub trait Protocol {} // TODO
 
@@ -8,15 +6,10 @@ pub struct ProtocolData {
 	pub name: String,
 	pub connect_addr: String,
 	pub connect_port: u16,
-	pub logger: Arc<Mutex<logger::Logger>>,
 }
 
 impl ProtocolData {
-	pub fn new(
-		name: &str,
-		config: &config::ConnectionData,
-		logger: Arc<Mutex<logger::Logger>>,
-	) -> Result<ProtocolData, String> {
+	pub fn new(name: &str, config: &config::ConnectionData) -> Result<ProtocolData, String> {
 		let config_data = config.get_data();
 		let connect_addr = if config_data.contains_key("server") {
 			config_data["server"].clone()
@@ -50,7 +43,6 @@ impl ProtocolData {
 			name: String::from(name),
 			connect_addr,
 			connect_port,
-			logger,
 		})
 	}
 }
