@@ -99,3 +99,56 @@ fn parse_log_level_string(log_level: &str) -> LevelFilter {
 		}
 	}
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn log_level_off() {
+		assert_eq!(parse_log_level_string("off"), LevelFilter::Off);
+		assert_eq!(parse_log_level_string("OFF"), LevelFilter::Off);
+		assert_eq!(parse_log_level_string("Off"), LevelFilter::Off);
+	}
+
+	#[test]
+	fn log_level_error() {
+		assert_eq!(parse_log_level_string("error"), LevelFilter::Error);
+		assert_eq!(parse_log_level_string("ERROR"), LevelFilter::Error);
+		assert_eq!(parse_log_level_string("Error"), LevelFilter::Error);
+	}
+
+	#[test]
+	fn log_level_warn() {
+		assert_eq!(parse_log_level_string("warn"), LevelFilter::Warn);
+		assert_eq!(parse_log_level_string("WARN"), LevelFilter::Warn);
+		assert_eq!(parse_log_level_string("Warn"), LevelFilter::Warn);
+	}
+
+	#[test]
+	fn log_level_info() {
+		assert_eq!(parse_log_level_string("info"), LevelFilter::Info);
+		assert_eq!(parse_log_level_string("INFO"), LevelFilter::Info);
+		assert_eq!(parse_log_level_string("Info"), LevelFilter::Info);
+	}
+
+	#[test]
+	fn log_level_debug() {
+		assert_eq!(parse_log_level_string("debug"), LevelFilter::Debug);
+		assert_eq!(parse_log_level_string("DEBUG"), LevelFilter::Debug);
+		assert_eq!(parse_log_level_string("Debug"), LevelFilter::Debug);
+	}
+
+	#[test]
+	fn log_level_trace() {
+		assert_eq!(parse_log_level_string("trace"), LevelFilter::Trace);
+		assert_eq!(parse_log_level_string("TRACE"), LevelFilter::Trace);
+		assert_eq!(parse_log_level_string("Trace"), LevelFilter::Trace);
+	}
+
+	#[test]
+	fn log_level_default_warn() {
+		assert_eq!(parse_log_level_string(""), LevelFilter::Warn);
+		assert_eq!(parse_log_level_string("butts"), LevelFilter::Warn);
+	}
+}
