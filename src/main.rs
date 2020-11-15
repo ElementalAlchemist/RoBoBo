@@ -1,8 +1,9 @@
 use clap::{App, Arg};
+use robobo::CURRENT_BOT_VERSION;
 
 fn main() {
 	let option_values = App::new("RoBoBo IRC Bot")
-		.version("3.0.0-dev") // TODO Get the version from a more common location
+		.version(CURRENT_BOT_VERSION)
 		.about("Customizable bot for IRC")
 		.arg(
 			Arg::with_name("debug")
