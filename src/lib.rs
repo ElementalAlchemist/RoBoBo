@@ -6,7 +6,6 @@ mod protocol_module;
 mod socket_module;
 use libc::daemon;
 use log::error;
-use signal_hook;
 use simplelog::{CombinedLogger, Config, LevelFilter, SharedLogger, TermLogger, TerminalMode, WriteLogger};
 use std::fs;
 use std::sync::atomic::AtomicBool;
