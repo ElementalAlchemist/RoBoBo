@@ -1,7 +1,8 @@
 use libloading::{Library, Symbol};
+use std::time::Duration;
 
 pub trait Socket {
-	fn connect(&mut self, connect_to: &str) -> Result<(), String>;
+	fn connect(&mut self, connect_to: &str, read_timeout: Option<Duration>) -> Result<(), String>;
 	fn read_line(&mut self) -> Result<String, String>;
 	fn write_line(&mut self, line: &str) -> Result<(), String>;
 	fn close(&mut self);
