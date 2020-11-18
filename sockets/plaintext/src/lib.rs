@@ -1,14 +1,22 @@
-use robobo::Socket;
+use robobo::{Socket, SocketConnection};
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use std::time::Duration;
 
-pub struct PlaintextSocket {
+pub struct PlaintextSocket;
+
+impl Socket for PlaintextSocket {
+	fn create_connection(&self) -> Box<dyn SocketConnection> {
+		Box::new(PlaintextConnection::new())
+	}
+}
+
+pub struct PlaintextConnection {
 	connection: Option<TcpStream>,
 	text_buffer: String,
 }
 
-impl PlaintextSocket {
+impl PlaintextConnection {
 	fn new() -> Self {
 		Self {
 			connection: None,
@@ -17,7 +25,7 @@ impl PlaintextSocket {
 	}
 }
 
-impl Socket for PlaintextSocket {
+impl SocketConnection for PlaintextConnection {
 	fn connect(&mut self, connect_to: &str, read_timeout: Option<Duration>) -> Result<(), String> {
 		let stream = match TcpStream::connect(connect_to) {
 			Ok(stream) => stream,
@@ -47,10 +55,7 @@ impl Socket for PlaintextSocket {
 		};
 
 		let line: String = self.text_buffer.drain(0..end_of_line).collect();
-		let line_no_ending = match line.strip_suffix('\n') {
-			Some(line) => line,
-			None => &line,
-		};
+		let line_no_ending = line.strip_suffix('\n').unwrap();
 		let line_no_ending = match line_no_ending.strip_suffix('\r') {
 			Some(line) => line,
 			None => line_no_ending,
@@ -80,5 +85,5 @@ impl Socket for PlaintextSocket {
 
 #[no_mangle]
 pub fn spawn() -> Box<dyn Socket> {
-	Box::new(PlaintextSocket::new())
+	Box::new(PlaintextSocket)
 }

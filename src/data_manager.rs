@@ -1,11 +1,13 @@
 use crate::module_module::{spawn_module, Module};
 use crate::protocol_module::Protocol;
+use crate::socket_module::Socket;
 use crate::CURRENT_BOT_MODULE_VERSION;
 use std::collections::HashMap;
 
 struct DataManager {
 	modules: HashMap<String, Box<dyn Module>>,
 	connections: HashMap<String, Box<dyn Protocol>>,
+	socket_creators: HashMap<String, Box<dyn Socket>>,
 }
 
 impl DataManager {

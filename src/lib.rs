@@ -12,7 +12,7 @@ use std::fs;
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
-pub use socket_module::Socket;
+pub use socket_module::{Socket, SocketConnection};
 
 pub const CURRENT_BOT_VERSION: &str = "3.0.0-dev";
 pub const CURRENT_BOT_MODULE_VERSION: u32 = 2990;

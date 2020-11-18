@@ -2,6 +2,10 @@ use libloading::{Library, Symbol};
 use std::time::Duration;
 
 pub trait Socket {
+	fn create_connection(&self) -> Box<dyn SocketConnection>;
+}
+
+pub trait SocketConnection {
 	fn connect(&mut self, connect_to: &str, read_timeout: Option<Duration>) -> Result<(), String>;
 	fn read_line(&mut self) -> Result<String, String>;
 	fn write_line(&mut self, line: &str) -> Result<(), String>;
