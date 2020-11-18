@@ -1,0 +1,14 @@
+[package]
+name = "rustls"
+version = "3.0.0"
+authors = ["ElementalAlchemist <ElementAlchemist7@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+robobo = { path = "../.." }
+rustls = "0.18.1"
+rustls-native-certs = "0.4.0"
+webpki = "0.21.3"
+
+[lib]
+crate-type = ["dylib"]
